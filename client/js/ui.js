@@ -21,9 +21,9 @@ const UI = (() => {
     const screen = document.getElementById(`${screenId}-screen`);
     if (screen) screen.classList.add('active');
 
-    // Show bottom nav only in the app screen (mobile)
+    // Show bottom nav only when app is active (mobile only via CSS)
     const bottomNav = document.getElementById('bottom-nav');
-    if (bottomNav) bottomNav.style.display = screenId === 'app' ? '' : 'none';
+    if (bottomNav) bottomNav.classList.toggle('visible', screenId === 'app');
   }
 
   // ---- Toast Notifications ----
