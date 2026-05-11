@@ -1,22 +1,28 @@
 // =============================================
-// server/lib/email.js — Resend API Helper
+// server/lib/email.js — Brevo API Helper
 // =============================================
-const { Resend } = require('resend');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 const supabase = require('./supabase');
 
 const APP_URL = 'https://lgu-system-eight.vercel.app';
 
-// Lazy init — prevents startup crash if env vars are missing
-let _resend = null;
-function getResend() {
-  if (!_resend) {
-    if (!process.env.RESEND_API_KEY) {
-      console.warn('[Email] Skipping: RESEND_API_KEY missing. Please add it to Render Environment settings.');
+// Lazy init Brevo client
+let _brevoApi = null;
+function getBrevoApi() {
+  if (!_brevoApi) {
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
+      console.warn('[Email] Skipping: BREVO_API_KEY missing. Please add it to Render Environment settings.');
       return null;
     }
-    _resend = new Resend(process.env.RESEND_API_KEY);
+
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
+    const apiKeyInstance = defaultClient.authentications['api-key'];
+    apiKeyInstance.apiKey = apiKey;
+
+    _brevoApi = new SibApiV3Sdk.TransactionalEmailsApi();
   }
-  return _resend;
+  return _brevoApi;
 }
 
 /**
@@ -40,17 +46,25 @@ async function getAllStudentEmails() {
 }
 
 /**
- * Sends an announcement notification email via Resend API (HTTP).
+ * Sends an announcement notification email via Brevo API (HTTP).
  */
 async function sendAnnouncementEmail(title, body) {
   try {
-    const resend = getResend();
-    if (!resend) return { sent: 0 };
+    const apiInstance = getBrevoApi();
+    if (!apiInstance) return { sent: 0 };
 
     const emails = await getAllStudentEmails();
     if (!emails.length) return { sent: 0 };
 
-    const html = buildEmailTemplate({
+    // Format recipients for Brevo: [{email: "x@y.com"}, ...]
+    // Note: To keep privacy, we can send to a single list with BCC, 
+    // but Brevo API handles 'to' as a list. We'll use one 'to' per student 
+    // or use a BCC strategy if preferred.
+    // For simplicity and standard behavior, we'll send a single email with multiple 'to' or 'bcc'.
+    
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.subject = `[COE LGU] ${title}`;
+    sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `📢 ${title}`,
       preheader: body.slice(0, 100),
       content: `
@@ -62,18 +76,17 @@ async function sendAnnouncementEmail(title, body) {
       `
     });
 
-    // Resend API uses HTTP (Port 443), so it won't time out on Render.
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
-      to: process.env.GMAIL_USER || 'onboarding@resend.dev', // Fallback
-      bcc: emails,
-      subject: `[COE LGU] ${title}`,
-      html
-    });
+    sendSmtpEmail.sender = { 
+      name: "COE Budget System", 
+      email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" 
+    };
+    
+    // Send to admin, BCC to students
+    sendSmtpEmail.to = [{ email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" }];
+    sendSmtpEmail.bcc = emails.map(email => ({ email }));
 
-    if (error) throw error;
-
-    console.log(`[Email] Announcement sent via Resend API: ${data.id}`);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`[Email] Announcement sent via Brevo: ${data.messageId}`);
     return { sent: emails.length };
   } catch (err) {
     console.error('[Email] ERROR sending announcement:', err);
@@ -82,17 +95,19 @@ async function sendAnnouncementEmail(title, body) {
 }
 
 /**
- * Sends a new event notification email via Resend API (HTTP).
+ * Sends a new event notification email via Brevo API (HTTP).
  */
 async function sendNewEventEmail(event) {
   try {
-    const resend = getResend();
-    if (!resend) return { sent: 0 };
+    const apiInstance = getBrevoApi();
+    if (!apiInstance) return { sent: 0 };
 
     const emails = await getAllStudentEmails();
     if (!emails.length) return { sent: 0 };
 
-    const html = buildEmailTemplate({
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.subject = `[COE LGU] New Event: ${event.event_name}`;
+    sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `🎯 New Event: ${event.event_name}`,
       preheader: `A new event has been added to the COE LGU system.`,
       content: `
@@ -106,17 +121,16 @@ async function sendNewEventEmail(event) {
       `
     });
 
-    const { data, error } = await resend.emails.send({
-      from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
-      to: process.env.GMAIL_USER || 'onboarding@resend.dev',
-      bcc: emails,
-      subject: `[COE LGU] New Event: ${event.event_name}`,
-      html
-    });
+    sendSmtpEmail.sender = { 
+      name: "COE Budget System", 
+      email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" 
+    };
+    
+    sendSmtpEmail.to = [{ email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" }];
+    sendSmtpEmail.bcc = emails.map(email => ({ email }));
 
-    if (error) throw error;
-
-    console.log(`[Email] Event notification sent via Resend API: ${data.id}`);
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`[Email] Event notification sent via Brevo: ${data.messageId}`);
     return { sent: emails.length };
   } catch (err) {
     console.error('[Email] ERROR sending event notification:', err);
