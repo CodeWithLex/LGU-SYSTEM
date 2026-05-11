@@ -14,6 +14,9 @@ const UI = (() => {
 
     if (view) view.classList.add('active');
     if (nav)  nav.classList.add('active');
+
+    // Re-render Lucide icons in case this view has dynamic content
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function showScreen(screenId) {

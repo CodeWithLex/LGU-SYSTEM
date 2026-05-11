@@ -4,6 +4,9 @@
 
 (async () => {
 
+  // Initialize Lucide icons on load
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+
   // ---- Auth Form Toggles ----
   document.getElementById('show-register').addEventListener('click', e => {
     e.preventDefault();

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/main.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -17,7 +18,7 @@
     <div class="auth-bg">
       <div class="auth-card glass">
         <div class="auth-header">
-          <div class="auth-logo"><span class="logo-cog">⚙</span></div>
+          <div class="auth-logo"><i data-lucide="graduation-cap"></i></div>
           <h1>COE Budget System</h1>
           <p>College of Engineering · LGU Financial Transparency</p>
         </div>
@@ -84,7 +85,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <span class="logo-cog sidebar-logo">⚙</span>
+        <span class="sidebar-logo"><i data-lucide="graduation-cap"></i></span>
         <div>
           <h2>COE Budget</h2>
           <span class="sidebar-tagline">Transparency System</span>
@@ -93,19 +94,19 @@
 
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-view="dashboard" id="nav-dashboard">
-          <span class="nav-icon">📊</span><span>Dashboard</span>
+          <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span>
         </a>
         <a href="#" class="nav-item" data-view="events" id="nav-events">
-          <span class="nav-icon">🎯</span><span>Events</span>
+          <span class="nav-icon"><i data-lucide="calendar"></i></span><span>Events</span>
         </a>
         <a href="#" class="nav-item" data-view="transactions" id="nav-transactions">
-          <span class="nav-icon">💳</span><span>Transactions</span>
+          <span class="nav-icon"><i data-lucide="receipt"></i></span><span>Transactions</span>
         </a>
         <a href="#" class="nav-item" data-view="reports" id="nav-reports">
-          <span class="nav-icon">📈</span><span>Reports</span>
+          <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span><span>Reports</span>
         </a>
         <a href="#" class="nav-item admin-only hidden" data-view="admin" id="nav-admin">
-          <span class="nav-icon">🛡️</span><span>Admin</span>
+          <span class="nav-icon"><i data-lucide="shield-check"></i></span><span>Admin</span>
         </a>
       </nav>
 
@@ -117,7 +118,7 @@
             <span class="user-role" id="user-role">Student</span>
           </div>
         </div>
-        <button class="btn-icon" id="logout-btn" title="Sign Out">↩</button>
+        <button class="btn-icon" id="logout-btn" title="Sign Out"><i data-lucide="log-out"></i></button>
       </div>
     </aside>
 
@@ -136,19 +137,19 @@
 
         <div class="stats-grid">
           <div class="stat-card stat-income">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon"><i data-lucide="trending-up"></i></div>
             <div class="stat-body"><p class="stat-label">Total Income</p><h3 class="stat-value" id="stat-income">₱0.00</h3></div>
           </div>
           <div class="stat-card stat-expense">
-            <div class="stat-icon">📤</div>
+            <div class="stat-icon"><i data-lucide="trending-down"></i></div>
             <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value" id="stat-expense">₱0.00</h3></div>
           </div>
           <div class="stat-card stat-balance">
-            <div class="stat-icon">🏦</div>
+            <div class="stat-icon"><i data-lucide="wallet"></i></div>
             <div class="stat-body"><p class="stat-label">Remaining Balance</p><h3 class="stat-value" id="stat-balance">₱0.00</h3></div>
           </div>
           <div class="stat-card stat-donations">
-            <div class="stat-icon">🎁</div>
+            <div class="stat-icon"><i data-lucide="heart-handshake"></i></div>
             <div class="stat-body"><p class="stat-label">Total Donations</p><h3 class="stat-value" id="stat-donations">₱0.00</h3></div>
           </div>
         </div>
@@ -366,22 +367,22 @@
   <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
   <nav class="bottom-nav" id="bottom-nav">
     <a href="#" class="bottom-nav-item active" data-view="dashboard">
-      <span class="nav-icon">📊</span><span>Dashboard</span>
+      <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="events">
-      <span class="nav-icon">🎯</span><span>Events</span>
+      <span class="nav-icon"><i data-lucide="calendar"></i></span><span>Events</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="transactions">
-      <span class="nav-icon">💳</span><span>Ledger</span>
+      <span class="nav-icon"><i data-lucide="receipt"></i></span><span>Ledger</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="reports">
-      <span class="nav-icon">📈</span><span>Reports</span>
+      <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span><span>Reports</span>
     </a>
     <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
-      <span class="nav-icon">🛡️</span><span>Admin</span>
+      <span class="nav-icon"><i data-lucide="shield-check"></i></span><span>Admin</span>
     </a>
     <button class="bottom-nav-item" id="bottom-logout-btn" style="background:none;border:none;cursor:pointer;">
-      <span class="nav-icon">🚪</span><span>Logout</span>
+      <span class="nav-icon"><i data-lucide="log-out"></i></span><span>Logout</span>
     </button>
   </nav>
 
