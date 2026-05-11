@@ -14,9 +14,23 @@ const PORT = process.env.PORT || 3000;
 // =============================================
 // Middleware
 // =============================================
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://lgu-system-eight.vercel.app',
+  'https://lgu-system.onrender.com'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, "../client")));
