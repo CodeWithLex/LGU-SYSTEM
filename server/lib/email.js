@@ -27,13 +27,26 @@ function getTransporter() {
 }
 
 /**
- * Fetches all registered student emails via Supabase Admin API.
+ * Fetches all registered student emails via the profiles table.
+ * Priority given to profiles table so manual DB edits work for tests.
  */
 async function getAllStudentEmails() {
   try {
-    const { data: users, error } = await supabase.auth.admin.listUsers();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('email')
+      .neq('role', 'admin');
+
     if (error) throw error;
-    return (users?.users || []).map(u => u.email).filter(Boolean);
+    
+    // Extract emails and filter out any null/empty ones
+    const emails = (data || []).map(p => p.email).filter(Boolean);
+    
+    if (emails.length > 0) return emails;
+
+    // Fallback: If profiles is empty, try Auth (Admin API)
+    const { data: authData } = await supabase.auth.admin.listUsers();
+    return (authData?.users || []).map(u => u.email).filter(Boolean);
   } catch (err) {
     console.error('[Email] Failed to fetch student emails:', err.message);
     return [];
