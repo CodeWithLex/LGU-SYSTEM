@@ -48,20 +48,28 @@
   document.getElementById('register-btn').addEventListener('click', async () => {
     const errEl = document.getElementById('reg-error');
     const btn   = document.getElementById('register-btn');
+    const email = document.getElementById('reg-email').value.trim();
     errEl.classList.add('hidden');
+
+    // ---- Domain gate ----
+    if (!email.toLowerCase().endsWith('@g.cjc.edu.ph')) {
+      errEl.textContent = '❌ Only @g.cjc.edu.ph accounts are allowed to register.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
     btn.textContent = 'Creating account…';
     btn.disabled = true;
 
     try {
       await Auth.register({
-        email:     document.getElementById('reg-email').value,
+        email,
         password:  document.getElementById('reg-password').value,
         fullName:  document.getElementById('reg-name').value,
         course:    document.getElementById('reg-course').value,
         yearLevel: document.getElementById('reg-year').value
       });
-      UI.toast('Account created! Check your email to confirm.', 'success');
-      // Switch back to login
+      UI.toast('Account created! Check your CJC Gmail to confirm your email.', 'success');
       document.getElementById('register-form').classList.remove('active');
       document.getElementById('login-form').classList.add('active');
     } catch (err) {
@@ -137,13 +145,23 @@
 
   // ---- Boot App ----
   async function bootApp(session) {
+    // ---- Email confirmation gate ----
+    if (!session.user.email_confirmed_at) {
+      await Auth.logout();
+      UI.showScreen('auth');
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = '📧 Please confirm your email address before logging in. Check your CJC Gmail inbox.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
     UI.showScreen('app');
 
     const profile = await Auth.getProfile();
 
     // Sidebar user info
-    document.getElementById('user-name').textContent  = profile?.full_name || session.user.email;
-    document.getElementById('user-role').textContent  = profile?.role === 'admin' ? '🛡 Admin' : '🎓 Student';
+    document.getElementById('user-name').textContent   = profile?.full_name || session.user.email;
+    document.getElementById('user-role').textContent   = profile?.role === 'admin' ? '🛡 Admin' : '🎓 Student';
     document.getElementById('user-avatar').textContent = (profile?.full_name || session.user.email)[0].toUpperCase();
 
     UI.setAdminVisibility(profile?.role === 'admin');
