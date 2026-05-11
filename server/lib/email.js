@@ -1,7 +1,6 @@
 // =============================================
 // server/lib/email.js — Resend Email Helper
 // =============================================
-const { Resend } = require('resend');
 const supabase = require('./supabase');
 
 const APP_URL = 'https://lgu-system-eight.vercel.app';
@@ -13,6 +12,7 @@ function getResend() {
     if (!process.env.RESEND_API_KEY) {
       throw new Error('RESEND_API_KEY environment variable is not set.');
     }
+    const { Resend } = require('resend');
     _resend = new Resend(process.env.RESEND_API_KEY);
   }
   return _resend;
