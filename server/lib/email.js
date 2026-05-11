@@ -68,14 +68,21 @@ async function sendAnnouncementEmail(title, body) {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.subject = `[COE LGU] ${title}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
-      subject: `📢 ${title}`,
+      subject: `📢 Announcement: ${title}`,
       preheader: body.slice(0, 100),
       content: `
-        <h2 style="margin:0 0 12px;color:#1a1f35;font-size:20px;">${title}</h2>
-        <p style="margin:0 0 20px;color:#4a5568;line-height:1.7;white-space:pre-wrap;">${body}</p>
-        <a href="${APP_URL}" style="display:inline-block;background:#6384ff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">
-          View Dashboard →
-        </a>
+        <div style="text-align:center;margin-bottom:24px;">
+          <span style="background:#eef2ff;color:#6384ff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">New Announcement</span>
+        </div>
+        <h2 style="margin:0 0 16px;color:#1a1f35;font-size:24px;font-weight:800;line-height:1.3;text-align:center;">${title}</h2>
+        <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #e2e8f0;">
+          <p style="margin:0;color:#4a5568;line-height:1.7;white-space:pre-wrap;font-size:15px;">${body}</p>
+        </div>
+        <div style="text-align:center;">
+          <a href="${APP_URL}" style="display:inline-block;background:#6384ff;color:#ffffff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(99,132,255,0.25);">
+            Open Dashboard →
+          </a>
+        </div>
       `
     });
 
@@ -109,18 +116,45 @@ async function sendNewEventEmail(event) {
     if (!emails.length) return { sent: 0 };
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sendSmtpEmail.subject = `[COE LGU] New Event: ${event.event_name}`;
+    sendSmtpEmail.subject = `🎯 New Event: ${event.event_name}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `🎯 New Event: ${event.event_name}`,
-      preheader: `A new event has been added to the COE LGU system.`,
+      preheader: `A new event has been added: ${event.event_name}`,
       content: `
-        <h2 style="margin:0 0 8px;color:#1a1f35;font-size:20px;">${event.event_name}</h2>
-        ${event.event_date ? `<p style="margin:0 0 8px;color:#6384ff;font-size:0.9rem;">📅 ${new Date(event.event_date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' })}</p>` : ''}
-        ${event.description ? `<p style="margin:0 0 16px;color:#4a5568;line-height:1.7;">${event.description}</p>` : ''}
-        <p style="margin:0 0 20px;color:#4a5568;">Allocated Budget: <strong>₱${Number(event.allocated_budget || 0).toLocaleString('en-PH', {minimumFractionDigits:2})}</strong></p>
-        <a href="${APP_URL}" style="display:inline-block;background:#6384ff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;">
-          View Event →
-        </a>
+        <div style="text-align:center;margin-bottom:20px;">
+          <span style="background:#fff7ed;color:#ea580c;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">System Update</span>
+        </div>
+        <h2 style="margin:0 0 12px;color:#1a1f35;font-size:24px;font-weight:800;line-height:1.3;text-align:center;">${event.event_name}</h2>
+        
+        <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 4px rgba(0,0,0,0.02);">
+           <table width="100%" cellpadding="0" cellspacing="0">
+             ${event.event_date ? `
+             <tr>
+               <td style="padding-bottom:12px;">
+                 <span style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;">Scheduled Date</span><br/>
+                 <span style="color:#1a1f35;font-size:16px;font-weight:700;">📅 ${new Date(event.event_date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' })}</span>
+               </td>
+             </tr>` : ''}
+             <tr>
+               <td style="padding-bottom:12px;">
+                 <span style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;">Allocated Budget</span><br/>
+                 <span style="color:#10b981;font-size:20px;font-weight:800;">₱${Number(event.allocated_budget || 0).toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
+               </td>
+             </tr>
+             ${event.description ? `
+             <tr>
+               <td style="border-top:1px solid #f1f5f9;padding-top:16px;">
+                 <p style="margin:0;color:#4a5568;line-height:1.6;font-size:14px;">${event.description}</p>
+               </td>
+             </tr>` : ''}
+           </table>
+        </div>
+
+        <div style="text-align:center;">
+          <a href="${APP_URL}" style="display:inline-block;background:#1a1f35;color:#ffffff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(26,31,53,0.2);">
+            View Event Details
+          </a>
+        </div>
       `
     });
 
@@ -143,41 +177,60 @@ async function sendNewEventEmail(event) {
 
 function buildEmailTemplate({ subject, preheader, content }) {
   return `<!DOCTYPE html>
-<html lang="en">
+<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
   <title>${subject}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    @media only screen and (max-width: 620px) {
+      .container { width: 100% !important; padding: 10px !important; }
+      .card { padding: 24px !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#f4f6fb;font-family:'Inter',Arial,sans-serif;">
-  <span style="display:none;max-height:0;overflow:hidden;">${preheader}</span>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6fb;padding:32px 16px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
-        <!-- Header -->
-        <tr>
-          <td style="background:#1a1f35;border-radius:16px 16px 0 0;padding:28px 32px;text-align:center;">
-            <p style="margin:0;font-size:13px;color:#6384ff;font-weight:600;letter-spacing:1px;text-transform:uppercase;">College of Engineering · Cor Jesu College</p>
-            <h1 style="margin:8px 0 0;color:#ffffff;font-size:22px;font-weight:700;">COE LGU Budget System</h1>
-          </td>
-        </tr>
-        <!-- Body -->
-        <tr>
-          <td style="background:#ffffff;padding:32px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
-            ${content}
-          </td>
-        </tr>
-        <!-- Footer -->
-        <tr>
-          <td style="background:#f8fafc;border-radius:0 0 16px 16px;border:1px solid #e2e8f0;border-top:none;padding:20px 32px;text-align:center;">
-            <p style="margin:0;font-size:12px;color:#8892a4;">You received this because you are a registered member of the COE LGU Budget Transparency System.</p>
-            <p style="margin:8px 0 0;font-size:12px;color:#8892a4;">
-              <a href="${APP_URL}" style="color:#6384ff;text-decoration:none;">Visit Dashboard</a>
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
+<body style="margin:0;padding:0;background-color:#f4f7fa;-webkit-font-smoothing:antialiased;">
+  <div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f7fa;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;margin:0 auto;">
+          <!-- Header Logo/Branding -->
+          <tr>
+            <td align="center" style="padding-bottom:24px;">
+              <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:10px 20px;background:#1a1f35;border-radius:12px;">
+                    <h1 style="margin:0;color:#ffffff;font-size:18px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">COE Budget System</h1>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Main Content Card -->
+          <tr>
+            <td class="card" style="background-color:#ffffff;padding:48px;border-radius:24px;box-shadow:0 10px 25px rgba(0,0,0,0.05);border:1px solid #eef2f6;">
+              ${content}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding-top:32px;">
+              <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.5;">
+                College of Engineering — Cor Jesu College<br/>
+                Budget Transparency & Liquidation System
+              </p>
+              <p style="margin:16px 0 0;font-size:12px;color:#cbd5e1;">
+                You received this because you are registered student member.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
   </table>
 </body>
 </html>`;
