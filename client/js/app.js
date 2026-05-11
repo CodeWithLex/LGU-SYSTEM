@@ -73,8 +73,11 @@
     }
   });
 
-  // ---- Logout ----
+  // ---- Logout (sidebar + mobile bottom nav) ----
   document.getElementById('logout-btn').addEventListener('click', async () => {
+    await Auth.logout();
+  });
+  document.getElementById('bottom-logout-btn').addEventListener('click', async () => {
     await Auth.logout();
   });
 
