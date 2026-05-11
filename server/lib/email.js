@@ -415,7 +415,7 @@ function buildEmailTemplate({ subject, preheader, content }) {
               <table cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td style="padding:10px 20px;background:#1a1f35;border-radius:12px;">
-                    <h1 style="margin:0;color:#ffffff;font-size:18px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">COE Budget System</h1>
+                    <h1 style="margin:0;color:#ffffff;font-size:18px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">COE Financial Transparency System</h1>
                   </td>
                 </tr>
               </table>
