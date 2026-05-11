@@ -18,15 +18,21 @@ function getTransporter() {
       return null;
     }
 
-    // Using explicit host/port is more reliable on Render than 'service: gmail'
+    // Using explicit host/port and forcing IPv4 for Render reliability
     _transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 465,
-      secure: true, // true for 465, false for other ports
+      secure: true,
       auth: { user, pass },
-      // Important for Render: sometimes it tries IPv6 which fails
-      tls: {
-        rejectUnauthorized: false
+      // Force IPv4 (very important for Render to avoid ENETUNREACH)
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      dns: {
+        // Pre-resolve to avoid IPv6 issues
+        lookup: (hostname, options, callback) => {
+          require('dns').lookup(hostname, { family: 4 }, callback);
+        }
       }
     });
   }
