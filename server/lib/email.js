@@ -14,13 +14,20 @@ function getTransporter() {
     const pass = process.env.GMAIL_APP_PASSWORD;
 
     if (!user || !pass) {
-      console.warn('[Email] Skipping: GMAIL_USER or GMAIL_APP_PASSWORD missing in .env');
+      console.warn('[Email] Skipping: GMAIL_USER or GMAIL_APP_PASSWORD missing. Please add them to Render Environment settings.');
       return null;
     }
 
+    // Using explicit host/port is more reliable on Render than 'service: gmail'
     _transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user, pass }
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // true for 465, false for other ports
+      auth: { user, pass },
+      // Important for Render: sometimes it tries IPv6 which fails
+      tls: {
+        rejectUnauthorized: false
+      }
     });
   }
   return _transporter;
