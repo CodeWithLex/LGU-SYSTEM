@@ -2,11 +2,21 @@
 // server/lib/email.js — Resend Email Helper
 // =============================================
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = require('./supabase');
 
-const FROM = process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>';
 const APP_URL = 'https://lgu-system-eight.vercel.app';
+
+// Lazy init — prevents startup crash if env var is not yet set
+let _resend = null;
+function getResend() {
+  if (!_resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set.');
+    }
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
 
 /**
  * Fetches all registered student emails from the profiles table.
@@ -52,8 +62,8 @@ async function sendAnnouncementEmail(title, body) {
     const batches = chunkArray(emails, 50);
     let sent = 0;
     for (const batch of batches) {
-      await resend.emails.send({
-        from: FROM,
+      await getResend().emails.send({
+        from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
         to: batch,
         subject: `[COE LGU] ${title}`,
         html
@@ -93,8 +103,8 @@ async function sendNewEventEmail(event) {
     const batches = chunkArray(emails, 50);
     let sent = 0;
     for (const batch of batches) {
-      await resend.emails.send({
-        from: FROM,
+      await getResend().emails.send({
+        from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
         to: batch,
         subject: `[COE LGU] New Event: ${event.event_name}`,
         html
