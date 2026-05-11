@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COE | Budget Transparency System</title>
+  <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-bg">
+      <div class="auth-card glass">
+        <div class="auth-header">
+          <div class="auth-logo"><span class="logo-cog">⚙</span></div>
+          <h1>COE Budget System</h1>
+          <p>College of Engineering · LGU Financial Transparency</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form active">
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <input type="email" id="login-email" placeholder="you@coe.edu" />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" />
+          </div>
+          <div class="auth-error hidden" id="login-error"></div>
+          <button class="btn btn-primary btn-full" id="login-btn"><span>Sign In</span></button>
+          <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form">
+          <div class="form-group">
+            <label for="reg-name">Full Name</label>
+            <input type="text" id="reg-name" placeholder="Juan dela Cruz" />
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email Address</label>
+            <input type="email" id="reg-email" placeholder="you@coe.edu" />
+          </div>
+          <div class="form-group">
+            <label for="reg-course">Course</label>
+            <select id="reg-course">
+              <option value="">Select Course</option>
+              <option>BS Civil Engineering</option>
+              <option>BS Electrical Engineering</option>
+              <option>BS Mechanical Engineering</option>
+              <option>BS Computer Engineering</option>
+              <option>BS Electronics Engineering</option>
+              <option>BS Chemical Engineering</option>
+              <option>BS Industrial Engineering</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reg-year">Year Level</label>
+            <select id="reg-year">
+              <option value="">Select Year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+              <option>5th Year</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" placeholder="Min. 8 characters" />
+          </div>
+          <div class="auth-error hidden" id="reg-error"></div>
+          <button class="btn btn-primary btn-full" id="register-btn">Create Account</button>
+          <p class="auth-switch">Already have an account? <a href="#" id="show-login">Sign In</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-screen" class="screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="logo-cog sidebar-logo">⚙</span>
+        <div>
+          <h2>COE Budget</h2>
+          <span class="sidebar-tagline">Transparency System</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <span class="nav-icon">📊</span><span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" data-view="events" id="nav-events">
+          <span class="nav-icon">🎯</span><span>Events</span>
+        </a>
+        <a href="#" class="nav-item" data-view="transactions" id="nav-transactions">
+          <span class="nav-icon">💳</span><span>Transactions</span>
+        </a>
+        <a href="#" class="nav-item" data-view="reports" id="nav-reports">
+          <span class="nav-icon">📈</span><span>Reports</span>
+        </a>
+        <a href="#" class="nav-item admin-only hidden" data-view="admin" id="nav-admin">
+          <span class="nav-icon">🛡️</span><span>Admin</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-pill" id="user-pill">
+          <div class="user-avatar" id="user-avatar">?</div>
+          <div class="user-info">
+            <span class="user-name" id="user-name">Loading...</span>
+            <span class="user-role" id="user-role">Student</span>
+          </div>
+        </div>
+        <button class="btn-icon" id="logout-btn" title="Sign Out">↩</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- DASHBOARD -->
+      <section class="view active" id="view-dashboard">
+        <div class="view-header">
+          <div>
+            <h2>Financial Dashboard</h2>
+            <p class="view-sub">Real-time overview of COE LGU funds</p>
+          </div>
+          <div class="live-badge"><span class="live-dot"></span> Live</div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card stat-income">
+            <div class="stat-icon">💰</div>
+            <div class="stat-body"><p class="stat-label">Total Income</p><h3 class="stat-value" id="stat-income">₱0.00</h3></div>
+          </div>
+          <div class="stat-card stat-expense">
+            <div class="stat-icon">📤</div>
+            <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value" id="stat-expense">₱0.00</h3></div>
+          </div>
+          <div class="stat-card stat-balance">
+            <div class="stat-icon">🏦</div>
+            <div class="stat-body"><p class="stat-label">Remaining Balance</p><h3 class="stat-value" id="stat-balance">₱0.00</h3></div>
+          </div>
+          <div class="stat-card stat-donations">
+            <div class="stat-icon">🎁</div>
+            <div class="stat-body"><p class="stat-label">Total Donations</p><h3 class="stat-value" id="stat-donations">₱0.00</h3></div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3>Recent Transactions</h3>
+            <div class="tx-list" id="recent-tx-list">
+              <div class="loading-state">Loading transactions…</div>
+            </div>
+          </div>
+          <div class="dashboard-card">
+            <h3>Announcements</h3>
+            <div class="announcement-list" id="announcement-list">
+              <div class="loading-state">Loading announcements…</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EVENTS -->
+      <section class="view" id="view-events">
+        <div class="view-header">
+          <div>
+            <h2>Events &amp; Activities</h2>
+            <p class="view-sub">Budget allocation per event</p>
+          </div>
+          <button class="btn btn-primary admin-only hidden" id="create-event-btn">+ New Event</button>
+        </div>
+        <div class="events-grid" id="events-grid">
+          <div class="loading-state">Loading events…</div>
+        </div>
+      </section>
+
+      <!-- EVENT DETAIL -->
+      <section class="view" id="view-event-detail">
+        <div class="view-header">
+          <button class="btn btn-ghost" id="back-to-events">← Back</button>
+        </div>
+        <div id="event-detail-content"></div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="view" id="view-transactions">
+        <div class="view-header">
+          <div>
+            <h2>All Transactions</h2>
+            <p class="view-sub">Complete financial ledger</p>
+          </div>
+          <div class="filter-bar">
+            <select id="tx-type-filter">
+              <option value="">All Types</option>
+              <option value="expense">Expense</option>
+              <option value="donation">Donation</option>
+              <option value="collection">Collection</option>
+              <option value="allocation">Allocation</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th><th>Event</th><th>Type</th><th>Description</th>
+                <th>Amount</th><th>Receipt</th><th>Added By</th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body">
+              <tr><td colspan="7" class="loading-state">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section class="view" id="view-reports">
+        <div class="view-header">
+          <div>
+            <h2>Financial Reports</h2>
+            <p class="view-sub">Monthly summaries and breakdowns</p>
+          </div>
+        </div>
+        <div id="reports-content">
+          <div class="loading-state">Loading reports…</div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section class="view" id="view-admin">
+        <div class="view-header">
+          <div>
+            <h2>Admin Management</h2>
+            <p class="view-sub">Manage records, events, and transactions</p>
+          </div>
+        </div>
+
+        <div class="admin-panels">
+
+          <!-- Create Event -->
+          <div class="dashboard-card">
+            <h3>➕ Create New Event</h3>
+            <form id="add-event-form" class="admin-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Event Name</label>
+                  <input type="text" id="ev-name" required placeholder="e.g. Engineering Week 2026" />
+                </div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select id="ev-status">
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Allocated Budget (₱)</label>
+                  <input type="number" id="ev-budget" min="0" step="0.01" required placeholder="0.00" />
+                </div>
+                <div class="form-group">
+                  <label>Event Date</label>
+                  <input type="date" id="ev-date" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <textarea id="ev-description" rows="2" placeholder="Brief description of the event…"></textarea>
+              </div>
+              <div class="form-error hidden" id="ev-error"></div>
+              <button class="btn btn-primary" type="submit" id="submit-ev-btn">Create Event</button>
+            </form>
+          </div>
+
+          <!-- Add Transaction -->
+          <div class="dashboard-card">
+            <h3>💳 Add Transaction</h3>
+            <form id="add-tx-form" class="admin-form" enctype="multipart/form-data">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Event</label>
+                  <select id="tx-event-id" name="event_id" required>
+                    <option value="">Select Event</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Type</label>
+                  <select id="tx-type" name="type" required>
+                    <option value="expense">Expense</option>
+                    <option value="donation">Donation</option>
+                    <option value="collection">Collection</option>
+                    <option value="allocation">Budget Allocation</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Amount (₱)</label>
+                  <input type="number" id="tx-amount" name="amount" min="1" step="0.01" required placeholder="0.00" />
+                </div>
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" id="tx-date" name="transaction_date" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="tx-desc" name="description" required placeholder="e.g. Sound system rental" />
+              </div>
+              <div class="form-group" id="donor-field">
+                <label>Donor Name (optional)</label>
+                <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
+              </div>
+              <div class="form-group">
+                <label>Receipt / Proof (JPG, PNG, PDF)</label>
+                <div class="file-drop-zone" id="receipt-drop-zone">
+                  <input type="file" id="tx-receipt" name="receipt" accept=".jpg,.jpeg,.png,.pdf" class="file-input" />
+                  <div class="file-drop-label">
+                    <span class="file-drop-icon">📎</span>
+                    <p>Drop file here or <span class="link">browse</span></p>
+                    <small>Max 5MB · JPG, PNG, PDF</small>
+                  </div>
+                  <div class="file-preview hidden" id="file-preview"></div>
+                </div>
+              </div>
+              <div class="form-error hidden" id="tx-error"></div>
+              <button class="btn btn-primary" type="submit" id="submit-tx-btn">Submit Transaction</button>
+            </form>
+          </div>
+
+          <!-- Post Announcement -->
+          <div class="dashboard-card">
+            <h3>📢 Post Announcement</h3>
+            <form id="add-announce-form" class="admin-form">
+              <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="announce-title" required placeholder="Announcement title" />
+              </div>
+              <div class="form-group">
+                <label>Message</label>
+                <textarea id="announce-body" required rows="4" placeholder="Write the announcement here…"></textarea>
+              </div>
+              <div class="form-error hidden" id="announce-error"></div>
+              <button class="btn btn-primary" type="submit">Post Announcement</button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast hidden" id="toast">
+    <span id="toast-icon">✅</span>
+    <span id="toast-message">Action completed.</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/events.js"></script>
+  <script src="js/transactions.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
