@@ -1,50 +1,26 @@
 // =============================================
-// server/lib/email.js — Nodemailer Gmail Helper
+// server/lib/email.js — Resend API Helper
 // =============================================
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const supabase = require('./supabase');
 
 const APP_URL = 'https://lgu-system-eight.vercel.app';
 
 // Lazy init — prevents startup crash if env vars are missing
-let _transporter = null;
-async function getTransporter() {
-  if (!_transporter) {
-    const user = process.env.GMAIL_USER;
-    const pass = process.env.GMAIL_APP_PASSWORD;
-
-    if (!user || !pass) {
-      console.warn('[Email] Skipping: GMAIL_USER or GMAIL_APP_PASSWORD missing. Please add them to Render Environment settings.');
+let _resend = null;
+function getResend() {
+  if (!_resend) {
+    if (!process.env.RESEND_API_KEY) {
+      console.warn('[Email] Skipping: RESEND_API_KEY missing. Please add it to Render Environment settings.');
       return null;
     }
-
-    try {
-      // Force IPv4 by resolving it manually first
-      const dns = require('dns').promises;
-      const { address } = await dns.lookup('smtp.gmail.com', { family: 4 });
-      console.log(`[Email] Resolved Gmail to IPv4: ${address}`);
-
-      _transporter = nodemailer.createTransport({
-        host: address,
-        port: 587,
-        secure: false,
-        auth: { user, pass },
-        connectionTimeout: 20000,
-        greetingTimeout: 20000,
-        socketTimeout: 20000,
-        servername: 'smtp.gmail.com' // Crucial when using IP as host
-      });
-    } catch (err) {
-      console.error('[Email] DNS Resolution failed:', err.message);
-      return null;
-    }
+    _resend = new Resend(process.env.RESEND_API_KEY);
   }
-  return _transporter;
+  return _resend;
 }
 
 /**
  * Fetches all registered student emails via the profiles table.
- * Priority given to profiles table so manual DB edits work for tests.
  */
 async function getAllStudentEmails() {
   try {
@@ -55,14 +31,8 @@ async function getAllStudentEmails() {
 
     if (error) throw error;
     
-    // Extract emails and filter out any null/empty ones
-    const emails = (data || []).map(p => p.email).filter(Boolean);
-    
-    if (emails.length > 0) return emails;
-
-    // Fallback: If profiles is empty, try Auth (Admin API)
-    const { data: authData } = await supabase.auth.admin.listUsers();
-    return (authData?.users || []).map(u => u.email).filter(Boolean);
+    // Extract emails and filter out nulls
+    return (data || []).map(p => p.email).filter(Boolean);
   } catch (err) {
     console.error('[Email] Failed to fetch student emails:', err.message);
     return [];
@@ -70,12 +40,12 @@ async function getAllStudentEmails() {
 }
 
 /**
- * Sends an announcement notification email to all students via Gmail.
+ * Sends an announcement notification email via Resend API (HTTP).
  */
 async function sendAnnouncementEmail(title, body) {
   try {
-    const transporter = await getTransporter();
-    if (!transporter) return { sent: 0 };
+    const resend = getResend();
+    if (!resend) return { sent: 0 };
 
     const emails = await getAllStudentEmails();
     if (!emails.length) return { sent: 0 };
@@ -92,18 +62,18 @@ async function sendAnnouncementEmail(title, body) {
       `
     });
 
-    console.log(`[Email] Found ${emails.length} recipients. Attempting to send...`);
-
-    const mailOptions = {
-      from: `"COE Budget System" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
+    // Resend API uses HTTP (Port 443), so it won't time out on Render.
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
+      to: process.env.GMAIL_USER || 'onboarding@resend.dev', // Fallback
       bcc: emails,
       subject: `[COE LGU] ${title}`,
       html
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[Email] Success! MessageID: ${info.messageId}`);
+    if (error) throw error;
+
+    console.log(`[Email] Announcement sent via Resend API: ${data.id}`);
     return { sent: emails.length };
   } catch (err) {
     console.error('[Email] ERROR sending announcement:', err);
@@ -112,12 +82,12 @@ async function sendAnnouncementEmail(title, body) {
 }
 
 /**
- * Sends a new event notification email to all students via Gmail.
+ * Sends a new event notification email via Resend API (HTTP).
  */
 async function sendNewEventEmail(event) {
   try {
-    const transporter = await getTransporter();
-    if (!transporter) return { sent: 0 };
+    const resend = getResend();
+    if (!resend) return { sent: 0 };
 
     const emails = await getAllStudentEmails();
     if (!emails.length) return { sent: 0 };
@@ -136,19 +106,20 @@ async function sendNewEventEmail(event) {
       `
     });
 
-    const mailOptions = {
-      from: `"COE Budget System" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
+      to: process.env.GMAIL_USER || 'onboarding@resend.dev',
       bcc: emails,
       subject: `[COE LGU] New Event: ${event.event_name}`,
       html
-    };
+    });
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`[Email] Event notification sent: ${info.messageId}`);
+    if (error) throw error;
+
+    console.log(`[Email] Event notification sent via Resend API: ${data.id}`);
     return { sent: emails.length };
   } catch (err) {
-    console.error('[Email] Failed to send event notification:', err.message);
+    console.error('[Email] ERROR sending event notification:', err);
     return { sent: 0, error: err.message };
   }
 }
