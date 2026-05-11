@@ -3,9 +3,10 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const eventsRouter = require("./routes/events");
-const transactionsRouter = require("./routes/transactions");
-const reportsRouter = require("./routes/reports");
+const eventsRouter        = require("./routes/events");
+const transactionsRouter  = require("./routes/transactions");
+const reportsRouter       = require("./routes/reports");
+const announcementsRouter = require("./routes/announcements");
 const authMiddleware = require("./middleware/auth");
 const keepAlive = require("./lib/keepAlive");
 
@@ -47,9 +48,10 @@ app.get("/api/health", (req, res) => {
 // =============================================
 // Protected API Routes
 // =============================================
-app.use("/api/events", authMiddleware, eventsRouter);
-app.use("/api/transactions", authMiddleware, transactionsRouter);
-app.use("/api/reports", authMiddleware, reportsRouter);
+app.use("/api/events",         authMiddleware, eventsRouter);
+app.use("/api/transactions",   authMiddleware, transactionsRouter);
+app.use("/api/reports",        authMiddleware, reportsRouter);
+app.use("/api/announcements",  authMiddleware, announcementsRouter);
 
 // SPA Fallback — serve index.html for all non-API routes
 app.get("*", (req, res) => {

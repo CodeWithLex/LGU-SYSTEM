@@ -123,15 +123,13 @@ const Admin = (() => {
       btn.textContent = 'Posting…';
 
       try {
-        const { error } = await window.supabaseClient
-          .from('announcements')
-          .insert({
-            title: document.getElementById('announce-title').value,
-            body:  document.getElementById('announce-body').value
-          });
+        // Post via backend so email notifications are triggered
+        await Api.request('POST', '/announcements', {
+          title: document.getElementById('announce-title').value,
+          body:  document.getElementById('announce-body').value
+        });
 
-        if (error) throw new Error(error.message);
-        UI.toast('Announcement posted!', 'success');
+        UI.toast('Announcement posted! Students will be notified by email. 📧', 'success');
         form.reset();
       } catch (err) {
         errEl.textContent = err.message;

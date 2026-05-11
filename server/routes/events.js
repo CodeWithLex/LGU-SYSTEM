@@ -1,6 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
+const { sendNewEventEmail } = require('../lib/email');
 
 // Admin-only guard
 function requireAdmin(req, res, next) {
@@ -56,6 +57,10 @@ router.post('/', requireAdmin, async (req, res) => {
     .single();
 
   if (error) return res.status(400).json({ error: error.message });
+
+  // Notify all students by email (background, non-blocking)
+  sendNewEventEmail(data).catch(err => console.error('[Email] Event notify failed:', err));
+
   res.status(201).json(data);
 });
 

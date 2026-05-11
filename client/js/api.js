@@ -45,5 +45,5 @@ const Api = (() => {
     monthly: () => _request('GET', '/reports/monthly'),
   };
 
-  return { events, transactions, reports };
+  return { events, transactions, reports, request: _request };
 })();
