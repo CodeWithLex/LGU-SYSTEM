@@ -37,7 +37,7 @@ const Api = (() => {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/transactions${q ? '?' + q : ''}`);
     },
-    create: (formData) => _request('POST', '/transactions', formData, true),
+    create: (body) => _request('POST', '/transactions', body),
   };
 
   const reports = {

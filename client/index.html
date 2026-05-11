@@ -325,16 +325,15 @@
                 <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
               </div>
               <div class="form-group">
-                <label>Receipt / Proof (JPG, PNG, PDF)</label>
-                <div class="file-drop-zone" id="receipt-drop-zone">
-                  <input type="file" id="tx-receipt" name="receipt" accept=".jpg,.jpeg,.png,.pdf" class="file-input" />
-                  <div class="file-drop-label">
-                    <span class="file-drop-icon">📎</span>
-                    <p>Drop file here or <span class="link">browse</span></p>
-                    <small>Max 5MB · JPG, PNG, PDF</small>
-                  </div>
-                  <div class="file-preview hidden" id="file-preview"></div>
-                </div>
+                <label>Receipt / Proof — Google Drive Link <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+                <input
+                  type="url"
+                  id="tx-receipt-url"
+                  placeholder="https://drive.google.com/file/d/..."
+                />
+                <small style="color:var(--col-text-muted);margin-top:0.3rem;display:block;">
+                  💡 In Google Drive: Right-click file → <em>Share</em> → <em>Copy link</em>. Make sure it is set to <strong>"Anyone with the link"</strong>.
+                </small>
               </div>
               <div class="form-error hidden" id="tx-error"></div>
               <button class="btn btn-primary" type="submit" id="submit-tx-btn">Submit Transaction</button>

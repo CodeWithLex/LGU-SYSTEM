@@ -13,7 +13,6 @@ const Admin = (() => {
       bindEventForm();
       bindTransactionForm();
       bindAnnouncementForm();
-      bindFileDropZone();
       _initialized = true;
     }
     setTodayDate();
@@ -57,7 +56,7 @@ const Admin = (() => {
 
         UI.toast('Event created successfully!', 'success');
         form.reset();
-        await populateEventDropdown(); // refresh dropdown
+        await populateEventDropdown();
       } catch (err) {
         errEl.textContent = err.message;
         errEl.classList.remove('hidden');
@@ -81,14 +80,25 @@ const Admin = (() => {
       btn.textContent = 'Submitting…';
 
       try {
-        const formData = new FormData(form);
-        await Api.transactions.create(formData);
+        // Validate Google Drive link if provided
+        const receiptUrl = document.getElementById('tx-receipt-url').value.trim();
+        if (receiptUrl && !receiptUrl.includes('drive.google.com') && !receiptUrl.startsWith('http')) {
+          throw new Error('Please enter a valid Google Drive link or leave it blank.');
+        }
+
+        await Api.transactions.create({
+          event_id:         document.getElementById('tx-event-id').value,
+          type:             document.getElementById('tx-type').value,
+          amount:           document.getElementById('tx-amount').value,
+          description:      document.getElementById('tx-desc').value,
+          donor_name:       document.getElementById('tx-donor').value,
+          transaction_date: document.getElementById('tx-date').value,
+          receipt_url:      receiptUrl || null
+        });
+
         UI.toast('Transaction recorded successfully!', 'success');
         form.reset();
         setTodayDate();
-        const preview = document.getElementById('file-preview');
-        preview.classList.add('hidden');
-        preview.textContent = '';
         await populateEventDropdown();
       } catch (err) {
         errEl.textContent = err.message;
@@ -113,7 +123,6 @@ const Admin = (() => {
       btn.textContent = 'Posting…';
 
       try {
-        // Insert directly via Supabase client — RLS will validate admin role
         const { error } = await window.supabaseClient
           .from('announcements')
           .insert({
@@ -130,36 +139,6 @@ const Admin = (() => {
       } finally {
         btn.disabled = false;
         btn.textContent = 'Post Announcement';
-      }
-    });
-  }
-
-  // ---- File Drop Zone ----
-  function bindFileDropZone() {
-    const zone    = document.getElementById('receipt-drop-zone');
-    const input   = document.getElementById('tx-receipt');
-    const preview = document.getElementById('file-preview');
-
-    if (!zone || !input) return;
-
-    input.addEventListener('change', () => {
-      const file = input.files[0];
-      if (file) {
-        preview.textContent = `📎 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-        preview.classList.remove('hidden');
-      }
-    });
-
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      if (e.dataTransfer.files.length) {
-        const dt = new DataTransfer();
-        dt.items.add(e.dataTransfer.files[0]);
-        input.files = dt.files;
-        input.dispatchEvent(new Event('change'));
       }
     });
   }

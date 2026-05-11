@@ -1,18 +1,6 @@
 const express  = require('express');
-const multer   = require('multer');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-
-// Multer in-memory storage for Supabase upload
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
-  fileFilter: (req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
-    if (allowed.includes(file.mimetype)) cb(null, true);
-    else cb(new Error('Only JPG, PNG, and PDF files are allowed.'));
-  }
-});
 
 function requireAdmin(req, res, next) {
   if (req.profile?.role !== 'admin') {
@@ -39,38 +27,24 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
-// POST /api/transactions — add a transaction with optional receipt upload (admin only)
-router.post('/', requireAdmin, upload.single('receipt'), async (req, res) => {
+// POST /api/transactions — add a transaction with optional Google Drive receipt link (admin only)
+router.post('/', requireAdmin, async (req, res) => {
   const {
     event_id, type, amount, description,
-    donor_name, transaction_date
+    donor_name, transaction_date, receipt_url
   } = req.body;
 
-  let receiptUrl = null;
-
-  // Upload receipt if provided
-  if (req.file) {
-    const ext  = req.file.originalname.split('.').pop();
-    const path = `receipts/${Date.now()}-${req.user.id}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('receipts')
-      .upload(path, req.file.buffer, { contentType: req.file.mimetype });
-
-    if (uploadError) return res.status(500).json({ error: uploadError.message });
-
-    const { data: urlData } = supabase.storage.from('receipts').getPublicUrl(path);
-    receiptUrl = urlData.publicUrl;
-  }
-
-  // Insert transaction (triggers balance sync automatically)
+  // Insert transaction (triggers balance sync automatically via DB trigger)
   const { data: tx, error: txError } = await supabase
     .from('transactions')
     .insert({
-      event_id, type, amount: Number(amount),
-      description, donor_name,
-      receipt_url: receiptUrl,
-      added_by: req.user.id,
+      event_id,
+      type,
+      amount:           Number(amount),
+      description,
+      donor_name:       donor_name || null,
+      receipt_url:      receipt_url || null,
+      added_by:         req.user.id,
       transaction_date: transaction_date || new Date().toISOString().split('T')[0]
     })
     .select()
@@ -78,13 +52,13 @@ router.post('/', requireAdmin, upload.single('receipt'), async (req, res) => {
 
   if (txError) return res.status(400).json({ error: txError.message });
 
-  // Record receipt metadata if uploaded
-  if (receiptUrl) {
+  // Record receipt metadata if a link was provided
+  if (receipt_url) {
     await supabase.from('receipts').insert({
       transaction_id: tx.id,
-      file_url:       receiptUrl,
-      file_name:      req.file.originalname,
-      file_type:      req.file.mimetype,
+      file_url:       receipt_url,
+      file_name:      'Google Drive Link',
+      file_type:      'link/gdrive',
       uploaded_by:    req.user.id
     });
   }
