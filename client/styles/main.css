@@ -142,20 +142,25 @@ textarea {
   box-shadow: 0 0 24px rgba(99, 132, 255, 0.4);
 }
 
-.logo-cog {
-  font-size: 1.8rem;
-  display: inline-block;
-  animation: spin-slow 8s linear infinite;
-}
-
-@keyframes spin-slow {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .sidebar-logo {
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* COE Logo image */
+.coe-logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 50%;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+}
+
+.sidebar-logo-img {
+  width: 36px;
+  height: 36px;
 }
 
 .auth-header h1 {
