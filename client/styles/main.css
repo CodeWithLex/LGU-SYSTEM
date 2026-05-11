@@ -1074,6 +1074,9 @@ textarea {
   .data-table td { padding: 0.6rem 0.75rem; font-size: 0.8rem; }
 }
 
+/* Bottom nav hidden by default on all screen sizes */
+.bottom-nav { display: none; }
+
 /* =============================================
    RESPONSIVE — Phone (≤480px)
    ============================================= */
