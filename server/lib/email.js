@@ -18,18 +18,16 @@ function getTransporter() {
       return null;
     }
 
-    // Using explicit host/port and forcing IPv4 for Render reliability
+    // Switching to 587 (STARTTLS) as port 465 is timing out on Render
     _transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
+      port: 587,
+      secure: false, // false for 587 (uses STARTTLS)
       auth: { user, pass },
-      // Force IPv4 (very important for Render to avoid ENETUNREACH)
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
+      connectionTimeout: 15000,
+      greetingTimeout: 15000,
+      socketTimeout: 15000,
       dns: {
-        // Pre-resolve to avoid IPv6 issues
         lookup: (hostname, options, callback) => {
           require('dns').lookup(hostname, { family: 4 }, callback);
         }
