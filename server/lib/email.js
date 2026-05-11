@@ -76,22 +76,21 @@ async function sendAnnouncementEmail(title, body) {
       `
     });
 
-    // Gmail sending. We use CC/BCC or multiple calls. 
-    // To protect privacy, we send individual emails or one email with all BCC'd.
-    // For reliability with Gmail, sending a single email with multiple BCCs is best to avoid rate limits.
+    console.log(`[Email] Found ${emails.length} recipients. Attempting to send...`);
+
     const mailOptions = {
       from: `"COE Budget System" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER, // Send to self
-      bcc: emails,                // Hide students from each other
+      to: process.env.GMAIL_USER,
+      bcc: emails,
       subject: `[COE LGU] ${title}`,
       html
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[Email] Announcement sent: ${info.messageId}`);
+    console.log(`[Email] Success! MessageID: ${info.messageId}`);
     return { sent: emails.length };
   } catch (err) {
-    console.error('[Email] Failed to send announcement:', err.message);
+    console.error('[Email] ERROR sending announcement:', err);
     return { sent: 0, error: err.message };
   }
 }
