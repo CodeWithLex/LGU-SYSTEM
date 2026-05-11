@@ -7,6 +7,7 @@ const eventsRouter = require("./routes/events");
 const transactionsRouter = require("./routes/transactions");
 const reportsRouter = require("./routes/reports");
 const authMiddleware = require("./middleware/auth");
+const keepAlive = require("./lib/keepAlive");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -64,9 +65,11 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(
-    `✅ COE Budget System Server running on http://localhost:${PORT}`,
-  );
+  console.log(`✅ COE Budget System Server running on http://localhost:${PORT}`);
+
+  // Start keep-alive to prevent Render sleep & Supabase pause
+  const serverUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+  keepAlive.start(serverUrl);
 });
 
 module.exports = app;
