@@ -1,48 +1,53 @@
 // =============================================
-// server/lib/email.js — Resend Email Helper
+// server/lib/email.js — Nodemailer Gmail Helper
 // =============================================
+const nodemailer = require('nodemailer');
 const supabase = require('./supabase');
 
 const APP_URL = 'https://lgu-system-eight.vercel.app';
 
-// Lazy init — prevents startup crash if env var is not yet set
-let _resend = null;
-function getResend() {
-  if (!_resend) {
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY environment variable is not set.');
+// Lazy init — prevents startup crash if env vars are missing
+let _transporter = null;
+function getTransporter() {
+  if (!_transporter) {
+    const user = process.env.GMAIL_USER;
+    const pass = process.env.GMAIL_APP_PASSWORD;
+
+    if (!user || !pass) {
+      console.warn('[Email] Skipping: GMAIL_USER or GMAIL_APP_PASSWORD missing in .env');
+      return null;
     }
-    const { Resend } = require('resend');
-    _resend = new Resend(process.env.RESEND_API_KEY);
+
+    _transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass }
+    });
   }
-  return _resend;
+  return _transporter;
 }
 
 /**
- * Fetches all registered student emails from the profiles table.
+ * Fetches all registered student emails via Supabase Admin API.
  */
 async function getAllStudentEmails() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('email:id, full_name')
-    .neq('role', 'admin');
-
-  if (error) {
-    // Fallback: get from auth users via service role
-    const { data: users } = await supabase.auth.admin.listUsers();
+  try {
+    const { data: users, error } = await supabase.auth.admin.listUsers();
+    if (error) throw error;
     return (users?.users || []).map(u => u.email).filter(Boolean);
+  } catch (err) {
+    console.error('[Email] Failed to fetch student emails:', err.message);
+    return [];
   }
-
-  // Get emails via auth admin
-  const { data: users } = await supabase.auth.admin.listUsers();
-  return (users?.users || []).map(u => u.email).filter(Boolean);
 }
 
 /**
- * Sends an announcement notification email to all students.
+ * Sends an announcement notification email to all students via Gmail.
  */
 async function sendAnnouncementEmail(title, body) {
   try {
+    const transporter = getTransporter();
+    if (!transporter) return { sent: 0 };
+
     const emails = await getAllStudentEmails();
     if (!emails.length) return { sent: 0 };
 
@@ -58,20 +63,20 @@ async function sendAnnouncementEmail(title, body) {
       `
     });
 
-    // Resend supports batch up to 100 recipients
-    const batches = chunkArray(emails, 50);
-    let sent = 0;
-    for (const batch of batches) {
-      await getResend().emails.send({
-        from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
-        to: batch,
-        subject: `[COE LGU] ${title}`,
-        html
-      });
-      sent += batch.length;
-    }
-    console.log(`[Email] Announcement sent to ${sent} recipients.`);
-    return { sent };
+    // Gmail sending. We use CC/BCC or multiple calls. 
+    // To protect privacy, we send individual emails or one email with all BCC'd.
+    // For reliability with Gmail, sending a single email with multiple BCCs is best to avoid rate limits.
+    const mailOptions = {
+      from: `"COE Budget System" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER, // Send to self
+      bcc: emails,                // Hide students from each other
+      subject: `[COE LGU] ${title}`,
+      html
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Email] Announcement sent: ${info.messageId}`);
+    return { sent: emails.length };
   } catch (err) {
     console.error('[Email] Failed to send announcement:', err.message);
     return { sent: 0, error: err.message };
@@ -79,10 +84,13 @@ async function sendAnnouncementEmail(title, body) {
 }
 
 /**
- * Sends a new event notification email to all students.
+ * Sends a new event notification email to all students via Gmail.
  */
 async function sendNewEventEmail(event) {
   try {
+    const transporter = getTransporter();
+    if (!transporter) return { sent: 0 };
+
     const emails = await getAllStudentEmails();
     if (!emails.length) return { sent: 0 };
 
@@ -100,30 +108,21 @@ async function sendNewEventEmail(event) {
       `
     });
 
-    const batches = chunkArray(emails, 50);
-    let sent = 0;
-    for (const batch of batches) {
-      await getResend().emails.send({
-        from: process.env.RESEND_FROM || 'COE Budget System <onboarding@resend.dev>',
-        to: batch,
-        subject: `[COE LGU] New Event: ${event.event_name}`,
-        html
-      });
-      sent += batch.length;
-    }
-    console.log(`[Email] New event notification sent to ${sent} recipients.`);
-    return { sent };
+    const mailOptions = {
+      from: `"COE Budget System" <${process.env.GMAIL_USER}>`,
+      to: process.env.GMAIL_USER,
+      bcc: emails,
+      subject: `[COE LGU] New Event: ${event.event_name}`,
+      html
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`[Email] Event notification sent: ${info.messageId}`);
+    return { sent: emails.length };
   } catch (err) {
     console.error('[Email] Failed to send event notification:', err.message);
     return { sent: 0, error: err.message };
   }
-}
-
-// ---- Helpers ----
-function chunkArray(arr, size) {
-  const chunks = [];
-  for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
-  return chunks;
 }
 
 function buildEmailTemplate({ subject, preheader, content }) {
