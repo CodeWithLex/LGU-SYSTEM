@@ -8,7 +8,7 @@ const APP_URL = 'https://lgu-system-eight.vercel.app';
 
 // Lazy init — prevents startup crash if env vars are missing
 let _transporter = null;
-function getTransporter() {
+async function getTransporter() {
   if (!_transporter) {
     const user = process.env.GMAIL_USER;
     const pass = process.env.GMAIL_APP_PASSWORD;
@@ -18,21 +18,26 @@ function getTransporter() {
       return null;
     }
 
-    // Switching to 587 (STARTTLS) as port 465 is timing out on Render
-    _transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false, // false for 587 (uses STARTTLS)
-      auth: { user, pass },
-      connectionTimeout: 15000,
-      greetingTimeout: 15000,
-      socketTimeout: 15000,
-      dns: {
-        lookup: (hostname, options, callback) => {
-          require('dns').lookup(hostname, { family: 4 }, callback);
-        }
-      }
-    });
+    try {
+      // Force IPv4 by resolving it manually first
+      const dns = require('dns').promises;
+      const { address } = await dns.lookup('smtp.gmail.com', { family: 4 });
+      console.log(`[Email] Resolved Gmail to IPv4: ${address}`);
+
+      _transporter = nodemailer.createTransport({
+        host: address,
+        port: 587,
+        secure: false,
+        auth: { user, pass },
+        connectionTimeout: 20000,
+        greetingTimeout: 20000,
+        socketTimeout: 20000,
+        servername: 'smtp.gmail.com' // Crucial when using IP as host
+      });
+    } catch (err) {
+      console.error('[Email] DNS Resolution failed:', err.message);
+      return null;
+    }
   }
   return _transporter;
 }
@@ -69,7 +74,7 @@ async function getAllStudentEmails() {
  */
 async function sendAnnouncementEmail(title, body) {
   try {
-    const transporter = getTransporter();
+    const transporter = await getTransporter();
     if (!transporter) return { sent: 0 };
 
     const emails = await getAllStudentEmails();
@@ -111,7 +116,7 @@ async function sendAnnouncementEmail(title, body) {
  */
 async function sendNewEventEmail(event) {
   try {
-    const transporter = getTransporter();
+    const transporter = await getTransporter();
     if (!transporter) return { sent: 0 };
 
     const emails = await getAllStudentEmails();
