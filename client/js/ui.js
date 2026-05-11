@@ -20,6 +20,10 @@ const UI = (() => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const screen = document.getElementById(`${screenId}-screen`);
     if (screen) screen.classList.add('active');
+
+    // Show bottom nav only in the app screen (mobile)
+    const bottomNav = document.getElementById('bottom-nav');
+    if (bottomNav) bottomNav.style.display = screenId === 'app' ? '' : 'none';
   }
 
   // ---- Toast Notifications ----

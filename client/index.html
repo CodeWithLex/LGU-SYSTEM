@@ -368,6 +368,25 @@
     </main>
   </div>
 
+  <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
+  <nav class="bottom-nav" id="bottom-nav" style="display:none;">
+    <a href="#" class="bottom-nav-item active" data-view="dashboard">
+      <span class="nav-icon">📊</span><span>Dashboard</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-view="events">
+      <span class="nav-icon">🎯</span><span>Events</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-view="transactions">
+      <span class="nav-icon">💳</span><span>Ledger</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-view="reports">
+      <span class="nav-icon">📈</span><span>Reports</span>
+    </a>
+    <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
+      <span class="nav-icon">🛡️</span><span>Admin</span>
+    </a>
+  </nav>
+
   <!-- Toast -->
   <div class="toast hidden" id="toast">
     <span id="toast-icon">✅</span>

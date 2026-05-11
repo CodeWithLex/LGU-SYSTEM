@@ -96,18 +96,26 @@
     UI.showScreen('auth');
   }
 
-  // ---- Navigation ----
-  document.querySelectorAll('.nav-item').forEach(item => {
+  // ---- Navigation (sidebar + bottom nav) ----
+  function navigateTo(view) {
+    UI.showView(view);
+
+    // Sync active class on both sidebar and bottom nav
+    document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.view === view);
+    });
+
+    if (view === 'dashboard')    Dashboard.load();
+    if (view === 'events')       Events.load();
+    if (view === 'transactions') Transactions.load();
+    if (view === 'reports')      Reports.load();
+    if (view === 'admin')        Admin.init();
+  }
+
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
     item.addEventListener('click', async e => {
       e.preventDefault();
-      const view = item.dataset.view;
-      UI.showView(view);
-
-      if (view === 'dashboard')    await Dashboard.load();
-      if (view === 'events')       await Events.load();
-      if (view === 'transactions') await Transactions.load();
-      if (view === 'reports')      await Reports.load();
-      if (view === 'admin')        await Admin.init();
+      navigateTo(item.dataset.view);
     });
   });
 
