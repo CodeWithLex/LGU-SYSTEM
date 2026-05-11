@@ -87,7 +87,7 @@ async function sendAnnouncementEmail(title, body) {
     });
 
     sendSmtpEmail.sender = { 
-      name: "COE Budget System", 
+      name: "COE Financial Transparency System", 
       email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" 
     };
     
@@ -118,48 +118,259 @@ async function sendNewEventEmail(event) {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.subject = `🎯 New Event: ${event.event_name}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
-      subject: `🎯 New Event: ${event.event_name}`,
-      preheader: `A new event has been added: ${event.event_name}`,
-      content: `
-        <div style="text-align:center;margin-bottom:20px;">
-          <span style="background:#fff7ed;color:#ea580c;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">System Update</span>
-        </div>
-        <h2 style="margin:0 0 12px;color:#1a1f35;font-size:24px;font-weight:800;line-height:1.3;text-align:center;">${event.event_name}</h2>
-        
-        <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:24px;box-shadow:0 2px 4px rgba(0,0,0,0.02);">
-           <table width="100%" cellpadding="0" cellspacing="0">
-             ${event.event_date ? `
-             <tr>
-               <td style="padding-bottom:12px;">
-                 <span style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;">Scheduled Date</span><br/>
-                 <span style="color:#1a1f35;font-size:16px;font-weight:700;">📅 ${new Date(event.event_date).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' })}</span>
-               </td>
-             </tr>` : ''}
-             <tr>
-               <td style="padding-bottom:12px;">
-                 <span style="color:#64748b;font-size:12px;font-weight:600;text-transform:uppercase;">Allocated Budget</span><br/>
-                 <span style="color:#10b981;font-size:20px;font-weight:800;">₱${Number(event.allocated_budget || 0).toLocaleString('en-PH', {minimumFractionDigits:2})}</span>
-               </td>
-             </tr>
-             ${event.description ? `
-             <tr>
-               <td style="border-top:1px solid #f1f5f9;padding-top:16px;">
-                 <p style="margin:0;color:#4a5568;line-height:1.6;font-size:14px;">${event.description}</p>
-               </td>
-             </tr>` : ''}
-           </table>
-        </div>
+      subject: `New Event: ${event.event_name}`,
+preheader: `A new event has been scheduled${event.event_date ? ` for ${new Date(event.event_date).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })}` : ''} — view the full details inside.`,
+content: `
 
-        <div style="text-align:center;">
-          <a href="${APP_URL}" style="display:inline-block;background:#1a1f35;color:#ffffff;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:700;font-size:15px;box-shadow:0 4px 12px rgba(26,31,53,0.2);">
-            View Event Details
-          </a>
-        </div>
-      `
+  <!-- Badge -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding-bottom: 20px;">
+        <span style="
+          display: inline-block;
+          background: #fff3e0;
+          color: #c2410c;
+          padding: 5px 16px;
+          border-radius: 100px;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+        ">New Event</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Title -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding-bottom: 28px;">
+        <h2 style="
+          margin: 0 0 6px;
+          font-family: Georgia, 'Times New Roman', serif;
+          font-size: 26px;
+          font-weight: 700;
+          line-height: 1.3;
+          color: #0f172a;
+        ">${event.event_name}</h2>
+        <p style="
+          margin: 0;
+          font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+          font-size: 13px;
+          color: #94a3b8;
+        ">A new event has been added to your calendar.</p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Detail Card -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  ">
+
+    <!-- Card Header -->
+    <tr>
+      <td style="
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 11px 24px;
+        font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #94a3b8;
+      ">Event Details</td>
+    </tr>
+
+    <!-- Card Body -->
+    <tr>
+      <td style="padding: 24px; background: #ffffff;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+
+          ${event.event_date ? `
+          <!-- Scheduled Date Row -->
+          <tr>
+            <td style="padding-bottom: 18px;">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="width: 36px; vertical-align: top; padding-top: 2px;">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: #eff6ff;
+                      border-radius: 8px;
+                      text-align: center;
+                      line-height: 32px;
+                      font-size: 15px;
+                    ">📅</div>
+                  </td>
+                  <td style="padding-left: 12px; vertical-align: top;">
+                    <p style="
+                      margin: 0 0 3px;
+                      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+                      font-size: 11px;
+                      font-weight: 700;
+                      letter-spacing: 0.6px;
+                      text-transform: uppercase;
+                      color: #94a3b8;
+                    ">Scheduled Date</p>
+                    <p style="
+                      margin: 0;
+                      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+                      font-size: 15px;
+                      font-weight: 600;
+                      color: #0f172a;
+                    ">${new Date(event.event_date).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding-bottom: 18px;">
+              <div style="height: 1px; background: #f1f5f9;"></div>
+            </td>
+          </tr>` : ''}
+
+          <!-- Allocated Budget Row -->
+          <tr>
+            <td style="padding-bottom: ${event.description ? '18px' : '0'};">
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="width: 36px; vertical-align: top; padding-top: 2px;">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: #f0fdf4;
+                      border-radius: 8px;
+                      text-align: center;
+                      line-height: 32px;
+                      font-size: 15px;
+                    ">💰</div>
+                  </td>
+                  <td style="padding-left: 12px; vertical-align: top;">
+                    <p style="
+                      margin: 0 0 3px;
+                      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+                      font-size: 11px;
+                      font-weight: 700;
+                      letter-spacing: 0.6px;
+                      text-transform: uppercase;
+                      color: #94a3b8;
+                    ">Allocated Budget</p>
+                    <p style="
+                      margin: 0;
+                      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+                      font-size: 22px;
+                      font-weight: 800;
+                      color: #059669;
+                      letter-spacing: -0.5px;
+                    ">&#8369;${Number(event.allocated_budget || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          ${event.description ? `
+          <!-- Divider -->
+          <tr>
+            <td style="padding-bottom: 18px;">
+              <div style="height: 1px; background: #f1f5f9;"></div>
+            </td>
+          </tr>
+
+          <!-- Description Row -->
+          <tr>
+            <td>
+              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                <tr>
+                  <td style="width: 36px; vertical-align: top; padding-top: 2px;">
+                    <div style="
+                      width: 32px;
+                      height: 32px;
+                      background: #faf5ff;
+                      border-radius: 8px;
+                      text-align: center;
+                      line-height: 32px;
+                      font-size: 15px;
+                    ">📋</div>
+                  </td>
+                  <td style="padding-left: 12px; vertical-align: top;">
+                    <p style="
+                      margin: 0 0 3px;
+                      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+                      font-size: 11px;
+                      font-weight: 700;
+                      letter-spacing: 0.6px;
+                      text-transform: uppercase;
+                      color: #94a3b8;
+                    ">Description</p>
+                    <p style="
+                      margin: 0;
+                      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+                      font-size: 14px;
+                      line-height: 1.7;
+                      color: #475569;
+                    ">${event.description}</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>` : ''}
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- CTA Button -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding-bottom: 6px;">
+        <a href="${APP_URL}" style="
+          display: inline-block;
+          background: #0f172a;
+          color: #ffffff;
+          padding: 14px 40px;
+          border-radius: 10px;
+          text-decoration: none;
+          font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+          font-size: 14px;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+        ">View Event Details &rarr;</a>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Footer -->
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+      <td align="center" style="padding-top: 24px;">
+        <p style="
+          margin: 0;
+          font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+          font-size: 12px;
+          color: #94a3b8;
+          line-height: 1.6;
+        ">You received this because you're subscribed to event notifications.<br/>
+        <a href="${APP_URL}/settings/notifications" style="color: #94a3b8; text-decoration: underline;">Manage preferences</a></p>
+      </td>
+    </tr>
+  </table>
+`
     });
 
     sendSmtpEmail.sender = { 
-      name: "COE Budget System", 
+      name: "COE Financial Transparency System", 
       email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" 
     };
     
