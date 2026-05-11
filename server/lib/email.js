@@ -21,6 +21,9 @@ function getBrevoApi() {
     apiKeyInstance.apiKey = apiKey;
 
     _brevoApi = new SibApiV3Sdk.TransactionalEmailsApi();
+    
+    // Add timeouts
+    defaultClient.timeout = 10000;
   }
   return _brevoApi;
 }
