@@ -13,9 +13,9 @@ async function initReports() {
 
   try {
     const [summary, monthly, events] = await Promise.all([
-      Api.get('/api/reports/summary'),
-      Api.get('/api/reports/monthly'),
-      Api.get('/api/reports/events-summary'),
+      Api.reports.summary(),
+      Api.reports.monthly(),
+      Api.reports.eventsSummary(),
     ]);
 
     container.innerHTML = buildReportsHTML(summary, monthly, events);

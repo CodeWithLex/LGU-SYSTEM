@@ -41,8 +41,9 @@ const Api = (() => {
   };
 
   const reports = {
-    summary: () => _request('GET', '/reports/summary'),
-    monthly: () => _request('GET', '/reports/monthly'),
+    summary:       () => _request('GET', '/reports/summary'),
+    monthly:       () => _request('GET', '/reports/monthly'),
+    eventsSummary: () => _request('GET', '/reports/events-summary'),
   };
 
   return { events, transactions, reports, request: _request };
