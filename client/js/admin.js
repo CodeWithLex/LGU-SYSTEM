@@ -103,7 +103,7 @@ const Admin = (() => {
 
       try {
         const receiptUrl = document.getElementById('tx-receipt-url').value.trim();
-        await Api.transactions.create({
+        const tx = await Api.transactions.create({
           event_id:         document.getElementById('tx-event-id').value,
           type:             document.getElementById('tx-type').value,
           amount:           document.getElementById('tx-amount').value,
@@ -112,7 +112,13 @@ const Admin = (() => {
           transaction_date: document.getElementById('tx-date').value,
           receipt_url:      receiptUrl || null
         });
-        UI.toast('Transaction recorded successfully!', 'success');
+
+        if (tx.over_budget_warning) {
+          UI.toast('Transaction recorded, but event is OVER 90% BUDGET CAPACITY!', 'warning');
+        } else {
+          UI.toast('Transaction recorded successfully!', 'success');
+        }
+        
         form.reset();
         setTodayDate();
         await populateEventDropdown();

@@ -99,6 +99,15 @@ router.post('/', requireAdmin, async (req, res) => {
     });
   }
 
+  // Check over-budget for expenses
+  if (type === 'expense') {
+    const { data: ev } = await supabase.from('events').select('allocated_budget, remaining_budget').eq('id', event_id).single();
+    if (ev && Number(ev.remaining_budget) < Number(ev.allocated_budget) * 0.1) {
+      tx.over_budget_warning = true;
+      logAudit(req.user.id, 'OVER_BUDGET_ALERT', { event_id, remaining_budget: ev.remaining_budget });
+    }
+  }
+
   logAudit(req.user.id, 'CREATE_TRANSACTION', {
     transaction_id: tx.id,
     event_id,
