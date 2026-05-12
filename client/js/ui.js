@@ -110,8 +110,13 @@ const UI = (() => {
       }
     },
     toggle() {
+      document.body.classList.add('theme-transitioning');
       const current = document.documentElement.getAttribute('data-theme') || 'dark';
       this.set(current === 'dark' ? 'light' : 'dark');
+      
+      setTimeout(() => {
+        document.body.classList.remove('theme-transitioning');
+      }, 500);
     }
   };
 
