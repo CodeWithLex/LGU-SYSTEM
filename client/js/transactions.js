@@ -57,9 +57,13 @@ const Transactions = (() => {
         </td>` : ''}
       </tr>
     `).join('');
+  }
 
-    // Delegate clicks on Edit/Delete buttons
-    document.getElementById('tx-table-body').addEventListener('click', e => {
+  function bindTableEvents() {
+    const tbody = document.getElementById('tx-table-body');
+    if (!tbody || tbody._bound) return;
+
+    tbody.addEventListener('click', e => {
       const editBtn = e.target.closest('.tx-edit-btn');
       const delBtn  = e.target.closest('.tx-del-btn');
       if (editBtn) {
@@ -67,12 +71,15 @@ const Transactions = (() => {
       } else if (delBtn) {
         deleteModal(delBtn.dataset.txid, delBtn.dataset.desc);
       }
-    }, { once: true });
+    });
+    tbody._bound = true;
   }
 
   function bindFilter() {
     const typeEl = document.getElementById('tx-type-filter');
     const searchEl = document.getElementById('tx-search');
+    
+    bindTableEvents();
 
     function applyFilters() {
       const type = typeEl ? typeEl.value : '';
