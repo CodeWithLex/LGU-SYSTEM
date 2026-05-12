@@ -1173,28 +1173,32 @@ textarea {
   .mobile-cards-container { display: flex !important; flex-direction: column; gap: 1rem; }
   
   /* Dashboard & Grid Overrides */
-  .dashboard-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .dashboard-grid { grid-template-columns: 1fr !important; gap: 0.85rem !important; }
+  .dashboard-card { padding: 1rem !important; }
+  .dashboard-card h3 { font-size: 1rem !important; margin-bottom: 1rem !important; }
+  
   .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
   .stat-card { padding: 0.85rem !important; gap: 0.6rem !important; }
-  .stat-icon { width: 30px; height: 30px; font-size: 0.85rem; }
-  .stat-label { font-size: 0.65rem; }
-  .stat-value { font-size: 1.1rem; }
+  .stat-icon { width: 30px !important; height: 30px !important; font-size: 0.85rem !important; }
+  .stat-label { font-size: 0.65rem !important; }
+  .stat-value { font-size: 1.1rem !important; }
 
   /* Activity Feed */
   .tx-item { 
-    padding: 0.65rem 0.5rem; 
-    gap: 0.5rem;
-    grid-template-columns: auto 1fr auto;
+    padding: 0.65rem 0.5rem !important; 
+    gap: 0.5rem !important;
+    grid-template-columns: auto 1fr auto !important;
   }
-  .tx-badge { padding: 2px 5px; font-size: 0.55rem; max-width: 55px; }
-  .tx-desc { font-size: 0.8rem; }
-  .tx-amount { font-size: 0.85rem; }
-  .tx-meta { font-size: 0.6rem; }
+  .tx-badge { padding: 2px 5px !important; font-size: 0.55rem !important; max-width: 55px !important; }
+  .tx-desc { font-size: 0.8rem !important; }
+  .tx-amount { font-size: 0.85rem !important; }
+  .tx-meta { font-size: 0.6rem !important; }
 
   /* Generic Content */
-  .announce-item { padding: 0.75rem; }
-  .announce-item h4 { font-size: 0.9rem; }
-  .announce-item p { font-size: 0.8rem; line-height: 1.4; }
+  .announce-item { padding: 0.7rem !important; margin-bottom: 0.6rem !important; }
+  .announce-item h4 { font-size: 0.87rem !important; margin-bottom: 0.2rem !important; }
+  .announce-item p { font-size: 0.78rem !important; line-height: 1.4 !important; }
+  .announce-date { font-size: 0.6rem !important; }
 
   /* Card Layouts */
   .data-card {
