@@ -70,11 +70,11 @@ app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // =============================================
-// Global Rate Limiting — 100 req / 15 min per IP
+// Global Rate Limiting — 1000 req / 15 min per IP
 // =============================================
 const globalLimiter = rateLimit({
   windowMs:         15 * 60 * 1000, // 15 minutes
-  max:              100,
+  max:              1000,
   standardHeaders:  true,
   legacyHeaders:    false,
   message:          { error: 'Too many requests. Please wait 15 minutes and try again.' },
@@ -82,10 +82,10 @@ const globalLimiter = rateLimit({
 });
 app.use('/api/', globalLimiter);
 
-// Stricter limiter for write operations (POST/PATCH)
+// Stricter limiter for specific operations if needed (presently just a reference)
 const writeLimiter = rateLimit({
   windowMs:        5 * 60 * 1000, // 5 minutes
-  max:             20,
+  max:             100,
   standardHeaders: true,
   legacyHeaders:   false,
   message:         { error: 'Too many write requests. Slow down.' },
@@ -107,10 +107,10 @@ app.get("/api/health", (req, res) => {
 // Protected API Routes
 // =============================================
 app.use("/api/events",        authMiddleware, eventsRouter);
-app.use("/api/transactions",  authMiddleware, writeLimiter, transactionsRouter);
+app.use("/api/transactions",  authMiddleware, transactionsRouter);
 app.use("/api/reports",       authMiddleware, reportsRouter);
-app.use("/api/announcements", authMiddleware, writeLimiter, announcementsRouter);
-app.use("/api/admin",         authMiddleware, writeLimiter, adminRouter);
+app.use("/api/announcements", authMiddleware, announcementsRouter);
+app.use("/api/admin",         authMiddleware, adminRouter);
 
 // =============================================
 // SPA Fallback
