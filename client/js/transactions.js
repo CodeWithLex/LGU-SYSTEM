@@ -22,10 +22,11 @@ const Transactions = (() => {
 
   function renderTable(txs) {
     const tbody = document.getElementById('tx-table-body');
-    const colSpan = _isAdmin ? 8 : 7;
 
     if (!txs.length) {
-      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon">💳</span><p>No transactions found.</p></div></td></tr>`;
+      const colSpan = _isAdmin ? 8 : 7;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><i data-lucide="credit-card"></i></span><p>No transactions found.</p></div></td></tr>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
       return;
     }
 
@@ -39,7 +40,7 @@ const Transactions = (() => {
           ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank">📎 View</a>`
+          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="paperclip" style="width:14px;"></i> View</a>`
           : '<span style="color:var(--col-text-dim)">—</span>'}</td>
         <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
         ${_isAdmin ? `
@@ -50,10 +51,10 @@ const Transactions = (() => {
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}">Edit</button>
+              data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3" style="width:14px;"></i></button>
             <button class="btn btn-ghost tx-del-btn" style="font-size:.75rem;padding:.25rem .6rem;color:#ef4444;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}">Delete</button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2" style="width:14px;"></i></button>
           </div>
         </td>` : ''}
       </tr>

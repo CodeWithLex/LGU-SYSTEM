@@ -151,7 +151,7 @@ const Admin = (() => {
           title: document.getElementById('announce-title').value,
           body:  document.getElementById('announce-body').value
         });
-        UI.toast('Announcement posted! Students will be notified. 📧', 'success');
+        UI.toast('Announcement posted! Students will be notified.', 'success');
         form.reset();
       } catch (err) {
         errEl.textContent = err.message;
@@ -215,7 +215,8 @@ const Admin = (() => {
       _allUsers = await Api.admin.users();
       renderUsersTable(document.getElementById('users-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('users-table-container').innerHTML = `<div class="empty-state">⚠️ ${err.message}</div>`;
+      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><i data-lucide="alert-triangle"></i> ${err.message}</div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   }
 
@@ -292,7 +293,8 @@ const Admin = (() => {
       _allLogs = await Api.admin.auditLogs({ limit: 100 });
       renderAuditTable(document.getElementById('audit-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state">⚠️ ${err.message}</div>`;
+      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state"><i data-lucide="alert-triangle"></i> ${err.message}</div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   }
 

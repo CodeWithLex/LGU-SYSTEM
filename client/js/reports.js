@@ -38,7 +38,8 @@ async function initReports() {
     });
 
   } catch (err) {
-    container.innerHTML = `<div class="empty-state">⚠️ Failed to load reports. ${err.message}</div>`;
+    container.innerHTML = `<div class="empty-state"><i data-lucide="alert-triangle"></i> Failed to load reports. ${err.message}</div>`;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 }
 
@@ -95,7 +96,7 @@ function buildReportsHTML(summary, monthly, events) {
         <span style="font-size:.8rem;color:var(--col-text-muted);">Admin only</span>
       </div>
       ${events.length === 0
-        ? `<div class="empty-state">No events found.</div>`
+        ? `<div class="empty-state"><i data-lucide="info"></i> No events found.</div>`
         : `<div class="table-wrapper">
           <table class="data-table">
             <thead>

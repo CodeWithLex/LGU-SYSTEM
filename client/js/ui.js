@@ -37,10 +37,20 @@ const UI = (() => {
     const iconEl   = document.getElementById('toast-icon');
     const msgEl    = document.getElementById('toast-message');
 
-    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-    iconEl.textContent  = icons[type] || '✅';
-    msgEl.textContent   = message;
+    const icons = { 
+      success: 'check-circle', 
+      error: 'x-circle', 
+      info: 'info', 
+      warning: 'alert-triangle' 
+    };
+    
+    const iconName = icons[type] || 'check-circle';
+    iconEl.innerHTML = `<i data-lucide="${iconName}" style="width:18px;height:18px;"></i>`;
+    msgEl.textContent = message;
+    
     toastEl.classList.remove('hidden');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.add('hidden'), 3500);
@@ -80,13 +90,16 @@ const UI = (() => {
     if (el) el.innerHTML = `<div class="loading-state">${text}</div>`;
   }
 
-  function setEmpty(containerId, icon = '📭', text = 'No data available.') {
+  function setEmpty(containerId, icon = 'inbox', text = 'No data available.') {
     const el = document.getElementById(containerId);
-    if (el) el.innerHTML = `
-      <div class="empty-state">
-        <span class="empty-icon">${icon}</span>
-        <p>${text}</p>
-      </div>`;
+    if (el) {
+      el.innerHTML = `
+        <div class="empty-state">
+          <span class="empty-icon"><i data-lucide="${icon}"></i></span>
+          <p>${text}</p>
+        </div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
   }
 
   // ---- Theme Management ----

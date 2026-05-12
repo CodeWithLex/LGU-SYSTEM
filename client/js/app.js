@@ -57,7 +57,7 @@
 
     // ---- Domain gate ----
     if (!email.toLowerCase().endsWith('@g.cjc.edu.ph')) {
-      errEl.textContent = '❌ Only @g.cjc.edu.ph accounts are allowed to register.';
+      errEl.textContent = 'Only @g.cjc.edu.ph accounts are allowed to register.';
       errEl.classList.remove('hidden');
       return;
     }
@@ -156,7 +156,7 @@
       await Auth.logout();
       UI.showScreen('auth');
       const errEl = document.getElementById('login-error');
-      errEl.textContent = '📧 Please confirm your email address before logging in. Check your CJC Gmail inbox.';
+      errEl.textContent = 'Please confirm your email address before logging in. Check your CJC Gmail inbox.';
       errEl.classList.remove('hidden');
       return;
     }

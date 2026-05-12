@@ -12,13 +12,13 @@ const Events = (() => {
       allEvents = await Api.events.list();
       renderEventCards(allEvents);
     } catch (err) {
-      UI.setEmpty('events-grid', '⚠️', 'Failed to load events.');
+      UI.setEmpty('events-grid', 'alert-triangle', 'Failed to load events.');
     }
   }
 
   function renderEventCards(events) {
     const grid = document.getElementById('events-grid');
-    if (!events.length) { UI.setEmpty('events-grid', '🎯', 'No events posted yet.'); return; }
+    if (!events.length) { UI.setEmpty('events-grid', 'target', 'No events posted yet.'); return; }
 
     grid.innerHTML = events.map(ev => {
       const spent   = ev.allocated_budget - ev.remaining_budget;
@@ -59,26 +59,26 @@ const Events = (() => {
           <span class="event-status-badge status-${ev.status}">${UI.capitalize(ev.status)}</span>
           <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
           <p style="color:var(--col-text-muted)">${ev.description || ''}</p>
-          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--col-text-muted)">📅 ${UI.dateStr(ev.event_date)}</p>` : ''}
+          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--col-text-muted);display:flex;align-items:center;gap:0.3rem;"><i data-lucide="calendar" style="width:14px;"></i> ${UI.dateStr(ev.event_date)}</p>` : ''}
         </div>
 
         <div class="stats-grid" style="margin-bottom:1.5rem">
           <div class="stat-card stat-balance">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon"><i data-lucide="wallet"></i></div>
             <div class="stat-body">
               <p class="stat-label">Allocated</p>
               <h3 class="stat-value">${UI.currency(ev.allocated_budget)}</h3>
             </div>
           </div>
           <div class="stat-card stat-expense">
-            <div class="stat-icon">📤</div>
+            <div class="stat-icon"><i data-lucide="trending-down"></i></div>
             <div class="stat-body">
               <p class="stat-label">Expenses</p>
               <h3 class="stat-value">${UI.currency(spent)}</h3>
             </div>
           </div>
           <div class="stat-card stat-income">
-            <div class="stat-icon">🏦</div>
+            <div class="stat-icon"><i data-lucide="building"></i></div>
             <div class="stat-body">
               <p class="stat-label">Remaining</p>
               <h3 class="stat-value">${UI.currency(ev.remaining_budget)}</h3>
@@ -104,12 +104,14 @@ const Events = (() => {
                     </div>
                     <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
                   </div>
-                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank">📎 Receipt</a>` : ''}
+                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="paperclip" style="width:14px;"></i> Receipt</a>` : ''}
                 </div>`).join('')
-              : '<div class="empty-state"><span class="empty-icon">💳</span><p>No transactions recorded yet.</p></div>'
+              : '<div class="empty-state"><span class="empty-icon"><i data-lucide="credit-card"></i></span><p>No transactions recorded yet.</p></div>'
             }
           </div>
         </div>`;
+      
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     } catch (err) {
       container.innerHTML = `<div class="loading-state">Failed to load event details.</div>`;
     }
