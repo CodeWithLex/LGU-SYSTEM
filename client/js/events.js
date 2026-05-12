@@ -5,20 +5,70 @@
 const Events = (() => {
 
   let allEvents = [];
+  let _isInitialized = false;
+
+  function init() {
+    if (_isInitialized) return;
+    const searchInput = document.getElementById('events-search');
+    const sortSelect  = document.getElementById('events-sort');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', () => applyFilters());
+    }
+    if (sortSelect) {
+      sortSelect.addEventListener('change', () => applyFilters());
+    }
+    _isInitialized = true;
+  }
 
   async function load() {
+    init(); // Ensure listeners are bound
     UI.setLoading('events-grid', 'Loading events…');
     try {
       allEvents = await Api.events.list();
-      renderEventCards(allEvents);
+      applyFilters(); // Apply current search/sort to newly loaded data
     } catch (err) {
       UI.setEmpty('events-grid', 'alert-triangle', 'Failed to load events.');
     }
   }
 
-  function renderEventCards(events) {
+  function applyFilters() {
+    const searchVal = document.getElementById('events-search')?.value.toLowerCase() || '';
+    const sortVal   = document.getElementById('events-sort')?.value || 'newest';
+
+    // 1. Filter
+    let filtered = allEvents.filter(ev => 
+      ev.event_name.toLowerCase().includes(searchVal) ||
+      (ev.description || '').toLowerCase().includes(searchVal)
+    );
+
+    // 2. Sort
+    filtered.sort((a, b) => {
+      if (sortVal === 'name-asc') {
+        return a.event_name.localeCompare(b.event_name);
+      } else if (sortVal === 'budget-desc') {
+        return b.allocated_budget - a.allocated_budget;
+      } else if (sortVal === 'budget-asc') {
+        return a.allocated_budget - b.allocated_budget;
+      } else {
+        // newest (created_at desc)
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      }
+    });
+
+    renderEventCards(filtered, searchVal.length > 0);
+  }
+
+  function renderEventCards(events, isSearching = false) {
     const grid = document.getElementById('events-grid');
-    if (!events.length) { UI.setEmpty('events-grid', 'target', 'No events posted yet.'); return; }
+    if (!events.length) {
+      if (isSearching) {
+        UI.setEmpty('events-grid', 'search', 'No events match your search.');
+      } else {
+        UI.setEmpty('events-grid', 'target', 'No events posted yet.');
+      }
+      return;
+    }
 
     grid.innerHTML = events.map(ev => {
       const spent   = ev.allocated_budget - ev.remaining_budget;
@@ -42,6 +92,8 @@ const Events = (() => {
     grid.querySelectorAll('.event-card').forEach(card => {
       card.addEventListener('click', () => loadEventDetail(card.dataset.id));
     });
+
+    if (window.lucide) lucide.createIcons();
   }
 
   async function loadEventDetail(id) {
@@ -118,10 +170,13 @@ const Events = (() => {
   }
 
   function bindBackButton() {
-    document.getElementById('back-to-events').addEventListener('click', e => {
-      e.preventDefault();
-      UI.showView('events');
-    });
+    const btn = document.getElementById('back-to-events');
+    if (btn) {
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        UI.showView('events');
+      });
+    }
   }
 
   return { load, bindBackButton };

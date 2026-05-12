@@ -185,9 +185,23 @@
           </div>
           <button class="btn btn-primary admin-only hidden" id="create-event-btn">+ New Event</button>
         </div>
-        <div class="events-grid" id="events-grid">
-          <div class="loading-state">Loading events…</div>
+      <section id="view-events" class="view">
+        <div class="view-header">
+          <h2>Events & Activities</h2>
+          <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;">
+            <div style="position:relative;display:flex;align-items:center;">
+              <i data-lucide="search" style="position:absolute;left:0.75rem;width:14px;height:14px;color:var(--col-text-muted);"></i>
+              <input type="text" id="events-search" placeholder="Search events…" style="padding:0.55rem 1rem 0.55rem 2.25rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;width:200px;" />
+            </div>
+            <select id="events-sort" style="padding:0.55rem 1rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;">
+              <option value="newest">Newest First</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="budget-desc">Budget (High-Low)</option>
+              <option value="budget-asc">Budget (Low-High)</option>
+            </select>
+          </div>
         </div>
+        <div id="events-grid" class="events-grid"></div>
       </section>
 
       <!-- EVENT DETAIL -->
