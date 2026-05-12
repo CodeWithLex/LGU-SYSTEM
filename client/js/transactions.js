@@ -70,33 +70,28 @@ const Transactions = (() => {
             <span style="font-size:0.75rem;color:var(--col-text-muted);">${UI.dateStr(tx.transaction_date)}</span>
           </div>
           <div class="data-card-body">
-            <div style="font-weight:600;margin-bottom:0.25rem;">${tx.description}</div>
-            <div class="data-card-row">
-              <span class="data-card-label">Amount</span>
-              <span class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}" style="font-size:1rem;">
+            <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.15rem;">${tx.description}</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;">
+               <span class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
+              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><i data-lucide="paperclip" style="width:14px;"></i> Receipt</a>` : ''}
             </div>
-            <div class="data-card-row">
-              <span class="data-card-label">Receipt</span>
-              <span>${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link"><i data-lucide="paperclip"></i> View</a>` : '—'}</span>
-            </div>
-            <div class="data-card-row">
-              <span class="data-card-label">Added By</span>
-              <span>${tx.profiles?.full_name || '—'}</span>
+            <div style="font-size:0.72rem;color:var(--col-text-muted);display:flex;align-items:center;gap:0.3rem;">
+              <i data-lucide="user" style="width:10px;height:10px;"></i> ${tx.profiles?.full_name || 'System'}
             </div>
           </div>
           ${_isAdmin ? `
-          <div class="data-card-actions">
-            <button class="btn btn-ghost tx-edit-btn" 
+          <div class="data-card-actions" style="margin-top:0.75rem;padding-top:0.5rem;">
+            <button class="btn btn-ghost tx-edit-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3"></i> Edit</button>
-            <button class="btn btn-ghost tx-del-btn" style="color:#ef4444;"
+              data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3"></i></button>
+            <button class="btn btn-ghost tx-del-btn" style="padding:0.4rem 0.8rem;color:#ef4444;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2"></i> Delete</button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2"></i></button>
           </div>` : ''}
         </div>
       `).join('');

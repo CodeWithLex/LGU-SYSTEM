@@ -137,18 +137,26 @@ function buildReportsHTML(summary, monthly, events) {
           ${events.map(ev => `
             <div class="data-card">
               <div class="data-card-header">
-                <strong style="font-size:1rem;">${ev.event_name}</strong>
-                <span class="status-badge status-${ev.status}">${ev.status}</span>
+                <strong style="font-size:1rem;color:var(--col-text);">${ev.event_name}</strong>
+                <span class="status-badge status-${ev.status}">${UI.capitalize(ev.status)}</span>
               </div>
-              <div class="data-card-body">
-                <div class="data-card-row"><span class="data-card-label">Allocated</span><span>${fmt(ev.allocated_budget)}</span></div>
-                <div class="data-card-row"><span class="data-card-label">Remaining</span><span style="font-weight:700;color:var(--col-primary);">${fmt(ev.remaining_budget)}</span></div>
+              
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.25rem;">
+                <div>
+                  <div style="font-size:0.65rem;color:var(--col-text-muted);text-transform:uppercase;font-weight:700;">Allocated</div>
+                  <div style="font-size:0.9rem;font-weight:600;">${fmt(ev.allocated_budget)}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:0.65rem;color:var(--col-text-muted);text-transform:uppercase;font-weight:700;">Remaining</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:var(--col-primary);">${fmt(ev.remaining_budget)}</div>
+                </div>
               </div>
-              <div class="data-card-actions">
-                <button class="btn btn-ghost admin-only" style="font-size:.85rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
+
+              <div class="data-card-actions" style="margin-top:1rem;padding-top:0.5rem;gap:0.4rem;">
+                <button class="btn btn-ghost admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
                   <i data-lucide="file-text"></i> PDF
                 </button>
-                <button class="btn btn-ghost admin-only" style="font-size:.85rem;color:#10b981;" data-excel="${ev.id}" data-name="${ev.event_name}">
+                <button class="btn btn-ghost admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;color:#10b981;" data-excel="${ev.id}" data-name="${ev.event_name}">
                   <i data-lucide="sheet"></i> Excel
                 </button>
               </div>
