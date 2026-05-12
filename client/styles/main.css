@@ -7,21 +7,21 @@
   /* ---- Dark Mode (Default) ---- */
   --col-bg: #0d0f1a;
   --col-surface: #141728;
-  --col-surface-glass: rgba(20, 24, 50, 0.7);
+  --col-surface-glass: rgba(20, 24, 50, 0.8);
   --col-card: #1a1f35;
-  --col-border: rgba(255, 255, 255, 0.07);
-  --col-border-glow: rgba(99, 132, 255, 0.35);
+  --col-border: rgba(255, 255, 255, 0.08);
+  --col-border-glow: rgba(99, 132, 255, 0.3);
 
   --col-primary: #6384ff;
   --col-primary-dk: #4a6cf7;
   --col-accent: #a78bfa;
-  --col-success: #34d399;
-  --col-danger: #f87171;
-  --col-warning: #fbbf24;
-  --col-info: #60a5fa;
+  --col-success: #10b981;
+  --col-danger: #ef4444;
+  --col-warning: #f59e0b;
+  --col-info: #3b82f6;
 
-  --col-text: #e2e8f0;
-  --col-text-muted: #8892a4;
+  --col-text: #f1f5f9;
+  --col-text-muted: #94a3b8;
   --col-text-dim: #4a5568;
 
   --sidebar-w: 240px;
@@ -30,28 +30,29 @@
   --radius-lg: 20px;
 
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-card: 0 4px 30px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 30px rgba(99, 132, 255, 0.15);
-  --glass-blur: 20px;
+  --glass-blur: 24px;
 }
 
 [data-theme="light"] {
-  --col-bg: #f8fafc;
+  /* ---- Light Mode (High Contrast) ---- */
+  --col-bg: #f1f5f9;
   --col-surface: #ffffff;
-  --col-surface-glass: rgba(255, 255, 255, 0.75);
+  --col-surface-glass: rgba(255, 255, 255, 0.85);
   --col-card: #ffffff;
-  --col-border: rgba(0, 0, 0, 0.08);
+  --col-border: #e2e8f0;
   --col-border-glow: rgba(99, 132, 255, 0.2);
 
-  --col-primary: #3b82f6;      /* Slightly cleaner blue for light mode */
-  --col-primary-dk: #2563eb;
-  --col-text: #0f172a;         /* Deep slate for readability */
+  --col-primary: #2563eb;
+  --col-primary-dk: #1d4ed8;
+  --col-text: #0f172a;
   --col-text-muted: #64748b;
   --col-text-dim: #94a3b8;
 
-  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.05);
   --shadow-glow: 0 0 20px rgba(99, 132, 255, 0.08);
-  --glass-blur: 15px;
+  --glass-blur: 10px;
 }
 
 /* ---- Reset & Base ---- */
