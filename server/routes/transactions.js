@@ -1,6 +1,12 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
+const { sanitizeText, validateDriveUrl, isPositiveNumber, isValidEnum, assertRequired } = require('../lib/validate');
+const { logAudit } = require('../lib/audit');
+
+const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation'];
+const MAX_LIMIT      = 100;
+const MAX_OFFSET     = 10000;
 
 function requireAdmin(req, res, next) {
   if (req.profile?.role !== 'admin') {
@@ -9,59 +15,97 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// GET /api/transactions — all transactions (optionally filter by event_id or type)
+// GET /api/transactions
 router.get('/', async (req, res) => {
-  const { event_id, type, limit = 50, offset = 0 } = req.query;
+  const event_id = req.query.event_id   || null;
+  const type     = req.query.type       || null;
+  const limit    = Math.min(Number(req.query.limit)  || 50, MAX_LIMIT);
+  const offset   = Math.min(Number(req.query.offset) || 0,  MAX_OFFSET);
+
+  // Validate type enum if provided
+  if (type && !isValidEnum(type, VALID_TX_TYPES)) {
+    return res.status(400).json({ error: 'Invalid transaction type filter.' });
+  }
 
   let query = supabase
     .from('transactions')
     .select('*, profiles!added_by(full_name)')
     .order('created_at', { ascending: false })
-    .range(Number(offset), Number(offset) + Number(limit) - 1);
+    .range(offset, offset + limit - 1);
 
   if (event_id) query = query.eq('event_id', event_id);
   if (type)     query = query.eq('type', type);
 
   const { data, error } = await query;
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(500).json({ error: 'Failed to fetch transactions.' });
   res.json(data);
 });
 
-// POST /api/transactions — add a transaction with optional Google Drive receipt link (admin only)
+// POST /api/transactions (admin only)
 router.post('/', requireAdmin, async (req, res) => {
-  const {
-    event_id, type, amount, description,
-    donor_name, transaction_date, receipt_url
-  } = req.body;
+  const { event_id, type, amount, description, donor_name, transaction_date, receipt_url } = req.body;
 
-  // Insert transaction (triggers balance sync automatically via DB trigger)
+  // 1. Required field check
+  const missing = assertRequired({ event_id, type, amount, description, transaction_date });
+  if (missing) return res.status(400).json({ error: missing });
+
+  // 2. Type enum validation
+  if (!isValidEnum(type, VALID_TX_TYPES)) {
+    return res.status(400).json({ error: `Invalid type. Must be one of: ${VALID_TX_TYPES.join(', ')}.` });
+  }
+
+  // 3. Amount must be a positive number
+  if (!isPositiveNumber(amount)) {
+    return res.status(400).json({ error: 'Amount must be a positive number.' });
+  }
+
+  // 4. SSRF protection — only allow Google Drive URLs
+  if (receipt_url && !validateDriveUrl(receipt_url)) {
+    return res.status(400).json({ error: 'Receipt URL must be a valid Google Drive link (https://drive.google.com/...).' });
+  }
+
+  // 5. Sanitize text inputs
+  const cleanDesc   = sanitizeText(description);
+  const cleanDonor  = donor_name ? sanitizeText(donor_name) : null;
+
+  if (cleanDesc.length > 500) {
+    return res.status(400).json({ error: 'Description must be 500 characters or less.' });
+  }
+
   const { data: tx, error: txError } = await supabase
     .from('transactions')
     .insert({
       event_id,
       type,
       amount:           Number(amount),
-      description,
-      donor_name:       donor_name || null,
+      description:      cleanDesc,
+      donor_name:       cleanDonor,
       receipt_url:      receipt_url || null,
       added_by:         req.user.id,
-      transaction_date: transaction_date || new Date().toISOString().split('T')[0]
+      transaction_date: transaction_date,
     })
     .select()
     .single();
 
-  if (txError) return res.status(400).json({ error: txError.message });
+  if (txError) return res.status(400).json({ error: 'Failed to create transaction.' });
 
-  // Record receipt metadata if a link was provided
   if (receipt_url) {
     await supabase.from('receipts').insert({
       transaction_id: tx.id,
       file_url:       receipt_url,
       file_name:      'Google Drive Link',
       file_type:      'link/gdrive',
-      uploaded_by:    req.user.id
+      uploaded_by:    req.user.id,
     });
   }
+
+  // Audit log
+  logAudit(req.user.id, 'CREATE_TRANSACTION', {
+    transaction_id: tx.id,
+    event_id,
+    type,
+    amount: Number(amount),
+  });
 
   res.status(201).json(tx);
 });

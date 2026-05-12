@@ -2,8 +2,11 @@ const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
 const { sendNewEventEmail } = require('../lib/email');
+const { sanitizeText, isPositiveNumber, isValidEnum, assertRequired } = require('../lib/validate');
+const { logAudit } = require('../lib/audit');
 
-// Admin-only guard
+const VALID_STATUSES = ['upcoming', 'ongoing', 'completed', 'cancelled'];
+
 function requireAdmin(req, res, next) {
   if (req.profile?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin privileges required.' });
@@ -11,18 +14,18 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// GET /api/events — list all events
+// GET /api/events
 router.get('/', async (req, res) => {
   const { data, error } = await supabase
     .from('events')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(500).json({ error: 'Failed to fetch events.' });
   res.json(data);
 });
 
-// GET /api/events/:id — single event with transactions
+// GET /api/events/:id
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -33,50 +36,114 @@ router.get('/:id', async (req, res) => {
     ]);
 
   if (evtErr) return res.status(404).json({ error: 'Event not found.' });
-  if (txErr)  return res.status(500).json({ error: txErr.message });
+  if (txErr)  return res.status(500).json({ error: 'Failed to fetch transactions.' });
 
   res.json({ ...event, transactions });
 });
 
-// POST /api/events — create event (admin only)
+// POST /api/events (admin only)
 router.post('/', requireAdmin, async (req, res) => {
   const { event_name, description, allocated_budget, event_date, status } = req.body;
+
+  // 1. Required fields
+  const missing = assertRequired({ event_name, allocated_budget });
+  if (missing) return res.status(400).json({ error: missing });
+
+  // 2. Budget must be positive
+  if (!isPositiveNumber(allocated_budget)) {
+    return res.status(400).json({ error: 'Allocated budget must be a positive number.' });
+  }
+
+  // 3. Status enum
+  const finalStatus = status || 'upcoming';
+  if (!isValidEnum(finalStatus, VALID_STATUSES)) {
+    return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}.` });
+  }
+
+  // 4. Sanitize text inputs
+  const cleanName = sanitizeText(String(event_name));
+  const cleanDesc = description ? sanitizeText(String(description)) : null;
+
+  if (cleanName.length > 150) {
+    return res.status(400).json({ error: 'Event name must be 150 characters or less.' });
+  }
+  if (cleanDesc && cleanDesc.length > 2000) {
+    return res.status(400).json({ error: 'Description must be 2000 characters or less.' });
+  }
 
   const { data, error } = await supabase
     .from('events')
     .insert({
-      event_name,
-      description,
+      event_name:       cleanName,
+      description:      cleanDesc,
       allocated_budget: Number(allocated_budget),
       remaining_budget: Number(allocated_budget),
-      event_date,
-      status: status || 'upcoming',
-      created_by: req.user.id
+      event_date:       event_date || null,
+      status:           finalStatus,
+      created_by:       req.user.id,
     })
     .select()
     .single();
 
-  if (error) return res.status(400).json({ error: error.message });
+  if (error) return res.status(400).json({ error: 'Failed to create event.' });
 
-  // Notify all students by email (background, non-blocking)
-  sendNewEventEmail(data).catch(err => console.error('[Email] Event notify failed:', err));
+  // Audit log
+  logAudit(req.user.id, 'CREATE_EVENT', {
+    event_id:         data.id,
+    event_name:       cleanName,
+    allocated_budget: Number(allocated_budget),
+  });
+
+  // Notify students (non-blocking)
+  sendNewEventEmail(data).catch(err => console.error('[Email] Event notify failed:', err.message));
 
   res.status(201).json(data);
 });
 
-// PATCH /api/events/:id — update event (admin only)
+// PATCH /api/events/:id (admin only)
 router.patch('/:id', requireAdmin, async (req, res) => {
-  const { id } = req.params;
-  const updates = req.body;
+  const { id }    = req.params;
+  const { event_name, description, allocated_budget, event_date, status } = req.body;
+
+  // Build a clean updates object — only include provided fields
+  const updates = {};
+
+  if (event_name !== undefined) {
+    updates.event_name = sanitizeText(String(event_name)).slice(0, 150);
+  }
+  if (description !== undefined) {
+    updates.description = sanitizeText(String(description)).slice(0, 2000);
+  }
+  if (allocated_budget !== undefined) {
+    if (!isPositiveNumber(allocated_budget)) {
+      return res.status(400).json({ error: 'Allocated budget must be a positive number.' });
+    }
+    updates.allocated_budget = Number(allocated_budget);
+  }
+  if (status !== undefined) {
+    if (!isValidEnum(status, VALID_STATUSES)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}.` });
+    }
+    updates.status = status;
+  }
+  if (event_date !== undefined) {
+    updates.event_date = event_date;
+  }
+
+  updates.updated_at = new Date().toISOString();
 
   const { data, error } = await supabase
     .from('events')
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update(updates)
     .eq('id', id)
     .select()
     .single();
 
-  if (error) return res.status(400).json({ error: error.message });
+  if (error) return res.status(400).json({ error: 'Failed to update event.' });
+
+  // Audit log
+  logAudit(req.user.id, 'UPDATE_EVENT', { event_id: id, changes: Object.keys(updates) });
+
   res.json(data);
 });
 
