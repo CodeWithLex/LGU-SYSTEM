@@ -112,7 +112,8 @@ router.post('/', requireAdmin, async (req, res) => {
     transaction_id: tx.id,
     event_id,
     type,
-    amount: Number(amount),
+    amount:      Number(amount),
+    description: cleanDesc
   });
 
   res.status(201).json(tx);
@@ -161,10 +162,15 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'A reason of at least 5 characters is required to delete a transaction.' });
   }
 
+  const { data: tx } = await supabase.from('transactions').select('description').eq('id', id).single();
   const { error } = await supabase.from('transactions').delete().eq('id', id);
   if (error) return res.status(400).json({ error: 'Failed to delete transaction.' });
 
-  logAudit(req.user.id, 'DELETE_TRANSACTION', { transaction_id: id, reason: sanitizeText(reason) });
+  logAudit(req.user.id, 'DELETE_TRANSACTION', { 
+    transaction_id: id, 
+    description: tx?.description || 'Unknown', 
+    reason: sanitizeText(reason) 
+  });
   res.json({ message: 'Transaction deleted successfully.' });
 });
 

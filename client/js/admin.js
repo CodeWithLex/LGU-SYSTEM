@@ -327,6 +327,36 @@ const Admin = (() => {
       OVER_BUDGET_ALERT:  '⚠️ Over Budget Alert',
     }[a] || a);
 
+    const formatDetails = (log) => {
+      const d = log.details || {};
+      try {
+        switch (log.action) {
+          case 'BUDGET_TRANSFER':
+            return `₱${Number(d.amount).toLocaleString()} from "${d.from_event_name || 'Event'}" to "${d.to_event_name || 'Event'}". Reason: ${d.reason}`;
+          case 'SET_USER_ROLE':
+            return `Changed ${d.user_name || 'user'}'s role to ${UI.capitalize(d.new_role)}`;
+          case 'CREATE_TRANSACTION':
+            return `Added ${d.type}: "${d.description}" for ₱${Number(d.amount).toLocaleString()}`;
+          case 'EDIT_TRANSACTION':
+            return `Edited transaction. Reason: ${d.reason}`;
+          case 'DELETE_TRANSACTION':
+            return `Deleted "${d.description || 'Transaction'}". Reason: ${d.reason}`;
+          case 'CREATE_EVENT':
+            return `Created event "${d.event_name}" with budget ₱${Number(d.allocated_budget).toLocaleString()}`;
+          case 'ARCHIVE_EVENT':
+            return `Archived event "${d.event_name}"`;
+          case 'POST_ANNOUNCEMENT':
+            return `Posted: "${d.title}"`;
+          case 'OVER_BUDGET_ALERT':
+            return `Budget Alert: ₱${Number(d.remaining_budget).toLocaleString()} remaining`;
+          default:
+            return JSON.stringify(d);
+        }
+      } catch (e) {
+        return JSON.stringify(d);
+      }
+    };
+
     container.innerHTML = `
         <div class="table-wrapper">
           <table class="data-table">
@@ -337,8 +367,8 @@ const Admin = (() => {
                   <td style="font-size:.8rem;white-space:nowrap">${fmtDate(log.created_at)}</td>
                   <td style="font-size:.8rem">${log.profiles?.full_name || '—'}</td>
                   <td><span style="font-size:.82rem">${actionLabel(log.action)}</span></td>
-                  <td style="font-size:.78rem;color:var(--col-text-muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
-                    ${JSON.stringify(log.details || {})}
+                  <td style="font-size:.78rem;color:var(--col-text-muted);max-width:300px;line-height:1.4;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
+                    ${formatDetails(log)}
                   </td>
                 </tr>
               `).join('')}

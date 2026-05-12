@@ -49,7 +49,7 @@ router.patch('/users/:id/role', async (req, res) => {
 
   if (error) return res.status(400).json({ error: 'Failed to update role.' });
 
-  logAudit(req.user.id, 'SET_USER_ROLE', { target_user_id: id, new_role: role });
+  logAudit(req.user.id, 'SET_USER_ROLE', { target_user_id: id, user_name: data.full_name, new_role: role });
   res.json(data);
 });
 
@@ -149,10 +149,12 @@ router.post('/budget-transfer', async (req, res) => {
   });
 
   logAudit(req.user.id, 'BUDGET_TRANSFER', {
-    from_event_id,
-    to_event_id,
-    amount: transferAmount,
-    reason: sanitizeText(reason),
+    from_event_id:   from_event_id,
+    from_event_name: fromEv.event_name,
+    to_event_id:     to_event_id,
+    to_event_name:   toEv.event_name,
+    amount:          transferAmount,
+    reason:          sanitizeText(reason),
   });
 
   res.json({
