@@ -129,8 +129,10 @@
 
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
     item.addEventListener('click', async e => {
-      e.preventDefault();
-      navigateTo(item.dataset.view);
+      if (item.dataset.view) {
+        e.preventDefault();
+        navigateTo(item.dataset.view);
+      }
     });
   });
 
