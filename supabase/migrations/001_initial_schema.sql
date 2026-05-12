@@ -25,12 +25,14 @@ CREATE TABLE public.profiles (
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, full_name, role)
+  INSERT INTO public.profiles (id, email, full_name, role, course, year_level)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'COE Member'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'student')
+    COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
+    NEW.raw_user_meta_data->>'course',
+    NEW.raw_user_meta_data->>'year_level'
   );
   RETURN NEW;
 END;
