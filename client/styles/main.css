@@ -1255,6 +1255,16 @@ textarea {
   box-shadow: 0 20px 60px rgba(0,0,0,.4);
 }
 
-/* Hide admin-only columns for non-admins */
-.admin-only { display: none; }
-body.is-admin .admin-only { display: table-cell; }
+/* Hide admin-only elements by default */
+.admin-only { display: none !important; }
+
+/* Show admin-only in sidebar as flex */
+body.is-admin .nav-item.admin-only { 
+  display: flex !important; 
+}
+
+/* Show admin-only in tables as table-cell */
+body.is-admin td.admin-only,
+body.is-admin th.admin-only { 
+  display: table-cell !important; 
+}
