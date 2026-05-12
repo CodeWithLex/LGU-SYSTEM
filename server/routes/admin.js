@@ -58,9 +58,9 @@ router.get('/audit-logs', async (req, res) => {
   const limit  = Math.min(Number(req.query.limit)  || 50, 100);
   const offset = Math.min(Number(req.query.offset) || 0, 10000);
 
-  const { data, error } = await supabase
+  const { data: logs, error } = await supabase
     .from('audit_logs')
-    .select('*, profiles(full_name, email)')
+    .select('*')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -68,7 +68,28 @@ router.get('/audit-logs', async (req, res) => {
     console.error('Audit Log Error:', error);
     return res.status(500).json({ error: error.message || 'Failed to fetch audit logs.' });
   }
-  res.json(data);
+
+  // Manual join for profiles to bypass missing FK relationships
+  const userIds = [...new Set(logs.map(l => l.user_id).filter(Boolean))];
+  let profilesMap = {};
+
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', userIds);
+      
+    if (profiles) {
+      profilesMap = profiles.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+    }
+  }
+
+  const mergedData = logs.map(log => ({
+    ...log,
+    profiles: profilesMap[log.user_id] || null
+  }));
+
+  res.json(mergedData);
 });
 
 // ── POST /api/admin/budget-transfer ──────────────────────────────────────────
