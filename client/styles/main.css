@@ -4,8 +4,10 @@
 
 /* ---- Design Tokens ---- */
 :root {
+  /* ---- Dark Mode (Default) ---- */
   --col-bg: #0d0f1a;
   --col-surface: #141728;
+  --col-surface-glass: rgba(20, 24, 50, 0.7);
   --col-card: #1a1f35;
   --col-border: rgba(255, 255, 255, 0.07);
   --col-border-glow: rgba(99, 132, 255, 0.35);
@@ -30,6 +32,26 @@
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --shadow-card: 0 4px 30px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 30px rgba(99, 132, 255, 0.15);
+  --glass-blur: 20px;
+}
+
+[data-theme="light"] {
+  --col-bg: #f8fafc;
+  --col-surface: #ffffff;
+  --col-surface-glass: rgba(255, 255, 255, 0.75);
+  --col-card: #ffffff;
+  --col-border: rgba(0, 0, 0, 0.08);
+  --col-border-glow: rgba(99, 132, 255, 0.2);
+
+  --col-primary: #3b82f6;      /* Slightly cleaner blue for light mode */
+  --col-primary-dk: #2563eb;
+  --col-text: #0f172a;         /* Deep slate for readability */
+  --col-text-muted: #64748b;
+  --col-text-dim: #94a3b8;
+
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(99, 132, 255, 0.08);
+  --glass-blur: 15px;
 }
 
 /* ---- Reset & Base ---- */
@@ -88,9 +110,9 @@ textarea {
 
 /* ---- Glassmorphism ---- */
 .glass {
-  background: rgba(20, 24, 50, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--col-surface-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--col-border);
 }
 

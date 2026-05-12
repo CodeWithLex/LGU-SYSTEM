@@ -89,5 +89,31 @@ const UI = (() => {
       </div>`;
   }
 
-  return { showView, showScreen, toast, currency, dateStr, capitalize, setAdminVisibility, setLoading, setEmpty };
+  // ---- Theme Management ----
+  const Theme = {
+    init() {
+      const saved = localStorage.getItem('theme') || 'dark';
+      this.set(saved);
+      
+      const toggleBtn = document.getElementById('theme-toggle');
+      if (toggleBtn) {
+        toggleBtn.onclick = () => this.toggle();
+      }
+    },
+    set(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const icon = document.getElementById('theme-toggle-icon');
+      if (icon) {
+        icon.setAttribute('data-lucide', theme === 'dark' ? 'moon' : 'sun');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }
+    },
+    toggle() {
+      const current = document.documentElement.getAttribute('data-theme') || 'dark';
+      this.set(current === 'dark' ? 'light' : 'dark');
+    }
+  };
+
+  return { showView, showScreen, toast, currency, dateStr, capitalize, setAdminVisibility, setLoading, setEmpty, Theme };
 })();

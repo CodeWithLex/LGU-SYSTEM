@@ -4,7 +4,8 @@
 
 (async () => {
 
-  // Initialize Lucide icons on load
+  // Initialize Theme and Lucide icons on load
+  UI.Theme.init();
   if (typeof lucide !== 'undefined') lucide.createIcons();
 
   // ---- Auth Form Toggles ----
