@@ -5,22 +5,27 @@
 const Transactions = (() => {
 
   let allTxs = [];
+  let _isAdmin = false;
 
   async function load() {
+    // Check admin status from the sidebar role label
+    _isAdmin = document.getElementById('user-role')?.textContent?.includes('Admin');
     try {
       allTxs = await Api.transactions.list({ limit: 200 });
       renderTable(allTxs);
       bindFilter();
     } catch (err) {
       document.getElementById('tx-table-body').innerHTML =
-        `<tr><td colspan="7" class="loading-state">Failed to load transactions.</td></tr>`;
+        `<tr><td colspan="8" class="loading-state">Failed to load transactions.</td></tr>`;
     }
   }
 
   function renderTable(txs) {
     const tbody = document.getElementById('tx-table-body');
+    const colSpan = _isAdmin ? 8 : 7;
+
     if (!txs.length) {
-      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span class="empty-icon">💳</span><p>No transactions found.</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon">💳</span><p>No transactions found.</p></div></td></tr>`;
       return;
     }
 
@@ -34,20 +39,171 @@ const Transactions = (() => {
           ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-            ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank">📎 View</a>`
-            : '<span style="color:var(--col-text-dim)">—</span>'}</td>
+          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank">📎 View</a>`
+          : '<span style="color:var(--col-text-dim)">—</span>'}</td>
         <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
+        ${_isAdmin ? `
+        <td style="text-align:center;">
+          <div style="display:inline-flex;gap:.4rem;">
+            <button class="btn btn-ghost tx-edit-btn" style="font-size:.75rem;padding:.25rem .6rem;"
+              data-txid="${tx.id}"
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
+              data-amount="${tx.amount}"
+              data-date="${tx.transaction_date}">Edit</button>
+            <button class="btn btn-ghost tx-del-btn" style="font-size:.75rem;padding:.25rem .6rem;color:#ef4444;"
+              data-txid="${tx.id}"
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}">Delete</button>
+          </div>
+        </td>` : ''}
       </tr>
     `).join('');
+
+    // Delegate clicks on Edit/Delete buttons
+    document.getElementById('tx-table-body').addEventListener('click', e => {
+      const editBtn = e.target.closest('.tx-edit-btn');
+      const delBtn  = e.target.closest('.tx-del-btn');
+      if (editBtn) {
+        editModal(editBtn.dataset.txid, editBtn.dataset.desc, editBtn.dataset.amount, editBtn.dataset.date);
+      } else if (delBtn) {
+        deleteModal(delBtn.dataset.txid, delBtn.dataset.desc);
+      }
+    }, { once: true });
   }
 
   function bindFilter() {
-    document.getElementById('tx-type-filter').addEventListener('change', e => {
-      const type = e.target.value;
-      const filtered = type ? allTxs.filter(t => t.type === type) : allTxs;
-      renderTable(filtered);
+    const el = document.getElementById('tx-type-filter');
+    if (!el._bound) {
+      el.addEventListener('change', e => {
+        const type = e.target.value;
+        renderTable(type ? allTxs.filter(t => t.type === type) : allTxs);
+      });
+      el._bound = true;
+    }
+  }
+
+  // ── Edit Modal ──────────────────────────────────────────────────────────
+  function editModal(id, desc, amount, date) {
+    const existing = document.getElementById('tx-edit-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'tx-edit-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-card">
+        <h3 style="margin:0 0 1rem;font-size:1.1rem;">Edit Transaction</h3>
+        <div class="form-group">
+          <label>Description</label>
+          <input id="edit-desc" type="text" value="${desc}" maxlength="500" />
+        </div>
+        <div class="form-group">
+          <label>Amount (₱)</label>
+          <input id="edit-amount" type="number" step="0.01" min="0" value="${amount}" />
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input id="edit-date" type="date" value="${date}" />
+        </div>
+        <div class="form-group">
+          <label>Reason for Edit <span style="color:#ef4444">*</span></label>
+          <input id="edit-reason" type="text" placeholder="Required — why are you editing this?" />
+        </div>
+        <div class="auth-error hidden" id="edit-error"></div>
+        <div style="display:flex;gap:.75rem;margin-top:1rem;">
+          <button class="btn btn-primary" style="flex:1;" id="edit-submit-btn">Save Changes</button>
+          <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('tx-edit-modal').remove()">Cancel</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('edit-submit-btn').addEventListener('click', async () => {
+      const btn    = document.getElementById('edit-submit-btn');
+      const errEl  = document.getElementById('edit-error');
+      const reason = document.getElementById('edit-reason').value.trim();
+      errEl.classList.add('hidden');
+
+      if (!reason || reason.length < 5) {
+        errEl.textContent = 'Please provide a reason (min 5 characters).';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      try {
+        await Api.transactions.update(id, {
+          description:      document.getElementById('edit-desc').value,
+          amount:           document.getElementById('edit-amount').value,
+          transaction_date: document.getElementById('edit-date').value,
+          reason,
+        });
+        modal.remove();
+        UI.toast('Transaction updated successfully.', 'success');
+        load();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+      }
     });
   }
 
-  return { load };
+  // ── Delete Modal ────────────────────────────────────────────────────────
+  function deleteModal(id, desc) {
+    const existing = document.getElementById('tx-delete-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'tx-delete-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-card">
+        <h3 style="margin:0 0 .5rem;font-size:1.1rem;color:#ef4444;">Delete Transaction</h3>
+        <p style="color:var(--col-text-muted);margin-bottom:1rem;font-size:.9rem;">
+          You are about to delete: <strong>${desc}</strong>.<br>This action is permanent and recorded.
+        </p>
+        <div class="form-group">
+          <label>Reason for Deletion <span style="color:#ef4444">*</span></label>
+          <input id="delete-reason" type="text" placeholder="Required — why are you deleting this?" />
+        </div>
+        <div class="auth-error hidden" id="delete-error"></div>
+        <div style="display:flex;gap:.75rem;margin-top:1rem;">
+          <button class="btn btn-primary" style="flex:1;background:#ef4444;" id="delete-submit-btn">Confirm Delete</button>
+          <button class="btn btn-ghost" style="flex:1;" onclick="document.getElementById('tx-delete-modal').remove()">Cancel</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('delete-submit-btn').addEventListener('click', async () => {
+      const btn    = document.getElementById('delete-submit-btn');
+      const errEl  = document.getElementById('delete-error');
+      const reason = document.getElementById('delete-reason').value.trim();
+      errEl.classList.add('hidden');
+
+      if (!reason || reason.length < 5) {
+        errEl.textContent = 'Please provide a reason (min 5 characters).';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting…';
+      try {
+        await Api.transactions.remove(id, { reason });
+        modal.remove();
+        UI.toast('Transaction deleted.', 'success');
+        load();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Confirm Delete';
+      }
+    });
+  }
+
+  return { load, editModal, deleteModal };
 })();

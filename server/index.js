@@ -9,6 +9,7 @@ const eventsRouter        = require("./routes/events");
 const transactionsRouter  = require("./routes/transactions");
 const reportsRouter       = require("./routes/reports");
 const announcementsRouter = require("./routes/announcements");
+const adminRouter         = require("./routes/admin");
 const authMiddleware      = require("./middleware/auth");
 const keepAlive           = require("./lib/keepAlive");
 
@@ -109,6 +110,7 @@ app.use("/api/events",        authMiddleware, eventsRouter);
 app.use("/api/transactions",  authMiddleware, writeLimiter, transactionsRouter);
 app.use("/api/reports",       authMiddleware, reportsRouter);
 app.use("/api/announcements", authMiddleware, writeLimiter, announcementsRouter);
+app.use("/api/admin",         authMiddleware, writeLimiter, adminRouter);
 
 // =============================================
 // SPA Fallback

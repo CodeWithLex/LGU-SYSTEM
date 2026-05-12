@@ -99,7 +99,6 @@ router.post('/', requireAdmin, async (req, res) => {
     });
   }
 
-  // Audit log
   logAudit(req.user.id, 'CREATE_TRANSACTION', {
     transaction_id: tx.id,
     event_id,
@@ -108,6 +107,56 @@ router.post('/', requireAdmin, async (req, res) => {
   });
 
   res.status(201).json(tx);
+});
+
+// PATCH /api/transactions/:id — edit with mandatory reason (admin only)
+router.patch('/:id', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { amount, description, transaction_date, reason } = req.body;
+
+  if (!reason || String(reason).trim().length < 5) {
+    return res.status(400).json({ error: 'A reason of at least 5 characters is required to edit a transaction.' });
+  }
+
+  const updates = {};
+  if (amount !== undefined) {
+    if (!isPositiveNumber(amount)) return res.status(400).json({ error: 'Amount must be a positive number.' });
+    updates.amount = Number(amount);
+  }
+  if (description !== undefined) updates.description = sanitizeText(String(description)).slice(0, 500);
+  if (transaction_date !== undefined) updates.transaction_date = transaction_date;
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: 'No valid fields provided for update.' });
+  }
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) return res.status(400).json({ error: 'Failed to update transaction.' });
+
+  logAudit(req.user.id, 'EDIT_TRANSACTION', { transaction_id: id, changes: updates, reason: sanitizeText(reason) });
+  res.json(data);
+});
+
+// DELETE /api/transactions/:id — soft-delete with mandatory reason (admin only)
+router.delete('/:id', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { reason } = req.body;
+
+  if (!reason || String(reason).trim().length < 5) {
+    return res.status(400).json({ error: 'A reason of at least 5 characters is required to delete a transaction.' });
+  }
+
+  const { error } = await supabase.from('transactions').delete().eq('id', id);
+  if (error) return res.status(400).json({ error: 'Failed to delete transaction.' });
+
+  logAudit(req.user.id, 'DELETE_TRANSACTION', { transaction_id: id, reason: sanitizeText(reason) });
+  res.json({ message: 'Transaction deleted successfully.' });
 });
 
 module.exports = router;

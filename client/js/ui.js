@@ -67,6 +67,7 @@ const UI = (() => {
 
   // ---- Admin-only elements ----
   function setAdminVisibility(isAdmin) {
+    document.body.classList.toggle('is-admin', isAdmin);
     document.querySelectorAll('.admin-only').forEach(el => {
       if (isAdmin) el.classList.remove('hidden');
       else         el.classList.add('hidden');

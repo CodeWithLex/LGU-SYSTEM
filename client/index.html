@@ -217,7 +217,7 @@
             <thead>
               <tr>
                 <th>Date</th><th>Event</th><th>Type</th><th>Description</th>
-                <th>Amount</th><th>Receipt</th><th>Added By</th>
+                <th>Amount</th><th>Receipt</th><th>Added By</th><th class="admin-only" style="text-align:center;">Actions</th>
               </tr>
             </thead>
             <tbody id="tx-table-body">
@@ -245,123 +245,168 @@
         <div class="view-header">
           <div>
             <h2>Admin Management</h2>
-            <p class="view-sub">Manage records, events, and transactions</p>
+            <p class="view-sub">Manage records, users, and audit logs</p>
           </div>
         </div>
 
-        <div class="admin-panels">
-
-          <!-- Create Event -->
-          <div class="dashboard-card">
-            <h3><i data-lucide="circle-plus"></i> Create New Event</h3>
-            <form id="add-event-form" class="admin-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Event Name</label>
-                  <input type="text" id="ev-name" required placeholder="e.g. Engineering Week 2026" />
-                </div>
-                <div class="form-group">
-                  <label>Status</label>
-                  <select id="ev-status">
-                    <option value="upcoming">Upcoming</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Allocated Budget (₱)</label>
-                  <input type="number" id="ev-budget" min="0" step="0.01" required placeholder="0.00" />
-                </div>
-                <div class="form-group">
-                  <label>Event Date</label>
-                  <input type="date" id="ev-date" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Description</label>
-                <textarea id="ev-description" rows="2" placeholder="Brief description of the event…"></textarea>
-              </div>
-              <div class="form-error hidden" id="ev-error"></div>
-              <button class="btn btn-primary" type="submit" id="submit-ev-btn">Create Event</button>
-            </form>
-          </div>
-
-          <!-- Add Transaction -->
-          <div class="dashboard-card">
-            <h3><i data-lucide="receipt"></i> Add Transaction</h3>
-            <form id="add-tx-form" class="admin-form" enctype="multipart/form-data">
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Event</label>
-                  <select id="tx-event-id" name="event_id" required>
-                    <option value="">Select Event</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Type</label>
-                  <select id="tx-type" name="type" required>
-                    <option value="expense">Expense</option>
-                    <option value="donation">Donation</option>
-                    <option value="collection">Collection</option>
-                    <option value="allocation">Budget Allocation</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Amount (₱)</label>
-                  <input type="number" id="tx-amount" name="amount" min="1" step="0.01" required placeholder="0.00" />
-                </div>
-                <div class="form-group">
-                  <label>Date</label>
-                  <input type="date" id="tx-date" name="transaction_date" required />
-                </div>
-              </div>
-              <div class="form-group">
-                <label>Description</label>
-                <input type="text" id="tx-desc" name="description" required placeholder="e.g. Sound system rental" />
-              </div>
-              <div class="form-group" id="donor-field">
-                <label>Donor Name (optional)</label>
-                <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
-              </div>
-              <div class="form-group">
-                <label>Receipt / Proof — Google Drive Link <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
-                <input
-                  type="url"
-                  id="tx-receipt-url"
-                  placeholder="https://drive.google.com/file/d/..."
-                />
-                <small style="color:var(--col-text-muted);margin-top:0.3rem;display:block;">
-                  <i data-lucide="info" style="width:0.85rem;height:0.85rem;vertical-align:middle;"></i> In Google Drive: Right-click file → <em>Share</em> → <em>Copy link</em>. Set to <strong>"Anyone with the link"</strong>.
-                </small>
-              </div>
-              <div class="form-error hidden" id="tx-error"></div>
-              <button class="btn btn-primary" type="submit" id="submit-tx-btn">Submit Transaction</button>
-            </form>
-          </div>
-
-          <!-- Post Announcement -->
-          <div class="dashboard-card">
-            <h3><i data-lucide="megaphone"></i> Post Announcement</h3>
-            <form id="add-announce-form" class="admin-form">
-              <div class="form-group">
-                <label>Title</label>
-                <input type="text" id="announce-title" required placeholder="Announcement title" />
-              </div>
-              <div class="form-group">
-                <label>Message</label>
-                <textarea id="announce-body" required rows="4" placeholder="Write the announcement here…"></textarea>
-              </div>
-              <div class="form-error hidden" id="announce-error"></div>
-              <button class="btn btn-primary" type="submit">Post Announcement</button>
-            </form>
-          </div>
-
+        <!-- Tab Navigation -->
+        <div class="admin-tabs">
+          <button class="admin-tab-btn active" data-tab="create">📝 Create Records</button>
+          <button class="admin-tab-btn" data-tab="transfer">💸 Budget Transfer</button>
+          <button class="admin-tab-btn" data-tab="users">👥 User Management</button>
+          <button class="admin-tab-btn" data-tab="audit">🕵️ Audit Log</button>
         </div>
+
+        <!-- Tab: Create Records -->
+        <div class="admin-tab-panel active" id="admin-tab-create">
+          <div class="admin-panels">
+
+            <!-- Create Event -->
+            <div class="dashboard-card">
+              <h3><i data-lucide="circle-plus"></i> Create New Event</h3>
+              <form id="add-event-form" class="admin-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Event Name</label>
+                    <input type="text" id="ev-name" required placeholder="e.g. Engineering Week 2026" />
+                  </div>
+                  <div class="form-group">
+                    <label>Status</label>
+                    <select id="ev-status">
+                      <option value="upcoming">Upcoming</option>
+                      <option value="ongoing">Ongoing</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Allocated Budget (₱)</label>
+                    <input type="number" id="ev-budget" min="0" step="0.01" required placeholder="0.00" />
+                  </div>
+                  <div class="form-group">
+                    <label>Event Date</label>
+                    <input type="date" id="ev-date" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <textarea id="ev-description" rows="2" placeholder="Brief description of the event…"></textarea>
+                </div>
+                <div class="form-error hidden" id="ev-error"></div>
+                <button class="btn btn-primary" type="submit" id="submit-ev-btn">Create Event</button>
+              </form>
+            </div>
+
+            <!-- Add Transaction -->
+            <div class="dashboard-card">
+              <h3><i data-lucide="receipt"></i> Add Transaction</h3>
+              <form id="add-tx-form" class="admin-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Event</label>
+                    <select id="tx-event-id" name="event_id" required class="event-select-dropdown">
+                      <option value="">Select Event</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Type</label>
+                    <select id="tx-type" name="type" required>
+                      <option value="expense">Expense</option>
+                      <option value="donation">Donation</option>
+                      <option value="collection">Collection</option>
+                      <option value="allocation">Budget Allocation</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Amount (₱)</label>
+                    <input type="number" id="tx-amount" name="amount" min="1" step="0.01" required placeholder="0.00" />
+                  </div>
+                  <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="tx-date" name="transaction_date" required />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <input type="text" id="tx-desc" name="description" required placeholder="e.g. Sound system rental" />
+                </div>
+                <div class="form-group">
+                  <label>Donor Name <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+                  <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
+                </div>
+                <div class="form-group">
+                  <label>Receipt — Google Drive Link <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+                  <input type="url" id="tx-receipt-url" placeholder="https://drive.google.com/file/d/..." />
+                </div>
+                <div class="form-error hidden" id="tx-error"></div>
+                <button class="btn btn-primary" type="submit" id="submit-tx-btn">Submit Transaction</button>
+              </form>
+            </div>
+
+            <!-- Post Announcement -->
+            <div class="dashboard-card">
+              <h3><i data-lucide="megaphone"></i> Post Announcement</h3>
+              <form id="add-announce-form" class="admin-form">
+                <div class="form-group">
+                  <label>Title</label>
+                  <input type="text" id="announce-title" required placeholder="Announcement title" />
+                </div>
+                <div class="form-group">
+                  <label>Message</label>
+                  <textarea id="announce-body" required rows="4" placeholder="Write the announcement here…"></textarea>
+                </div>
+                <div class="form-error hidden" id="announce-error"></div>
+                <button class="btn btn-primary" type="submit">Post Announcement</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab: Budget Transfer -->
+        <div class="admin-tab-panel" id="admin-tab-transfer">
+          <div class="dashboard-card" style="max-width:600px;">
+            <h3><i data-lucide="arrow-right-left"></i> Budget Transfer</h3>
+            <p style="color:var(--col-text-muted);margin-bottom:1.25rem;font-size:.9rem;">
+              Move surplus funds from one event to another. A transfer record is automatically created on the target event.
+            </p>
+            <form id="transfer-form" class="admin-form">
+              <div class="form-group">
+                <label>Transfer From</label>
+                <select id="transfer-from" required class="event-select-dropdown"><option value="">Select Source Event</option></select>
+              </div>
+              <div class="form-group">
+                <label>Transfer To</label>
+                <select id="transfer-to" required class="event-select-dropdown"><option value="">Select Target Event</option></select>
+              </div>
+              <div class="form-group">
+                <label>Amount (₱)</label>
+                <input type="number" id="transfer-amount" min="1" step="0.01" required placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label>Reason <span style="color:#ef4444">*</span></label>
+                <input type="text" id="transfer-reason" required placeholder="Why is this transfer being made?" />
+              </div>
+              <div class="form-error hidden" id="transfer-error"></div>
+              <button class="btn btn-primary" type="submit" id="submit-transfer-btn">Confirm Transfer</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tab: User Management -->
+        <div class="admin-tab-panel" id="admin-tab-users">
+          <div class="loading-state">Loading users…</div>
+        </div>
+
+        <!-- Tab: Audit Log -->
+        <div class="admin-tab-panel" id="admin-tab-audit">
+          <div class="loading-state">Loading audit log…</div>
+        </div>
+
       </section>
 
     </main>

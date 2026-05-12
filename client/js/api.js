@@ -26,10 +26,11 @@ const Api = (() => {
   }
 
   const events = {
-    list:   ()       => _request('GET', '/events'),
-    get:    (id)     => _request('GET', `/events/${id}`),
-    create: (body)   => _request('POST', '/events', body),
-    update: (id, b)  => _request('PATCH', `/events/${id}`, b),
+    list:    ()       => _request('GET', '/events'),
+    get:     (id)     => _request('GET', `/events/${id}`),
+    create:  (body)   => _request('POST', '/events', body),
+    update:  (id, b)  => _request('PATCH', `/events/${id}`, b),
+    archive: (id)     => _request('PATCH', `/admin/events/${id}/archive`),
   };
 
   const transactions = {
@@ -37,7 +38,9 @@ const Api = (() => {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/transactions${q ? '?' + q : ''}`);
     },
-    create: (body) => _request('POST', '/transactions', body),
+    create: (body)        => _request('POST',   '/transactions', body),
+    update: (id, body)    => _request('PATCH',  `/transactions/${id}`, body),
+    remove: (id, body)    => _request('DELETE', `/transactions/${id}`, body),
   };
 
   const reports = {
@@ -46,5 +49,15 @@ const Api = (() => {
     eventsSummary: () => _request('GET', '/reports/events-summary'),
   };
 
-  return { events, transactions, reports, request: _request };
+  const admin = {
+    users:          ()         => _request('GET',   '/admin/users'),
+    setRole:        (id, role) => _request('PATCH', `/admin/users/${id}/role`, { role }),
+    auditLogs:      (params={})=> {
+      const q = new URLSearchParams(params).toString();
+      return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`);
+    },
+    transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
+  };
+
+  return { events, transactions, reports, admin, request: _request };
 })();
