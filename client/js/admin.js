@@ -7,6 +7,8 @@ const Admin = (() => {
   let _initialized  = false;
   let _currentTab   = 'create';
   let _allEvents    = [];
+  let _allUsers     = [];
+  let _allLogs      = [];
 
   async function init() {
     await populateEventDropdown();
@@ -197,16 +199,45 @@ const Admin = (() => {
   // ── Users Tab ─────────────────────────────────────────────────────────────
   async function loadUsers() {
     const container = document.getElementById('admin-tab-users');
-    container.innerHTML = '<div class="loading-state">Loading users…</div>';
+    if (!container.innerHTML.includes('tx-search')) {
+      container.innerHTML = `
+        <div style="margin-bottom:1rem;">
+          <input type="text" id="users-search" placeholder="Search users by name, email, or course…" style="width:100%;max-width:400px;padding:0.5rem;border-radius:4px;border:1px solid var(--col-border);background:var(--col-surface);color:white;font-size:0.9rem;" />
+        </div>
+        <div id="users-table-container"><div class="loading-state">Loading users…</div></div>
+      `;
+      document.getElementById('users-search').addEventListener('input', e => renderUsersTable(e.target.value.toLowerCase()));
+    } else {
+      document.getElementById('users-table-container').innerHTML = '<div class="loading-state">Loading users…</div>';
+    }
 
     try {
-      const users = await Api.admin.users();
-      container.innerHTML = `
+      _allUsers = await Api.admin.users();
+      renderUsersTable(document.getElementById('users-search').value.toLowerCase());
+    } catch (err) {
+      document.getElementById('users-table-container').innerHTML = `<div class="empty-state">⚠️ ${err.message}</div>`;
+    }
+  }
+
+  function renderUsersTable(searchTerm = '') {
+    const container = document.getElementById('users-table-container');
+    const filtered = _allUsers.filter(u => 
+      (u.full_name || '').toLowerCase().includes(searchTerm) ||
+      (u.email || '').toLowerCase().includes(searchTerm) ||
+      (u.course || '').toLowerCase().includes(searchTerm)
+    );
+
+    if (!filtered.length) {
+      container.innerHTML = `<div class="empty-state">No users found.</div>`;
+      return;
+    }
+
+    container.innerHTML = `
         <div class="table-wrapper">
           <table class="data-table">
             <thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Year</th><th>Role</th><th style="text-align:center;">Action</th></tr></thead>
             <tbody>
-              ${users.map(u => `
+              ${filtered.map(u => `
                 <tr>
                   <td><strong>${u.full_name || '—'}</strong></td>
                   <td style="font-size:.8rem;color:var(--col-text-muted)">${u.email || '—'}</td>
@@ -224,9 +255,6 @@ const Admin = (() => {
             </tbody>
           </table>
         </div>`;
-    } catch (err) {
-      container.innerHTML = `<div class="empty-state">⚠️ ${err.message}</div>`;
-    }
   }
 
   async function toggleRole(userId, currentRole, btn) {
@@ -248,44 +276,68 @@ const Admin = (() => {
   // ── Audit Log Tab ─────────────────────────────────────────────────────────
   async function loadAuditLog() {
     const container = document.getElementById('admin-tab-audit');
-    container.innerHTML = '<div class="loading-state">Loading audit log…</div>';
+    if (!container.innerHTML.includes('audit-search')) {
+      container.innerHTML = `
+        <div style="margin-bottom:1rem;">
+          <input type="text" id="audit-search" placeholder="Search by action, name, or detail snippets…" style="width:100%;max-width:400px;padding:0.5rem;border-radius:4px;border:1px solid var(--col-border);background:var(--col-surface);color:white;font-size:0.9rem;" />
+        </div>
+        <div id="audit-table-container"><div class="loading-state">Loading audit log…</div></div>
+      `;
+      document.getElementById('audit-search').addEventListener('input', e => renderAuditTable(e.target.value.toLowerCase()));
+    } else {
+      document.getElementById('audit-table-container').innerHTML = '<div class="loading-state">Loading audit log…</div>';
+    }
 
     try {
-      const logs = await Api.admin.auditLogs({ limit: 50 });
+      _allLogs = await Api.admin.auditLogs({ limit: 100 });
+      renderAuditTable(document.getElementById('audit-search').value.toLowerCase());
+    } catch (err) {
+      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state">⚠️ ${err.message}</div>`;
+    }
+  }
 
-      if (!logs.length) {
-        container.innerHTML = '<div class="empty-state">No audit log entries yet.</div>';
-        return;
-      }
+  function renderAuditTable(searchTerm = '') {
+    const container = document.getElementById('audit-table-container');
+    const filtered = _allLogs.filter(log => 
+      (log.action || '').toLowerCase().includes(searchTerm) ||
+      (log.profiles?.full_name || '').toLowerCase().includes(searchTerm) ||
+      JSON.stringify(log.details || {}).toLowerCase().includes(searchTerm)
+    );
 
-      const fmtDate = d => new Date(d).toLocaleString('en-PH', {
-        month: 'short', day: 'numeric', year: 'numeric',
-        hour: '2-digit', minute: '2-digit'
-      });
+    if (!filtered.length) {
+      container.innerHTML = '<div class="empty-state">No audit log entries matched.</div>';
+      return;
+    }
 
-      const actionLabel = a => ({
-        CREATE_TRANSACTION: '📝 Created Transaction',
-        EDIT_TRANSACTION:   '✏️ Edited Transaction',
-        DELETE_TRANSACTION: '🗑️ Deleted Transaction',
-        CREATE_EVENT:       '📅 Created Event',
-        UPDATE_EVENT:       '📝 Updated Event',
-        ARCHIVE_EVENT:      '📦 Archived Event',
-        POST_ANNOUNCEMENT:  '📢 Posted Announcement',
-        SET_USER_ROLE:      '🛡️ Changed User Role',
-        BUDGET_TRANSFER:    '💸 Budget Transfer',
-      }[a] || a);
+    const fmtDate = d => new Date(d).toLocaleString('en-PH', {
+      month: 'short', day: 'numeric', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
 
-      container.innerHTML = `
+    const actionLabel = a => ({
+      CREATE_TRANSACTION: '📝 Created Transaction',
+      EDIT_TRANSACTION:   '✏️ Edited Transaction',
+      DELETE_TRANSACTION: '🗑️ Deleted Transaction',
+      CREATE_EVENT:       '📅 Created Event',
+      UPDATE_EVENT:       '📝 Updated Event',
+      ARCHIVE_EVENT:      '📦 Archived Event',
+      POST_ANNOUNCEMENT:  '📢 Posted Announcement',
+      SET_USER_ROLE:      '🛡️ Changed User Role',
+      BUDGET_TRANSFER:    '💸 Budget Transfer',
+      OVER_BUDGET_ALERT:  '⚠️ Over Budget Alert',
+    }[a] || a);
+
+    container.innerHTML = `
         <div class="table-wrapper">
           <table class="data-table">
             <thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Details</th></tr></thead>
             <tbody>
-              ${logs.map(log => `
+              ${filtered.map(log => `
                 <tr>
                   <td style="font-size:.8rem;white-space:nowrap">${fmtDate(log.created_at)}</td>
                   <td style="font-size:.8rem">${log.profiles?.full_name || '—'}</td>
                   <td><span style="font-size:.82rem">${actionLabel(log.action)}</span></td>
-                  <td style="font-size:.78rem;color:var(--col-text-muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;">
+                  <td style="font-size:.78rem;color:var(--col-text-muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
                     ${JSON.stringify(log.details || {})}
                   </td>
                 </tr>
@@ -293,9 +345,6 @@ const Admin = (() => {
             </tbody>
           </table>
         </div>`;
-    } catch (err) {
-      container.innerHTML = `<div class="empty-state">⚠️ ${err.message}</div>`;
-    }
   }
 
   return { init, toggleRole };

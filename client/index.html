@@ -202,7 +202,8 @@
             <h2>All Transactions</h2>
             <p class="view-sub">Complete financial ledger</p>
           </div>
-          <div class="filter-bar">
+          <div class="filter-bar" style="display:flex;align-items:center;">
+            <input type="text" id="tx-search" placeholder="Search transactions…" style="padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--col-border);background:var(--col-surface);color:var(--col-text);margin-right:0.5rem;font-size:0.9rem;" />
             <select id="tx-type-filter">
               <option value="">All Types</option>
               <option value="expense">Expense</option>

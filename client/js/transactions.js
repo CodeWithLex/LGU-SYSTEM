@@ -71,13 +71,32 @@ const Transactions = (() => {
   }
 
   function bindFilter() {
-    const el = document.getElementById('tx-type-filter');
-    if (!el._bound) {
-      el.addEventListener('change', e => {
-        const type = e.target.value;
-        renderTable(type ? allTxs.filter(t => t.type === type) : allTxs);
+    const typeEl = document.getElementById('tx-type-filter');
+    const searchEl = document.getElementById('tx-search');
+
+    function applyFilters() {
+      const type = typeEl ? typeEl.value : '';
+      const text = searchEl ? searchEl.value.toLowerCase().trim() : '';
+
+      const filtered = allTxs.filter(t => {
+        const matchesType = !type || t.type === type;
+        const matchesText = !text || 
+          (t.description || '').toLowerCase().includes(text) || 
+          (t.profiles?.full_name || '').toLowerCase().includes(text) ||
+          (t.donor_name || '').toLowerCase().includes(text);
+        
+        return matchesType && matchesText;
       });
-      el._bound = true;
+      renderTable(filtered);
+    }
+
+    if (typeEl && !typeEl._bound) {
+      typeEl.addEventListener('change', applyFilters);
+      typeEl._bound = true;
+    }
+    if (searchEl && !searchEl._bound) {
+      searchEl.addEventListener('input', applyFilters);
+      searchEl._bound = true;
     }
   }
 

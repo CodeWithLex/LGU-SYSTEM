@@ -60,11 +60,14 @@ router.get('/audit-logs', async (req, res) => {
 
   const { data, error } = await supabase
     .from('audit_logs')
-    .select('*, profiles!user_id(full_name, email)')
+    .select('*, profiles(full_name, email)')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (error) return res.status(500).json({ error: 'Failed to fetch audit logs.' });
+  if (error) {
+    console.error('Audit Log Error:', error);
+    return res.status(500).json({ error: error.message || 'Failed to fetch audit logs.' });
+  }
   res.json(data);
 });
 
