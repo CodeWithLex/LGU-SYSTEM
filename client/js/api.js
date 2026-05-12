@@ -19,6 +19,14 @@ const Api = (() => {
     if (body) opts.body = isFormData ? body : JSON.stringify(body);
 
     const res = await fetch(`${window.API_BASE}/api${path}`, opts);
+    
+    if (res.status === 401) {
+      // If we get an unauthorized error, the session has likely expired.
+      // We trigger a signOut which will be picked up by the auth observer in app.js
+      if (window.supabaseClient) window.supabaseClient.auth.signOut();
+      throw new Error('Invalid or expired session token. Please log in again.');
+    }
+
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);

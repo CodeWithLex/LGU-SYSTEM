@@ -38,7 +38,18 @@ async function initReports() {
     });
 
   } catch (err) {
-    container.innerHTML = `<div class="empty-state"><i data-lucide="alert-triangle"></i> Failed to load reports. ${err.message}</div>`;
+    const isSessionErr = err.message.includes('session');
+    container.innerHTML = `
+      <div class="empty-state">
+        <i data-lucide="alert-triangle" style="width:48px;height:48px;color:var(--col-danger);margin-bottom:1rem;"></i>
+        <p style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">${isSessionErr ? 'Session Expired' : 'Failed to Load Reports'}</p>
+        <p style="color:var(--col-text-muted);margin-bottom:1.5rem;max-width:300px;margin-left:auto;margin-right:auto;">
+          ${err.message}
+        </p>
+        ${isSessionErr 
+          ? `<button class="btn btn-primary" onclick="Auth.logout()">Sign In Again</button>` 
+          : `<button class="btn btn-ghost" onclick="Reports.load()">Retry</button>`}
+      </div>`;
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 }
