@@ -1,7 +1,6 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-const { sendNewEventEmail } = require('../lib/email');
 const { sanitizeText, isPositiveNumber, isValidEnum, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 
@@ -93,9 +92,6 @@ router.post('/', requireAdmin, async (req, res) => {
     event_name:       cleanName,
     allocated_budget: Number(allocated_budget),
   });
-
-  // Notify students (non-blocking)
-  sendNewEventEmail(data).catch(err => console.error('[Email] Event notify failed:', err.message));
 
   res.status(201).json(data);
 });
