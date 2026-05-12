@@ -60,14 +60,57 @@ const Transactions = (() => {
       </tr>
     `).join('');
 
+    // ---- Mobile Cards ----
+    const cardContainer = document.getElementById('tx-mobile-cards');
+    if (cardContainer) {
+      cardContainer.innerHTML = txs.map(tx => `
+        <div class="data-card">
+          <div class="data-card-header">
+            <span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span>
+            <span style="font-size:0.75rem;color:var(--col-text-muted);">${UI.dateStr(tx.transaction_date)}</span>
+          </div>
+          <div class="data-card-body">
+            <div style="font-weight:600;margin-bottom:0.25rem;">${tx.description}</div>
+            <div class="data-card-row">
+              <span class="data-card-label">Amount</span>
+              <span class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}" style="font-size:1rem;">
+                ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
+              </span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Receipt</span>
+              <span>${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link"><i data-lucide="paperclip"></i> View</a>` : '—'}</span>
+            </div>
+            <div class="data-card-row">
+              <span class="data-card-label">Added By</span>
+              <span>${tx.profiles?.full_name || '—'}</span>
+            </div>
+          </div>
+          ${_isAdmin ? `
+          <div class="data-card-actions">
+            <button class="btn btn-ghost tx-edit-btn" 
+              data-txid="${tx.id}"
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
+              data-amount="${tx.amount}"
+              data-date="${tx.transaction_date}"
+              data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3"></i> Edit</button>
+            <button class="btn btn-ghost tx-del-btn" style="color:#ef4444;"
+              data-txid="${tx.id}"
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2"></i> Delete</button>
+          </div>` : ''}
+        </div>
+      `).join('');
+    }
+
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function bindTableEvents() {
     const tbody = document.getElementById('tx-table-body');
+    const mobContainer = document.getElementById('tx-mobile-cards');
     if (!tbody || tbody._bound) return;
 
-    tbody.addEventListener('click', e => {
+    const handleClick = e => {
       const editBtn = e.target.closest('.tx-edit-btn');
       const delBtn  = e.target.closest('.tx-del-btn');
       if (editBtn) {
@@ -75,7 +118,10 @@ const Transactions = (() => {
       } else if (delBtn) {
         deleteModal(delBtn.dataset.txid, delBtn.dataset.desc);
       }
-    });
+    };
+
+    tbody.addEventListener('click', handleClick);
+    if (mobContainer) mobContainer.addEventListener('click', handleClick);
     tbody._bound = true;
   }
 
