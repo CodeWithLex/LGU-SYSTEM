@@ -24,6 +24,12 @@ const UI = (() => {
     const screen = document.getElementById(`${screenId}-screen`);
     if (screen) screen.classList.add('active');
 
+    // If switching to auth, strip all admin privileges and app state
+    if (screenId === 'auth') {
+      setAdminVisibility(false);
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    }
+
     // Show bottom nav only when app is active (mobile only via CSS)
     const bottomNav = document.getElementById('bottom-nav');
     if (bottomNav) bottomNav.classList.toggle('visible', screenId === 'app');
