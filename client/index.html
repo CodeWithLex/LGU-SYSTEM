@@ -199,23 +199,29 @@
       </section>
 
       <!-- TRANSACTIONS -->
-      <section class="view" id="view-transactions">
+      <section id="view-transactions" class="view ledger-view">
         <div class="view-header">
-          <div>
-            <h2>All Transactions</h2>
-            <p class="view-sub">Complete financial ledger</p>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <h2 style="margin:0;">Financial Ledger</h2>
+            <div id="tx-overbudget-alert" class="hidden" style="color:var(--col-danger);padding:0.4rem 0.8rem;background:rgba(239, 68, 68, 0.1);border-radius:100px;font-size:0.75rem;font-weight:700;display:flex;align-items:center;gap:0.4rem;border:1px solid rgba(239, 68, 68, 0.2)">
+              <i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Over Budget
+            </div>
           </div>
-          <div class="filter-bar" style="display:flex;align-items:center;">
-            <input type="text" id="tx-search" placeholder="Search transactions…" style="padding:0.4rem 0.6rem;border-radius:4px;border:1px solid var(--col-border);background:var(--col-surface);color:var(--col-text);margin-right:0.5rem;font-size:0.9rem;" />
-            <select id="tx-type-filter">
-              <option value="">All Types</option>
-              <option value="expense">Expense</option>
-              <option value="donation">Donation</option>
-              <option value="collection">Collection</option>
-              <option value="allocation">Allocation</option>
+          <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;">
+            <select id="filter-type">
+              <option value="all">All Types</option>
+              <option value="expense">Expenses</option>
+              <option value="income">Income</option>
+              <option value="donation">Donations</option>
+              <option value="collection">Collections</option>
+              <option value="allocation">Allocations</option>
+            </select>
+            <select id="filter-event">
+              <option value="all">All Events</option>
             </select>
           </div>
         </div>
+
         <div class="table-wrapper">
           <table class="data-table">
             <thead>

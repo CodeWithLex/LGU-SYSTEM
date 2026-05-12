@@ -131,6 +131,29 @@ function buildReportsHTML(summary, monthly, events) {
               `).join('')}
             </tbody>
           </table>
+        </div>
+        <!-- Mobile View Cards -->
+        <div class="mobile-cards-container">
+          ${events.map(ev => `
+            <div class="data-card">
+              <div class="data-card-header">
+                <strong style="font-size:1rem;">${ev.event_name}</strong>
+                <span class="status-badge status-${ev.status}">${ev.status}</span>
+              </div>
+              <div class="data-card-body">
+                <div class="data-card-row"><span class="data-card-label">Allocated</span><span>${fmt(ev.allocated_budget)}</span></div>
+                <div class="data-card-row"><span class="data-card-label">Remaining</span><span style="font-weight:700;color:var(--col-primary);">${fmt(ev.remaining_budget)}</span></div>
+              </div>
+              <div class="data-card-actions">
+                <button class="btn btn-ghost admin-only" style="font-size:.85rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
+                  <i data-lucide="file-text"></i> PDF
+                </button>
+                <button class="btn btn-ghost admin-only" style="font-size:.85rem;color:#10b981;" data-excel="${ev.id}" data-name="${ev.event_name}">
+                  <i data-lucide="sheet"></i> Excel
+                </button>
+              </div>
+            </div>
+          `).join('')}
         </div>`
       }
     </div>
