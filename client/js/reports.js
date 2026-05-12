@@ -20,6 +20,9 @@ async function initReports() {
 
     container.innerHTML = buildReportsHTML(summary, monthly, events);
 
+    // CRITICAL: re-create Lucide icons after dynamic HTML injection
+    if (window.lucide) lucide.createIcons();
+
     // Render charts after DOM is ready
     requestAnimationFrame(() => {
       renderMonthlyChart(monthly);
@@ -192,27 +195,44 @@ function renderBreakdownChart(breakdown) {
   if (!canvas || !window.Chart) return;
   if (_breakdownChart) _breakdownChart.destroy();
 
-  const labels = Object.keys(breakdown).map(k => k.charAt(0).toUpperCase() + k.slice(1));
-  const values = Object.values(breakdown);
+  // Fixed order so colors always match the right type
+  const typeMap = [
+    { key: 'expense',    label: 'Expenses',   color: '#ef4444' },
+    { key: 'allocation', label: 'Allocation', color: '#6384ff' },
+    { key: 'donation',   label: 'Donations',  color: '#10b981' },
+    { key: 'collection', label: 'Collection', color: '#f59e0b' },
+  ];
+
+  // Filter out zero-value types so the chart isn't cluttered
+  const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
+  const hasData = active.length > 0;
 
   _breakdownChart = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels,
+      labels: hasData ? active.map(t => t.label) : ['No Data'],
       datasets: [{
-        data: values,
-        backgroundColor: ['#ef4444', '#10b981', '#6384ff', '#f59e0b'],
+        data: hasData ? active.map(t => breakdown[t.key]) : [1],
+        backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
         borderWidth: 2,
-        borderColor: '#ffffff',
+        borderColor: 'rgba(255,255,255,0.08)',
         hoverOffset: 6
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '60%',
+      cutout: '65%',
       plugins: {
-        legend: { position: 'bottom', labels: { font: { family: 'Inter' }, padding: 12 } },
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { family: 'Inter', size: 12 },
+            padding: 16,
+            usePointStyle: true,
+            pointStyleWidth: 10
+          }
+        },
         tooltip: {
           callbacks: {
             label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
@@ -228,7 +248,8 @@ async function downloadReport(type, eventId, eventName) {
   if (!token) { alert('Please log in again.'); return; }
 
   const btn = document.querySelector(`[data-${type}="${eventId}"]`);
-  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+  const originalHTML = btn ? btn.innerHTML : null;
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Generating…'; }
 
   try {
     const BASE = window.API_BASE || '';
@@ -251,7 +272,7 @@ async function downloadReport(type, eventId, eventName) {
   } catch (err) {
     alert(`Download failed: ${err.message}`);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = type.toUpperCase(); }
+    if (btn && originalHTML) { btn.disabled = false; btn.innerHTML = originalHTML; }
     if (window.lucide) lucide.createIcons();
   }
 }
