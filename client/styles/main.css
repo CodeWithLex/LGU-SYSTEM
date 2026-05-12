@@ -421,6 +421,7 @@ textarea {
   font-weight: 500;
   transition: all var(--transition);
   text-decoration: none;
+  line-height: 1; /* Reset line height to prevent shifting */
 }
 
 .nav-item:hover {
@@ -440,8 +441,11 @@ textarea {
 }
 
 .nav-icon {
+  width: 20px; /* Fixed width ensures text alignment */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.1rem;
-  line-height: 1;
 }
 
 .sidebar-footer {
