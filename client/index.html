@@ -177,17 +177,12 @@
       </section>
 
       <!-- EVENTS -->
-      <section class="view" id="view-events">
-        <div class="view-header">
-          <div>
-            <h2>Events &amp; Activities</h2>
-            <p class="view-sub">Budget allocation per event</p>
-          </div>
-          <button class="btn btn-primary admin-only hidden" id="create-event-btn">+ New Event</button>
-        </div>
       <section id="view-events" class="view">
         <div class="view-header">
-          <h2>Events & Activities</h2>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <h2 style="margin:0;">Events & Activities</h2>
+            <button class="btn btn-primary admin-only hidden" id="create-event-btn" style="padding:0.4rem 0.8rem;font-size:0.85rem;">+ New Event</button>
+          </div>
           <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;">
             <div style="position:relative;display:flex;align-items:center;">
               <i data-lucide="search" style="position:absolute;left:0.75rem;width:14px;height:14px;color:var(--col-text-muted);"></i>
@@ -201,7 +196,9 @@
             </select>
           </div>
         </div>
-        <div id="events-grid" class="events-grid"></div>
+        <div id="events-grid" class="events-grid">
+          <div class="loading-state">Loading events…</div>
+        </div>
       </section>
 
       <!-- EVENT DETAIL -->
