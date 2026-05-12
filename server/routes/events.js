@@ -3,6 +3,7 @@ const router   = express.Router();
 const supabase = require('../lib/supabase');
 const { sanitizeText, isPositiveNumber, isValidEnum, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
+const { sendNewEventEmail } = require('../lib/email');
 
 const VALID_STATUSES = ['upcoming', 'ongoing', 'completed', 'cancelled'];
 
@@ -92,6 +93,11 @@ router.post('/', requireAdmin, async (req, res) => {
     event_name:       cleanName,
     allocated_budget: Number(allocated_budget),
   });
+
+  // Send email notifications to students in background
+  sendNewEventEmail(data).catch(err =>
+    console.error('[Email] Background send failed:', err.message)
+  );
 
   res.status(201).json(data);
 });
