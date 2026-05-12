@@ -63,12 +63,23 @@
   padding: 0;
 }
 
-/* Smooth Theme Transition Hack */
+/* Smooth Theme Transition */
 body.theme-transitioning,
-body.theme-transitioning *,
-body.theme-transitioning *::before,
-body.theme-transitioning *::after {
-  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease !important;
+body.theme-transitioning .glass,
+body.theme-transitioning .dashboard-card,
+body.theme-transitioning .stat-card,
+body.theme-transitioning .data-table,
+body.theme-transitioning .nav-item,
+body.theme-transitioning .bottom-nav-item,
+body.theme-transitioning .btn,
+body.theme-transitioning h1,
+body.theme-transitioning h2,
+body.theme-transitioning h3,
+body.theme-transitioning p,
+body.theme-transitioning span,
+body.theme-transitioning td,
+body.theme-transitioning th {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 body {
