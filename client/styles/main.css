@@ -1130,12 +1130,8 @@ textarea {
    RESPONSIVE — Tablet (≤1024px)
    ============================================= */
 @media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-  .admin-panels {
-    grid-template-columns: 1fr;
-  }
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-panels { grid-template-columns: 1fr; }
 }
 
 /* =============================================
@@ -1154,7 +1150,7 @@ textarea {
   .sidebar-footer { justify-content: center; }
 
   .form-row { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   .view { padding: 1.25rem 1rem; }
 
   .view-header { flex-wrap: wrap; gap: 0.75rem; }
@@ -1171,42 +1167,41 @@ textarea {
    RESPONSIVE — Phone (≤480px)
    ============================================= */
 @media (max-width: 480px) {
-  /* Table to Card Layout */
+  /* Layout Toggles */
   .ledger-view .table-wrapper { display: none !important; }
   .reports-view .table-wrapper { display: none !important; }
   .mobile-cards-container { display: flex !important; flex-direction: column; gap: 1rem; }
   
-  .stats-grid { gap: 0.75rem; }
-  .stat-card { padding: 1rem; gap: 0.75rem; }
-  .stat-icon { width: 32px; height: 32px; font-size: 0.9rem; }
-  .stat-label { font-size: 0.7rem; }
-  .stat-value { font-size: 1.2rem; }
+  /* Dashboard & Grid Overrides */
+  .dashboard-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
+  .stat-card { padding: 0.85rem !important; gap: 0.6rem !important; }
+  .stat-icon { width: 30px; height: 30px; font-size: 0.85rem; }
+  .stat-label { font-size: 0.65rem; }
+  .stat-value { font-size: 1.1rem; }
 
+  /* Activity Feed */
   .tx-item { 
-    padding: 0.75rem 0.5rem; 
-    gap: 0.6rem;
+    padding: 0.65rem 0.5rem; 
+    gap: 0.5rem;
     grid-template-columns: auto 1fr auto;
   }
-  .tx-badge { 
-    padding: 2px 6px; 
-    font-size: 0.6rem; 
-    max-width: 60px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-  .tx-desc { font-size: 0.85rem; }
-  .tx-amount { font-size: 0.9rem; }
-  .tx-meta { font-size: 0.65rem; }
+  .tx-badge { padding: 2px 5px; font-size: 0.55rem; max-width: 55px; }
+  .tx-desc { font-size: 0.8rem; }
+  .tx-amount { font-size: 0.85rem; }
+  .tx-meta { font-size: 0.6rem; }
 
+  /* Generic Content */
   .announce-item { padding: 0.75rem; }
   .announce-item h4 { font-size: 0.9rem; }
   .announce-item p { font-size: 0.8rem; line-height: 1.4; }
 
+  /* Card Layouts */
   .data-card {
     background: var(--col-card);
     border: 1px solid var(--col-border);
     border-radius: var(--radius-md);
-    padding: 1.25rem;
+    padding: 1rem;
     box-shadow: var(--shadow-card);
     position: relative;
   }
@@ -1214,39 +1209,29 @@ textarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
   }
   .data-card-body {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
-  .data-card-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-  }
+  .data-card-row { display: flex; justify-content: space-between; font-size: 0.8rem; }
   .data-card-label { color: var(--col-text-muted); }
   .data-card-actions {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    padding-top: 0.6rem;
     border-top: 1px solid var(--col-border);
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
     justify-content: flex-end;
   }
 
   /* Prevent iOS zoom on inputs */
-  input, select, textarea {
-    font-size: 16px !important;
-  }
+  input, select, textarea { font-size: 16px !important; }
 
-  /* Hide sidebar, show bottom nav bar */
-  .sidebar {
-    display: none;
-  }
-
-  /* Bottom Navigation Bar */
+  /* Navigation Overrides */
+  .sidebar { display: none; }
   .bottom-nav.visible {
     display: flex;
     position: fixed;
@@ -1256,7 +1241,7 @@ textarea {
     z-index: 1000;
     background: var(--col-surface);
     border-top: 1px solid var(--col-border);
-    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom));
+    padding: 0.5rem 0 calc(0.3rem + env(safe-area-inset-bottom));
     justify-content: space-around;
     align-items: center;
   }
@@ -1265,91 +1250,27 @@ textarea {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.2rem;
+    gap: 0.15rem;
     color: var(--col-text-muted);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
-    padding: 0.3rem 0.6rem;
+    padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
     cursor: pointer;
     text-decoration: none;
     transition: color var(--transition);
   }
+  .bottom-nav-item.active { color: var(--col-primary); }
+  .bottom-nav-item .nav-icon { font-size: 1.2rem; line-height: 1; }
 
-  .bottom-nav-item.active {
-    color: var(--col-primary);
-  }
-
-  .bottom-nav-item .nav-icon {
-    font-size: 1.35rem;
-    line-height: 1;
-  }
-
-  /* Adjust main content for bottom nav */
-  #app-screen {
-    flex-direction: column;
-  }
-
-  .main-content {
-    padding-bottom: 80px; /* room for bottom nav */
-  }
-
-  /* Full-width view with safe padding */
-  .view {
-    padding: 1rem;
-  }
-
-  /* Stats: 2-col on phones */
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  /* Stat card compact */
-  .stat-card {
-    padding: 1rem;
-  }
-  .stat-value {
-    font-size: 1.2rem;
-  }
-
-  /* Auth card full-width */
-  .auth-card {
-    margin: 0.75rem;
-    padding: 1.5rem 1.1rem;
-  }
-  .auth-bg {
-    align-items: flex-start;
-    padding-top: 2rem;
-  }
-
-  /* Table: scroll horizontally */
-  .table-wrapper {
-    margin: 0 -1rem;
-    border-radius: 0;
-  }
-
-  /* Admin panels single col */
-  .admin-panels {
-    grid-template-columns: 1fr;
-  }
-
-  /* Dashboard grid single col */
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* Toast bottom above nav */
-  .toast {
-    bottom: 90px;
-    left: 1rem;
-    right: 1rem;
-    max-width: 100%;
-  }
-
-  /* Event card full width */
-  .events-grid {
-    grid-template-columns: 1fr;
-  }
+  /* Layout Base Adjustments */
+  #app-screen { flex-direction: column; }
+  .main-content { padding-bottom: 75px; }
+  .view { padding: 0.85rem; }
+  .auth-card { margin: 0.5rem; padding: 1.25rem 1rem; }
+  .table-wrapper { margin: 0 -0.85rem; border-radius: 0; }
+  .admin-panels { grid-template-columns: 1fr; }
+  .toast { bottom: 85px; left: 0.75rem; right: 0.75rem; max-width: 100%; }
 }
 
 /* =============================================
