@@ -122,7 +122,7 @@ router.post('/', requireAdmin, async (req, res) => {
 // PATCH /api/transactions/:id — edit with mandatory reason (admin only)
 router.patch('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
-  const { amount, description, transaction_date, reason } = req.body;
+  const { amount, description, transaction_date, reason, receipt_url } = req.body;
 
   if (!reason || String(reason).trim().length < 5) {
     return res.status(400).json({ error: 'A reason of at least 5 characters is required to edit a transaction.' });
@@ -135,6 +135,7 @@ router.patch('/:id', requireAdmin, async (req, res) => {
   }
   if (description !== undefined) updates.description = sanitizeText(String(description)).slice(0, 500);
   if (transaction_date !== undefined) updates.transaction_date = transaction_date;
+  if (receipt_url !== undefined) updates.receipt_url = sanitizeText(String(receipt_url));
 
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ error: 'No valid fields provided for update.' });
