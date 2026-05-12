@@ -314,18 +314,26 @@ const Admin = (() => {
       hour: '2-digit', minute: '2-digit'
     });
 
-    const actionLabel = a => ({
-      CREATE_TRANSACTION: '📝 Created Transaction',
-      EDIT_TRANSACTION:   '✏️ Edited Transaction',
-      DELETE_TRANSACTION: '🗑️ Deleted Transaction',
-      CREATE_EVENT:       '📅 Created Event',
-      UPDATE_EVENT:       '📝 Updated Event',
-      ARCHIVE_EVENT:      '📦 Archived Event',
-      POST_ANNOUNCEMENT:  '📢 Posted Announcement',
-      SET_USER_ROLE:      '🛡️ Changed User Role',
-      BUDGET_TRANSFER:    '💸 Budget Transfer',
-      OVER_BUDGET_ALERT:  '⚠️ Over Budget Alert',
-    }[a] || a);
+    const actionLabel = a => {
+      const icons = {
+        CREATE_TRANSACTION: { icon: 'plus-circle', color: '#10b981', label: 'Created Transaction' },
+        EDIT_TRANSACTION:   { icon: 'edit-3',       color: '#3b82f6', label: 'Edited Transaction' },
+        DELETE_TRANSACTION: { icon: 'trash-2',      color: '#ef4444', label: 'Deleted Transaction' },
+        CREATE_EVENT:       { icon: 'calendar-plus',color: '#10b981', label: 'Created Event' },
+        UPDATE_EVENT:       { icon: 'calendar',     color: '#3b82f6', label: 'Updated Event' },
+        ARCHIVE_EVENT:      { icon: 'archive',      color: '#8b5cf6', label: 'Archived Event' },
+        POST_ANNOUNCEMENT:  { icon: 'megaphone',    color: '#f59e0b', label: 'Posted Announcement' },
+        SET_USER_ROLE:      { icon: 'shield',       color: '#6366f1', label: 'Changed User Role' },
+        BUDGET_TRANSFER:    { icon: 'repeat',       color: '#14b8a6', label: 'Budget Transfer' },
+        OVER_BUDGET_ALERT:  { icon: 'alert-triangle',color: '#f97316', label: 'Over Budget Alert' },
+      };
+      const item = icons[a] || { icon: 'activity', color: 'var(--col-text-muted)', label: a };
+      return `
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <i data-lucide="${item.icon}" style="width:14px;height:14px;color:${item.color}"></i>
+          <span style="font-size:.82rem">${item.label}</span>
+        </div>`;
+    };
 
     const formatDetails = (log) => {
       const d = log.details || {};
@@ -366,7 +374,7 @@ const Admin = (() => {
                 <tr>
                   <td style="font-size:.8rem;white-space:nowrap">${fmtDate(log.created_at)}</td>
                   <td style="font-size:.8rem">${log.profiles?.full_name || '—'}</td>
-                  <td><span style="font-size:.82rem">${actionLabel(log.action)}</span></td>
+                  <td>${actionLabel(log.action)}</td>
                   <td style="font-size:.78rem;color:var(--col-text-muted);max-width:300px;line-height:1.4;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
                     ${formatDetails(log)}
                   </td>
@@ -375,6 +383,8 @@ const Admin = (() => {
             </tbody>
           </table>
         </div>`;
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   return { init, toggleRole };
