@@ -71,23 +71,48 @@ router.get('/audit-logs', async (req, res) => {
 
   // Manual join for profiles to bypass missing FK relationships
   const userIds = [...new Set(logs.map(l => l.user_id).filter(Boolean))];
-  let profilesMap = {};
+  
+  // Collect detailed enrichment IDs
+  const targetUserIds = [...new Set(logs.map(l => l.details?.target_user_id).filter(Boolean))];
+  const allProfileIds = [...new Set([...userIds, ...targetUserIds])];
 
-  if (userIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, full_name, email')
-      .in('id', userIds);
-      
-    if (profiles) {
-      profilesMap = profiles.reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
-    }
+  const eventIds = [...new Set(logs.flatMap(l => {
+    const d = l.details || {};
+    return [d.event_id, d.from_event_id, d.to_event_id].filter(Boolean);
+  }))];
+
+  let profilesMap = {};
+  let eventsMap = {};
+
+  const fetches = [];
+  if (allProfileIds.length > 0) {
+    fetches.push(supabase.from('profiles').select('id, full_name, email').in('id', allProfileIds).then(({ data }) => {
+      if (data) data.forEach(p => profilesMap[p.id] = p);
+    }));
+  }
+  if (eventIds.length > 0) {
+    fetches.push(supabase.from('events').select('id, event_name').in('id', eventIds).then(({ data }) => {
+      if (data) data.forEach(e => eventsMap[e.id] = e.event_name);
+    }));
   }
 
-  const mergedData = logs.map(log => ({
-    ...log,
-    profiles: profilesMap[log.user_id] || null
-  }));
+  await Promise.all(fetches);
+
+  const mergedData = logs.map(log => {
+    const d = { ...(log.details || {}) };
+    
+    // Inject names if missing but ID exists
+    if (d.event_id && !d.event_name) d.event_name = eventsMap[d.event_id];
+    if (d.from_event_id && !d.from_event_name) d.from_event_name = eventsMap[d.from_event_id];
+    if (d.to_event_id && !d.to_event_name) d.to_event_name = eventsMap[d.to_event_id];
+    if (d.target_user_id && !d.user_name) d.user_name = profilesMap[d.target_user_id]?.full_name;
+
+    return {
+      ...log,
+      profiles: profilesMap[log.user_id] || null,
+      details: d
+    };
+  });
 
   res.json(mergedData);
 });
