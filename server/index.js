@@ -50,6 +50,8 @@ const ALLOWED_ORIGINS = [
   'https://lgu-system.onrender.com',
   'https://coelgu.tech',
   'https://www.coelgu.tech',
+  'https://coelgu-system.engineer',
+  'https://www.coelgu-system.engineer',
 ];
 
 app.use(cors({
