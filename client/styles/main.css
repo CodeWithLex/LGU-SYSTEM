@@ -129,7 +129,7 @@ textarea {
 }
 
 /* ---- Utilities ---- */
-.hidden {
+html body .hidden {
   display: none !important;
 }
 .screen {
@@ -1339,7 +1339,7 @@ textarea {
 }
 
 /* Hide admin-only elements by default */
-.admin-only { display: none !important; }
+html body .admin-only { display: none !important; }
 
 /* Show admin-only in sidebar as flex */
 body.is-admin .nav-item.admin-only,
