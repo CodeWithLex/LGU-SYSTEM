@@ -1321,12 +1321,17 @@ textarea {
 .admin-only { display: none !important; }
 
 /* Show admin-only in sidebar as flex */
-body.is-admin .nav-item.admin-only { 
+body.is-admin .nav-item.admin-only,
+body.is-admin .bottom-nav-item.admin-only { 
   display: flex !important; 
 }
 
 /* Show admin-only in tables as table-cell */
 body.is-admin td.admin-only,
-body.is-admin th.admin-only { 
+body.is-admin th.admin-only,
+body.is-admin .btn.admin-only { 
   display: table-cell !important; 
+}
+body.is-admin .btn.admin-only:not(td):not(th) {
+  display: inline-flex !important;
 }
