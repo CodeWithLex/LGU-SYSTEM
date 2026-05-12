@@ -4,7 +4,7 @@
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 const supabase = require('./supabase');
 
-const APP_URL = 'https://lgu-system-eight.vercel.app';
+const APP_URL = 'https://coelgu-system.engineer';
 
 // Lazy init Brevo client
 let _brevoApi = null;
@@ -88,12 +88,13 @@ async function sendAnnouncementEmail(title, body) {
 
     sendSmtpEmail.sender = { 
       name: "COE Financial Transparency System", 
-      email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" 
+      email: process.env.BREVO_SENDER_EMAIL || "noreply@coelgu-system.engineer" 
     };
     
     // Send to admin, BCC to students
-    sendSmtpEmail.to = [{ email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com" }];
+    sendSmtpEmail.to = [{ email: process.env.BREVO_SENDER_EMAIL || "noreply@coelgu-system.engineer" }];
     sendSmtpEmail.bcc = emails.map(email => ({ email }));
+
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
     console.log(`[Email] Announcement sent via Brevo: ${data.messageId}`);
