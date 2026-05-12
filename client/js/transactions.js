@@ -49,7 +49,8 @@ const Transactions = (() => {
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
-              data-date="${tx.transaction_date}">Edit</button>
+              data-date="${tx.transaction_date}"
+              data-receipt="${tx.receipt_url || ''}">Edit</button>
             <button class="btn btn-ghost tx-del-btn" style="font-size:.75rem;padding:.25rem .6rem;color:#ef4444;"
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}">Delete</button>
@@ -67,7 +68,7 @@ const Transactions = (() => {
       const editBtn = e.target.closest('.tx-edit-btn');
       const delBtn  = e.target.closest('.tx-del-btn');
       if (editBtn) {
-        editModal(editBtn.dataset.txid, editBtn.dataset.desc, editBtn.dataset.amount, editBtn.dataset.date);
+        editModal(editBtn.dataset.txid, editBtn.dataset.desc, editBtn.dataset.amount, editBtn.dataset.date, editBtn.dataset.receipt);
       } else if (delBtn) {
         deleteModal(delBtn.dataset.txid, delBtn.dataset.desc);
       }
@@ -108,7 +109,7 @@ const Transactions = (() => {
   }
 
   // ── Edit Modal ──────────────────────────────────────────────────────────
-  function editModal(id, desc, amount, date) {
+  function editModal(id, desc, amount, date, receipt) {
     const existing = document.getElementById('tx-edit-modal');
     if (existing) existing.remove();
 
@@ -129,6 +130,10 @@ const Transactions = (() => {
         <div class="form-group">
           <label>Date</label>
           <input id="edit-date" type="date" value="${date}" />
+        </div>
+        <div class="form-group">
+          <label>Receipt URL (G-Drive Link)</label>
+          <input id="edit-receipt" type="url" value="${receipt || ''}" placeholder="Paste Google Drive/Receipt link here" />
         </div>
         <div class="form-group">
           <label>Reason for Edit <span style="color:#ef4444">*</span></label>
@@ -162,6 +167,7 @@ const Transactions = (() => {
           description:      document.getElementById('edit-desc').value,
           amount:           document.getElementById('edit-amount').value,
           transaction_date: document.getElementById('edit-date').value,
+          receipt_url:      document.getElementById('edit-receipt').value,
           reason,
         });
         modal.remove();
