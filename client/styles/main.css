@@ -1120,8 +1120,12 @@ textarea {
 }
 
 /* =============================================
-   RESPONSIVE
+   MOBILE CARDS (Hidden on Desktop)
    ============================================= */
+.mobile-cards-container {
+  display: none;
+}
+
 /* =============================================
    RESPONSIVE — Tablet (≤1024px)
    ============================================= */
@@ -1168,8 +1172,9 @@ textarea {
    ============================================= */
 @media (max-width: 480px) {
   /* Table to Card Layout */
-  .ledger-view .table-wrapper { display: none; }
-  .mobile-cards-container { display: flex; flex-direction: column; gap: 1rem; }
+  .ledger-view .table-wrapper { display: none !important; }
+  .reports-view .table-wrapper { display: none !important; }
+  .mobile-cards-container { display: flex !important; flex-direction: column; gap: 1rem; }
   
   .data-card {
     background: var(--col-card);
