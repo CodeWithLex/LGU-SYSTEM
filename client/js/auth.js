@@ -46,6 +46,8 @@ const Auth = (() => {
 
   function onAuthChange(callback) {
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
+      // Expose token globally so reports downloads can authenticate
+      window._authToken = session?.access_token || null;
       callback(event, session);
     });
   }
