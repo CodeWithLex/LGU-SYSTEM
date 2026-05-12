@@ -84,10 +84,22 @@ const UI = (() => {
   // ---- Admin-only elements ----
   function setAdminVisibility(isAdmin) {
     document.body.classList.toggle('is-admin', isAdmin);
+    
+    // Explicitly hide/show all protected elements
     document.querySelectorAll('.admin-only').forEach(el => {
-      if (isAdmin) el.classList.remove('hidden');
-      else         el.classList.add('hidden');
+      if (isAdmin) {
+        el.classList.remove('hidden');
+      } else {
+        el.classList.add('hidden');
+        // If an unauthorized user is currently looking at a protected view, kick them to dashboard
+        if (el.classList.contains('view') && el.classList.contains('active')) {
+          showView('dashboard');
+        }
+      }
     });
+
+    // Re-render icons for any newly shown/hidden elements
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ---- Loading / Empty states ----
