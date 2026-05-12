@@ -165,10 +165,60 @@ const Admin = (() => {
 
   // ── Budget Transfer ───────────────────────────────────────────────────────
   function bindBudgetTransferForm() {
-    const form  = document.getElementById('transfer-form');
+    const form    = document.getElementById('transfer-form');
     if (!form) return;
-    const errEl = document.getElementById('transfer-error');
-    const btn   = document.getElementById('submit-transfer-btn');
+    const fromSelect = document.getElementById('transfer-from');
+    const toSelect   = document.getElementById('transfer-to');
+    const amountInp  = document.getElementById('transfer-amount');
+    const errEl   = document.getElementById('transfer-error');
+    const btn     = document.getElementById('submit-transfer-btn');
+
+    const updatePreview = () => {
+      const fromId = fromSelect.value;
+      const toId   = toSelect.value;
+      const amount = parseFloat(amountInp.value) || 0;
+      const preview = document.getElementById('transfer-preview');
+
+      if (!fromId && !toId) {
+        preview.classList.add('hidden');
+        return;
+      }
+
+      preview.classList.remove('hidden');
+      const fromEv = _allEvents.find(e => e.id === fromId);
+      const toEv   = _allEvents.find(e => e.id === toId);
+
+      const fromBalEl = document.getElementById('tp-from-val');
+      const toBalEl   = document.getElementById('tp-to-val');
+
+      if (fromEv) {
+        const newBal = fromEv.remaining_budget - amount;
+        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <i data-lucide="arrow-right" style="width:12px;"></i> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        if (newBal < 0) {
+          errEl.textContent = "Source event has insufficient funds!";
+          errEl.classList.remove('hidden');
+          btn.disabled = true;
+        } else {
+          errEl.classList.add('hidden');
+          btn.disabled = false;
+        }
+      } else {
+        fromBalEl.textContent = '—';
+      }
+
+      if (toEv) {
+        const newBal = toEv.remaining_budget + amount;
+        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <i data-lucide="arrow-right" style="width:12px;"></i> <span style="color:#10b981">${UI.currency(newBal)}</span>`;
+      } else {
+        toBalEl.textContent = '—';
+      }
+      
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    fromSelect.addEventListener('change', updatePreview);
+    toSelect.addEventListener('change', updatePreview);
+    amountInp.addEventListener('input', updatePreview);
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -178,13 +228,14 @@ const Admin = (() => {
 
       try {
         const result = await Api.admin.transfer({
-          from_event_id: document.getElementById('transfer-from').value,
-          to_event_id:   document.getElementById('transfer-to').value,
-          amount:        document.getElementById('transfer-amount').value,
+          from_event_id: fromSelect.value,
+          to_event_id:   toSelect.value,
+          amount:        amountInp.value,
           reason:        document.getElementById('transfer-reason').value,
         });
         UI.toast(result.message, 'success');
         form.reset();
+        preview.classList.add('hidden');
         await populateEventDropdown();
       } catch (err) {
         errEl.textContent = err.message;

@@ -414,6 +414,21 @@
                 <input type="text" id="transfer-reason" required placeholder="Why is this transfer being made?" />
               </div>
               <div class="form-error hidden" id="transfer-error"></div>
+              
+              <div id="transfer-preview" class="hidden" style="margin-bottom:1.5rem;padding:1rem;background:var(--col-surface);border-radius:var(--radius-sm);border:1px dashed var(--col-border);font-size:0.87rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+                  <div id="tp-from" style="flex:1;">
+                    <div style="color:var(--col-text-muted);font-size:0.7rem;text-transform:uppercase;margin-bottom:0.25rem;">Source Balance</div>
+                    <div id="tp-from-val" style="font-weight:700;">₱0.00</div>
+                  </div>
+                  <div style="color:var(--col-text-muted);"><i data-lucide="arrow-right"></i></div>
+                  <div id="tp-to" style="flex:1;text-align:right;">
+                    <div style="color:var(--col-text-muted);font-size:0.7rem;text-transform:uppercase;margin-bottom:0.25rem;">Target Balance</div>
+                    <div id="tp-to-val" style="font-weight:700;">₱0.00</div>
+                  </div>
+                </div>
+              </div>
+
               <button class="btn btn-primary" type="submit" id="submit-transfer-btn">Confirm Transfer</button>
             </form>
           </div>
