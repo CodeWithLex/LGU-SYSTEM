@@ -95,19 +95,24 @@ const UI = (() => {
       const saved = localStorage.getItem('theme') || 'dark';
       this.set(saved);
       
-      const toggleBtn = document.getElementById('theme-toggle');
-      if (toggleBtn) {
-        toggleBtn.onclick = () => this.toggle();
-      }
+      const toggles = document.querySelectorAll('#theme-toggle, #bottom-theme-toggle');
+      toggles.forEach(t => {
+        t.onclick = (e) => {
+          e.preventDefault();
+          this.toggle();
+        };
+      });
     },
     set(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
-      const icon = document.getElementById('theme-toggle-icon');
-      if (icon) {
+      
+      const icons = document.querySelectorAll('#theme-toggle-icon, .theme-toggle-icon');
+      icons.forEach(icon => {
         icon.setAttribute('data-lucide', theme === 'dark' ? 'moon' : 'sun');
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-      }
+      });
+      
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     },
     toggle() {
       document.body.classList.add('theme-transitioning');
