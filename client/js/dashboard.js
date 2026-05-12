@@ -43,6 +43,7 @@ const Dashboard = (() => {
       `).join('');
     } catch (err) {
       container.innerHTML = `<div class="loading-state"><i data-lucide="alert-triangle"></i> Failed to load transactions.</div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   }
 
@@ -66,6 +67,7 @@ const Dashboard = (() => {
       `).join('');
     } catch (err) {
       container.innerHTML = `<div class="loading-state"><i data-lucide="alert-triangle"></i> Failed to load announcements.</div>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   }
 

@@ -59,6 +59,8 @@ const Transactions = (() => {
         </td>` : ''}
       </tr>
     `).join('');
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   function bindTableEvents() {
