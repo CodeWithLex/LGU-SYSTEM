@@ -58,12 +58,14 @@ router.post('/', requireAdmin, async (req, res) => {
   // Audit log
   logAudit(req.user.id, 'POST_ANNOUNCEMENT', { announcement_id: data.id, title: cleanTitle });
 
-  // Send email notifications in the background (non-blocking)
+  // Send email notifications in the background (non-blocking) - DISABLED AS PER REQUEST
+  /*
   sendAnnouncementEmail(cleanTitle, cleanBody).catch(err =>
     console.error('[Email] Background send failed:', err.message)
   );
+  */
 
-  res.status(201).json({ ...data, email_status: 'sending' });
+  res.status(201).json({ ...data, email_status: 'off' });
 });
 
 module.exports = router;

@@ -30,17 +30,18 @@ function getBrevoApi() {
 
 /**
  * Fetches all registered student emails via the profiles table.
+ * Specifically filters for Gmail/Google Workspace accounts as requested.
  */
 async function getAllStudentEmails() {
   try {
     const { data, error } = await supabase
       .from('profiles')
       .select('email')
-      .neq('role', 'admin');
+      .neq('role', 'admin')
+      .or('email.ilike.%@gmail.com,email.ilike.%@g.cjc.edu.ph');
 
     if (error) throw error;
     
-    // Extract emails and filter out nulls
     return (data || []).map(p => p.email).filter(Boolean);
   } catch (err) {
     console.error('[Email] Failed to fetch student emails:', err.message);
