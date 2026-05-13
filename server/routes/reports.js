@@ -16,17 +16,26 @@ function requireAdmin(req, res, next) {
 router.get('/summary', async (req, res) => {
   const { data, error } = await supabase
     .from('transactions')
-    .select('type, amount');
+    .select('type, amount, use_allocation');
 
   if (error) return res.status(500).json({ error: error.message });
 
   const summary = data.reduce((acc, tx) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
-    return acc;
-  }, { expense: 0, donation: 0, collection: 0, allocation: 0 });
+    
+    // Track dashboard-impacting expenses
+    // Dashboard Expense = all 'allocation' PLUS 'expense' where use_allocation is false
+    if (tx.type === 'allocation') {
+      acc.dashboard_expense += Number(tx.amount);
+    } else if (tx.type === 'expense' && !tx.use_allocation) {
+      acc.dashboard_expense += Number(tx.amount);
+    }
 
-  const totalIncome  = summary.allocation + summary.donation + summary.collection;
-  const totalExpense = summary.expense;
+    return acc;
+  }, { expense: 0, donation: 0, collection: 0, allocation: 0, dashboard_expense: 0 });
+
+  const totalIncome  = summary.donation + summary.collection;
+  const totalExpense = summary.dashboard_expense;
 
   res.json({
     totalIncome,

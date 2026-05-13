@@ -364,6 +364,14 @@
                   <label>Receipt — Google Drive Link <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
                   <input type="url" id="tx-receipt-url" placeholder="https://drive.google.com/file/d/..." />
                 </div>
+                <!-- Fund Source Toggle -->
+                <div class="form-group" id="fund-source-group" style="display:none;margin-top:.5rem;">
+                   <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem;background:rgba(255,255,255,0.03);border-radius:var(--radius-sm);border:1px solid var(--col-border);">
+                      <input type="checkbox" id="tx-use-allocation" checked style="width:1.2rem;height:1.2rem;" />
+                      <label for="tx-use-allocation" style="margin:0;font-size:.85rem;cursor:pointer;">Deduct from Event Allocated Budget?</label>
+                   </div>
+                   <p style="font-size:.7rem;color:var(--col-text-muted);margin: .25rem 0 0 .5rem;">If unchecked, this will deduct directly from the general Dashboard balance.</p>
+                </div>
                 <div class="form-error hidden" id="tx-error"></div>
                 <button class="btn btn-primary" type="submit" id="submit-tx-btn">Submit Transaction</button>
               </form>

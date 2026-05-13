@@ -97,6 +97,23 @@ const Admin = (() => {
     const form  = document.getElementById('add-tx-form');
     const errEl = document.getElementById('tx-error');
     const btn   = document.getElementById('submit-tx-btn');
+    const eventSel = document.getElementById('tx-event-id');
+    const typeSel  = document.getElementById('tx-type');
+    const fundGrp  = document.getElementById('fund-source-group');
+    const useAlloc = document.getElementById('tx-use-allocation');
+
+    const updateFundToggle = () => {
+      // Only show if it's an expense AND an event is selected
+      if (typeSel.value === 'expense' && eventSel.value) {
+        fundGrp.style.display = 'block';
+      } else {
+        fundGrp.style.display = 'none';
+        useAlloc.checked = true; // reset to default
+      }
+    };
+
+    eventSel.addEventListener('change', updateFundToggle);
+    typeSel.addEventListener('change', updateFundToggle);
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -107,13 +124,14 @@ const Admin = (() => {
       try {
         const receiptUrl = document.getElementById('tx-receipt-url').value.trim();
         const tx = await Api.transactions.create({
-          event_id:         document.getElementById('tx-event-id').value,
-          type:             document.getElementById('tx-type').value,
+          event_id:         eventSel.value,
+          type:             typeSel.value,
           amount:           document.getElementById('tx-amount').value,
           description:      document.getElementById('tx-desc').value,
           donor_name:       document.getElementById('tx-donor').value,
           transaction_date: document.getElementById('tx-date').value,
-          receipt_url:      receiptUrl || null
+          receipt_url:      receiptUrl || null,
+          use_allocation:   (typeSel.value === 'expense' && eventSel.value) ? useAlloc.checked : false
         });
 
         if (tx.over_budget_warning) {
@@ -123,6 +141,8 @@ const Admin = (() => {
         }
         
         form.reset();
+        useAlloc.checked = true; 
+        updateFundToggle();
         setTodayDate();
         await populateEventDropdown();
       } catch (err) {

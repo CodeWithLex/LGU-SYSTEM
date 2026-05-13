@@ -43,7 +43,7 @@ router.get('/', async (req, res) => {
 
 // POST /api/transactions (admin only)
 router.post('/', requireAdmin, async (req, res) => {
-  const { event_id, type, amount, description, donor_name, transaction_date, receipt_url } = req.body;
+  const { event_id, type, amount, description, donor_name, transaction_date, receipt_url, use_allocation } = req.body;
 
   // 1. Required field check
   const missing = assertRequired({ event_id, type, amount, description, transaction_date });
@@ -59,14 +59,10 @@ router.post('/', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'Amount must be a positive number.' });
   }
 
-  // 4. SSRF protection — only allow Google Drive URLs
-  if (receipt_url && !validateDriveUrl(receipt_url)) {
-    return res.status(400).json({ error: 'Receipt URL must be a valid Google Drive link (https://drive.google.com/...).' });
-  }
-
-  // 5. Sanitize text inputs
+  // 4. Sanitize inputs
   const cleanDesc   = sanitizeText(description);
   const cleanDonor  = donor_name ? sanitizeText(donor_name) : null;
+  const cleanReceipt = receipt_url ? validateDriveUrl(receipt_url) : null;
 
   if (cleanDesc.length > 500) {
     return res.status(400).json({ error: 'Description must be 500 characters or less.' });
@@ -80,9 +76,10 @@ router.post('/', requireAdmin, async (req, res) => {
       amount:           Number(amount),
       description:      cleanDesc,
       donor_name:       cleanDonor,
-      receipt_url:      receipt_url || null,
+      receipt_url:      cleanReceipt,
       added_by:         req.user.id,
       transaction_date: transaction_date,
+      use_allocation:   use_allocation !== undefined ? Boolean(use_allocation) : true
     })
     .select()
     .single();
