@@ -24,17 +24,15 @@ router.get('/summary', async (req, res) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
     
     // Track dashboard-impacting expenses
-    // Dashboard Expense = all 'allocation' PLUS 'expense' where use_allocation is false
-    if (tx.type === 'allocation') {
-      acc.dashboard_expense += Number(tx.amount);
-    } else if (tx.type === 'expense' && !tx.use_allocation) {
+    // Dashboard Expense = 'expense' where use_allocation is false
+    if (tx.type === 'expense' && !tx.use_allocation) {
       acc.dashboard_expense += Number(tx.amount);
     }
 
     return acc;
   }, { expense: 0, donation: 0, collection: 0, allocation: 0, dashboard_expense: 0 });
 
-  const totalIncome  = summary.donation + summary.collection;
+  const totalIncome  = summary.allocation + summary.donation + summary.collection;
   const totalExpense = summary.dashboard_expense;
 
   res.json({
@@ -82,17 +80,21 @@ router.get('/events-summary', async (req, res) => {
   const txStats = {};
   if (transactions) {
     transactions.forEach(tx => {
-      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0 };
-      if (tx.type === 'expense') txStats[tx.event_id].expenses += Number(tx.amount);
+      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0, alloc_expenses: 0 };
+      if (tx.type === 'expense') {
+        txStats[tx.event_id].expenses += Number(tx.amount);
+        if (tx.use_allocation) txStats[tx.event_id].alloc_expenses += Number(tx.amount);
+      }
       else txStats[tx.event_id].income += Number(tx.amount);
     });
   }
 
   res.json(events.map(ev => {
-    const stats = txStats[ev.id] || { income: 0, expenses: 0 };
+    const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0 };
     return {
       ...ev,
-      computed_remaining: Number(ev.allocated_budget) + stats.income - stats.expenses
+      // Event remaining reflects original allocation + donations - explicit event costs
+      computed_remaining: Number(ev.allocated_budget) + stats.income - stats.alloc_expenses
     };
   }));
 });
@@ -142,12 +144,15 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
   const fmt = n => `₱${Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
 
-  let pdfExp = 0, pdfInc = 0;
+  let pdfAllExp = 0, pdfAllocExp = 0, pdfInc = 0;
   (transactions || []).forEach(tx => {
-    if (tx.type === 'expense') pdfExp += Number(tx.amount);
+    if (tx.type === 'expense') {
+       pdfAllExp += Number(tx.amount);
+       if (tx.use_allocation) pdfAllocExp += Number(tx.amount);
+    }
     else pdfInc += Number(tx.amount);
   });
-  const trueRemaining = Number(event.allocated_budget) + pdfInc - pdfExp;
+  const trueRemaining = Number(event.allocated_budget) + pdfInc - pdfAllocExp;
 
   doc.font('Helvetica').fontSize(9.5).fillColor(textMuted);
   doc.text(`Event Date: ${fmtDate(event.event_date)}`,        66, infoY + 36);
@@ -269,12 +274,15 @@ router.get('/excel/:eventId', requireAdmin, async (req, res) => {
   const fmt = n => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
 
-  let xlExp = 0, xlInc = 0;
+  let xlAllExp = 0, xlAllocExp = 0, xlInc = 0;
   (transactions || []).forEach(tx => {
-    if (tx.type === 'expense') xlExp += Number(tx.amount);
+    if (tx.type === 'expense') {
+       xlAllExp += Number(tx.amount);
+       if (tx.use_allocation) xlAllocExp += Number(tx.amount);
+    }
     else xlInc += Number(tx.amount);
   });
-  const trueRem = Number(event.allocated_budget) + xlInc - xlExp;
+  const trueRem = Number(event.allocated_budget) + xlInc - xlAllocExp;
 
   const infoRows = [
     ['Event Name:', event.event_name, '', 'Event Date:', fmtDate(event.event_date), ''],

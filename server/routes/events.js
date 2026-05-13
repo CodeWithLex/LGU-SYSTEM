@@ -18,7 +18,7 @@ function requireAdmin(req, res, next) {
 router.get('/', async (req, res) => {
   const [{ data: events, error: evtErr }, { data: transactions, error: txErr }] = await Promise.all([
     supabase.from('events').select('*').order('created_at', { ascending: false }),
-    supabase.from('transactions').select('event_id, type, amount')
+    supabase.from('transactions').select('event_id, type, amount, use_allocation')
   ]);
 
   if (evtErr) return res.status(500).json({ error: 'Failed to fetch events.' });
@@ -26,22 +26,26 @@ router.get('/', async (req, res) => {
   const txStats = {};
   if (transactions) {
     transactions.forEach(tx => {
-      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0 };
-      if (tx.type === 'expense') txStats[tx.event_id].expenses += Number(tx.amount);
-      else txStats[tx.event_id].income += Number(tx.amount);
+      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0, alloc_expenses: 0 };
+      if (tx.type === 'expense') {
+        txStats[tx.event_id].expenses += Number(tx.amount);
+        if (tx.use_allocation) {
+          txStats[tx.event_id].alloc_expenses += Number(tx.amount);
+        }
+      } else {
+        txStats[tx.event_id].income += Number(tx.amount);
+      }
     });
   }
 
   const enrichedEvents = events.map(ev => {
-    const stats = txStats[ev.id] || { income: 0, expenses: 0 };
-    // true_remaining is now purely calculated from transactions 
-    // (Allocation tx + Donations + Collections - Expenses)
-    const true_remaining = stats.income - stats.expenses;
+    const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0 };
     return {
       ...ev,
-      computed_expenses: stats.expenses,
+      computed_expenses: stats.expenses, // Total expenses (allocated + general)
       computed_income: stats.income,
-      computed_remaining: true_remaining
+      // Event remaining budget only deducts expenses marked to use event allocation
+      computed_remaining: Number(ev.allocated_budget) + stats.income - stats.alloc_expenses
     };
   });
 
@@ -62,11 +66,16 @@ router.get('/:id', async (req, res) => {
   if (txErr)  return res.status(500).json({ error: 'Failed to fetch transactions.' });
 
   let expenses = 0;
+  let alloc_expenses = 0;
   let income = 0;
   if (transactions) {
     transactions.forEach(tx => {
-      if (tx.type === 'expense') expenses += Number(tx.amount);
-      else income += Number(tx.amount);
+      if (tx.type === 'expense') {
+        expenses += Number(tx.amount);
+        if (tx.use_allocation) alloc_expenses += Number(tx.amount);
+      } else {
+        income += Number(tx.amount);
+      }
     });
   }
 
@@ -74,7 +83,7 @@ router.get('/:id', async (req, res) => {
     ...event, 
     computed_expenses: expenses,
     computed_income: income,
-    computed_remaining: Number(event.allocated_budget) + income - expenses,
+    computed_remaining: Number(event.allocated_budget) + income - alloc_expenses,
     transactions 
   });
 });

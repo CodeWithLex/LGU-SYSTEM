@@ -115,6 +115,9 @@ const Admin = (() => {
     eventSel.addEventListener('change', updateFundToggle);
     typeSel.addEventListener('change', updateFundToggle);
 
+    // Initialize visibility
+    updateFundToggle();
+
     form.addEventListener('submit', async e => {
       e.preventDefault();
       errEl.classList.add('hidden');
