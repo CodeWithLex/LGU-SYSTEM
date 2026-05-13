@@ -732,6 +732,8 @@ html body .hidden {
   border-radius: var(--radius-md);
   padding: 1.5rem;
   box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-card h3 {
@@ -1056,12 +1058,17 @@ html body .hidden {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  align-items: start;
+  align-items: stretch;
 }
 .admin-form {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  flex: 1;
+}
+
+.admin-form button {
+  margin-top: auto;
 }
 
 /* =============================================
