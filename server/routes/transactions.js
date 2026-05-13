@@ -45,8 +45,8 @@ router.get('/', async (req, res) => {
 router.post('/', requireAdmin, async (req, res) => {
   const { event_id, type, amount, description, donor_name, transaction_date, receipt_url, use_allocation } = req.body;
 
-  // 1. Required field check
-  const missing = assertRequired({ event_id, type, amount, description, transaction_date });
+  // 1. Required field check (event_id is optional for General Income)
+  const missing = assertRequired({ type, amount, description, transaction_date });
   if (missing) return res.status(400).json({ error: missing });
 
   // 2. Type enum validation
