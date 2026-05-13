@@ -159,11 +159,15 @@ router.post('/budget-transfer', async (req, res) => {
       if (['donation', 'collection', 'allocation'].includes(tx.type)) {
         acc.income += Number(tx.amount);
       }
+      // Track dashboard-impacting expenses
       if (tx.type === 'expense' && !tx.use_allocation) {
         acc.dashboard_expense += Number(tx.amount);
       }
+
+      // Explicitly exclude internal 'transfer' from totalIncome summing
+      // but keep it in breakdown for ledger awareness
       return acc;
-    }, { income: 0, dashboard_expense: 0 });
+    }, { expense: 0, donation: 0, collection: 0, allocation: 0, transfer: 0, dashboard_expense: 0 });
 
     const totalReserved = (events || []).reduce((sum, e) => sum + Number(e.allocated_budget), 0);
     const availableBalance = summary.income - summary.dashboard_expense - totalReserved;
@@ -211,10 +215,10 @@ router.post('/budget-transfer', async (req, res) => {
     if (e1 || e2) return res.status(500).json({ error: 'Transfer failed. Please try again.' });
   }
 
-  // ── SHARED: Record allocation and Audit ────────────────────────────
+  // ── SHARED: Record transfer and Audit ────────────────────────────
   await supabase.from('transactions').insert({
     event_id:         to_event_id,
-    type:             'allocation',
+    type:             'transfer', // Changed from allocation to transfer
     amount:           transferAmount,
     description:      `Budget transfer from "${fromEventName}": ${sanitizeText(reason)}`,
     added_by:         req.user.id,

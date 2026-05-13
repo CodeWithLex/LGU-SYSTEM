@@ -36,8 +36,8 @@ const Transactions = (() => {
         <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.events?.event_name || '—'}</td>
         <td><span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span></td>
         <td>${tx.description}</td>
-        <td class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}">
-          ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
+        <td class="tx-amount ${tx.type === 'expense' ? 'expense' : (tx.type === 'transfer' ? 'transfer' : 'income')}">
+          ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
           ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="paperclip" style="width:14px;"></i> View</a>`

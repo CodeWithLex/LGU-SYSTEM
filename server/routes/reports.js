@@ -25,13 +25,13 @@ router.get('/summary', async (req, res) => {
   const summary = txs.reduce((acc, tx) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
     
-    // Track dashboard-impacting expenses
+    // Track dashboard-impacting expenses (only from general fund pool)
     if (tx.type === 'expense' && !tx.use_allocation) {
       acc.dashboard_expense += Number(tx.amount);
     }
 
     return acc;
-  }, { expense: 0, donation: 0, collection: 0, allocation: 0, dashboard_expense: 0 });
+  }, { expense: 0, donation: 0, collection: 0, allocation: 0, transfer: 0, dashboard_expense: 0 });
 
   let totalReservedEnvelopes = 0;
   (events || []).forEach(e => {

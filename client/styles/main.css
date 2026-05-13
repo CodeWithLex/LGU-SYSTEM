@@ -851,22 +851,11 @@ html body .hidden {
   flex-shrink: 0;
 }
 
-.badge-expense {
-  background: rgba(248, 113, 113, 0.15);
-  color: var(--col-danger);
-}
-.badge-donation {
-  background: rgba(167, 139, 250, 0.15);
-  color: var(--col-accent);
-}
-.badge-collection {
-  background: rgba(96, 165, 250, 0.15);
-  color: var(--col-info);
-}
-.badge-allocation {
-  background: rgba(52, 211, 153, 0.15);
-  color: var(--col-success);
-}
+.badge-expense { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+.badge-donation { background: rgba(167, 139, 250, 0.15); color: var(--col-accent); }
+.badge-allocation { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.badge-transfer   { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; }
+.badge-collection { background: rgba(96, 165, 250, 0.15); color: var(--col-info); }
 
 .tx-desc {
   flex: 1;
@@ -891,6 +880,9 @@ html body .hidden {
 }
 .tx-amount.income {
   color: var(--col-success);
+}
+.tx-amount.transfer {
+  color: #2dd4bf;
 }
 
 /* ---- Announcements ---- */
