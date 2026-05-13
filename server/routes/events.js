@@ -44,8 +44,8 @@ router.get('/', async (req, res) => {
       ...ev,
       computed_expenses: stats.expenses, // Total expenses (allocated + general)
       computed_income: stats.income,
-      // Event remaining budget only deducts expenses marked to use event allocation
-      computed_remaining: Number(ev.allocated_budget) + stats.income - stats.alloc_expenses
+      // Event remaining budget strictly enforces the initial allocation
+      computed_remaining: Number(ev.allocated_budget) - stats.alloc_expenses
     };
   });
 
@@ -83,7 +83,7 @@ router.get('/:id', async (req, res) => {
     ...event, 
     computed_expenses: expenses,
     computed_income: income,
-    computed_remaining: Number(event.allocated_budget) + income - alloc_expenses,
+    computed_remaining: Number(event.allocated_budget) - alloc_expenses,
     transactions 
   });
 });

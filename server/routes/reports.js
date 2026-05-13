@@ -93,8 +93,8 @@ router.get('/events-summary', async (req, res) => {
     const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0 };
     return {
       ...ev,
-      // Event remaining reflects original allocation + donations - explicit event costs
-      computed_remaining: Number(ev.allocated_budget) + stats.income - stats.alloc_expenses
+      // Event remaining strictly reflects original allocation minus explicit event costs
+      computed_remaining: Number(ev.allocated_budget) - stats.alloc_expenses
     };
   }));
 });
@@ -152,7 +152,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
     }
     else pdfInc += Number(tx.amount);
   });
-  const trueRemaining = Number(event.allocated_budget) + pdfInc - pdfAllocExp;
+  const trueRemaining = Number(event.allocated_budget) - pdfAllocExp;
 
   doc.font('Helvetica').fontSize(9.5).fillColor(textMuted);
   doc.text(`Event Date: ${fmtDate(event.event_date)}`,        66, infoY + 36);
@@ -282,7 +282,7 @@ router.get('/excel/:eventId', requireAdmin, async (req, res) => {
     }
     else xlInc += Number(tx.amount);
   });
-  const trueRem = Number(event.allocated_budget) + xlInc - xlAllocExp;
+  const trueRem = Number(event.allocated_budget) - xlAllocExp;
 
   const infoRows = [
     ['Event Name:', event.event_name, '', 'Event Date:', fmtDate(event.event_date), ''],
