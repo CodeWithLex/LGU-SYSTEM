@@ -1346,8 +1346,8 @@ html body .hidden {
   box-shadow: 0 20px 60px rgba(0,0,0,.4);
 }
 
-/* Hide admin-only elements by default */
-html body .admin-only { display: none !important; }
+/* Hide admin-only elements by default unless the body has is-admin */
+html body:not(.is-admin) .admin-only { display: none !important; }
 
 /* Show admin-only in sidebar as flex */
 html body.is-admin .nav-item.admin-only,
