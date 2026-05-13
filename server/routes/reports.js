@@ -63,13 +63,29 @@ router.get('/monthly', async (req, res) => {
 
 // ── GET /api/reports/events-summary ──────────────────────────────────────────
 router.get('/events-summary', async (req, res) => {
-  const { data: events, error: evtErr } = await supabase
-    .from('events')
-    .select('id, event_name, allocated_budget, remaining_budget, status')
-    .order('created_at', { ascending: false });
+  const [{ data: events, error: evtErr }, { data: transactions }] = await Promise.all([
+    supabase.from('events').select('id, event_name, allocated_budget, remaining_budget, status').order('created_at', { ascending: false }),
+    supabase.from('transactions').select('event_id, type, amount')
+  ]);
 
   if (evtErr) return res.status(500).json({ error: evtErr.message });
-  res.json(events);
+
+  const txStats = {};
+  if (transactions) {
+    transactions.forEach(tx => {
+      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0 };
+      if (tx.type === 'expense') txStats[tx.event_id].expenses += Number(tx.amount);
+      else txStats[tx.event_id].income += Number(tx.amount);
+    });
+  }
+
+  res.json(events.map(ev => {
+    const stats = txStats[ev.id] || { income: 0, expenses: 0 };
+    return {
+      ...ev,
+      computed_remaining: Number(ev.allocated_budget) + stats.income - stats.expenses
+    };
+  }));
 });
 
 // ── GET /api/reports/pdf/:eventId ─────────────────────────────────────────────
@@ -117,11 +133,18 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
   const fmt = n => `₱${Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
 
+  let pdfExp = 0, pdfInc = 0;
+  (transactions || []).forEach(tx => {
+    if (tx.type === 'expense') pdfExp += Number(tx.amount);
+    else pdfInc += Number(tx.amount);
+  });
+  const trueRemaining = Number(event.allocated_budget) + pdfInc - pdfExp;
+
   doc.font('Helvetica').fontSize(9.5).fillColor(textMuted);
   doc.text(`Event Date: ${fmtDate(event.event_date)}`,        66, infoY + 36);
   doc.text(`Status: ${(event.status || 'N/A').toUpperCase()}`, 66, infoY + 52);
   doc.text(`Allocated Budget: ${fmt(event.allocated_budget)}`,  66, infoY + 68);
-  doc.text(`Remaining Budget: ${fmt(event.remaining_budget)}`, 300, infoY + 68);
+  doc.text(`Remaining Budget: ${fmt(trueRemaining)}`, 300, infoY + 68);
   doc.text(`Generated: ${new Date().toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })}`, 66, infoY + 84);
 
   doc.moveDown(5.5);
@@ -237,10 +260,17 @@ router.get('/excel/:eventId', requireAdmin, async (req, res) => {
   const fmt = n => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
 
+  let xlExp = 0, xlInc = 0;
+  (transactions || []).forEach(tx => {
+    if (tx.type === 'expense') xlExp += Number(tx.amount);
+    else xlInc += Number(tx.amount);
+  });
+  const trueRem = Number(event.allocated_budget) + xlInc - xlExp;
+
   const infoRows = [
     ['Event Name:', event.event_name, '', 'Event Date:', fmtDate(event.event_date), ''],
     ['Status:',    (event.status || '').toUpperCase(), '', 'Allocated Budget:', `₱${fmt(event.allocated_budget)}`, ''],
-    ['Generated:', new Date().toLocaleString('en-PH'), '', 'Remaining Budget:', `₱${fmt(event.remaining_budget)}`, ''],
+    ['Generated:', new Date().toLocaleString('en-PH'), '', 'Remaining Budget:', `₱${fmt(trueRem)}`, ''],
   ];
 
   infoRows.forEach((row, i) => {
