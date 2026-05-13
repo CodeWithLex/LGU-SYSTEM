@@ -1168,7 +1168,15 @@ html body .hidden {
    ============================================= */
 @media (max-width: 480px) {
   /* Dashboard & Grid Overrides */
-  html body #view-dashboard .view-header { display: none !important; }
+  html body #view-dashboard .view-header { 
+    display: flex !important; 
+    margin-bottom: 0.75rem !important;
+    padding-bottom: 0.5rem !important;
+    border-bottom: 1px solid var(--col-border) !important;
+  }
+  html body #view-dashboard .view-header h2 { font-size: 1.1rem !important; }
+  html body #view-dashboard .view-header p { font-size: 0.7rem !important; }
+  html body #view-dashboard .live-badge { padding: 2px 6px !important; font-size: 0.65rem !important; }
   
   html body .dashboard-grid { grid-template-columns: 1fr !important; gap: 0.6rem !important; }
   html body .dashboard-card { padding: 0.75rem !important; }
