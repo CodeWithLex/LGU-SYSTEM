@@ -25,17 +25,28 @@
   document.getElementById('login-btn').addEventListener('click', async () => {
     const errEl = document.getElementById('login-error');
     const btn   = document.getElementById('login-btn');
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-password').value;
+
     errEl.classList.add('hidden');
+
+    if (!email || !pass) {
+      errEl.textContent = 'Please enter your email and password.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
     btn.textContent = 'Signing in…';
     btn.disabled = true;
 
     try {
-      await Auth.login(
-        document.getElementById('login-email').value,
-        document.getElementById('login-password').value
-      );
+      await Auth.login(email, pass);
     } catch (err) {
-      errEl.textContent = err.message;
+      if (err.message.includes('missing email or phone') || err.message.includes('phone')) {
+        errEl.textContent = 'Please enter your email and password.';
+      } else {
+        errEl.textContent = err.message;
+      }
       errEl.classList.remove('hidden');
     } finally {
       btn.textContent = 'Sign In';
@@ -53,7 +64,17 @@
     const errEl = document.getElementById('reg-error');
     const btn   = document.getElementById('register-btn');
     const email = document.getElementById('reg-email').value.trim();
+    const pass  = document.getElementById('reg-password').value;
+    const name  = document.getElementById('reg-name').value.trim();
+
     errEl.classList.add('hidden');
+
+    // ---- Required fields ----
+    if (!email || !pass || !name) {
+      errEl.textContent = 'Please fill out all required fields.';
+      errEl.classList.remove('hidden');
+      return;
+    }
 
     // ---- Domain gate ----
     if (!email.toLowerCase().endsWith('@g.cjc.edu.ph')) {
@@ -68,8 +89,8 @@
     try {
       await Auth.register({
         email,
-        password:  document.getElementById('reg-password').value,
-        fullName:  document.getElementById('reg-name').value,
+        password:  pass,
+        fullName:  name,
         course:    document.getElementById('reg-course').value,
         yearLevel: document.getElementById('reg-year').value
       });
