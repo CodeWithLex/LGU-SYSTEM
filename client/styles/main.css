@@ -802,10 +802,29 @@ html body .hidden {
 }
 
 /* ---- Transaction List Items ---- */
-.tx-list {
+.tx-list, .announcement-list {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom Scrollbar */
+.tx-list::-webkit-scrollbar,
+.announcement-list::-webkit-scrollbar {
+  width: 4px;
+}
+.tx-list::-webkit-scrollbar-track,
+.announcement-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.tx-list::-webkit-scrollbar-thumb,
+.announcement-list::-webkit-scrollbar-thumb {
+  background: var(--col-primary);
+  border-radius: 10px;
+  opacity: 0.5;
 }
 
 .tx-item {
