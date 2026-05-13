@@ -1350,25 +1350,15 @@ html body .hidden {
 html body .admin-only { display: none !important; }
 
 /* Show admin-only in sidebar as flex */
-body.is-admin .nav-item.admin-only,
-body.is-admin .bottom-nav-item.admin-only { 
+html body.is-admin .nav-item.admin-only,
+html body.is-admin .bottom-nav-item.admin-only { 
   display: flex !important; 
 }
 
 /* Show admin-only in tables as table-cell */
-body.is-admin td.admin-only,
-body.is-admin th.admin-only { 
+html body.is-admin td.admin-only,
+html body.is-admin th.admin-only { 
   display: table-cell !important; 
-}
-
-/* Ensure administrative buttons/items outside of tables are visible as flex */
-body.is-admin .admin-only:not(td):not(th) {
-  display: flex !important;
-}
-
-/* Specific case for inline-flex buttons (like in reports) */
-body.is-admin .btn.admin-only:not(td):not(th) {
-  display: inline-flex !important;
 }
 
 /* =============================================
