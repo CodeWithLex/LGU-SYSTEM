@@ -71,7 +71,7 @@ const Events = (() => {
     }
 
     grid.innerHTML = events.map(ev => {
-      const spent   = ev.allocated_budget - ev.remaining_budget;
+      const spent   = ev.computed_expenses || 0;
       const pct     = ev.allocated_budget > 0 ? Math.min((spent / ev.allocated_budget) * 100, 100) : 0;
       return `
         <div class="event-card" data-id="${ev.id}">
@@ -103,7 +103,7 @@ const Events = (() => {
 
     try {
       const ev = await Api.events.get(id);
-      const spent = ev.allocated_budget - ev.remaining_budget;
+      const spent = ev.computed_expenses || 0;
       const pct   = ev.allocated_budget > 0 ? Math.min((spent / ev.allocated_budget) * 100, 100) : 0;
 
       container.innerHTML = `
@@ -133,7 +133,7 @@ const Events = (() => {
             <div class="stat-icon"><i data-lucide="building"></i></div>
             <div class="stat-body">
               <p class="stat-label">Remaining</p>
-              <h3 class="stat-value">${UI.currency(ev.remaining_budget)}</h3>
+              <h3 class="stat-value">${UI.currency(ev.computed_remaining)}</h3>
             </div>
           </div>
         </div>

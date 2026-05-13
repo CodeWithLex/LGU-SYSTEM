@@ -16,13 +16,34 @@ function requireAdmin(req, res, next) {
 
 // GET /api/events
 router.get('/', async (req, res) => {
-  const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const [{ data: events, error: evtErr }, { data: transactions, error: txErr }] = await Promise.all([
+    supabase.from('events').select('*').order('created_at', { ascending: false }),
+    supabase.from('transactions').select('event_id, type, amount')
+  ]);
 
-  if (error) return res.status(500).json({ error: 'Failed to fetch events.' });
-  res.json(data);
+  if (evtErr) return res.status(500).json({ error: 'Failed to fetch events.' });
+
+  const txStats = {};
+  if (transactions) {
+    transactions.forEach(tx => {
+      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0 };
+      if (tx.type === 'expense') txStats[tx.event_id].expenses += Number(tx.amount);
+      else txStats[tx.event_id].income += Number(tx.amount);
+    });
+  }
+
+  const enrichedEvents = events.map(ev => {
+    const stats = txStats[ev.id] || { income: 0, expenses: 0 };
+    const true_remaining = Number(ev.allocated_budget) + stats.income - stats.expenses;
+    return {
+      ...ev,
+      computed_expenses: stats.expenses,
+      computed_income: stats.income,
+      computed_remaining: true_remaining
+    };
+  });
+
+  res.json(enrichedEvents);
 });
 
 // GET /api/events/:id
@@ -38,7 +59,22 @@ router.get('/:id', async (req, res) => {
   if (evtErr) return res.status(404).json({ error: 'Event not found.' });
   if (txErr)  return res.status(500).json({ error: 'Failed to fetch transactions.' });
 
-  res.json({ ...event, transactions });
+  let expenses = 0;
+  let income = 0;
+  if (transactions) {
+    transactions.forEach(tx => {
+      if (tx.type === 'expense') expenses += Number(tx.amount);
+      else income += Number(tx.amount);
+    });
+  }
+
+  res.json({ 
+    ...event, 
+    computed_expenses: expenses,
+    computed_income: income,
+    computed_remaining: Number(event.allocated_budget) + income - expenses,
+    transactions 
+  });
 });
 
 // POST /api/events (admin only)
