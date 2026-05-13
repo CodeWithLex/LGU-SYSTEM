@@ -60,15 +60,16 @@ const Dashboard = (() => {
         <div class="stat-pop-row total"><span>Total Income</span> <span>${UI.currency(summary.totalIncome)}</span></div>
       `;
 
+      const eventExpense = summary.totalExpense - summary.generalExpense;
       document.getElementById('pop-expense').innerHTML = `
-        <div class="stat-pop-row"><span>Misc Expenses</span> <span>${UI.currency(summary.totalExpense)}</span></div>
-        <div class="stat-pop-row total"><span>Total Deductions</span> <span>${UI.currency(summary.totalExpense)}</span></div>
-        <p style="font-size:0.65rem;color:var(--col-text-dim);margin-top:0.4rem;line-height:1.2;">* This excludes spending already tracked within event envelopes.</p>
+        <div class="stat-pop-row"><span>General/Misc</span> <span>${UI.currency(summary.generalExpense)}</span></div>
+        <div class="stat-pop-row"><span>Event Spending</span> <span>${UI.currency(eventExpense)}</span></div>
+        <div class="stat-pop-row total"><span>Total Spent</span> <span>${UI.currency(summary.totalExpense)}</span></div>
       `;
 
       document.getElementById('pop-balance').innerHTML = `
         <div class="stat-pop-row income"><span>Total Income</span> <span>${UI.currency(summary.totalIncome)}</span></div>
-        <div class="stat-pop-row expense"><span>Misc Expenses</span> <span>-${UI.currency(summary.totalExpense)}</span></div>
+        <div class="stat-pop-row expense"><span>Misc Expenses</span> <span>-${UI.currency(summary.generalExpense)}</span></div>
         <div class="stat-pop-row" style="color:var(--col-warning)"><span>Reserved (Events)</span> <span>-${UI.currency(summary.breakdown.reserved_envelopes)}</span></div>
         <div class="stat-pop-row total"><span>Available Fund</span> <span>${UI.currency(summary.remainingBalance)}</span></div>
         <p style="font-size:0.65rem;color:var(--col-text-dim);margin-top:0.4rem;line-height:1.2;">Unreserved cash available for new allocations or general operations.</p>

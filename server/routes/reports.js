@@ -25,13 +25,16 @@ router.get('/summary', async (req, res) => {
   const summary = txs.reduce((acc, tx) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
     
-    // Track dashboard-impacting expenses (only from general fund pool)
-    if (tx.type === 'expense' && !tx.use_allocation) {
-      acc.dashboard_expense += Number(tx.amount);
+    // Track global system spending
+    if (tx.type === 'expense') {
+      acc.total_system_expense += Number(tx.amount);
+      if (!tx.use_allocation) {
+        acc.dashboard_expense += Number(tx.amount);
+      }
     }
 
     return acc;
-  }, { expense: 0, donation: 0, collection: 0, allocation: 0, transfer: 0, dashboard_expense: 0 });
+  }, { expense: 0, donation: 0, collection: 0, allocation: 0, transfer: 0, dashboard_expense: 0, total_system_expense: 0 });
 
   let totalReservedEnvelopes = 0;
   (events || []).forEach(e => {
@@ -39,13 +42,15 @@ router.get('/summary', async (req, res) => {
   });
 
   const totalIncome  = summary.allocation + summary.donation + summary.collection;
-  const totalExpense = summary.dashboard_expense;
+  const totalExpense = summary.total_system_expense; // Re-mapped to include ALL expenses
+  const generalExpense = summary.dashboard_expense;
   
-  const remainingBalance = totalIncome - totalExpense - totalReservedEnvelopes;
+  const remainingBalance = totalIncome - generalExpense - totalReservedEnvelopes;
 
   res.json({
     totalIncome,
     totalExpense,
+    generalExpense,
     remainingBalance,
     breakdown: {
       ...summary,
