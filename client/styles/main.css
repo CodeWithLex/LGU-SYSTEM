@@ -802,12 +802,12 @@ html body .hidden {
 }
 
 /* ---- Transaction List Items ---- */
-.tx-list, .announcement-list {
+.tx-list, .announcement-list, .mobile-cards-container {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  max-height: 480px;
-  overflow-y: auto;
+  max-height: 500px;
+  overflow: auto;
   padding-right: 0.5rem;
 }
 
@@ -1023,9 +1023,34 @@ html body .hidden {
    DATA TABLE
    ============================================= */
 .table-wrapper {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 600px;
   border-radius: var(--radius-md);
   border: 1px solid var(--col-border);
+}
+
+/* Global Custom Scrollbar for all scrollable containers */
+.table-wrapper::-webkit-scrollbar,
+.tx-list::-webkit-scrollbar,
+.announcement-list::-webkit-scrollbar,
+.mobile-cards-container::-webkit-scrollbar,
+#admin-audit-log-content::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.table-wrapper::-webkit-scrollbar-track,
+.tx-list::-webkit-scrollbar-track,
+.announcement-list::-webkit-scrollbar-track,
+.mobile-cards-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.table-wrapper::-webkit-scrollbar-thumb,
+.tx-list::-webkit-scrollbar-thumb,
+.announcement-list::-webkit-scrollbar-thumb,
+.mobile-cards-container::-webkit-scrollbar-thumb {
+  background: var(--col-primary);
+  border-radius: 10px;
+  opacity: 0.5;
 }
 
 .data-table {
@@ -1036,7 +1061,10 @@ html body .hidden {
 
 .data-table thead {
   background: var(--col-surface);
-  border-bottom: 1px solid var(--col-border);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  box-shadow: 0 1px 0 var(--col-border);
 }
 
 .data-table th {
@@ -1048,6 +1076,7 @@ html body .hidden {
   letter-spacing: 0.05em;
   color: var(--col-text-muted);
   white-space: nowrap;
+  background: var(--col-surface);
 }
 
 .data-table td {
