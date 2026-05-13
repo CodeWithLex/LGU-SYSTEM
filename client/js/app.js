@@ -164,7 +164,11 @@
     // Show splash screen during boot and record start time
     const splash = document.getElementById('splash-screen');
     const splashStart = Date.now();
-    if (splash) splash.classList.remove('hidden');
+    if (splash) {
+      splash.style.opacity = '1';
+      splash.style.visibility = 'visible';
+      splash.classList.remove('hidden');
+    }
 
     UI.showScreen('app');
 
