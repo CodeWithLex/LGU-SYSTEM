@@ -136,54 +136,102 @@ router.post('/budget-transfer', async (req, res) => {
 
   const transferAmount = Number(amount);
 
-  // Fetch both events
-  const [{ data: fromEv, error: fe }, { data: toEv, error: te }] = await Promise.all([
-    supabase.from('events').select('id, event_name, remaining_budget, status').eq('id', from_event_id).single(),
-    supabase.from('events').select('id, event_name, remaining_budget, status').eq('id', to_event_id).single(),
-  ]);
+  let fromEventName = "General Fund";
+  let toEventName   = "";
 
-  if (fe || !fromEv) return res.status(404).json({ error: 'Source event not found.' });
-  if (te || !toEv)   return res.status(404).json({ error: 'Target event not found.' });
+  // ── CASE 1: Transfer from General Fund ──────────────────────────────
+  if (from_event_id === 'GENERAL') {
+    const [{ data: txs, error: txErr }, { data: events, error: evErr }, { data: targetEv, error: te }] = await Promise.all([
+      supabase.from('transactions').select('type, amount, use_allocation'),
+      supabase.from('events').select('allocated_budget'),
+      supabase.from('events').select('id, event_name, allocated_budget, remaining_budget, status').eq('id', to_event_id).single(),
+    ]);
 
-  if (fromEv.status === 'archived') {
-    return res.status(400).json({ error: 'Cannot transfer from an archived event.' });
+    if (txErr || evErr) return res.status(500).json({ error: 'Failed to compute general fund balance.' });
+    if (te || !targetEv) return res.status(404).json({ error: 'Target event not found.' });
+    if (targetEv.status === 'archived') return res.status(400).json({ error: 'Cannot transfer to an archived event.' });
+
+    toEventName = targetEv.event_name;
+
+    // Compute Available General Fund
+    // Logic: Total Incomes - Dashboard Expenses - Reserved Envelopes
+    const summary = (txs || []).reduce((acc, tx) => {
+      if (['donation', 'collection', 'allocation'].includes(tx.type)) {
+        acc.income += Number(tx.amount);
+      }
+      if (tx.type === 'expense' && !tx.use_allocation) {
+        acc.dashboard_expense += Number(tx.amount);
+      }
+      return acc;
+    }, { income: 0, dashboard_expense: 0 });
+
+    const totalReserved = (events || []).reduce((sum, e) => sum + Number(e.allocated_budget), 0);
+    const availableBalance = summary.income - summary.dashboard_expense - totalReserved;
+
+    if (transferAmount > availableBalance) {
+      return res.status(400).json({ 
+        error: `Insufficient unreserved funds in General Fund. Available: ₱${availableBalance.toLocaleString()}.` 
+      });
+    }
+
+    // UPDATE: Increase target event's budgets
+    // Note: Since this is coming from the dashboard, it increases the total "Allocated" for this event.
+    const { error: updErr } = await supabase.from('events').update({
+      allocated_budget: Number(targetEv.allocated_budget) + transferAmount,
+      remaining_budget: Number(targetEv.remaining_budget) + transferAmount
+    }).eq('id', to_event_id);
+
+    if (updErr) return res.status(500).json({ error: 'Failed to update target event budget.' });
+
+  } 
+  // ── CASE 2: Transfer from another Event ─────────────────────────────
+  else {
+    const [{ data: fromEv, error: fe }, { data: toEv, error: te }] = await Promise.all([
+      supabase.from('events').select('id, event_name, remaining_budget, status').eq('id', from_event_id).single(),
+      supabase.from('events').select('id, event_name, remaining_budget, status').eq('id', to_event_id).single(),
+    ]);
+
+    if (fe || !fromEv) return res.status(404).json({ error: 'Source event not found.' });
+    if (te || !toEv)   return res.status(404).json({ error: 'Target event not found.' });
+
+    fromEventName = fromEv.event_name;
+    toEventName   = toEv.event_name;
+
+    if (fromEv.status === 'archived') return res.status(400).json({ error: 'Cannot transfer from an archived event.' });
+    if (Number(fromEv.remaining_budget) < transferAmount) {
+      return res.status(400).json({ error: `Insufficient remaining budget in "${fromEv.event_name}". Available: ₱${Number(fromEv.remaining_budget).toLocaleString()}.` });
+    }
+
+    // Deduct from source, add to target
+    const [{ error: e1 }, { error: e2 }] = await Promise.all([
+      supabase.from('events').update({ remaining_budget: Number(fromEv.remaining_budget) - transferAmount }).eq('id', from_event_id),
+      supabase.from('events').update({ remaining_budget: Number(toEv.remaining_budget) + transferAmount }).eq('id', to_event_id),
+    ]);
+
+    if (e1 || e2) return res.status(500).json({ error: 'Transfer failed. Please try again.' });
   }
-  if (Number(fromEv.remaining_budget) < transferAmount) {
-    return res.status(400).json({ error: `Insufficient remaining budget in "${fromEv.event_name}". Available: ₱${Number(fromEv.remaining_budget).toLocaleString()}.` });
-  }
 
-  // Deduct from source, add to target
-  const [{ error: e1 }, { error: e2 }] = await Promise.all([
-    supabase.from('events').update({ remaining_budget: Number(fromEv.remaining_budget) - transferAmount }).eq('id', from_event_id),
-    supabase.from('events').update({
-      remaining_budget: Number(toEv.remaining_budget) + transferAmount,
-      allocated_budget: supabase.rpc ? undefined : undefined, // keep allocated the same
-    }).eq('id', to_event_id),
-  ]);
-
-  if (e1 || e2) return res.status(500).json({ error: 'Transfer failed. Please try again.' });
-
-  // Record as allocation transaction on the target event
+  // ── SHARED: Record allocation and Audit ────────────────────────────
   await supabase.from('transactions').insert({
     event_id:         to_event_id,
     type:             'allocation',
     amount:           transferAmount,
-    description:      `Budget transfer from "${fromEv.event_name}": ${sanitizeText(reason)}`,
+    description:      `Budget transfer from "${fromEventName}": ${sanitizeText(reason)}`,
     added_by:         req.user.id,
     transaction_date: new Date().toISOString().split('T')[0],
   });
 
   logAudit(req.user.id, 'BUDGET_TRANSFER', {
-    from_event_id:   from_event_id,
-    from_event_name: fromEv.event_name,
-    to_event_id:     to_event_id,
-    to_event_name:   toEv.event_name,
+    from_event_id,
+    from_event_name: fromEventName,
+    to_event_id,
+    to_event_name:   toEventName,
     amount:          transferAmount,
     reason:          sanitizeText(reason),
   });
 
   res.json({
-    message: `Successfully transferred ₱${transferAmount.toLocaleString()} from "${fromEv.event_name}" to "${toEv.event_name}".`
+    message: `Successfully transferred ₱${transferAmount.toLocaleString()} from "${fromEventName}" to "${toEventName}".`
   });
 });
 

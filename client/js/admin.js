@@ -51,6 +51,13 @@ const Admin = (() => {
       const opts = '<option value="">Select Event</option>' +
         _allEvents.map(ev => `<option value="${ev.id}" data-rem="${ev.computed_remaining}">${ev.event_name}</option>`).join('');
       document.querySelectorAll('.event-select-dropdown').forEach(el => { el.innerHTML = opts; });
+      
+      // Specifically for Budget Transfer: Add "General Fund" as a source option
+      const fromSel = document.getElementById('transfer-from');
+      if (fromSel) {
+        fromSel.insertAdjacentHTML('afterbegin', '<option value="GENERAL" style="color:var(--col-success);font-weight:700;">🏦 GENERAL FUND (Available Total)</option>');
+        fromSel.value = ""; // reset to placeholder
+      }
     } catch { /* non-fatal */ }
   }
 
