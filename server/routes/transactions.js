@@ -59,6 +59,46 @@ router.post('/', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'Amount must be a positive number.' });
   }
 
+  // 4. Budget Overdraft Validation
+  if (type === 'expense') {
+    if (use_allocation) {
+      // Check against Event balance
+      const [{ data: event }, { data: evTxs }] = await Promise.all([
+        supabase.from('events').select('allocated_budget').eq('id', event_id).single(),
+        supabase.from('transactions').select('type, amount, use_allocation').eq('event_id', event_id)
+      ]);
+      if (event) {
+        let allocExp = 0, inc = 0;
+        (evTxs || []).forEach(tx => {
+           if (tx.type === 'expense') {
+              if (tx.use_allocation) allocExp += Number(tx.amount);
+           } else {
+              inc += Number(tx.amount);
+           }
+        });
+        const remaining = Number(event.allocated_budget) + inc - allocExp;
+        if (Number(amount) > remaining) {
+           return res.status(400).json({ error: `Amount exceeds available event budget (₱${remaining.toLocaleString()}).` });
+        }
+      }
+    } else {
+      // Check against Dashboard balance
+      const { data: allTxs } = await supabase.from('transactions').select('type, amount, use_allocation');
+      let dashExp = 0, dashInc = 0;
+      (allTxs || []).forEach(tx => {
+         if (tx.type === 'expense') {
+            if (!tx.use_allocation) dashExp += Number(tx.amount);
+         } else {
+            dashInc += Number(tx.amount);
+         }
+      });
+      const remaining = dashInc - dashExp;
+      if (Number(amount) > remaining) {
+         return res.status(400).json({ error: `Amount exceeds available general fund (₱${remaining.toLocaleString()}).` });
+      }
+    }
+  }
+
   // 4. Sanitize inputs
   const cleanDesc   = sanitizeText(description);
   const cleanDonor  = donor_name ? sanitizeText(donor_name) : null;

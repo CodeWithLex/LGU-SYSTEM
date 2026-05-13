@@ -49,7 +49,7 @@ const Admin = (() => {
     try {
       _allEvents = await Api.events.list();
       const opts = '<option value="">Select Event</option>' +
-        _allEvents.map(ev => `<option value="${ev.id}">${ev.event_name}</option>`).join('');
+        _allEvents.map(ev => `<option value="${ev.id}" data-rem="${ev.computed_remaining}">${ev.event_name}</option>`).join('');
       document.querySelectorAll('.event-select-dropdown').forEach(el => { el.innerHTML = opts; });
     } catch { /* non-fatal */ }
   }
@@ -102,7 +102,7 @@ const Admin = (() => {
     const fundGrp  = document.getElementById('fund-source-group');
     const useAlloc = document.getElementById('tx-use-allocation');
 
-    const updateFundToggle = () => {
+    const updateFundToggle = async () => {
       // Only show if it's an expense AND an event is selected
       if (typeSel.value === 'expense' && eventSel.value) {
         fundGrp.style.display = 'block';
@@ -110,10 +110,35 @@ const Admin = (() => {
         fundGrp.style.display = 'none';
         useAlloc.checked = true; // reset to default
       }
+
+      const balInd = document.getElementById('tx-balance-indicator');
+      if (typeSel.value === 'expense') {
+        balInd.style.display = 'inline';
+        if (eventSel.value && useAlloc.checked) {
+          const selectedOption = eventSel.options[eventSel.selectedIndex];
+          const rem = selectedOption.dataset.rem || 0;
+          balInd.textContent = `(Available Event Budget: ${UI.currency(rem)})`;
+          balInd.dataset.maxAmount = rem;
+        } else {
+          // Fetch dashboard balance
+          try {
+            const summary = await Api.reports.getSummary();
+            const rem = summary.remainingBalance || 0;
+            balInd.textContent = `(Available General Fund: ${UI.currency(rem)})`;
+            balInd.dataset.maxAmount = rem;
+          } catch {
+             balInd.textContent = '';
+          }
+        }
+      } else {
+        balInd.style.display = 'none';
+        delete balInd.dataset.maxAmount;
+      }
     };
 
     eventSel.addEventListener('change', updateFundToggle);
     typeSel.addEventListener('change', updateFundToggle);
+    useAlloc.addEventListener('change', updateFundToggle);
 
     // Initialize visibility
     updateFundToggle();
@@ -121,6 +146,18 @@ const Admin = (() => {
     form.addEventListener('submit', async e => {
       e.preventDefault();
       errEl.classList.add('hidden');
+      
+      const balInd = document.getElementById('tx-balance-indicator');
+      const amount = Number(document.getElementById('tx-amount').value);
+      if (typeSel.value === 'expense' && balInd.dataset.maxAmount !== undefined) {
+         const maxAmt = Number(balInd.dataset.maxAmount);
+         if (amount > maxAmt) {
+             errEl.textContent = `Amount (₱${amount.toLocaleString()}) exceeds available balance (₱${maxAmt.toLocaleString()})!`;
+             errEl.classList.remove('hidden');
+             return;
+         }
+      }
+
       btn.disabled = true;
       btn.textContent = 'Submitting…';
 
