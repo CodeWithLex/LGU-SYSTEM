@@ -9,6 +9,7 @@ const Admin = (() => {
   let _allEvents    = [];
   let _allUsers     = [];
   let _allLogs      = [];
+  let _genFundBalance = 0;
 
   async function init() {
     await populateEventDropdown();
@@ -47,7 +48,12 @@ const Admin = (() => {
   // ── Event Dropdown ─────────────────────────────────────────────────────────
   async function populateEventDropdown() {
     try {
-      _allEvents = await Api.events.list();
+      const [events, summary] = await Promise.all([
+        Api.events.list(),
+        Api.reports.summary()
+      ]);
+      _allEvents = events;
+      _genFundBalance = summary.remainingBalance; // Store available general fund balance
       const opts = '<option value="">Select Event</option>' +
         _allEvents.map(ev => `<option value="${ev.id}" data-rem="${ev.computed_remaining}">${ev.event_name}</option>`).join('');
       document.querySelectorAll('.event-select-dropdown').forEach(el => { el.innerHTML = opts; });
@@ -344,7 +350,18 @@ const Admin = (() => {
       const fromBalEl = document.getElementById('tp-from-val');
       const toBalEl   = document.getElementById('tp-to-val');
 
-      if (fromEv) {
+      if (fromId === 'GENERAL') {
+        const newBal = _genFundBalance - amount;
+        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <i data-lucide="arrow-right" style="width:12px;"></i> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        if (newBal < 0) {
+          errEl.textContent = "Insufficient funds in General Fund!";
+          errEl.classList.remove('hidden');
+          btn.disabled = true;
+        } else {
+          errEl.classList.add('hidden');
+          btn.disabled = false;
+        }
+      } else if (fromId && fromEv) {
         const newBal = fromEv.remaining_budget - amount;
         fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <i data-lucide="arrow-right" style="width:12px;"></i> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
