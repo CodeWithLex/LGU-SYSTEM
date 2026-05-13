@@ -200,6 +200,9 @@ function renderMonthlyChart(monthly) {
           backgroundColor: 'rgba(16,185,129,0.75)',
           borderRadius: 6,
           borderSkipped: false,
+          maxBarThickness: 35,
+          categoryPercentage: 0.8,
+          barPercentage: 0.9
         },
         {
           label: 'Expenses',
@@ -207,6 +210,9 @@ function renderMonthlyChart(monthly) {
           backgroundColor: 'rgba(239,68,68,0.75)',
           borderRadius: 6,
           borderSkipped: false,
+          maxBarThickness: 35,
+          categoryPercentage: 0.8,
+          barPercentage: 0.9
         }
       ]
     },
