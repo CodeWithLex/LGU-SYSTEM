@@ -161,8 +161,9 @@
       return;
     }
 
-    // Show splash screen during boot
+    // Show splash screen during boot and record start time
     const splash = document.getElementById('splash-screen');
+    const splashStart = Date.now();
     if (splash) splash.classList.remove('hidden');
 
     UI.showScreen('app');
@@ -179,10 +180,19 @@
     UI.showView('dashboard');
     await Dashboard.load();
 
-    // Hide splash with a slight delay for smooth transition
+    // Ensure splash stays visible for at least 1.2s to show off the animation smoothly
+    const elapsed = Date.now() - splashStart;
+    const minSplashDuration = 1200; 
+    const hideDelay = Math.max(0, minSplashDuration - elapsed);
+
     setTimeout(() => {
-      if (splash) splash.classList.add('hidden');
-    }, 600);
+      // 0.5s CSS transition handles the fade out
+      if (splash) {
+        splash.style.opacity = '0';
+        splash.style.visibility = 'hidden';
+        setTimeout(() => splash.classList.add('hidden'), 500);
+      }
+    }, hideDelay);
   }
 
 })();
