@@ -124,7 +124,7 @@ function buildReportsHTML(summary, monthly, events) {
                 <tr>
                   <td><strong>${ev.event_name}</strong></td>
                   <td>${fmt(ev.allocated_budget)}</td>
-                  <td>${fmt(ev.remaining_budget)}</td>
+                  <td>${fmt(ev.computed_remaining || 0)}</td>
                   <td><span class="status-badge status-${ev.status}">${ev.status}</span></td>
                   <td style="text-align:center;">
                     <div style="display:inline-flex;gap:.5rem;">
