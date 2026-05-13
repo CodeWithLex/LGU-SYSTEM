@@ -1104,13 +1104,29 @@ html body .hidden {
   align-items: center;
   gap: 0.25rem;
 }
-.filter-bar select {
+.filter-bar select, .search-input-wrapper input {
   padding: 0.55rem 1rem;
-  background: var(--col-card);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--col-border);
   border-radius: var(--radius-sm);
   color: var(--col-text);
   font-size: 0.87rem;
+  transition: all var(--transition);
+}
+
+.search-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--col-primary);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 10px rgba(99, 132, 255, 0.2);
+}
+
+.search-input-wrapper i {
+  transition: color var(--transition);
+}
+
+.search-input-wrapper input:focus + i {
+  color: var(--col-primary) !important;
 }
 
 /* =============================================
