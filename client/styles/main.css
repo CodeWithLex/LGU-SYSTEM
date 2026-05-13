@@ -650,24 +650,6 @@ html body .hidden {
 /* =============================================
    DASHBOARD STATS
    ============================================= */
-#stat-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(4px);
-  z-index: 40;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-#stat-backdrop.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -687,18 +669,16 @@ html body .hidden {
   align-items: center;
   gap: 1rem;
   box-shadow: var(--shadow-card);
-  position: relative;
   overflow: hidden;
   transition:
     transform var(--transition),
-    box-shadow var(--transition),
-    z-index var(--transition);
+    box-shadow var(--transition);
 }
 
 .stat-card.hover-active {
-  z-index: 45; /* Above backdrop */
-  transform: scale(1.02);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  z-index: 10;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   border-color: var(--col-primary);
 }
 

@@ -13,30 +13,18 @@ const Dashboard = (() => {
   }
 
   function bindPopovers() {
-    const backdrop = document.getElementById('stat-backdrop');
-    if (!backdrop) return;
-    
     document.querySelectorAll('.stat-card').forEach(card => {
-      const showHover = () => {
-        card.classList.add('hover-active');
-        backdrop.classList.add('active');
-      };
-      const hideHover = () => {
-        card.classList.remove('hover-active');
-      };
+      const showHover = () => card.classList.add('hover-active');
+      const hideHover = () => card.classList.remove('hover-active');
       
       card.addEventListener('mouseenter', showHover);
-      card.addEventListener('mouseleave', (e) => {
-         hideHover();
-         backdrop.classList.remove('active');
-      });
+      card.addEventListener('mouseleave', hideHover);
+
       // Tap toggle for mobile
       card.addEventListener('click', (e) => {
-        // Prevent bubbling to backdrop immediately
         e.stopPropagation();
         if (card.classList.contains('hover-active')) {
              hideHover();
-             backdrop.classList.remove('active');
         } else {
              document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('hover-active'));
              showHover();
@@ -44,9 +32,9 @@ const Dashboard = (() => {
       });
     });
 
-    backdrop.addEventListener('click', () => {
+    // Close any open popovers when clicking elsewhere
+    document.addEventListener('click', () => {
       document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('hover-active'));
-      backdrop.classList.remove('active');
     });
   }
 
