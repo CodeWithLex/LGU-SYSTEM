@@ -225,16 +225,19 @@
               <i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Over Budget
             </div>
           </div>
-          <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;">
-            <select id="filter-type">
+          <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+            <div class="search-input-wrapper" style="position:relative;flex:1;min-width:200px;">
+              <i data-lucide="search" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--col-text-dim);"></i>
+              <input type="text" id="tx-search" placeholder="Search by description or source..." style="padding-left:2.5rem;width:100%;" />
+            </div>
+            <select id="filter-type" style="min-width:140px;">
               <option value="all">All Types</option>
               <option value="expense">Expenses</option>
-              <option value="income">Income</option>
               <option value="donation">Donations</option>
               <option value="collection">Collections</option>
               <option value="allocation">Allocations</option>
             </select>
-            <select id="filter-event">
+            <select id="filter-event" style="min-width:160px;">
               <option value="all">All Events</option>
             </select>
           </div>

@@ -121,23 +121,28 @@ const Transactions = (() => {
   }
 
   function bindFilter() {
-    const typeEl = document.getElementById('tx-type-filter');
+    const typeEl   = document.getElementById('filter-type');
+    const eventEl  = document.getElementById('filter-event');
     const searchEl = document.getElementById('tx-search');
     
+    // Initial population of event filter
+    populateEventFilter();
     bindTableEvents();
 
     function applyFilters() {
-      const type = typeEl ? typeEl.value : '';
-      const text = searchEl ? searchEl.value.toLowerCase().trim() : '';
+      const type    = typeEl ? typeEl.value : 'all';
+      const eventId = eventEl ? eventEl.value : 'all';
+      const text    = searchEl ? searchEl.value.toLowerCase().trim() : '';
 
       const filtered = allTxs.filter(t => {
-        const matchesType = !type || t.type === type;
-        const matchesText = !text || 
+        const matchesType  = (type === 'all') || (t.type === type);
+        const matchesEvent = (eventId === 'all') || (String(t.event_id) === eventId);
+        const matchesText  = !text || 
           (t.description || '').toLowerCase().includes(text) || 
           (t.profiles?.full_name || '').toLowerCase().includes(text) ||
-          (t.donor_name || '').toLowerCase().includes(text);
+          (t.events?.event_name || '').toLowerCase().includes(text);
         
-        return matchesType && matchesText;
+        return matchesType && matchesEvent && matchesText;
       });
       renderTable(filtered);
     }
@@ -146,10 +151,38 @@ const Transactions = (() => {
       typeEl.addEventListener('change', applyFilters);
       typeEl._bound = true;
     }
+    if (eventEl && !eventEl._bound) {
+      eventEl.addEventListener('change', applyFilters);
+      eventEl._bound = true;
+    }
     if (searchEl && !searchEl._bound) {
       searchEl.addEventListener('input', applyFilters);
       searchEl._bound = true;
     }
+  }
+
+  function populateEventFilter() {
+    const eventEl = document.getElementById('filter-event');
+    if (!eventEl) return;
+
+    // Get unique events from the current transaction set
+    const uniqueEvents = [];
+    const seen = new Set();
+
+    allTxs.forEach(tx => {
+      if (tx.event_id && tx.events && !seen.has(tx.event_id)) {
+        uniqueEvents.push({ id: tx.event_id, name: tx.events.event_name });
+        seen.add(tx.event_id);
+      }
+    });
+
+    // Add "Unassociated / General" if any tx has no event_id
+    if (allTxs.some(tx => !tx.event_id)) {
+      uniqueEvents.push({ id: 'null', name: 'General Fund (No Event)' });
+    }
+
+    eventEl.innerHTML = '<option value="all">All Events</option>' + 
+      uniqueEvents.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
   }
 
   // ── Edit Modal ──────────────────────────────────────────────────────────
