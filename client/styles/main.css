@@ -1393,7 +1393,17 @@ html body .hidden {
   body .main-content { padding-bottom: 70px !important; }
   body .view { padding: 0.75rem !important; }
   body .auth-card { margin: 0.5rem !important; padding: 1.25rem 1rem !important; }
-  body .table-wrapper { margin: 0 -0.75rem !important; border-radius: 0 !important; }
+  body .table-wrapper { 
+    margin: 0 -0.75rem !important; 
+    border-radius: 0 !important; 
+    max-height: 420px !important; 
+    overflow: auto !important;
+  }
+  body .mobile-cards-container {
+    max-height: 420px !important;
+    overflow: auto !important;
+    padding: 0.25rem 0 !important;
+  }
   body .admin-panels { grid-template-columns: 1fr !important; }
   body .toast { bottom: 85px !important; left: 0.75rem !important; right: 0.75rem !important; max-width: 100% !important; }
 }
