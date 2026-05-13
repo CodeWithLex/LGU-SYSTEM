@@ -650,14 +650,35 @@ html body .hidden {
 /* =============================================
    DASHBOARD STATS
    ============================================= */
+#stat-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#stat-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1.75rem;
+  position: relative;
 }
 
 .stat-card {
+  position: relative;
+  z-index: 1;
   background: var(--col-card);
   border: 1px solid var(--col-border);
   border-radius: var(--radius-md);
@@ -670,7 +691,57 @@ html body .hidden {
   overflow: hidden;
   transition:
     transform var(--transition),
-    box-shadow var(--transition);
+    box-shadow var(--transition),
+    z-index var(--transition);
+}
+
+.stat-card.hover-active {
+  z-index: 45; /* Above backdrop */
+  transform: scale(1.02);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+  border-color: var(--col-primary);
+}
+
+.stat-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  min-width: 250px;
+  background: var(--col-surface);
+  border: 1px solid var(--col-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 46;
+}
+
+.stat-card.hover-active .stat-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(12px);
+}
+
+.stat-pop-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--col-text-muted);
+}
+.stat-pop-row:last-child {
+  margin-bottom: 0;
+}
+.stat-pop-row.total {
+  border-top: 1px solid var(--col-border);
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  color: var(--col-text);
+  font-weight: 600;
 }
 
 .stat-card::before {
