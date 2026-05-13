@@ -256,6 +256,72 @@
         <div id="tx-mobile-cards" class="mobile-cards-container"></div>
       </section>
 
+      <!-- TOTAL INCOME -->
+      <section id="view-income" class="view">
+        <div class="view-header">
+          <div>
+            <h2>Total Income Tracker</h2>
+            <p class="view-sub">Track all external injections into the General Fund</p>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Left: Income Table -->
+          <div class="dashboard-card" style="grid-column: span 2;">
+            <h3>Income Sources</h3>
+            <div class="table-wrapper" style="margin-top: 1rem;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th><th>Type</th><th>Source/Description</th><th>Amount</th><th>Added By</th>
+                  </tr>
+                </thead>
+                <tbody id="income-table-body">
+                  <tr><td colspan="5" class="loading-state">Loading income history…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Add Income Card (Admin Only) -->
+          <div class="dashboard-card admin-only hidden" id="add-income-panel">
+            <h3><i data-lucide="plus-circle" style="color:var(--col-success);margin-right:0.4rem;"></i> Add General Income</h3>
+            <form id="add-income-form" class="admin-form" style="margin-top:1rem;">
+              <div class="form-group">
+                <label>Income Type</label>
+                <select id="inc-type" required>
+                  <option value="donation">Donation (External Sponsorship)</option>
+                  <option value="collection">Collection (General Fee/Ticket)</option>
+                  <option value="allocation">Grant/Allocation (University Fund)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Source / Description</label>
+                <input type="text" id="inc-desc" required placeholder="Where did this come from?" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Amount (₱)</label>
+                  <input type="number" id="inc-amount" min="1" step="0.01" required placeholder="0.00" />
+                </div>
+                <div class="form-group">
+                  <label>Date Received</label>
+                  <input type="date" id="inc-date" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Proof of Receipt (Optional Link)</label>
+                <input type="url" id="inc-receipt" placeholder="https://" />
+              </div>
+              <div class="auth-error hidden" id="inc-error"></div>
+              <button class="btn btn-primary" type="submit" id="inc-submit" style="width:100%;margin-top:1rem;background:var(--col-success);border-color:var(--col-success);">
+                Add to Total Income
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
       <!-- REPORTS -->
       <section class="view reports-view" id="view-reports">
         <div class="view-header">
