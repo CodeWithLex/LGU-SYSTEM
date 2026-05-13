@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
 
   let query = supabase
     .from('transactions')
-    .select('*, profiles!added_by(full_name)')
+    .select('*, profiles!added_by(full_name), events(event_name)')
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 

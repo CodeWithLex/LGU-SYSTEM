@@ -33,7 +33,7 @@ const Transactions = (() => {
     tbody.innerHTML = txs.map(tx => `
       <tr>
         <td>${UI.dateStr(tx.transaction_date)}</td>
-        <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.event_id ? '—' : '—'}</td>
+        <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.events?.event_name || '—'}</td>
         <td><span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span></td>
         <td>${tx.description}</td>
         <td class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}">
