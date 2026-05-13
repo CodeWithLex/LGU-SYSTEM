@@ -161,6 +161,10 @@
       return;
     }
 
+    // Show splash screen during boot
+    const splash = document.getElementById('splash-screen');
+    if (splash) splash.classList.remove('hidden');
+
     UI.showScreen('app');
 
     const profile = await Auth.getProfile();
@@ -174,6 +178,11 @@
 
     UI.showView('dashboard');
     await Dashboard.load();
+
+    // Hide splash with a slight delay for smooth transition
+    setTimeout(() => {
+      if (splash) splash.classList.add('hidden');
+    }, 600);
   }
 
 })();
