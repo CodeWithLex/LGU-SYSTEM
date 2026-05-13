@@ -145,6 +145,10 @@
     if (view === 'events')       Events.load();
     if (view === 'transactions') Transactions.load();
     if (view === 'reports')      Reports.load();
+    if (view === 'income') {
+        Income.load();
+        Income.bindForm();
+    }
     if (view === 'admin')        Admin.init();
   }
 
