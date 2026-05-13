@@ -119,6 +119,58 @@ router.post('/', requireAdmin, async (req, res) => {
   res.status(201).json(tx);
 });
 
+// POST /api/transactions/bulk (admin only)
+router.post('/bulk', requireAdmin, async (req, res) => {
+  const { transactions } = req.body;
+
+  if (!Array.isArray(transactions) || transactions.length === 0 || transactions.length > 500) {
+    return res.status(400).json({ error: 'Valid transactions array (max 500) is required.' });
+  }
+
+  // 1. Initial Validation & Sanitization Loop
+  for (let i = 0; i < transactions.length; i++) {
+    const tx = transactions[i];
+    const missing = assertRequired({ 
+      event_id: tx.event_id, 
+      type: tx.type, 
+      amount: tx.amount, 
+      description: tx.description, 
+      transaction_date: tx.transaction_date 
+    });
+    if (missing) return res.status(400).json({ error: `Row ${i + 1} missing data: ${missing}` });
+    
+    if (!isValidEnum(tx.type, VALID_TX_TYPES)) {
+      return res.status(400).json({ error: `Row ${i + 1} error: Invalid type (${tx.type}).` });
+    }
+    if (!isPositiveNumber(tx.amount)) {
+      return res.status(400).json({ error: `Row ${i + 1} error: Amount must be > 0.` });
+    }
+    
+    // Transform inline for insertion
+    tx.amount = Number(tx.amount);
+    tx.description = sanitizeText(String(tx.description)).slice(0, 500);
+    tx.donor_name = tx.donor_name ? sanitizeText(String(tx.donor_name)) : null;
+    tx.added_by = req.user.id;
+  }
+
+  // 2. Safe Bulk Insert to Database
+  const { data, error } = await supabase
+    .from('transactions')
+    .insert(transactions)
+    .select();
+
+  if (error) {
+    return res.status(500).json({ error: 'Database bulk insert failed: ' + error.message });
+  }
+
+  logAudit(req.user.id, 'BULK_IMPORT_TRANSACTIONS', { 
+    count: transactions.length, 
+    sample_event_id: transactions[0].event_id 
+  });
+
+  res.status(201).json({ message: 'Bulk import successful.', count: transactions.length });
+});
+
 // PATCH /api/transactions/:id — edit with mandatory reason (admin only)
 router.patch('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;

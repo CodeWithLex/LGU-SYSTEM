@@ -386,6 +386,29 @@
               </form>
             </div>
 
+            <!-- Bulk Import Transactions -->
+            <div class="dashboard-card">
+              <h3><i data-lucide="file-spreadsheet"></i> Bulk Import CSV</h3>
+              <p style="color:var(--col-text-muted);font-size:0.85rem;margin-bottom:1rem;line-height:1.4;">Insert multiple transactions at once. Ensure your file matches the template.</p>
+              <form id="bulk-import-form" class="admin-form">
+                <div class="form-group">
+                  <label>Target Event</label>
+                  <select id="bulk-event-id" required class="event-select-dropdown">
+                    <option value="">Select Event</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label>Upload .CSV</label>
+                  <input type="file" id="bulk-csv-file" accept=".csv" required style="padding:0.75rem; border:1px dashed var(--col-border); background:var(--col-surface); border-radius:var(--radius-sm); width:100%; color:var(--col-text); font-size:0.87rem; cursor:pointer;" />
+                </div>
+                <div class="form-error hidden" id="bulk-error" style="margin-top:0.75rem;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--col-border);">
+                  <button type="button" class="btn btn-secondary" id="download-csv-template" style="font-size:0.8rem; padding:0.4rem 0.6rem;"><i data-lucide="download"></i> Template</button>
+                  <button class="btn btn-primary" type="submit" id="submit-bulk-btn">Import Data</button>
+                </div>
+              </form>
+            </div>
+
           </div>
         </div>
 
@@ -482,6 +505,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <!-- Custom Loading Splash Screen -->
   <div id="splash-screen" class="splash-screen hidden">
     <div class="splash-content">

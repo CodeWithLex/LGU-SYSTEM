@@ -17,6 +17,7 @@ const Admin = (() => {
       bindEventForm();
       bindTransactionForm();
       bindAnnouncementForm();
+      bindBulkImportForm();
       bindBudgetTransferForm();
       _initialized = true;
     }
@@ -160,6 +161,91 @@ const Admin = (() => {
         btn.disabled = false;
         btn.textContent = 'Post Announcement';
       }
+    });
+  }
+
+  // ── Bulk CSV Import ────────────────────────────────────────────────────────
+  function bindBulkImportForm() {
+    const form  = document.getElementById('bulk-import-form');
+    const errEl = document.getElementById('bulk-error');
+    const btn   = document.getElementById('submit-bulk-btn');
+    const tpl   = document.getElementById('download-csv-template');
+
+    tpl.addEventListener('click', () => {
+      const csvStr = "transaction_date,type,amount,description,donor_name\n" +
+                     "2026-05-13,expense,150.00,Sound System Rental,\n" +
+                     "2026-05-14,donation,500.00,Alumni Sponsorship,John Doe\n" +
+                     "2026-05-15,collection,250.00,Ticket Sales,";
+      const blob = new Blob([csvStr], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'LGU_Transactions_Template.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      errEl.classList.add('hidden');
+      
+      const fileInput = document.getElementById('bulk-csv-file');
+      const eventId   = document.getElementById('bulk-event-id').value;
+      if (!fileInput.files.length) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Parsing…';
+
+      Papa.parse(fileInput.files[0], {
+        header: true,
+        skipEmptyLines: true,
+        complete: async function(results) {
+          try {
+            if (results.errors && results.errors.length > 0) {
+              throw new Error("CSV Parsing Error: " + results.errors[0].message);
+            }
+            
+            const rows = results.data;
+            if (!rows.length) throw new Error("CSV file is empty.");
+            if (rows.length > 500) throw new Error("Maximum 500 transactions allowed per import.");
+
+            const bulkData = rows.map((r, i) => {
+              if (!r.amount || !r.type || !r.transaction_date || !r.description) {
+                throw new Error(`Row ${i+2}: Missing required columns. Ensure the header matches the template.`);
+              }
+              return {
+                event_id: eventId,
+                transaction_date: r.transaction_date,
+                type: String(r.type).toLowerCase().trim(),
+                amount: parseFloat(r.amount),
+                description: r.description,
+                donor_name: r.donor_name || null
+              };
+            });
+
+            btn.textContent = 'Importing Data…';
+            const res = await Api.transactions.bulkCreate(bulkData);
+            UI.toast(`Success! ${res.count} transactions imported.`, 'success');
+            
+            form.reset();
+            await populateEventDropdown();
+            // Optional: force a refresh of the transactions list if we were in that view
+          } catch (err) {
+            errEl.textContent = err.message || 'Import failed.';
+            errEl.classList.remove('hidden');
+          } finally {
+            btn.disabled = false;
+            btn.textContent = 'Import Data';
+            fileInput.value = ''; // Reset file input
+          }
+        },
+        error: function(err) {
+          errEl.textContent = "CSV Error: " + err.message;
+          errEl.classList.remove('hidden');
+          btn.disabled = false;
+          btn.textContent = 'Import Data';
+        }
+      });
     });
   }
 

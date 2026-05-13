@@ -47,6 +47,7 @@ const Api = (() => {
       return _request('GET', `/transactions${q ? '?' + q : ''}`);
     },
     create: (body)        => _request('POST',   '/transactions', body),
+    bulkCreate: (body)    => _request('POST',   '/transactions/bulk', { transactions: body }),
     update: (id, body)    => _request('PATCH',  `/transactions/${id}`, body),
     remove: (id, body)    => _request('DELETE', `/transactions/${id}`, body),
   };
