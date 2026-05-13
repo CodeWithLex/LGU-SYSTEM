@@ -134,21 +134,7 @@ router.post('/', requireAdmin, async (req, res) => {
 
   if (error) return res.status(400).json({ error: 'Failed to create event.' });
 
-  // 5. Automatic Allocation Transaction
-  // This records the initial budget move in the ledger
-  const { error: allocErr } = await supabase
-    .from('transactions')
-    .insert({
-      event_id:         data.id,
-      type:             'allocation',
-      amount:           Number(allocated_budget),
-      description:      `Initial Budget Allocation for ${cleanName}`,
-      transaction_date: new Date().toISOString().split('T')[0],
-      added_by:         req.user.id,
-      use_allocation:   false // Allocations don't use allocation
-    });
-
-  if (allocErr) console.error('[Allocation] Failed to seed transaction:', allocErr.message);
+  // 5. Automatic Allocation Transaction used to be here, removed for strict envelope accounting.
 
   // Audit log
   logAudit(req.user.id, 'CREATE_EVENT', {

@@ -14,17 +14,18 @@ function requireAdmin(req, res, next) {
 
 // ── GET /api/reports/summary ──────────────────────────────────────────────────
 router.get('/summary', async (req, res) => {
-  const { data, error } = await supabase
-    .from('transactions')
-    .select('type, amount, use_allocation');
+  const [{ data: txs, error: txErr }, { data: events, error: evErr }] = await Promise.all([
+    supabase.from('transactions').select('type, amount, use_allocation'),
+    supabase.from('events').select('allocated_budget')
+  ]);
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (txErr) return res.status(500).json({ error: txErr.message });
+  if (evErr) return res.status(500).json({ error: evErr.message });
 
-  const summary = data.reduce((acc, tx) => {
+  const summary = txs.reduce((acc, tx) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
     
     // Track dashboard-impacting expenses
-    // Dashboard Expense = 'expense' where use_allocation is false
     if (tx.type === 'expense' && !tx.use_allocation) {
       acc.dashboard_expense += Number(tx.amount);
     }
@@ -32,14 +33,24 @@ router.get('/summary', async (req, res) => {
     return acc;
   }, { expense: 0, donation: 0, collection: 0, allocation: 0, dashboard_expense: 0 });
 
+  let totalReservedEnvelopes = 0;
+  (events || []).forEach(e => {
+     totalReservedEnvelopes += Number(e.allocated_budget);
+  });
+
   const totalIncome  = summary.allocation + summary.donation + summary.collection;
   const totalExpense = summary.dashboard_expense;
+  
+  const remainingBalance = totalIncome - totalExpense - totalReservedEnvelopes;
 
   res.json({
     totalIncome,
     totalExpense,
-    remainingBalance: totalIncome - totalExpense,
-    breakdown: summary
+    remainingBalance,
+    breakdown: {
+      ...summary,
+      reserved_envelopes: totalReservedEnvelopes
+    }
   });
 });
 

@@ -68,23 +68,27 @@ router.post('/', requireAdmin, async (req, res) => {
         supabase.from('transactions').select('type, amount, use_allocation').eq('event_id', event_id)
       ]);
       if (event) {
-        let allocExp = 0, inc = 0;
+        let allocExp = 0;
         (evTxs || []).forEach(tx => {
-           if (tx.type === 'expense') {
-              if (tx.use_allocation) allocExp += Number(tx.amount);
-           } else {
-              inc += Number(tx.amount);
+           if (tx.type === 'expense' && tx.use_allocation) {
+              allocExp += Number(tx.amount);
            }
         });
-        const remaining = Number(event.allocated_budget) + inc - allocExp;
+        const remaining = Number(event.allocated_budget) - allocExp;
         if (Number(amount) > remaining) {
            return res.status(400).json({ error: `Amount exceeds available event budget (₱${remaining.toLocaleString()}).` });
         }
       }
     } else {
-      // Check against Dashboard balance
-      const { data: allTxs } = await supabase.from('transactions').select('type, amount, use_allocation');
-      let dashExp = 0, dashInc = 0;
+      // Check against Dashboard balance (Envelope limits applies)
+      const [{ data: allTxs }, { data: events }] = await Promise.all([
+         supabase.from('transactions').select('type, amount, use_allocation'),
+         supabase.from('events').select('allocated_budget')
+      ]);
+      
+      let dashExp = 0, dashInc = 0, reservedEnvelopes = 0;
+      (events || []).forEach(e => reservedEnvelopes += Number(e.allocated_budget));
+      
       (allTxs || []).forEach(tx => {
          if (tx.type === 'expense') {
             if (!tx.use_allocation) dashExp += Number(tx.amount);
@@ -92,7 +96,7 @@ router.post('/', requireAdmin, async (req, res) => {
             dashInc += Number(tx.amount);
          }
       });
-      const remaining = dashInc - dashExp;
+      const remaining = dashInc - dashExp - reservedEnvelopes;
       if (Number(amount) > remaining) {
          return res.status(400).json({ error: `Amount exceeds available general fund (₱${remaining.toLocaleString()}).` });
       }
