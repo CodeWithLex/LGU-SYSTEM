@@ -4,35 +4,45 @@
 
 /* ---- Design Tokens ---- */
 :root {
-  /* ---- Dark Mode (Default) ---- */
+  /* ---- Semantic Color System ---- */
+  --col-income: #1D9E75;        /* Teal */
+  --col-expense: #D85A30;       /* Coral/Red */
+  --col-donation: #BA7517;      /* Amber */
+  --col-budget: #185FA5;        /* Blue */
+  --col-neutral: #5F5E5A;       /* Gray */
+  
   --col-bg: #0d0f1a;
   --col-surface: #141728;
   --col-surface-glass: rgba(20, 24, 50, 0.8);
   --col-card: #1a1f35;
   --col-border: rgba(255, 255, 255, 0.08);
-  --col-border-glow: rgba(99, 132, 255, 0.3);
-
-  --col-primary: #6384ff;
-  --col-primary-dk: #4a6cf7;
-  --col-accent: #a78bfa;
-  --col-success: #10b981;
-  --col-danger: #ef4444;
-  --col-warning: #f59e0b;
-  --col-info: #3b82f6;
-
+  
   --col-text: #f1f5f9;
-  --col-text-muted: #94a3b8;
-  --col-text-dim: #4a5568;
+  --col-text-muted: #8faabf;    /* Raised for WCAG AA compliance */
+  --col-text-dim: #5F5E5A;      /* Aligned with neutral role */
+
+  /* ---- Typography System ---- */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  /* 6-step scale */
+  --size-28: 28px;
+  --size-22: 22px;
+  --size-18: 18px;
+  --size-15: 15px;
+  --size-13: 13px;
+  --size-11: 11px;
+  
+  --weight-body: 400;
+  --weight-label: 500;
 
   --sidebar-w: 240px;
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
 
-  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.25s ease;
   --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 30px rgba(99, 132, 255, 0.15);
-  --glass-blur: 24px;
 }
 
 [data-theme="light"] {
@@ -95,22 +105,37 @@ body.theme-transitioning th {
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-body);
   background: var(--col-bg);
   color: var(--col-text);
+  font-size: var(--size-15);
+  font-weight: var(--weight-body);
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Tabular figures for currencies */
+.stat-value, .data-table td:nth-child(5), .data-table td:nth-child(4) {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 h1,
 h2,
 h3,
 h4 {
-  font-family: "Outfit", sans-serif;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 500;
   line-height: 1.2;
 }
+
+h1 { font-size: var(--size-28); }
+h2 { font-size: var(--size-22); }
+h3 { font-size: var(--size-18); }
+h4 { font-size: var(--size-15); }
+.text-secondary { font-size: var(--size-13); color: var(--col-text-muted); }
+.text-label { font-size: var(--size-11); font-weight: var(--weight-label); text-transform: uppercase; letter-spacing: 0.05em; }
 a {
   color: var(--col-primary);
   text-decoration: none;
@@ -664,10 +689,10 @@ html body .hidden {
   background: var(--col-card);
   border: 1px solid var(--col-border);
   border-radius: var(--radius-md);
-  padding: 1.4rem 1.25rem;
+  padding: 24px; /* Increased to generous 24px */
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   box-shadow: var(--shadow-card);
   overflow: hidden;
   transition:
@@ -729,22 +754,14 @@ html body .hidden {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 2px;
+  bottom: 0;
+  width: 4px; /* 4px wide accent line */
 }
 
-.stat-income::before {
-  background: linear-gradient(90deg, var(--col-success), transparent);
-}
-.stat-expense::before {
-  background: linear-gradient(90deg, var(--col-danger), transparent);
-}
-.stat-balance::before {
-  background: linear-gradient(90deg, var(--col-primary), transparent);
-}
-.stat-donations::before {
-  background: linear-gradient(90deg, var(--col-accent), transparent);
-}
+.stat-income::before { background: var(--col-income); }
+.stat-expense::before { background: var(--col-expense); }
+.stat-balance::before { background: var(--col-neutral); } /* Gray for balance per spec */
+.stat-donations::before { background: var(--col-donation); }
 
 .stat-card:hover {
   transform: translateY(-2px);
@@ -851,11 +868,11 @@ html body .hidden {
   flex-shrink: 0;
 }
 
-.badge-expense { background: rgba(248, 113, 113, 0.15); color: #f87171; }
-.badge-donation { background: rgba(167, 139, 250, 0.15); color: var(--col-accent); }
-.badge-allocation { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-.badge-transfer   { background: rgba(20, 184, 166, 0.15); color: #2dd4bf; }
-.badge-collection { background: rgba(96, 165, 250, 0.15); color: var(--col-info); }
+.badge-expense { background: rgba(216, 90, 48, 0.15); color: var(--col-expense); }
+.badge-donation { background: rgba(186, 117, 23, 0.15); color: var(--col-donation); }
+.badge-allocation { background: rgba(24, 95, 165, 0.15); color: var(--col-budget); }
+.badge-collection { background: rgba(29, 158, 117, 0.15); color: var(--col-income); }
+.badge-transfer   { background: rgba(24, 95, 165, 0.15); color: var(--col-budget); }
 
 .tx-desc {
   flex: 1;
@@ -875,12 +892,12 @@ html body .hidden {
   white-space: nowrap;
 }
 
-.tx-amount.expense {
-  color: var(--col-danger);
-}
-.tx-amount.income {
-  color: var(--col-success);
-}
+.tx-amount.expense { color: var(--col-expense); }
+.tx-amount.income, 
+.tx-amount.collection { color: var(--col-income); }
+.tx-amount.donation { color: var(--col-donation); }
+.tx-amount.allocation,
+.tx-amount.transfer { color: var(--col-budget); }
 .tx-amount.transfer {
   color: #2dd4bf;
 }
@@ -1060,9 +1077,9 @@ html body .hidden {
 }
 
 .data-table th {
-  padding: 0.85rem 1rem;
+  padding: 16px; /* 16px for generous spacing */
   text-align: left;
-  font-size: 0.75rem;
+  font-size: var(--size-11);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1072,7 +1089,8 @@ html body .hidden {
 }
 
 .data-table td {
-  padding: 0.8rem 1rem;
+  padding: 12px 16px; /* 16px horizontal padding */
+  height: 52px;       /* 52px minimum row height */
   border-bottom: 1px solid var(--col-border);
   color: var(--col-text);
   vertical-align: middle;

@@ -36,7 +36,7 @@ const Transactions = (() => {
         <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.events?.event_name || '—'}</td>
         <td><span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span></td>
         <td>${tx.description}</td>
-        <td class="tx-amount ${tx.type === 'expense' ? 'expense' : (tx.type === 'transfer' ? 'transfer' : 'income')}">
+        <td class="tx-amount ${tx.type}">
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
@@ -72,7 +72,7 @@ const Transactions = (() => {
           <div class="data-card-body">
             <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.15rem;">${tx.description}</div>
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;">
-               <span class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}" style="font-size:1.2rem;font-weight:800;">
+               <span class="tx-amount ${tx.type}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
               ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><i data-lucide="paperclip" style="width:14px;"></i> Receipt</a>` : ''}

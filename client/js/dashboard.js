@@ -94,7 +94,7 @@ const Dashboard = (() => {
           <span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span>
           <span class="tx-desc" title="${tx.description}">${tx.description}</span>
           <div>
-            <div class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}">
+            <div class="tx-amount ${tx.type}">
               ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
             </div>
             <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>

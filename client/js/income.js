@@ -30,7 +30,7 @@ const Income = (() => {
         <td>${UI.dateStr(tx.transaction_date)}</td>
         <td><span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span></td>
         <td>${tx.description}</td>
-        <td class="tx-amount income">+${UI.currency(tx.amount)}</td>
+        <td class="tx-amount ${tx.type}">+${UI.currency(tx.amount)}</td>
         <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.profiles?.full_name || 'System'}</td>
       </tr>
     `).join('');
