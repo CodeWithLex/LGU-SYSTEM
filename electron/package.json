@@ -1,0 +1,69 @@
+{
+  "name": "lgu-system-admin-desktop",
+  "version": "1.0.0",
+  "description": "Native desktop admin app for COE Budget Transparency System",
+  "main": "main.js",
+  "author": "COE LGU",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "prepackage": "powershell -NoProfile -Command \"Get-ChildItem -Path .\\dist-build-* -Directory -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force\"",
+    "package": "electron-builder"
+  },
+  "build": {
+    "appId": "org.coe.lgu.admin",
+    "productName": "LGU System Admin",
+    "copyright": "Copyright © 2026 COE LGU",
+    "asar": false,
+    "directories": {
+      "output": "dist-build"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/**/*",
+      "!**/dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../client",
+        "to": "client"
+      }
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}

@@ -9,6 +9,7 @@ A centralized web application designed for the College of Engineering (COE) and 
 - **`/supabase`**: Database migrations, RLS policies, and SQL setup.
 - **`/docs`**: System documentation, requirements, and architecture diagrams.
 - **`/scripts`**: Helper scripts for development and deployment.
+- **`/electron`**: Native desktop application for admins (Electron-based).
 
 ## Technical Stack
 
@@ -24,3 +25,25 @@ A centralized web application designed for the College of Engineering (COE) and 
 2. **Event Transparency**: Dedicated financial pages for individual engineering events.
 3. **Receipt Management**: Digital storage and verification of all transaction proofs.
 4. **Monitoring Systems**: Dedicated modules for donations and collections.
+
+## Desktop Application
+
+A native desktop application is available for administrators built with Electron. See `docs/desktop-app.md` for details.
+
+**Features**:
+- System tray integration
+- Native menus (File, Edit, View, Window, Help)
+- Window management (hide to tray)
+- Cross-platform (Windows, macOS, Linux)
+
+**Development**:
+```bash
+cd electron
+npm install
+npm run dev
+```
+
+**Build**:
+```bash
+npm run package
+```

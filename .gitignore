@@ -3,3 +3,9 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+dist*/
+dist-build*/
+*.exe
+*.blockmap
+*.yml
+electron-builder/
