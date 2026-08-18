@@ -33,26 +33,26 @@ const Transactions = (() => {
     tbody.innerHTML = txs.map(tx => `
       <tr>
         <td>${UI.dateStr(tx.transaction_date)}</td>
-        <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.events?.event_name || '—'}</td>
-        <td><span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span></td>
+        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.events?.event_name || '—'}</td>
+        <td>${UI.renderStatusBadge(tx.type)}</td>
         <td>${tx.description}</td>
         <td class="tx-amount ${tx.type}">
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
           ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="paperclip" style="width:14px;"></i> View</a>`
-          : '<span style="color:var(--col-text-dim)">—</span>'}</td>
-        <td style="color:var(--col-text-muted);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
+          : '<span style="color:var(--text-tertiary)">—</span>'}</td>
+        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
         ${_isAdmin ? `
         <td style="text-align:center;">
           <div style="display:inline-flex;gap:.4rem;">
-            <button class="btn btn-ghost tx-edit-btn" style="font-size:.75rem;padding:.25rem .6rem;"
+            <button class="tx-action-btn tx-edit-btn"
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
               data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3" style="width:14px;"></i></button>
-            <button class="btn btn-ghost tx-del-btn" style="font-size:.75rem;padding:.25rem .6rem;color:#ef4444;"
+            <button class="tx-action-btn tx-del-btn"
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2" style="width:14px;"></i></button>
           </div>
@@ -66,8 +66,8 @@ const Transactions = (() => {
       cardContainer.innerHTML = txs.map(tx => `
         <div class="data-card">
           <div class="data-card-header">
-            <span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span>
-            <span style="font-size:0.75rem;color:var(--col-text-muted);">${UI.dateStr(tx.transaction_date)}</span>
+            ${UI.renderStatusBadge(tx.type)}
+            <span style="font-size:0.75rem;color:var(--text-secondary);">${UI.dateStr(tx.transaction_date)}</span>
           </div>
           <div class="data-card-body">
             <div style="font-size:1.1rem;font-weight:700;margin-bottom:0.15rem;">${tx.description}</div>
@@ -77,19 +77,19 @@ const Transactions = (() => {
               </span>
               ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><i data-lucide="paperclip" style="width:14px;"></i> Receipt</a>` : ''}
             </div>
-            <div style="font-size:0.72rem;color:var(--col-text-muted);display:flex;align-items:center;gap:0.3rem;">
+            <div style="font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;">
               <i data-lucide="user" style="width:10px;height:10px;"></i> ${tx.profiles?.full_name || 'System'}
             </div>
           </div>
           ${_isAdmin ? `
           <div class="data-card-actions" style="margin-top:0.75rem;padding-top:0.5rem;">
-            <button class="btn btn-ghost tx-edit-btn" style="padding:0.4rem 0.8rem;"
+            <button class="tx-action-btn tx-edit-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
               data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3"></i></button>
-            <button class="btn btn-ghost tx-del-btn" style="padding:0.4rem 0.8rem;color:#ef4444;"
+            <button class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2"></i></button>
           </div>` : ''}
@@ -270,7 +270,7 @@ const Transactions = (() => {
     modal.innerHTML = `
       <div class="modal-card">
         <h3 style="margin:0 0 .5rem;font-size:1.1rem;color:#ef4444;">Delete Transaction</h3>
-        <p style="color:var(--col-text-muted);margin-bottom:1rem;font-size:.9rem;">
+        <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:.9rem;">
           You are about to delete: <strong>${desc}</strong>.<br>This action is permanent and recorded.
         </p>
         <div class="form-group">

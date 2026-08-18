@@ -75,7 +75,7 @@ const Events = (() => {
       const pct     = ev.allocated_budget > 0 ? Math.min((spent / ev.allocated_budget) * 100, 100) : 0;
       return `
         <div class="event-card" data-id="${ev.id}">
-          <span class="event-status-badge status-${ev.status}">${UI.capitalize(ev.status)}</span>
+          ${UI.renderStatusBadge(ev.status)}
           <h3>${ev.event_name}</h3>
           <p>${ev.description || 'No description provided.'}</p>
           <div class="event-budget-bar">
@@ -108,10 +108,10 @@ const Events = (() => {
 
       container.innerHTML = `
         <div style="margin-bottom:1.5rem">
-          <span class="event-status-badge status-${ev.status}">${UI.capitalize(ev.status)}</span>
+          ${UI.renderStatusBadge(ev.status)}
           <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
-          <p style="color:var(--col-text-muted)">${ev.description || ''}</p>
-          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--col-text-muted);display:flex;align-items:center;gap:0.3rem;"><i data-lucide="calendar" style="width:14px;"></i> ${UI.dateStr(ev.event_date)}</p>` : ''}
+          <p style="color:var(--text-secondary)">${ev.description || ''}</p>
+          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><i data-lucide="calendar" style="width:14px;"></i> ${UI.dateStr(ev.event_date)}</p>` : ''}
         </div>
 
         <div class="stats-grid" style="margin-bottom:1.5rem">
@@ -148,7 +148,7 @@ const Events = (() => {
             ${ev.transactions && ev.transactions.length
               ? ev.transactions.map(tx => `
                 <div class="tx-item">
-                  <span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span>
+                  ${UI.renderStatusBadge(tx.type)}
                   <span class="tx-desc">${tx.description}</span>
                   <div>
                     <div class="tx-amount ${tx.type === 'expense' ? 'expense' : 'income'}">

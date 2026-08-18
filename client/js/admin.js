@@ -462,12 +462,12 @@ const Admin = (() => {
               ${filtered.map(u => `
                 <tr>
                   <td><strong>${u.full_name || '—'}</strong></td>
-                  <td style="font-size:.8rem;color:var(--col-text-muted)">${u.email || '—'}</td>
+                  <td style="font-size:.8rem;color:var(--text-secondary)">${u.email || '—'}</td>
                   <td style="font-size:.8rem">${u.course || '—'}</td>
                   <td style="font-size:.8rem">${u.year_level || '—'}</td>
-                  <td><span class="status-badge ${u.role === 'admin' ? 'status-ongoing' : 'status-upcoming'}">${u.role}</span></td>
+                  <td>${UI.renderStatusBadge(u.role)}</td>
                   <td style="text-align:center;">
-                    <button class="btn btn-ghost" style="font-size:.8rem;padding:.3rem .7rem;"
+                    <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;"
                       onclick="Admin.toggleRole('${u.id}', '${u.role}', this)">
                       ${u.role === 'admin' ? 'Demote' : 'Promote to Admin'}
                     </button>
@@ -550,7 +550,7 @@ const Admin = (() => {
         BUDGET_TRANSFER:    { icon: 'repeat',       color: '#14b8a6', label: 'Budget Transfer' },
         OVER_BUDGET_ALERT:  { icon: 'alert-triangle',color: '#f97316', label: 'Over Budget Alert' },
       };
-      const item = icons[a] || { icon: 'activity', color: 'var(--col-text-muted)', label: a };
+      const item = icons[a] || { icon: 'activity', color: 'var(--text-secondary)', label: a };
       return `
         <div style="display:flex;align-items:center;gap:0.5rem;">
           <i data-lucide="${item.icon}" style="width:14px;height:14px;color:${item.color}"></i>
@@ -598,7 +598,7 @@ const Admin = (() => {
                   <td style="font-size:.8rem;white-space:nowrap">${fmtDate(log.created_at)}</td>
                   <td style="font-size:.8rem">${log.profiles?.full_name || '—'}</td>
                   <td>${actionLabel(log.action)}</td>
-                  <td style="font-size:.78rem;color:var(--col-text-muted);max-width:300px;line-height:1.4;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
+                  <td style="font-size:.78rem;color:var(--text-secondary);max-width:300px;line-height:1.4;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
                     ${formatDetails(log)}
                   </td>
                 </tr>

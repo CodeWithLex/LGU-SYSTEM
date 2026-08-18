@@ -104,7 +104,7 @@ function buildReportsHTML(summary, monthly, events) {
     <div class="dashboard-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
         <h3 style="margin:0;"><i data-lucide="file-text" style="width:1rem;height:1rem;margin-right:.4rem;vertical-align:middle;"></i>Export Per-Event Reports</h3>
-        <span style="font-size:.8rem;color:var(--col-text-muted);">Admin only</span>
+        <span style="font-size:.8rem;color:var(--text-secondary);">Admin only</span>
       </div>
       ${events.length === 0
         ? `<div class="empty-state"><i data-lucide="info"></i> No events found.</div>`
@@ -125,14 +125,14 @@ function buildReportsHTML(summary, monthly, events) {
                   <td><strong>${ev.event_name}</strong></td>
                   <td>${fmt(ev.allocated_budget)}</td>
                   <td>${fmt(ev.computed_remaining || 0)}</td>
-                  <td><span class="status-badge status-${ev.status}">${ev.status}</span></td>
+                  <td>${UI.renderStatusBadge(ev.status)}</td>
                   <td style="text-align:center;">
                     <div style="display:inline-flex;gap:.5rem;">
-                      <button class="btn btn-ghost admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
+                      <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-pdf="${ev.id}" data-name="${ev.event_name}">
                         <i data-lucide="file-text" style="width:.85rem;height:.85rem;margin-right:.3rem;"></i>PDF
                       </button>
-                      <button class="btn btn-ghost admin-only" style="font-size:.8rem;padding:.35rem .8rem;color:#10b981;"
+                      <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-excel="${ev.id}" data-name="${ev.event_name}">
                         <i data-lucide="sheet" style="width:.85rem;height:.85rem;margin-right:.3rem;"></i>Excel
                       </button>
@@ -148,26 +148,26 @@ function buildReportsHTML(summary, monthly, events) {
           ${events.map(ev => `
             <div class="data-card">
               <div class="data-card-header">
-                <strong style="font-size:1rem;color:var(--col-text);">${ev.event_name}</strong>
-                <span class="status-badge status-${ev.status}">${UI.capitalize(ev.status)}</span>
+                <strong style="font-size:1rem;color:var(--text-primary);">${ev.event_name}</strong>
+                ${UI.renderStatusBadge(ev.status)}
               </div>
               
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.25rem;">
                 <div>
-                  <div style="font-size:0.65rem;color:var(--col-text-muted);text-transform:uppercase;font-weight:700;">Allocated</div>
+                  <div style="font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;font-weight:700;">Allocated</div>
                   <div style="font-size:0.9rem;font-weight:600;">${fmt(ev.allocated_budget)}</div>
                 </div>
                 <div style="text-align:right;">
-                  <div style="font-size:0.65rem;color:var(--col-text-muted);text-transform:uppercase;font-weight:700;">Remaining</div>
-                  <div style="font-size:1.1rem;font-weight:800;color:var(--col-primary);">${fmt(ev.remaining_budget)}</div>
+                  <div style="font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;font-weight:700;">Remaining</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:var(--text-primary);">${fmt(ev.computed_remaining || 0)}</div>
                 </div>
               </div>
 
               <div class="data-card-actions" style="margin-top:1rem;padding-top:0.5rem;gap:0.4rem;">
-                <button class="btn btn-ghost admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
+                <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
                   <i data-lucide="file-text"></i> PDF
                 </button>
-                <button class="btn btn-ghost admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;color:#10b981;" data-excel="${ev.id}" data-name="${ev.event_name}">
+                <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-excel="${ev.id}" data-name="${ev.event_name}">
                   <i data-lucide="sheet"></i> Excel
                 </button>
               </div>
@@ -197,7 +197,7 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: 'rgba(16,185,129,0.75)',
+          backgroundColor: '#E8874A',
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 35,
@@ -207,7 +207,7 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Expenses',
           data: monthly.map(m => m.expense),
-          backgroundColor: 'rgba(239,68,68,0.75)',
+          backgroundColor: '#3F3F46',
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 35,
@@ -220,7 +220,7 @@ function renderMonthlyChart(monthly) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top', labels: { font: { family: 'Inter' } } },
+        legend: { position: 'top', labels: { color: '#8F8F94', font: { family: 'Inter' } } },
         tooltip: {
           callbacks: {
             label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
@@ -228,9 +228,14 @@ function renderMonthlyChart(monthly) {
         }
       },
       scales: {
-        x: { grid: { display: false } },
+        x: { 
+          grid: { display: false },
+          ticks: { color: '#8F8F94' }
+        },
         y: {
+          grid: { color: 'rgba(255, 255, 255, 0.08)' },
           ticks: {
+            color: '#8F8F94',
             callback: v => `₱${(v / 1000).toFixed(0)}k`
           }
         }
@@ -246,10 +251,10 @@ function renderBreakdownChart(breakdown) {
 
   // Fixed order so colors always match the right type
   const typeMap = [
-    { key: 'expense',    label: 'Expenses',   color: '#ef4444' },
-    { key: 'allocation', label: 'Allocation', color: '#6384ff' },
-    { key: 'donation',   label: 'Donations',  color: '#10b981' },
-    { key: 'collection', label: 'Collection', color: '#f59e0b' },
+    { key: 'expense',    label: 'Expenses',   color: '#F87171' },
+    { key: 'allocation', label: 'Allocation', color: '#8F8F94' },
+    { key: 'donation',   label: 'Donations',  color: '#4ADE80' },
+    { key: 'collection', label: 'Collection', color: '#E8874A' },
   ];
 
   // Filter out zero-value types so the chart isn't cluttered
@@ -264,7 +269,7 @@ function renderBreakdownChart(breakdown) {
         data: hasData ? active.map(t => breakdown[t.key]) : [1],
         backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
         borderWidth: 2,
-        borderColor: 'rgba(255,255,255,0.08)',
+        borderColor: '#0d0e10',
         hoverOffset: 6
       }]
     },
@@ -276,6 +281,7 @@ function renderBreakdownChart(breakdown) {
         legend: {
           position: 'bottom',
           labels: {
+            color: '#8F8F94',
             font: { family: 'Inter', size: 12 },
             padding: 16,
             usePointStyle: true,

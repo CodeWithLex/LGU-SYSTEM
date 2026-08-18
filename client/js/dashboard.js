@@ -70,9 +70,9 @@ const Dashboard = (() => {
       document.getElementById('pop-balance').innerHTML = `
         <div class="stat-pop-row income"><span>Total Income</span> <span>${UI.currency(summary.totalIncome)}</span></div>
         <div class="stat-pop-row expense"><span>Misc Expenses</span> <span>-${UI.currency(summary.generalExpense)}</span></div>
-        <div class="stat-pop-row" style="color:var(--col-warning)"><span>Reserved (Events)</span> <span>-${UI.currency(summary.breakdown.reserved_envelopes)}</span></div>
+        <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Reserved (Events)</span> <span>-${UI.currency(summary.breakdown.reserved_envelopes)}</span></div>
         <div class="stat-pop-row total"><span>Available Fund</span> <span>${UI.currency(summary.remainingBalance)}</span></div>
-        <p style="font-size:0.65rem;color:var(--col-text-dim);margin-top:0.4rem;line-height:1.2;">Unreserved cash available for new allocations or general operations.</p>
+        <p style="font-size:0.65rem;color:var(--text-tertiary);margin-top:0.4rem;line-height:1.2;">Unreserved cash available for new allocations or general operations.</p>
       `;
 
       document.getElementById('pop-donations').innerHTML = `
@@ -91,7 +91,7 @@ const Dashboard = (() => {
 
       container.innerHTML = txs.map(tx => `
         <div class="tx-item">
-          <span class="tx-badge badge-${tx.type}">${UI.capitalize(tx.type)}</span>
+          ${UI.renderStatusBadge(tx.type)}
           <span class="tx-desc" title="${tx.description}">${tx.description}</span>
           <div>
             <div class="tx-amount ${tx.type}">

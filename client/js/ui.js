@@ -81,6 +81,11 @@ const UI = (() => {
     return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
   }
 
+  function renderStatusBadge(type) {
+    const cleanType = type.toLowerCase();
+    return `<span class="status-badge"><span class="status-dot status-dot--${cleanType}"></span><span class="status-label">${capitalize(cleanType)}</span></span>`;
+  }
+
   // ---- Admin-only elements ----
   function setAdminVisibility(isAdmin) {
     document.body.classList.toggle('is-admin', isAdmin);
@@ -156,5 +161,5 @@ const UI = (() => {
     }
   };
 
-  return { showView, showScreen, toast, currency, dateStr, capitalize, setAdminVisibility, setLoading, setEmpty, Theme };
+  return { showView, showScreen, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setLoading, setEmpty, Theme };
 })();
