@@ -20,10 +20,9 @@
   --text-tertiary: rgba(255, 255, 255, 0.35);
 
   /* Accent — exactly ONE, used only for: primary buttons, active nav indicator,
-     links, focus rings, and chart fill on progress bars. Confirm exact hex with
-     Lex before finalizing — sample from the COE crest orange if unsure. */
-  --accent: #E8874A; /* placeholder — confirm exact hex */
-  --accent-muted: rgba(232, 135, 74, 0.15);
+     links, focus rings, and chart fill on progress bars */
+  --accent: #BA7517; /* COE crest orange */
+  --accent-muted: rgba(186, 117, 23, 0.15);
   --accent-text-on: #0A0A0B; /* text color to use ON TOP of a solid accent fill */
 
   /* Status — use ONLY as a 6px dot + text color, NEVER as a badge background */
@@ -40,30 +39,26 @@
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-
-  /* Layout & Animation Utilities (Retained for Structural Integrity) */
-  --sidebar-w: 240px;
-  --transition: 0.25s ease;
 }
 
 [data-theme="light"] {
-  /* Backgrounds — flat, light */
-  --bg-base: #F8F9FA;
-  --bg-surface: #FFFFFF;
-  --bg-surface-raised: #F1F3F5;
+  /* ---- Light Mode (High Contrast) ---- */
+  --col-bg: #f5f7fb;
+  --col-surface: #ffffff;
+  --col-surface-glass: rgba(255, 255, 255, 0.65);
+  --col-card: #ffffff;
+  --col-border: rgba(0, 0, 0, 0.06);
+  --col-border-glow: rgba(99, 132, 255, 0.2);
 
-  /* Borders */
-  --border-default: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(0, 0, 0, 0.14);
+  --col-primary: #3b82f6;
+  --col-primary-dk: #2563eb;
+  --col-text: #1e293b;
+  --col-text-muted: #64748b;
+  --col-text-dim: #94a3b8;
 
-  /* Text */
-  --text-primary: rgba(0, 0, 0, 0.88);
-  --text-secondary: rgba(0, 0, 0, 0.56);
-  --text-tertiary: rgba(0, 0, 0, 0.36);
-
-  /* Accent Muted */
-  --accent-muted: rgba(232, 135, 74, 0.12);
-  --accent-text-on: #FFFFFF;
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px rgba(99, 132, 255, 0.08);
+  --glass-blur: 20px;
 }
 
 /* ---- Reset & Base ---- */
@@ -106,10 +101,11 @@ body.theme-transitioning th {
 }
 
 body {
-  font-family: var(--font-family);
-  background: var(--bg-base);
-  color: var(--text-primary);
+  font-family: var(--font-body);
+  background: var(--col-bg);
+  color: var(--col-text);
   font-size: var(--size-15);
+  font-weight: var(--weight-body);
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -125,7 +121,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-family);
+  font-family: var(--font-display);
   font-weight: 500;
   line-height: 1.2;
 }
@@ -134,10 +130,10 @@ h1 { font-size: var(--size-28); }
 h2 { font-size: var(--size-22); }
 h3 { font-size: var(--size-18); }
 h4 { font-size: var(--size-15); }
-.text-secondary { font-size: var(--size-13); color: var(--text-secondary); }
-.text-label { font-size: var(--size-11); text-transform: uppercase; letter-spacing: 0.05em; }
+.text-secondary { font-size: var(--size-13); color: var(--col-text-muted); }
+.text-label { font-size: var(--size-11); font-weight: var(--weight-label); text-transform: uppercase; letter-spacing: 0.05em; }
 a {
-  color: var(--accent);
+  color: var(--col-primary);
   text-decoration: none;
 }
 a:hover {
@@ -150,7 +146,7 @@ input,
 select,
 textarea {
   font-family: inherit;
-  color: var(--text-primary);
+  color: var(--col-text);
 }
 
 /* ---- Utilities ---- */
@@ -164,7 +160,7 @@ html body .hidden {
   display: flex;
 }
 
-/* ---- Flat Surface Layout (replaces glassmorphism) ---- */
+/* ---- Glassmorphism ---- removed, flat surfaces only */
 .glass {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
@@ -185,10 +181,9 @@ html body .hidden {
 .auth-card {
   width: 100%;
   max-width: 440px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-default);
-  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
   padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-card), var(--shadow-glow);
 }
 
 .auth-header {
@@ -451,8 +446,8 @@ html body .hidden {
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-default);
+  background: var(--col-surface);
+  border-right: 1px solid var(--col-border);
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1rem;
@@ -466,21 +461,17 @@ html body .hidden {
   align-items: center;
   gap: 0.75rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--col-border);
   margin-bottom: 1.25rem;
 }
 
 .sidebar-header h2 {
   font-size: 1.05rem;
   line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 600;
-  color: var(--text-primary);
 }
 .sidebar-tagline {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  letter-spacing: -0.015em;
+  font-size: 0.72rem;
+  color: var(--col-text-muted);
 }
 
 .sidebar-nav {
@@ -491,13 +482,12 @@ html body .hidden {
 }
 
 .nav-item {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: var(--col-text-muted);
   font-size: 0.9rem;
   font-weight: 500;
   transition: all var(--transition);
@@ -506,29 +496,19 @@ html body .hidden {
 }
 
 .nav-item:hover {
-  background: var(--bg-surface-raised);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--col-text);
   text-decoration: none;
 }
 
 .nav-item.active {
-  background: var(--accent-muted);
-  color: var(--text-primary);
-}
-
-.nav-item.active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 20%;
-  bottom: 20%;
-  width: 2px;
-  background: var(--accent);
-}
-
-.nav-item i, .nav-item svg {
-  stroke: currentColor;
-  color: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(99, 132, 255, 0.2),
+    rgba(167, 139, 250, 0.1)
+  );
+  color: var(--col-primary);
+  border: 1px solid rgba(99, 132, 255, 0.2);
 }
 
 .nav-icon {
@@ -544,7 +524,7 @@ html body .hidden {
   align-items: center;
   gap: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-default);
+  border-top: 1px solid var(--col-border);
 }
 
 .user-pill {
@@ -559,9 +539,7 @@ html body .hidden {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
-  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--col-primary), var(--col-accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -578,14 +556,13 @@ html body .hidden {
 .user-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .user-role {
   font-size: 0.72rem;
-  color: var(--text-tertiary);
+  color: var(--col-text-muted);
 }
 
 /* ---- Main Content ---- */
@@ -593,7 +570,13 @@ html body .hidden {
   flex: 1;
   min-height: 100vh;
   overflow-y: auto;
-  background: var(--bg-base);
+  background:
+    radial-gradient(
+      ellipse 60% 40% at 90% 0%,
+      rgba(99, 132, 255, 0.07) 0%,
+      transparent 60%
+    ),
+    var(--col-bg);
 }
 
 /* ---- Views ---- */
@@ -686,25 +669,19 @@ html body .hidden {
 .stat-card {
   position: relative;
   z-index: 1;
-  background: var(--col-card);
-  border: 1px solid var(--col-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  padding: 24px; /* Increased to generous 24px */
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition:
-    transform var(--transition),
-    box-shadow var(--transition);
 }
 
 .stat-card.hover-active {
   z-index: 10;
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  border-color: var(--col-primary);
+  background: var(--bg-surface-raised);
 }
 
 .stat-popover {
@@ -765,7 +742,6 @@ html body .hidden {
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
 }
 
 .stat-icon {
@@ -1509,7 +1485,7 @@ html body.is-admin th.admin-only {
 .splash-screen {
   position: fixed;
   inset: 0;
-  background: var(--bg-base);
+  background: rgba(11, 15, 25, 0.7);
   display: flex !important;
   align-items: center;
   justify-content: center;
