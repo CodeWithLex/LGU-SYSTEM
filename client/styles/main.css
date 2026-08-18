@@ -855,8 +855,8 @@ html body .hidden {
 .tx-amount.expense { color: var(--status-negative); }
 .tx-amount.income, 
 .tx-amount.collection,
-.tx-amount.donation { color: var(--status-positive); }
-.tx-amount.allocation,
+.tx-amount.donation,
+.tx-amount.allocation { color: var(--status-positive); }
 .tx-amount.transfer { color: var(--text-primary); }
 
 .tx-desc {
@@ -1271,23 +1271,25 @@ html body .hidden {
 
   
   html body .dashboard-grid { grid-template-columns: 1fr !important; gap: 0.6rem !important; }
-  html body .dashboard-card { padding: 0.75rem !important; }
+  html body .dashboard-card { padding: 0.9rem !important; }
   html body .dashboard-card h3 { font-size: 0.9rem !important; margin-bottom: 0.6rem !important; }
   
-  html body .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.5rem !important; }
-  html body .stat-card { padding: 0.65rem !important; gap: 0.4rem !important; }
+  html body .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem !important; }
+  html body .stat-card { padding: 0.9rem !important; gap: 0.6rem !important; }
   html body .stat-icon { width: 26px !important; height: 26px !important; font-size: 0.75rem !important; }
-  html body .stat-label { font-size: 0.58rem !important; }
-  body .stat-value { font-size: 0.95rem !important; }
+  html body .stat-label { font-size: 0.65rem !important; }
+  body .stat-value { font-size: 1.05rem !important; }
 
   /* Activity Feed & Badge Fixes */
   html body .tx-item { 
-    padding: 0.55rem 0.5rem !important; 
-    gap: 0.6rem !important;
+    padding: 0.9rem 0.75rem !important; 
+    gap: 0.75rem !important;
     grid-template-columns: 75px 1fr auto !important; /* Rigid column for badge */
     align-items: center !important;
-    min-height: 48px !important;
+    min-height: 56px !important;
+    border-bottom: 1px solid var(--border-default) !important;
   }
+  html body .tx-item:last-child { border-bottom: none !important; }
   html body .tx-badge { 
     padding: 2px 4px !important; 
     font-size: 0.5rem !important; 
@@ -1297,9 +1299,9 @@ html body .hidden {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
-  html body .tx-desc { font-size: 0.78rem !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
-  html body .tx-amount { font-size: 0.8rem !important; font-weight: 700 !important; white-space: nowrap !important; }
-  html body .tx-meta { font-size: 0.58rem !important; }
+  html body .tx-desc { font-size: 0.85rem !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  html body .tx-amount { font-size: 0.9rem !important; font-weight: 700 !important; white-space: nowrap !important; }
+  html body .tx-meta { font-size: 0.68rem !important; }
 
   /* Generic Content */
   body .announce-item { padding: 0.65rem !important; margin-bottom: 0.5rem !important; }
@@ -1352,8 +1354,8 @@ html body .hidden {
     z-index: 1000 !important;
     background: var(--bg-surface) !important;
     border-top: 1px solid var(--border-default) !important;
-    padding: 0.5rem 0 calc(0.3rem + env(safe-area-inset-bottom)) !important;
-    justify-content: space-around !important;
+    padding: 0.6rem 0 calc(0.4rem + env(safe-area-inset-bottom)) !important;
+    justify-content: space-evenly !important;
     align-items: center !important;
   }
 
@@ -1363,20 +1365,21 @@ html body .hidden {
     align-items: center !important;
     gap: 0.15rem !important;
     color: var(--text-secondary) !important;
-    font-size: 0.6rem !important;
+    font-size: 0.65rem !important;
     font-weight: 600 !important;
-    padding: 0.25rem 0.5rem !important;
+    padding: 0.35rem 0.6rem !important;
     border-radius: var(--radius-sm) !important;
     cursor: pointer !important;
     text-decoration: none !important;
     transition: color var(--transition) !important;
+    min-height: 56px !important;
   }
   body .bottom-nav-item.active { color: var(--accent) !important; }
-  body .bottom-nav-item .nav-icon { font-size: 1.1rem !important; line-height: 1 !important; }
+  body .bottom-nav-item .nav-icon { font-size: 1.15rem !important; line-height: 1 !important; }
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  body .main-content { padding-bottom: 70px !important; }
+  body .main-content { padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
   body .view { padding: 0.75rem !important; }
   body .auth-card { margin: 0.5rem !important; padding: 1.25rem 1rem !important; }
   body .table-wrapper { 
