@@ -631,18 +631,7 @@ html body .hidden {
   margin-top: 0.15rem;
 }
 
-.sync-status {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  user-select: none;
-}
+
 
 /* =============================================
    DASHBOARD STATS
@@ -1279,7 +1268,7 @@ html body .hidden {
   }
   html body #view-dashboard .view-header h2 { font-size: 1.1rem !important; }
   html body #view-dashboard .view-header p { font-size: 0.7rem !important; }
-  html body #view-dashboard .sync-status { padding: 2px 6px !important; font-size: 0.65rem !important; }
+
   
   html body .dashboard-grid { grid-template-columns: 1fr !important; gap: 0.6rem !important; }
   html body .dashboard-card { padding: 0.75rem !important; }
