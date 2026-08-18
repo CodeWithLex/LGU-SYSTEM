@@ -1345,11 +1345,11 @@ html body .hidden {
 
   /* Card Layouts */
   body .data-card {
-    background: var(--col-card) !important;
-    border: 1px solid var(--col-border) !important;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-default) !important;
     border-radius: var(--radius-md) !important;
     padding: 0.85rem !important;
-    box-shadow: var(--shadow-card) !important;
+    box-shadow: none !important;
     position: relative !important;
   }
   body .data-card-header {
@@ -1364,11 +1364,11 @@ html body .hidden {
     gap: 0.3rem !important;
   }
   body .data-card-row { display: flex !important; justify-content: space-between !important; font-size: 0.78rem !important; }
-  body .data-card-label { color: var(--col-text-muted) !important; }
+  body .data-card-label { color: var(--text-secondary) !important; }
   body .data-card-actions {
     margin-top: 0.65rem !important;
     padding-top: 0.5rem !important;
-    border-top: 1px solid var(--col-border) !important;
+    border-top: 1px solid var(--border-default) !important;
     display: flex !important;
     gap: 0.4rem !important;
     justify-content: flex-end !important;
@@ -1386,8 +1386,8 @@ html body .hidden {
     left: 0 !important;
     right: 0 !important;
     z-index: 1000 !important;
-    background: var(--col-surface) !important;
-    border-top: 1px solid var(--col-border) !important;
+    background: var(--bg-surface) !important;
+    border-top: 1px solid var(--border-default) !important;
     padding: 0.5rem 0 calc(0.3rem + env(safe-area-inset-bottom)) !important;
     justify-content: space-around !important;
     align-items: center !important;
@@ -1398,7 +1398,7 @@ html body .hidden {
     flex-direction: column !important;
     align-items: center !important;
     gap: 0.15rem !important;
-    color: var(--col-text-muted) !important;
+    color: var(--text-secondary) !important;
     font-size: 0.6rem !important;
     font-weight: 600 !important;
     padding: 0.25rem 0.5rem !important;
@@ -1407,7 +1407,7 @@ html body .hidden {
     text-decoration: none !important;
     transition: color var(--transition) !important;
   }
-  body .bottom-nav-item.active { color: var(--col-primary) !important; }
+  body .bottom-nav-item.active { color: var(--accent) !important; }
   body .bottom-nav-item .nav-icon { font-size: 1.1rem !important; line-height: 1 !important; }
 
   /* Layout Base Adjustments */
