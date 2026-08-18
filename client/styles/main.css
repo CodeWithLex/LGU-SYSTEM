@@ -449,6 +449,7 @@ html body .hidden {
   flex-direction: column;
   padding: 1.5rem 1rem;
   position: sticky;
+  left: var(--sidebar-w);
   top: 0;
   flex-shrink: 0;
 }
@@ -511,7 +512,7 @@ html body .hidden {
 .nav-item.active::before {
   content: "";
   position: absolute;
-  left: 0;
+  left: var(--sidebar-w);
   top: 20%;
   bottom: 20%;
   width: 2px;
@@ -585,6 +586,7 @@ html body .hidden {
   flex: 1;
   min-height: 100vh;
   overflow-y: auto;
+  margin-left: var(--sidebar-w);
   background: var(--bg-base);
 }
 
@@ -615,9 +617,9 @@ html body .hidden {
   justify-content: space-between;
   margin-bottom: 1.75rem;
   position: sticky;
+  left: var(--sidebar-w);
   top: 0;
-  z-index: 100;
-  background: var(--col-bg);
+  background: var(--bg-base);
   padding: 0.5rem 0;
 }
 
@@ -667,7 +669,7 @@ html body .hidden {
 .stat-popover {
   position: absolute;
   top: 100%;
-  left: 0;
+  left: var(--sidebar-w);
   width: 100%;
   min-width: 250px;
   background: var(--bg-surface-raised);
@@ -1002,6 +1004,7 @@ html body .hidden {
 .data-table thead {
   background: var(--bg-surface-raised);
   position: sticky;
+  left: var(--sidebar-w);
   top: 0;
   z-index: 5;
   border-bottom: 1px solid var(--border-default);
@@ -1182,7 +1185,7 @@ html body .hidden {
    TOAST NOTIFICATION
    ============================================= */
 .toast {
-  position: fixed;
+  position: sticky;
   bottom: 2rem;
   right: 2rem;
   display: flex;
@@ -1230,6 +1233,7 @@ html body .hidden {
    RESPONSIVE — Small Tablet / Large Phone (≤768px)
    ============================================= */
 @media (max-width: 768px) {
+  .main-content { margin-left: var(--sidebar-w); }
   :root { --sidebar-w: 60px; }
 
   .sidebar-header h2,
@@ -1455,7 +1459,7 @@ html body .hidden {
   content: '';
   position: absolute;
   bottom: -1px;
-  left: 0;
+  left: var(--sidebar-w);
   right: 0;
   height: 2px;
   background: var(--accent);
@@ -1467,7 +1471,7 @@ html body .hidden {
 
 /* Modal Overlay */
 .modal-overlay {
-  position: fixed;
+  position: sticky;
   inset: 0;
   background: rgba(0,0,0,.65);
   display: flex;
@@ -1505,7 +1509,7 @@ html body.is-admin th.admin-only {
    Phase 5 — Custom Loading Splash Screen
    ============================================= */
 .splash-screen {
-  position: fixed;
+  position: sticky;
   inset: 0;
   background: var(--bg-base);
   display: flex !important;
