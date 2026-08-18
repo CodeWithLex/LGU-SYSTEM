@@ -4,41 +4,45 @@
 
 /* ---- Design Tokens ---- */
 :root {
-  /* Backgrounds — flat, opaque, no glassmorphism */
-  --bg-base: #0A0A0B;           /* app shell, page background */
-  --bg-surface: #0D0E10;        /* sidebar, modals, cards */
-  --bg-surface-raised: #131417; /* input fields, hover states */
+  /* ---- Semantic Color System ---- */
+  --col-income: #1D9E75;        /* Teal */
+  --col-expense: #D85A30;       /* Coral/Red */
+  --col-donation: #BA7517;      /* Amber */
+  --col-budget: #185FA5;        /* Blue */
+  --col-neutral: #5F5E5A;       /* Gray */
+  
+  --col-bg: #0d0f1a;
+  --col-surface: #141728;
+  --col-surface-glass: rgba(20, 24, 50, 0.8);
+  --col-card: #1a1f35;
+  --col-border: rgba(255, 255, 255, 0.08);
+  
+  --col-text: #f1f5f9;
+  --col-text-muted: #8faabf;    /* Raised for WCAG AA compliance */
+  --col-text-dim: #5F5E5A;      /* Aligned with neutral role */
 
-  /* Borders — this replaces backdrop-blur/fill/shadow as the primary elevation tool */
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.14);
-  --border-focus: var(--accent); /* defined below */
+  /* ---- Typography System ---- */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  /* 6-step scale */
+  --size-28: 28px;
+  --size-22: 22px;
+  --size-18: 18px;
+  --size-15: 15px;
+  --size-13: 13px;
+  --size-11: 11px;
+  
+  --weight-body: 400;
+  --weight-label: 500;
 
-  /* Text */
-  --text-primary: rgba(255, 255, 255, 0.92);
-  --text-secondary: rgba(255, 255, 255, 0.55);
-  --text-tertiary: rgba(255, 255, 255, 0.35);
+  --sidebar-w: 240px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
 
-  /* Accent — exactly ONE, used only for: primary buttons, active nav indicator,
-     links, focus rings, and chart fill on progress bars */
-  --accent: #BA7517; /* COE crest orange */
-  --accent-muted: rgba(186, 117, 23, 0.15);
-  --accent-text-on: #0A0A0B; /* text color to use ON TOP of a solid accent fill */
-
-  /* Status — use ONLY as a 6px dot + text color, NEVER as a badge background */
-  --status-positive: #4ADE80; /* income / donation / collection */
-  --status-negative: #F87171; /* expense */
-  --status-neutral: var(--text-secondary); /* allocation — no unique hue, treat as informational */
-
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 6px;
-
-  /* Shadows — reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
-  --shadow-popover: 0 4px 16px rgba(0, 0, 0, 0.4);
-
-  /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.25s ease;
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="light"] {
@@ -102,7 +106,7 @@ body.theme-transitioning th {
 
 body {
   font-family: var(--font-body);
-  background: var(--bg-base);
+  background: var(--col-bg);
   color: var(--col-text);
   font-size: var(--size-15);
   font-weight: var(--weight-body);
@@ -160,10 +164,12 @@ html body .hidden {
   display: flex;
 }
 
-/* ---- Glassmorphism ---- removed, flat surfaces only */
+/* ---- Glassmorphism ---- */
 .glass {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  background: var(--col-surface-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--col-border);
 }
 
 /* =============================================
@@ -175,16 +181,26 @@ html body .hidden {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-base);
+  background:
+    radial-gradient(
+      ellipse 80% 80% at 20% 10%,
+      rgba(99, 132, 255, 0.15) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 60% 60% at 80% 90%,
+      rgba(167, 139, 250, 0.12) 0%,
+      transparent 50%
+    ),
+    var(--col-bg);
 }
 
 .auth-card {
   width: 100%;
   max-width: 440px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-card), var(--shadow-glow);
 }
 
 .auth-header {
@@ -249,15 +265,6 @@ html body .hidden {
   color: var(--col-text-muted);
 }
 
-.auth-switch a {
-  color: var(--text-secondary);
-}
-
-.auth-switch a:hover {
-  color: var(--text-primary);
-  text-decoration: underline;
-}
-
 .auth-error {
   background: rgba(248, 113, 113, 0.1);
   border: 1px solid var(--col-danger);
@@ -291,12 +298,11 @@ html body .hidden {
 
 .form-group input,
 .form-group select,
-.form-group textarea,
-.form-group input[type="date"] {
+.form-group textarea {
   width: 100%;
   padding: 0.7rem 1rem;
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--col-border);
   border-radius: var(--radius-sm);
   font-size: 0.95rem;
   color: var(--col-text);
@@ -308,25 +314,9 @@ html body .hidden {
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus,
-.form-group input[type="date"]:focus {
-  border-color: var(--accent);
-  box-shadow: none;
-}
-
-input[type=email],
-input[type=password],
-.input {
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-}
-
-input[type=email]:focus,
-input[type=password]:focus,
-.input:focus {
-  border-color: var(--accent);
-  box-shadow: none;
+.form-group textarea:focus {
+  border-color: var(--col-primary);
+  box-shadow: 0 0 0 3px rgba(99, 132, 255, 0.2);
 }
 
 .form-group select option {
@@ -417,13 +407,18 @@ input[type=password]:focus,
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-text-on);
-  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    135deg,
+    var(--col-primary),
+    var(--col-primary-dk)
+  );
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(99, 132, 255, 0.35);
 }
 
 .btn-primary:hover {
-  filter: brightness(0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 132, 255, 0.5);
 }
 .btn-primary:active {
   transform: translateY(0);
@@ -431,13 +426,12 @@ input[type=password]:focus,
 
 .btn-ghost {
   background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-default);
+  color: var(--col-text-muted);
+  border: 1px solid var(--col-border);
 }
 .btn-ghost:hover {
-  background: transparent;
-  color: var(--text-primary);
-  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--col-text);
 }
 
 .btn-full {
@@ -469,8 +463,8 @@ input[type=password]:focus,
 .sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-default);
+  background: var(--col-surface);
+  border-right: 1px solid var(--col-border);
   display: flex;
   flex-direction: column;
   padding: 1.5rem 1rem;
@@ -484,7 +478,7 @@ input[type=password]:focus,
   align-items: center;
   gap: 0.75rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--col-border);
   margin-bottom: 1.25rem;
 }
 
@@ -510,7 +504,7 @@ input[type=password]:focus,
   gap: 0.75rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: var(--col-text-muted);
   font-size: 0.9rem;
   font-weight: 500;
   transition: all var(--transition);
@@ -519,14 +513,19 @@ input[type=password]:focus,
 }
 
 .nav-item:hover {
-  background: var(--bg-surface-raised);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--col-text);
   text-decoration: none;
 }
 
 .nav-item.active {
-  color: var(--text-primary);
-  border-left: 2px solid var(--accent);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 132, 255, 0.2),
+    rgba(167, 139, 250, 0.1)
+  );
+  color: var(--col-primary);
+  border: 1px solid rgba(99, 132, 255, 0.2);
 }
 
 .nav-icon {
@@ -542,7 +541,7 @@ input[type=password]:focus,
   align-items: center;
   gap: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-default);
+  border-top: 1px solid var(--col-border);
 }
 
 .user-pill {
@@ -644,22 +643,21 @@ input[type=password]:focus,
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: none;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-tertiary);
+  padding: 0.35rem 0.85rem;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--col-success);
 }
 
 .live-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--status-positive);
+  background: var(--col-success);
   animation: pulse 1.8s ease infinite;
-  flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -688,19 +686,25 @@ input[type=password]:focus,
 .stat-card {
   position: relative;
   z-index: 1;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  background: var(--col-card);
+  border: 1px solid var(--col-border);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 24px; /* Increased to generous 24px */
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  box-shadow: var(--shadow-card);
   overflow: hidden;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
 }
 
 .stat-card.hover-active {
   z-index: 10;
-  background: var(--bg-surface-raised);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  border-color: var(--col-primary);
 }
 
 .stat-popover {
@@ -709,7 +713,7 @@ input[type=password]:focus,
   left: 0;
   width: 100%;
   min-width: 250px;
-  background: var(--bg-surface);
+  background: var(--col-surface);
   border: 1px solid var(--col-border);
   border-radius: var(--radius-md);
   padding: 1.25rem;
@@ -761,33 +765,23 @@ input[type=password]:focus,
 
 .stat-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
 }
 
 .stat-icon {
   font-size: 1.8rem;
   line-height: 1;
 }
-.stat-card .stat-icon i {
-  color: var(--text-tertiary);
-}
-.stat-card.stat-income .stat-icon i {
-  color: var(--status-positive);
-}
-.stat-card.stat-expense .stat-icon i {
-  color: var(--status-negative);
-}
 .stat-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: 0.78rem;
+  color: var(--col-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-weight: 500;
+  font-weight: 600;
 }
 .stat-value {
   font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
+  font-weight: 800;
   font-family: "Outfit", sans-serif;
 }
 
@@ -854,53 +848,31 @@ input[type=password]:focus,
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  padding: 0.75rem 0.5rem;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border-default);
-  border-radius: 0;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--col-border);
+  border-radius: var(--radius-sm);
   transition: background var(--transition);
 }
 
 .tx-item:hover {
-  background: var(--bg-surface-raised);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .tx-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
-  color: var(--text-secondary);
   flex-shrink: 0;
 }
-.tx-badge::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-  background: var(--status-neutral);
-}
 
-.badge-expense { color: var(--text-secondary); }
-.badge-donation { color: var(--text-secondary); }
-.badge-allocation { color: var(--text-secondary); }
-.badge-collection { color: var(--text-secondary); }
-.badge-transfer { color: var(--text-secondary); }
-
-.tx-badge.badge-expense::before { background: var(--status-negative); }
-.tx-badge.badge-donation::before { background: var(--status-positive); }
-.tx-badge.badge-collection::before { background: var(--status-positive); }
-.tx-badge.badge-allocation::before { background: var(--status-neutral); }
-.tx-badge.badge-transfer::before { background: var(--status-neutral); }
+.badge-expense { background: rgba(216, 90, 48, 0.15); color: var(--col-expense); }
+.badge-donation { background: rgba(186, 117, 23, 0.15); color: var(--col-donation); }
+.badge-allocation { background: rgba(24, 95, 165, 0.15); color: var(--col-budget); }
+.badge-collection { background: rgba(29, 158, 117, 0.15); color: var(--col-income); }
+.badge-transfer   { background: rgba(24, 95, 165, 0.15); color: var(--col-budget); }
 
 .tx-desc {
   flex: 1;
@@ -915,10 +887,9 @@ input[type=password]:focus,
 }
 
 .tx-amount {
-  font-weight: 500;
+  font-weight: 700;
   font-size: 0.9rem;
   white-space: nowrap;
-  font-variant-numeric: tabular-nums;
 }
 
 .tx-amount.expense { color: var(--col-expense); }
@@ -934,25 +905,23 @@ input[type=password]:focus,
 /* ---- Announcements ---- */
 .announce-item {
   padding: 0.85rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--col-primary);
+  background: rgba(99, 132, 255, 0.05);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-bottom: 0.6rem;
 }
 
 .announce-item h4 {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.88rem;
   margin-bottom: 0.25rem;
 }
 .announce-item p {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  font-size: 0.8rem;
+  color: var(--col-text-muted);
 }
 .announce-date {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  color: var(--col-text-dim);
   margin-top: 0.3rem;
 }
 
@@ -966,11 +935,11 @@ input[type=password]:focus,
 }
 
 .event-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
+  background: var(--col-card);
+  border: 1px solid var(--col-border);
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  box-shadow: none;
+  box-shadow: var(--shadow-card);
   cursor: pointer;
   transition: all var(--transition);
   position: relative;
@@ -988,64 +957,39 @@ input[type=password]:focus,
 
 .event-card:hover {
   transform: translateY(-3px);
-  box-shadow: none;
-  border-color: var(--border-hover);
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
+  border-color: var(--col-border-glow);
 }
 .event-card:hover::after {
   opacity: 1;
 }
 
 .event-status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 100px;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.75rem;
 }
 
-.event-status-badge::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
 .status-upcoming {
-  background: transparent;
-  color: var(--text-secondary);
-}
-.status-upcoming::before {
-  background: var(--status-neutral);
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--col-warning);
 }
 .status-ongoing {
-  background: transparent;
-  color: var(--text-secondary);
-}
-.status-ongoing::before {
-  background: var(--status-positive);
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--col-success);
 }
 .status-completed {
-  background: transparent;
-  color: var(--text-secondary);
-}
-.status-completed::before {
-  background: var(--status-neutral);
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--col-text-muted);
 }
 .status-cancelled {
-  background: transparent;
-  color: var(--text-secondary);
-}
-.status-cancelled::before {
-  background: var(--status-negative);
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--col-danger);
 }
 
 .event-card h3 {
@@ -1060,16 +1004,16 @@ input[type=password]:focus,
 }
 
 .event-budget-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--bg-surface-raised);
+  height: 5px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.08);
   margin-bottom: 0.5rem;
   overflow: hidden;
 }
 .event-budget-fill {
   height: 100%;
-  border-radius: 2px;
-  background: var(--accent);
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--col-primary), var(--col-accent));
   transition: width 0.6s ease;
 }
 
@@ -1125,7 +1069,7 @@ input[type=password]:focus,
 }
 
 .data-table thead {
-  background: var(--bg-surface);
+  background: var(--col-surface);
   position: sticky;
   top: 0;
   z-index: 5;
@@ -1141,7 +1085,7 @@ input[type=password]:focus,
   letter-spacing: 0.05em;
   color: var(--col-text-muted);
   white-space: nowrap;
-  background: var(--bg-surface);
+  background: var(--col-surface);
 }
 
 .data-table td {
@@ -1502,65 +1446,26 @@ input[type=password]:focus,
   flex-wrap: wrap;
 }
 .admin-tab-btn {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text-secondary);
+  background: var(--col-card);
+  border: 1px solid var(--col-border);
+  color: var(--col-text-muted);
   padding: .55rem 1.1rem;
+  border-radius: var(--radius-sm);
   font-size: .85rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
 }
-.admin-tab-btn:hover { color: var(--text-primary); }
+.admin-tab-btn:hover { color: var(--col-text); border-color: var(--col-primary); }
 .admin-tab-btn.active {
-  background: transparent;
-  color: var(--text-primary);
-  border-bottom-color: var(--accent);
+  background: var(--col-primary);
+  color: #fff;
+  border-color: var(--col-primary);
 }
 
 /* Admin Tab Panels */
 .admin-tab-panel { display: none; }
 .admin-tab-panel.active { display: block; }
-
-/* Phase 7 Admin Management - Form Panels */
-.panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-}
-.panel h3,
-.panel .section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-}
-
-/* Phase 7 Admin Management - Inputs */
-input,
-select,
-textarea,
-input[type="date"] {
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-}
-input:focus,
-select:focus,
-textarea:focus,
-input[type="date"]:focus {
-  border-color: var(--accent);
-  box-shadow: none;
-  outline: none;
-}
-
-/* Phase 7 Placeholder */
-::placeholder {
-  color: var(--text-tertiary);
-  opacity: 1;
-}
 
 /* Modal Overlay */
 .modal-overlay {
@@ -1605,6 +1510,8 @@ html body.is-admin th.admin-only {
   position: fixed;
   inset: 0;
   background: rgba(11, 15, 25, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex !important;
   align-items: center;
   justify-content: center;
@@ -1654,185 +1561,5 @@ html body.is-admin th.admin-only {
 @keyframes auraGlow {
   0%, 100% { opacity: 0.15; transform: scale(1); }
   50% { opacity: 0.35; transform: scale(1.4); }
-}
-
-/* =============================================
-   Phase 5 — Financial Ledger / Total Income Tracker Restyle
-   ============================================= */
-
-/* Table header */
-.ledger-view .data-table thead,
-#view-income .data-table thead {
-  background: transparent;
-}
-
-.ledger-view .data-table thead th,
-#view-income .data-table thead th {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-  border-bottom: 1px solid var(--border-default);
-  background: transparent;
-  box-shadow: none;
-}
-
-/* Table rows */
-.ledger-view .data-table tbody tr,
-#view-income .data-table tbody tr {
-  background: transparent;
-  border-bottom: 1px solid var(--border-default);
-}
-
-.ledger-view .data-table tbody tr:hover,
-#view-income .data-table tbody tr:hover {
-  background: var(--bg-surface-raised);
-}
-
-.ledger-view .data-table tbody td,
-#view-income .data-table tbody td {
-  border-bottom: none;
-}
-
-/* Type badges — keep dot+text shared style */
-.ledger-view .data-table .tx-badge,
-#view-income .data-table .tx-badge {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-/* Amount column */
-.ledger-view .data-table .tx-amount,
-#view-income .data-table .tx-amount {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-  text-align: right;
-}
-
-/* Action icons edit/delete */
-.ledger-view .data-table .tx-edit-btn,
-.ledger-view .data-table .tx-del-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-tertiary);
-}
-
-.ledger-view .data-table .tx-edit-btn:hover {
-  color: var(--text-primary);
-  background: transparent;
-}
-
-.ledger-view .data-table .tx-del-btn:hover {
-  color: var(--status-negative);
-  opacity: 0.7;
-  background: transparent;
-}
-
-/* Search input + filter dropdowns */
-#view-transactions .search-input-wrapper input,
-#view-transactions .filter-bar select {
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
-  color: var(--text-primary);
-}
-
-#view-transactions .search-input-wrapper input:focus,
-#view-transactions .filter-bar select:focus {
-  border-color: var(--accent);
-  outline: none;
-  box-shadow: none;
-}
-
-/* General Income section as panel */
-#add-income-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-}
-
-#add-income-panel::before {
-  display: none;
-}
-
-#add-income-panel h3 i {
-  color: var(--text-secondary);
-}
-
-/* =============================================
-   Phase 6 — Financial Reports Restyle
-   ============================================= */
-
-/* Report containers use panel elevation: flat surface + hairline border */
-.report-card,
-.reports-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-}
-
-/* Export buttons follow Phase 4 .btn-ghost spec: icon+text, hairline border,
-   var(--text-secondary) default, hover var(--text-primary) + border-hover */
-.export-btn,
-.btn-export {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-default);
-}
-.export-btn:hover,
-.btn-export:hover,
-.export-btn:focus,
-.btn-export:focus {
-  color: var(--text-primary);
-  border-color: var(--border-hover);
-}
-
-/* Report tables inherit Phase 5 Financial Ledger table spec */
-.reports-panel .data-table thead,
-.report-card .data-table thead {
-  background: transparent;
-}
-.reports-panel .data-table thead th,
-.report-card .data-table thead th {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 500;
-  border-bottom: 1px solid var(--border-default);
-  background: transparent;
-  box-shadow: none;
-}
-.reports-panel .data-table tbody tr,
-.report-card .data-table tbody tr {
-  background: transparent;
-  border-bottom: 1px solid var(--border-default);
-}
-.reports-panel .data-table tbody tr:hover,
-.report-card .data-table tbody tr:hover {
-  background: var(--bg-surface-raised);
-}
-.reports-panel .data-table tbody td,
-.report-card .data-table tbody td {
-  border-bottom: none;
-}
-
-/* Status text upcoming uses shared dot+text renderStatusBadge pattern */
-.report-status.status-upcoming,
-.reports-panel .status-upcoming {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  color: var(--text-secondary);
-}
-.report-status.status-upcoming::before,
-.reports-panel .status-upcoming::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--status-neutral);
-  display: inline-block;
-  flex-shrink: 0;
 }
 
