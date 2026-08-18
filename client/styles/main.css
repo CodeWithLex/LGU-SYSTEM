@@ -634,7 +634,6 @@ html body .hidden {
 .sync-status {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--text-secondary);
@@ -643,30 +642,6 @@ html body .hidden {
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   user-select: none;
-}
-
-.sync-sonar {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 0 rgba(232, 135, 74, 0.4);
-  animation: sonar 2.5s infinite;
-}
-
-@keyframes sonar {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(232, 135, 74, 0.6);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 5px rgba(232, 135, 74, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(232, 135, 74, 0);
-  }
 }
 
 /* =============================================
