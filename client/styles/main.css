@@ -479,13 +479,14 @@ html body .hidden {
    ============================================= */
 #app-screen {
   flex-direction: row;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* ---- Sidebar ---- */
 .sidebar {
   width: var(--sidebar-w);
-  min-height: 100vh;
+  height: 100vh;
   background: var(--bg-surface);
   border-right: 1px solid var(--border-default);
   display: flex;
@@ -494,6 +495,8 @@ html body .hidden {
   position: sticky;
   top: 0;
   flex-shrink: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .sidebar-header {
