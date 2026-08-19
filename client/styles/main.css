@@ -1674,6 +1674,20 @@ html body .hidden {
   display: block;
 }
 
+/* =========================================
+   Phosphor Icons — global normalization
+   Ensures all ph icons render at the right
+   weight, line-height and display context.
+   ========================================= */
+.ph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 /* ---- Skeleton Loading ---- */
 .skeleton-stack {
   display: flex;
@@ -1815,7 +1829,7 @@ html body .hidden {
   
   html body .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem !important; }
   html body .stat-card { padding: 0.9rem !important; gap: 0.6rem !important; }
-  html body .stat-icon { width: 26px !important; height: 26px !important; font-size: 0.75rem !important; }
+  html body .stat-icon { width: 26px !important; height: 26px !important; font-size: 1.15rem !important; }
   html body .stat-label { font-size: 0.65rem !important; }
   body .stat-value { font-size: 1.05rem !important; }
 
