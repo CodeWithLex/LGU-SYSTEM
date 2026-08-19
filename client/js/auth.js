@@ -4,6 +4,12 @@
 
 const Auth = (() => {
 
+  async function login(email, password) {
+    const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  }
+
   async function logout() {
     await window.supabaseClient.auth.signOut();
   }
@@ -34,5 +40,5 @@ const Auth = (() => {
     });
   }
 
-  return { logout, getSession, getProfile, onAuthChange };
+  return { login, logout, getSession, getProfile, onAuthChange };
 })();

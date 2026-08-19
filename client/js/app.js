@@ -8,38 +8,42 @@
   UI.Theme.init();
   if (typeof lucide !== 'undefined') lucide.createIcons();
 
-  // ---- Google OAuth SSO ----
-  document.getElementById('google-sso-btn').addEventListener('click', async () => {
-    const btn = document.getElementById('google-sso-btn');
+  // ---- Login ----
+  document.getElementById('login-btn').addEventListener('click', async () => {
     const errEl = document.getElementById('login-error');
+    const btn   = document.getElementById('login-btn');
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-password').value;
+
     errEl.classList.add('hidden');
-    btn.disabled = true;
-    btn.querySelector('span').textContent = 'Redirecting…';
-    try {
-      const { error } = await window.supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/index.html',
-          queryParams: {
-            hd: 'g.cjc.edu.ph'   // restrict login to CJC Google Workspace domain
-          }
-        }
-      });
-      if (error) {
-        const errEl = document.getElementById('login-error');
-        errEl.textContent = 'Sign-in failed. Make sure you are using your official @g.cjc.edu.ph account.';
-        errEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.querySelector('span').textContent = 'Continue with CJC Google Account';
-      }
-      // On success, browser redirects — no else needed
-    } catch (e) {
-      const errEl = document.getElementById('login-error');
-      errEl.textContent = 'Google sign-in unavailable. Try again later.';
+
+    if (!email || !pass) {
+      errEl.textContent = 'Please enter your email and password.';
       errEl.classList.remove('hidden');
-      btn.disabled = false;
-      btn.querySelector('span').textContent = 'Continue with CJC Google Account';
+      return;
     }
+
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+
+    try {
+      await Auth.login(email, pass);
+    } catch (err) {
+      if (err.message.includes('missing email or phone') || err.message.includes('phone')) {
+        errEl.textContent = 'Please enter your email and password.';
+      } else {
+        errEl.textContent = err.message;
+      }
+      errEl.classList.remove('hidden');
+    } finally {
+      btn.textContent = 'Sign In';
+      btn.disabled = false;
+    }
+  });
+
+  // Allow Enter key on login form
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('login-btn').click();
   });
 
   // ---- Logout (sidebar + mobile bottom nav) ----
