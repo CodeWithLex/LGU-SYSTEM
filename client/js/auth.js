@@ -4,24 +4,6 @@
 
 const Auth = (() => {
 
-  async function login(email, password) {
-    const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) throw error;
-    return data;
-  }
-
-  async function register({ email, password, fullName, course, yearLevel }) {
-    const { data, error } = await window.supabaseClient.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, role: 'student', course, year_level: yearLevel }
-      }
-    });
-    if (error) throw error;
-    return data;
-  }
-
   async function logout() {
     await window.supabaseClient.auth.signOut();
   }
@@ -52,5 +34,5 @@ const Auth = (() => {
     });
   }
 
-  return { login, register, logout, getSession, getProfile, onAuthChange };
+  return { logout, getSession, getProfile, onAuthChange };
 })();

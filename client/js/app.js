@@ -8,22 +8,11 @@
   UI.Theme.init();
   if (typeof lucide !== 'undefined') lucide.createIcons();
 
-  // ---- Auth Form Toggles ----
-  document.getElementById('show-register').addEventListener('click', e => {
-    e.preventDefault();
-    document.getElementById('login-form').classList.remove('active');
-    document.getElementById('register-form').classList.add('active');
-  });
-
-  document.getElementById('show-login').addEventListener('click', e => {
-    e.preventDefault();
-    document.getElementById('register-form').classList.remove('active');
-    document.getElementById('login-form').classList.add('active');
-  });
-
   // ---- Google OAuth SSO ----
   document.getElementById('google-sso-btn').addEventListener('click', async () => {
     const btn = document.getElementById('google-sso-btn');
+    const errEl = document.getElementById('login-error');
+    errEl.classList.add('hidden');
     btn.disabled = true;
     btn.querySelector('span').textContent = 'Redirecting…';
     try {
@@ -37,100 +26,19 @@
         }
       });
       if (error) {
-        UI.toast(error.message, 'error');
+        const errEl = document.getElementById('login-error');
+        errEl.textContent = 'Sign-in failed. Make sure you are using your official @g.cjc.edu.ph account.';
+        errEl.classList.remove('hidden');
         btn.disabled = false;
         btn.querySelector('span').textContent = 'Continue with CJC Google Account';
       }
       // On success, browser redirects — no else needed
     } catch (e) {
-      UI.toast('Google sign-in unavailable. Try email instead.', 'error');
+      const errEl = document.getElementById('login-error');
+      errEl.textContent = 'Google sign-in unavailable. Try again later.';
+      errEl.classList.remove('hidden');
       btn.disabled = false;
       btn.querySelector('span').textContent = 'Continue with CJC Google Account';
-    }
-  });
-
-  // ---- Login ----
-  document.getElementById('login-btn').addEventListener('click', async () => {
-    const errEl = document.getElementById('login-error');
-    const btn   = document.getElementById('login-btn');
-    const email = document.getElementById('login-email').value.trim();
-    const pass  = document.getElementById('login-password').value;
-
-    errEl.classList.add('hidden');
-
-    if (!email || !pass) {
-      errEl.textContent = 'Please enter your email and password.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-
-    btn.textContent = 'Signing in…';
-    btn.disabled = true;
-
-    try {
-      await Auth.login(email, pass);
-    } catch (err) {
-      if (err.message.includes('missing email or phone') || err.message.includes('phone')) {
-        errEl.textContent = 'Please enter your email and password.';
-      } else {
-        errEl.textContent = err.message;
-      }
-      errEl.classList.remove('hidden');
-    } finally {
-      btn.textContent = 'Sign In with Email';
-      btn.disabled = false;
-    }
-  });
-
-  // Allow Enter key on login form
-  document.getElementById('login-password').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('login-btn').click();
-  });
-
-  // ---- Register ----
-  document.getElementById('register-btn').addEventListener('click', async () => {
-    const errEl = document.getElementById('reg-error');
-    const btn   = document.getElementById('register-btn');
-    const email = document.getElementById('reg-email').value.trim();
-    const pass  = document.getElementById('reg-password').value;
-    const name  = document.getElementById('reg-name').value.trim();
-
-    errEl.classList.add('hidden');
-
-    // ---- Required fields ----
-    if (!email || !pass || !name) {
-      errEl.textContent = 'Please fill out all required fields.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-
-    // ---- Domain gate ----
-    if (!email.toLowerCase().endsWith('@g.cjc.edu.ph')) {
-      errEl.textContent = 'Only @g.cjc.edu.ph accounts are allowed to register.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-
-    btn.textContent = 'Creating account…';
-    btn.disabled = true;
-
-    try {
-      await Auth.register({
-        email,
-        password:  pass,
-        fullName:  name,
-        course:    document.getElementById('reg-course').value,
-        yearLevel: document.getElementById('reg-year').value
-      });
-      UI.toast('Account created! Check your CJC Gmail to confirm your email.', 'success');
-      document.getElementById('register-form').classList.remove('active');
-      document.getElementById('login-form').classList.add('active');
-    } catch (err) {
-      errEl.textContent = err.message;
-      errEl.classList.remove('hidden');
-    } finally {
-      btn.textContent = 'Create Account';
-      btn.disabled = false;
     }
   });
 
