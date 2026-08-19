@@ -190,7 +190,7 @@ html body .hidden {
   overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 /* Layer 2 — geometry grid pattern */
@@ -212,44 +212,44 @@ html body .hidden {
   user-select: none;
 }
 .auth-watermark-logo {
-  top: 2.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 190px;
+  top: -90px;
+  left: -100px;
+  width: 480px;
+  transform: rotate(-15deg);
 }
 .auth-watermark-bear {
-  bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 210px;
+  bottom: -150px;
+  right: -150px;
+  width: 580px;
 }
 
 /* Layer 4 — foreground branding content */
 .auth-brand-content {
   position: relative;
   z-index: 2;
-  max-width: 400px;
-  padding: 2.5rem;
+  max-width: 480px;
+  padding: 4rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.5rem;
+  align-items: flex-start;
+  text-align: left;
+  gap: 2rem;
 }
 
 .auth-identity h1 {
-  font-size: 1.65rem;
+  font-size: 2.1rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  line-height: 1.25;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
   color: var(--text-primary);
+  white-space: nowrap;
 }
 
 .auth-subtitle {
   margin-top: 0.6rem;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-secondary);
 }
@@ -258,7 +258,7 @@ html body .hidden {
   font-size: 0.85rem;
   color: var(--text-tertiary);
   line-height: 1.7;
-  max-width: 320px;
+  max-width: 380px;
 }
 
 /* ---- Right Form Panel ---- */
@@ -357,30 +357,38 @@ html body .hidden {
   .auth-brand-panel {
     border-right: none;
     border-bottom: 1px solid var(--border-default);
-    height: 420px; /* tall enough for shield + text + wildcat stacked */
+    height: 380px; /* tall enough for shield + text + wildcat stacked */
     flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
   .auth-watermark-logo {
-    top: 1.5rem;
-    width: 72px;
+    top: -60px;
+    left: -70px;
+    width: 280px;
+    transform: rotate(-15deg);
   }
   .auth-watermark-bear {
-    bottom: 1.25rem;
-    width: 82px;
+    bottom: -100px;
+    right: -100px;
+    width: 380px;
   }
   .auth-brand-content {
-    padding: 1.5rem;
-    gap: 1rem;
+    padding: 2rem;
+    gap: 1.25rem;
+    align-items: flex-start;
+    text-align: left;
   }
   .auth-identity h1 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
   .auth-subtitle {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     margin-top: 0.4rem;
   }
   .auth-brand-desc {
-    font-size: 0.78rem;
+    font-size: 0.8rem;
   }
 
   .auth-form-panel {
