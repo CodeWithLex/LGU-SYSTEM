@@ -78,6 +78,7 @@
         if (el.tagName === 'SELECT') el.selectedIndex = 0;
         else el.value = '';
       });
+      dropdowns.forEach(d => d.sync());
     }
   }
 
@@ -154,6 +155,117 @@
       if (e.key === 'Enter') document.getElementById('register-btn').click();
     });
   });
+
+  // ---- Custom animated dropdowns (register selects) ----
+  // Replaces the native select with an animating listbox while keeping the
+  // original <select> in the DOM (hidden) as the single source of truth, so
+  // the register submit handler and form reset keep working unchanged.
+  const dropdowns = [];
+
+  function initDropdowns() {
+    ['register-course', 'register-year'].forEach(id => {
+      const select = document.getElementById(id);
+      const wrap = select?.closest('.input-icon-wrap');
+      if (!select || !wrap || select.dataset.ddBound) return;
+      select.dataset.ddBound = '1';
+
+      const dd = document.createElement('div');
+      dd.className = 'dd';
+
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'dd-trigger';
+      trigger.setAttribute('aria-haspopup', 'listbox');
+      trigger.setAttribute('aria-expanded', 'false');
+
+      const label = document.createElement('span');
+      label.className = 'dd-label';
+
+      const chevron = document.createElement('i');
+      chevron.className = 'dd-chevron';
+      chevron.setAttribute('data-lucide', 'chevron-down');
+
+      trigger.append(label, chevron);
+
+      const menu = document.createElement('ul');
+      menu.className = 'dd-menu';
+      menu.setAttribute('role', 'listbox');
+
+      [...select.options].forEach((opt, i) => {
+        const li = document.createElement('li');
+        li.textContent = opt.text;
+        li.dataset.index = i;
+        li.setAttribute('role', 'option');
+        li.addEventListener('click', () => {
+          select.selectedIndex = i;
+          sync();
+          markSelected();
+          close();
+        });
+        menu.appendChild(li);
+      });
+
+      function sync() {
+        const opt = select.options[select.selectedIndex];
+        const hasValue = opt && opt.value;
+        label.textContent = hasValue ? opt.text : select.options[0].text;
+        label.classList.toggle('dd-placeholder', !hasValue);
+      }
+
+      function markSelected() {
+        menu.querySelectorAll('li').forEach(li => {
+          li.classList.toggle('dd-selected', Number(li.dataset.index) === select.selectedIndex);
+        });
+      }
+
+      function open() {
+        dd.classList.add('dd-open');
+        trigger.setAttribute('aria-expanded', 'true');
+        markSelected();
+      }
+
+      function close() {
+        dd.classList.remove('dd-open');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+
+      trigger.addEventListener('click', e => {
+        e.stopPropagation();
+        if (dd.classList.contains('dd-open')) close();
+        else open();
+      });
+
+      trigger.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { close(); trigger.focus(); return; }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const delta = e.key === 'ArrowDown' ? 1 : -1;
+          const next = select.selectedIndex + delta;
+          if (next >= 0 && next < select.options.length) {
+            select.selectedIndex = next;
+            sync();
+            markSelected();
+          }
+        }
+      });
+
+      document.addEventListener('click', e => {
+        if (!dd.contains(e.target)) close();
+      });
+
+      dd.append(trigger, menu);
+      wrap.insertBefore(dd, select);
+      select.style.display = 'none';
+      wrap.querySelector('.input-icon-right')?.remove();
+
+      sync();
+      dropdowns.push({ sync });
+    });
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  initDropdowns();
 
   // ---- Logout (sidebar + mobile bottom nav) ----
   document.getElementById('logout-btn').addEventListener('click', async () => {
