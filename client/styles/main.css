@@ -1511,7 +1511,6 @@ html body .hidden {
    ============================================= */
 @media (max-width: 1024px) {
   .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
-  .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-panels { grid-template-columns: 1fr; }
 }
 
@@ -1530,17 +1529,8 @@ html body .hidden {
   .nav-item { justify-content: center; padding: 0.7rem; }
   .sidebar-footer { justify-content: center; }
 
-  /* Skeleton mirrors the 60px sidebar rail: hide text bones, center icons */
-  .sk-sidebar-brand,
-  .sk-sidebar-footer { justify-content: center; }
-  .sk-sidebar-brand .sk-rail-text,
-  .sk-sidebar-footer .sk-rail-text { display: none; }
-
   .form-row { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  .sk-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
-  .sk-main { padding: 1.25rem 1rem; }
   .view { padding: 1.25rem 1rem; }
 
   .view-header { flex-wrap: wrap; gap: 0.75rem; }
@@ -1557,11 +1547,6 @@ html body .hidden {
    RESPONSIVE — Phone (≤480px)
    ============================================= */
 @media (max-width: 480px) {
-  /* Skeleton: hide sidebar shell, show bottom nav shell (mirrors real app) */
-  .sk-sidebar { display: none; }
-  .sk-bottom-nav { display: flex; }
-  .sk-main { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
-
   /* Dashboard & Grid Overrides */
   html body #view-dashboard .view-header { 
     display: flex !important; 
@@ -1579,10 +1564,6 @@ html body .hidden {
   
   html body .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.6rem !important; }
   html body .stat-card { padding: 0.9rem !important; gap: 0.6rem !important; }
-  .sk-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
-  .sk-stat-card { padding: 0.9rem; gap: 0.6rem; }
-  .sk-cards-grid { grid-template-columns: 1fr; gap: 0.6rem; }
-  .sk-content-card { padding: 0.9rem; }
   html body .stat-icon { width: 26px !important; height: 26px !important; font-size: 0.75rem !important; }
   html body .stat-label { font-size: 0.65rem !important; }
   body .stat-value { font-size: 1.05rem !important; }
@@ -1836,6 +1817,7 @@ html body.is-admin th.admin-only {
   flex-direction: column;
   padding: 1.5rem 1rem;
   flex-shrink: 0;
+  overflow-x: hidden; /* clips like the real .sidebar when narrowed to the 60px rail */
 }
 
 .sk-sidebar-brand {
@@ -1950,3 +1932,49 @@ html body.is-admin th.admin-only {
   flex-shrink: 0;
 }
 
+
+/* =============================================
+   SKELETON RESPONSIVE OVERRIDES
+   Must stay after every .sk-* base rule: the base
+   rules live above the main responsive section, so
+   equal-specificity overrides here win the cascade.
+   Mirrors the real app breakpoints (sidebar/bottom-nav
+   swap at 480px, 60px rail at 768px).
+   ============================================= */
+
+/* ≤1024px — content cards stack 2-up like .dashboard-grid */
+@media (max-width: 1024px) {
+  .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ≤768px — skeleton mirrors the 60px sidebar rail */
+@media (max-width: 768px) {
+  .sk-sidebar-brand,
+  .sk-sidebar-footer { justify-content: center; }
+  .sk-sidebar-brand .sk-rail-text,
+  .sk-sidebar-footer .sk-rail-text { display: none; }
+  .sk-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .sk-main { padding: 1.25rem 1rem; }
+}
+
+/* ≤480px — hide sidebar shell, show bottom nav shell (mirrors real app) */
+@media (max-width: 480px) {
+  .sk-sidebar { display: none; }
+  .sk-bottom-nav {
+    display: flex;
+    height: auto;
+    min-height: 56px;
+    padding: 0.6rem 0 calc(0.4rem + env(safe-area-inset-bottom));
+    justify-content: space-evenly;
+  }
+  .sk-main { padding: 0.75rem 0.75rem calc(84px + env(safe-area-inset-bottom)); }
+  .sk-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .sk-stat-card { padding: 0.9rem; gap: 0.6rem; }
+  .sk-stat-card .sk-circle { width: 26px !important; height: 26px !important; } /* inline-sized bones: matches the 26px mobile stat icon */
+  .sk-cards-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+  .sk-content-card { padding: 0.9rem; }
+  .sk-header { border-bottom: 1px solid var(--border-default); margin-bottom: 0.75rem; padding-bottom: 0.5rem; }
+  .sk-header .sk-bone:first-child { height: 18px !important; }   /* matches mobile view-title size */
+  .sk-header .sk-bone:nth-child(2) { height: 11px !important; }  /* matches mobile view-subtitle size */
+}
