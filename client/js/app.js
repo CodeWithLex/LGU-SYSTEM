@@ -64,8 +64,10 @@
     loginErr.classList.add('hidden');
     document.getElementById('register-error').classList.add('hidden');
     if (!toLogin) {
-      ['register-name', 'register-email', 'register-password', 'register-confirm'].forEach(id => {
-        document.getElementById(id).value = '';
+      ['register-name', 'register-email', 'register-password', 'register-confirm', 'register-course', 'register-year'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
       });
     }
   }
@@ -79,13 +81,15 @@
     const errEl = document.getElementById('register-error');
     const btn = document.getElementById('register-btn');
     const name = document.getElementById('register-name').value.trim();
+    const course = document.getElementById('register-course').value;
+    const year = document.getElementById('register-year').value;
     const email = document.getElementById('register-email').value.trim();
     const pass = document.getElementById('register-password').value;
     const confirm = document.getElementById('register-confirm').value;
 
     errEl.classList.add('hidden');
 
-    if (!name || !email || !pass || !confirm) {
+    if (!name || !course || !year || !email || !pass || !confirm) {
       errEl.textContent = 'Please fill in all fields.';
       errEl.classList.remove('hidden');
       return;
@@ -105,7 +109,7 @@
     btn.disabled = true;
 
     try {
-      const data = await Auth.register(name, email, pass);
+      const data = await Auth.register(name, email, pass, { course, year });
       if (data.session) {
         // Email confirmation disabled — session already active
         await bootApp(data.session);

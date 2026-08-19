@@ -4,6 +4,8 @@
 
 /* ---- Design Tokens ---- */
 :root {
+  /* Render native controls (select dropdowns, scrollbars) in dark mode */
+  color-scheme: dark;
   /* Backgrounds — flat, opaque, no glassmorphism */
   --bg-base: #0A0A0B;           /* app shell, page background */
   --bg-surface: #0D0E10;        /* sidebar, modals, cards */
@@ -315,6 +317,12 @@ html body .hidden {
 .input-icon-wrap input {
   width: 100%;
   padding-left: 2.9rem !important;
+}
+
+.input-icon-wrap select {
+  width: 100%;
+  padding-left: 2.9rem !important;
+  cursor: pointer;
 }
 
 .auth-error {

@@ -10,11 +10,11 @@ const Auth = (() => {
     return data;
   }
 
-  async function register(fullName, email, password) {
+  async function register(fullName, email, password, extra = {}) {
     const { data, error } = await window.supabaseClient.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName } },
+      options: { data: { full_name: fullName, ...extra } },
     });
     if (error) throw error;
     return data;
