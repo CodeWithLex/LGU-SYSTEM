@@ -21,6 +21,22 @@
     document.getElementById('login-form').classList.add('active');
   });
 
+  // ---- Google OAuth SSO ----
+  document.getElementById('google-sso-btn').addEventListener('click', async () => {
+    try {
+      const { error } = await window.supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: { hd: 'g.cjc.edu.ph' }   // restrict to CJC domain
+        }
+      });
+      if (error) UI.toast(error.message, 'error');
+    } catch (e) {
+      UI.toast('Google sign-in failed. Try email instead.', 'error');
+    }
+  });
+
   // ---- Login ----
   document.getElementById('login-btn').addEventListener('click', async () => {
     const errEl = document.getElementById('login-error');
@@ -49,7 +65,7 @@
       }
       errEl.classList.remove('hidden');
     } finally {
-      btn.textContent = 'Sign In';
+      btn.textContent = 'Sign In with Email';
       btn.disabled = false;
     }
   });
