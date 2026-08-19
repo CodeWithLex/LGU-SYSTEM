@@ -279,11 +279,17 @@ html body .hidden {
   background: #131417;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.auth-form-panel .form-group input:hover,
+.auth-form-panel .form-group select:hover {
+  border-color: var(--border-hover);
 }
 .auth-form-panel .form-group input:focus,
 .auth-form-panel .form-group select:focus {
   border-color: var(--accent);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(232, 135, 74, 0.15);
 }
 
 /* Force dark theme during browser autofill (UA default light-blue/yellow surfaces) */
@@ -322,7 +328,24 @@ html body .hidden {
 .input-icon-wrap select {
   width: 100%;
   padding-left: 2.9rem !important;
+  padding-right: 2.75rem !important; /* room for the custom chevron */
+  appearance: none;
+  -webkit-appearance: none;
   cursor: pointer;
+}
+
+/* Right-aligned chevron for selects (replaces the native arrow) */
+.input-icon-right {
+  left: auto;
+  right: 0.9rem;
+  width: 15px;
+  height: 15px;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.input-icon-wrap select:hover + .input-icon-right,
+.input-icon-wrap select:focus + .input-icon-right {
+  color: var(--accent);
+  transform: translateY(2px);
 }
 
 .auth-error {
@@ -413,6 +436,31 @@ html body .hidden {
 }
 .auth-form.active {
   display: block;
+  animation: authFormIn 0.3s ease-out;
+}
+
+/* Entrance cascade — form children fade in with a subtle stagger */
+.auth-form.active > * {
+  animation: authFieldIn 0.32s ease-out both;
+}
+.auth-form.active > *:nth-child(1) { animation-delay: 0.03s; }
+.auth-form.active > *:nth-child(2) { animation-delay: 0.07s; }
+.auth-form.active > *:nth-child(3) { animation-delay: 0.11s; }
+.auth-form.active > *:nth-child(4) { animation-delay: 0.15s; }
+.auth-form.active > *:nth-child(5) { animation-delay: 0.19s; }
+.auth-form.active > *:nth-child(6),
+.auth-form.active > *:nth-child(7),
+.auth-form.active > *:nth-child(8),
+.auth-form.active > *:nth-child(9) { animation-delay: 0.23s; }
+
+@keyframes authFormIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authFieldIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Auth form toggle — switch between Sign in / Register */
@@ -1497,6 +1545,8 @@ html body .hidden {
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton { animation: none; }
+  .auth-form.active,
+  .auth-form.active > * { animation: none !important; }
 }
 
 /* =============================================
