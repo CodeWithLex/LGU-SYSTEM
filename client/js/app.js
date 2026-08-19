@@ -141,7 +141,7 @@
 
     // Sidebar user info
     document.getElementById('user-name').textContent   = profile?.full_name || session.user.email;
-    document.getElementById('user-role').textContent   = profile?.role === 'admin' ? '🛡 Admin' : '🎓 Student';
+    document.getElementById('user-role').textContent   = profile?.role === 'admin' ? 'Admin' : 'Student';
     document.getElementById('user-avatar').textContent = (profile?.full_name || session.user.email)[0].toUpperCase();
 
     UI.setAdminVisibility(profile?.role === 'admin');

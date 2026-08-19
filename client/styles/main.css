@@ -731,7 +731,7 @@ html body .hidden {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding-top: 1rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border-default);
 }
 
@@ -748,7 +748,7 @@ html body .hidden {
   height: 34px;
   border-radius: 50%;
   background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
+  border: 1px solid rgba(255, 255, 255, 0.14);  /* slightly brighter than --border-default for contrast */
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -770,10 +770,12 @@ html body .hidden {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 120px;
 }
 .user-role {
   font-size: 0.72rem;
   color: var(--text-tertiary);
+  /* No icon, no padding-left needed */
 }
 
 /* ---- Main Content ---- */
