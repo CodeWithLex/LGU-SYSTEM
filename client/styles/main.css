@@ -285,8 +285,11 @@ html body .hidden {
   .auth-brand-panel {
     border-right: none;
     border-bottom: 1px solid var(--border-default);
-    height: 240px;
+    height: 260px;               /* taller so the square graphic fits without cropping */
     flex: 0 0 auto;
+    background-size: contain;    /* whole graphic visible — no side/top-bottom clipping */
+    background-repeat: no-repeat;
+    background-position: center; /* centers heading, shield logo, and wildcat */
   }
 
   .auth-form-panel {
