@@ -180,13 +180,85 @@ html body .hidden {
 
 /* ---- Left Brand Panel ---- */
 .auth-brand-panel {
+  position: relative;
   flex: 0 0 50%;
-  background-color: #0D0E10; /* fallback while the image loads */
-  background-image: url('../assets/login-bg.png');
+  background-color: #0D0E10; /* fallback while the plate loads */
+  background-image: url('../assets/black-bg-back.png');
   background-size: cover;
   background-position: center;
   border-right: 1px solid var(--border-default);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Layer 2 — geometry grid pattern */
+.auth-pattern-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/bg-pattern-front.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Layer 3 — faint watermark graphics */
+.auth-watermark {
+  position: absolute;
+  opacity: 0.06;
+  pointer-events: none;
+  user-select: none;
+}
+.auth-watermark-logo {
+  top: 2.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 190px;
+}
+.auth-watermark-bear {
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 210px;
+}
+
+/* Layer 4 — foreground branding content */
+.auth-brand-content {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.auth-identity h1 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.auth-subtitle {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.auth-brand-desc {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  line-height: 1.7;
+  max-width: 320px;
 }
 
 /* ---- Right Form Panel ---- */
@@ -285,11 +357,30 @@ html body .hidden {
   .auth-brand-panel {
     border-right: none;
     border-bottom: 1px solid var(--border-default);
-    height: 260px;               /* taller so the square graphic fits without cropping */
+    height: 420px; /* tall enough for shield + text + wildcat stacked */
     flex: 0 0 auto;
-    background-size: contain;    /* whole graphic visible — no side/top-bottom clipping */
-    background-repeat: no-repeat;
-    background-position: center; /* centers heading, shield logo, and wildcat */
+  }
+  .auth-watermark-logo {
+    top: 1.5rem;
+    width: 72px;
+  }
+  .auth-watermark-bear {
+    bottom: 1.25rem;
+    width: 82px;
+  }
+  .auth-brand-content {
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+  .auth-identity h1 {
+    font-size: 1.25rem;
+  }
+  .auth-subtitle {
+    font-size: 0.7rem;
+    margin-top: 0.4rem;
+  }
+  .auth-brand-desc {
+    font-size: 0.78rem;
   }
 
   .auth-form-panel {
