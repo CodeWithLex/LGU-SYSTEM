@@ -778,6 +778,31 @@ html body .hidden {
   /* No icon, no padding-left needed */
 }
 
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.sidebar-footer .btn-icon {
+  width: 34px;               /* matches .user-avatar height for vertical alignment */
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--text-tertiary);
+}
+.sidebar-footer .btn-icon:hover {
+  background: var(--bg-surface-raised);
+  color: var(--text-primary);
+}
+.sidebar-footer #logout-btn:hover {
+  color: var(--status-negative);
+}
+
 /* ---- Main Content ---- */
 .main-content {
   flex: 1;

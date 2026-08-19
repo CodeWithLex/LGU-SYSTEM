@@ -99,9 +99,6 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button id="theme-toggle" class="btn-icon" title="Toggle Appearance" style="margin-right:auto;color:var(--col-text-muted);">
-          <i id="theme-toggle-icon" data-lucide="moon"></i>
-        </button>
         <div class="user-pill" id="user-pill">
           <div class="user-avatar" id="user-avatar">?</div>
           <div class="user-info">
@@ -109,7 +106,12 @@
             <span class="user-role" id="user-role">Student</span>
           </div>
         </div>
-        <button class="btn-icon" id="logout-btn" title="Sign Out"><i data-lucide="log-out"></i></button>
+        <div class="sidebar-actions">
+          <button id="theme-toggle" class="btn-icon" title="Toggle Appearance">
+            <i id="theme-toggle-icon" data-lucide="moon"></i>
+          </button>
+          <button class="btn-icon" id="logout-btn" title="Sign Out"><i data-lucide="log-out"></i></button>
+        </div>
       </div>
     </aside>
 
