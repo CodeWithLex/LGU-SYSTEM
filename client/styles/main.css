@@ -182,16 +182,18 @@ html body .hidden {
 .auth-brand-panel {
   position: relative;
   flex: 0 0 50%;
-  background: #0D0E10;   /* flat, single color — no stripes, no gradients */
+  background-color: #0D0E10; /* fallback while the image loads */
+  background-image:
+    linear-gradient(rgba(10, 10, 11, 0.68), rgba(10, 10, 11, 0.5)),
+    url('../assets/login-bg.png');
+  background-size: cover;
+  background-position: center;
   border-right: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
 }
-
-/* Remove the radial fade mask — no longer needed */
-.auth-brand-panel::after { display: none; }
 
 .auth-brand-content {
   position: relative;
@@ -227,6 +229,7 @@ html body .hidden {
   letter-spacing: -0.04em;
   line-height: 1.2;
   color: var(--text-primary);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 .auth-identity p {
@@ -235,13 +238,15 @@ html body .hidden {
   margin-top: 0.5rem;
   line-height: 1.65;
   font-family: var(--font-body);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .auth-brand-desc {
   font-size: 0.85rem;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   line-height: 1.7;
   max-width: 340px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 /* ---- Right Form Panel ---- */
