@@ -182,8 +182,8 @@ html body .hidden {
 .auth-brand-panel {
   position: relative;
   flex: 0 0 50%;
-  background-color: #0D0E10; /* fallback while the plate loads */
-  background-image: url('../assets/black-bg-back.png');
+  background-color: #0D0E10; /* fallback while the pattern loads */
+  background-image: url('../assets/bg-pattern-front.png');
   background-size: cover;
   background-position: center;
   border-right: 1px solid var(--border-default);
@@ -193,37 +193,7 @@ html body .hidden {
   justify-content: flex-start;
 }
 
-/* Layer 2 — geometry grid pattern */
-.auth-pattern-overlay {
-  position: absolute;
-  inset: 0;
-  background-image: url('../assets/bg-pattern-front.png');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-/* Layer 3 — faint watermark graphics */
-.auth-watermark {
-  position: absolute;
-  opacity: 0.06;
-  pointer-events: none;
-  user-select: none;
-}
-.auth-watermark-logo {
-  top: -90px;
-  left: -100px;
-  width: 480px;
-  transform: rotate(-15deg);
-}
-.auth-watermark-bear {
-  bottom: -150px;
-  right: -150px;
-  width: 580px;
-}
-
-/* Layer 4 — foreground branding content */
+/* Foreground branding content */
 .auth-brand-content {
   position: relative;
   z-index: 2;
@@ -362,17 +332,6 @@ html body .hidden {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-  }
-  .auth-watermark-logo {
-    top: -60px;
-    left: -70px;
-    width: 280px;
-    transform: rotate(-15deg);
-  }
-  .auth-watermark-bear {
-    bottom: -100px;
-    right: -100px;
-    width: 380px;
   }
   .auth-brand-content {
     padding: 2rem;
