@@ -14,69 +14,123 @@
 </head>
 <body>
 
-  <!-- AUTH SCREEN -->
+  <!-- AUTH SCREEN — Split Layout -->
   <div id="auth-screen" class="screen active">
-    <div class="auth-bg">
-      <div class="auth-card glass">
-        <div class="auth-header">
-          <div class="auth-logo"><img src="assets/coe-logo.png" alt="COE Logo" class="coe-logo-img" /></div>
-          <h1>COE Financial Transparency System</h1>
-          <p>College of Engineering · LGU Financial Transparency</p>
+    <!-- Left Brand Panel -->
+    <div class="auth-brand-panel">
+      <div class="auth-brand-grid" aria-hidden="true"></div>
+      <div class="auth-brand-content">
+        <div class="auth-brand-logo">
+          <img src="assets/coe-logo.png" alt="COE Logo" class="auth-brand-logo-img" />
         </div>
+        <div class="auth-brand-text">
+          <h1>COE Budget<br/>Transparency System</h1>
+          <p>Real-time financial visibility for the College of Engineering student body.</p>
+        </div>
+        <div class="auth-brand-features">
+          <div class="auth-feat">
+            <span class="auth-feat-dot"></span>
+            <span>Live ledger & expense tracking</span>
+          </div>
+          <div class="auth-feat">
+            <span class="auth-feat-dot"></span>
+            <span>Event budget management</span>
+          </div>
+          <div class="auth-feat">
+            <span class="auth-feat-dot"></span>
+            <span>Verified student-only access</span>
+          </div>
+        </div>
+        <div class="auth-brand-badge">
+          <i data-lucide="shield-check" style="width:14px;height:14px;"></i>
+          <span>CJC College of Engineering · Official System</span>
+        </div>
+      </div>
+    </div>
 
+    <!-- Right Form Panel -->
+    <div class="auth-form-panel">
+      <div class="auth-form-container">
         <!-- Login Form -->
         <div id="login-form" class="auth-form active">
+          <div class="auth-form-header">
+            <h2>Welcome back</h2>
+            <p>Sign in with your CJC Google account to continue.</p>
+          </div>
           <div class="form-group">
             <label for="login-email">Email Address</label>
-            <input type="email" id="login-email" placeholder="gsuiteAccount@g.cjc.edu.ph" />
+            <div class="input-icon-wrap">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" id="login-email" placeholder="you@g.cjc.edu.ph" />
+            </div>
           </div>
           <div class="form-group">
             <label for="login-password">Password</label>
-            <input type="password" id="login-password" placeholder="••••••••" />
+            <div class="input-icon-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="login-password" placeholder="••••••••" />
+            </div>
           </div>
           <div class="auth-error hidden" id="login-error"></div>
-          <button class="btn btn-primary btn-full" id="login-btn"><span>Sign In</span></button>
-          <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
+          <button class="btn btn-primary btn-full" id="login-btn">
+            <i data-lucide="log-in" style="width:16px;height:16px;"></i>
+            <span>Sign In</span>
+          </button>
+          <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Create one</a></p>
         </div>
 
         <!-- Register Form -->
         <div id="register-form" class="auth-form">
-          <div class="form-group">
-            <label for="reg-name">Full Name</label>
-            <input type="text" id="reg-name" placeholder="Eg. Lex Matondo" />
+          <div class="auth-form-header">
+            <h2>Create account</h2>
+            <p>Use your official CJC Google account.</p>
           </div>
-          <div class="form-group">
-            <label for="reg-email">Email Address</label>
-            <input type="email" id="reg-email" placeholder="gsuiteAccount@g.cjc.edu.ph" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-name">Full Name</label>
+              <input type="text" id="reg-name" placeholder="Eg. Lex Matondo" />
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email</label>
+              <input type="email" id="reg-email" placeholder="you@g.cjc.edu.ph" />
+            </div>
           </div>
-          <div class="form-group">
-            <label for="reg-course">Course</label>
-            <select id="reg-course">
-              <option value="">Select Course</option>
-              <option>BS Civil Engineering</option>
-              <option>BS Computer Engineering</option>
-              <option>BS Electronics Engineering</option>
-              <option>BS Nursing</option>
-              <option>BS Rehabilitation Sciences</option>
-          </select>
-          </div>
-          <div class="form-group">
-            <label for="reg-year">Year Level</label>
-            <select id="reg-year">
-              <option value="">Select Year</option>
-              <option>1st Year</option>
-              <option>2nd Year</option>
-              <option>3rd Year</option>
-              <option>4th Year</option>
-              <option>5th Year</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-course">Course</label>
+              <select id="reg-course">
+                <option value="">Select Course</option>
+                <option>BS Civil Engineering</option>
+                <option>BS Computer Engineering</option>
+                <option>BS Electronics Engineering</option>
+                <option>BS Nursing</option>
+                <option>BS Rehabilitation Sciences</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="reg-year">Year Level</label>
+              <select id="reg-year">
+                <option value="">Select Year</option>
+                <option>1st Year</option>
+                <option>2nd Year</option>
+                <option>3rd Year</option>
+                <option>4th Year</option>
+                <option>5th Year</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label for="reg-password">Password</label>
-            <input type="password" id="reg-password" placeholder="Min. 8 characters" />
+            <div class="input-icon-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="reg-password" placeholder="Min. 8 characters" />
+            </div>
           </div>
           <div class="auth-error hidden" id="reg-error"></div>
-          <button class="btn btn-primary btn-full" id="register-btn">Create Account</button>
+          <button class="btn btn-primary btn-full" id="register-btn">
+            <i data-lucide="user-plus" style="width:16px;height:16px;"></i>
+            Create Account
+          </button>
           <p class="auth-switch">Already have an account? <a href="#" id="show-login">Sign In</a></p>
         </div>
       </div>
