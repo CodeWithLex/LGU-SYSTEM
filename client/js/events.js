@@ -28,7 +28,7 @@ const Events = (() => {
       allEvents = await Api.events.list();
       applyFilters(); // Apply current search/sort to newly loaded data
     } catch (err) {
-      UI.setEmpty('events-grid', 'alert-triangle', 'Failed to load events.');
+      UI.setEmpty('events-grid', 'warning', 'Failed to load events.');
     }
   }
 
@@ -63,7 +63,7 @@ const Events = (() => {
     const grid = document.getElementById('events-grid');
     if (!events.length) {
       if (isSearching) {
-        UI.setEmpty('events-grid', 'search', 'No events match your search.');
+        UI.setEmpty('events-grid', 'magnifying-glass', 'No events match your search.');
       } else {
         UI.setEmpty('events-grid', 'target', 'No events posted yet.');
       }

@@ -174,7 +174,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ COE Budget System Server running on http://localhost:${PORT}`);
+  console.log(`COE Budget System Server running on http://localhost:${PORT}`);
   const serverUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
   keepAlive.start(serverUrl);
 });

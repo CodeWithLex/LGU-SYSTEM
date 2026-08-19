@@ -61,7 +61,7 @@ const Admin = (() => {
       // Specifically for Budget Transfer: Add "General Fund" as a source option
       const fromSel = document.getElementById('transfer-from');
       if (fromSel) {
-        fromSel.insertAdjacentHTML('afterbegin', '<option value="GENERAL" style="color:var(--col-success);font-weight:700;">🏦 GENERAL FUND (Available Total)</option>');
+        fromSel.insertAdjacentHTML('afterbegin', '<option value="GENERAL" style="color:var(--col-success);font-weight:700;">GENERAL FUND (Available Total)</option>');
         fromSel.value = ""; // reset to placeholder
       }
     } catch { /* non-fatal */ }

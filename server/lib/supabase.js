@@ -8,7 +8,7 @@ const url = process.env.SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_KEY;
 
 if (!url || !key || url.includes('your-supabase')) {
-  console.error('❌ Missing Supabase credentials. Please fill in your .env file.');
+  console.error('Missing Supabase credentials. Please fill in your .env file.');
   process.exit(1);
 }
 

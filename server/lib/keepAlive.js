@@ -14,21 +14,21 @@ function start(serverUrl) {
     try {
       const res = await fetch(`${serverUrl}/api/health`);
       const data = await res.json();
-      console.log(`[keep-alive] ✅ Server pinged — ${data.timestamp}`);
+      console.log(`[keep-alive] Server pinged — ${data.timestamp}`);
     } catch (err) {
-      console.warn('[keep-alive] ⚠️  Server ping failed:', err.message);
+      console.warn('[keep-alive] Server ping failed:', err.message);
     }
 
     // 2. Run a lightweight Supabase query to prevent project pause
     try {
       await supabase.from('events').select('id', { count: 'planned', head: true });
-      console.log('[keep-alive] ✅ Supabase pinged');
+      console.log('[keep-alive] Supabase pinged');
     } catch (err) {
-      console.warn('[keep-alive] ⚠️  Supabase ping failed:', err.message);
+      console.warn('[keep-alive] Supabase ping failed:', err.message);
     }
   }, PING_INTERVAL_MS);
 
-  console.log(`[keep-alive] 🔁 Running every ${PING_INTERVAL_MS / 60000} minutes`);
+  console.log(`[keep-alive] Running every ${PING_INTERVAL_MS / 60000} minutes`);
 }
 
 module.exports = { start };

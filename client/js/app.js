@@ -154,43 +154,49 @@
     });
   });
 
-  // ---- Custom animated dropdowns (register selects) ----
-  // Replaces the native select with an animating listbox while keeping the
+  // ---- Custom animated dropdowns ----
+  // Replaces a native <select> with an animating listbox while keeping the
   // original <select> in the DOM (hidden) as the single source of truth, so
-  // the register submit handler and form reset keep working unchanged.
+  // existing submit handlers, change listeners, and form resets keep working
+  // unchanged. The menu is rebuilt on every open, so selects whose options are
+  // populated dynamically (event pickers, transfer source/target) always show
+  // the current option set.
   const dropdowns = [];
 
-  function initDropdowns() {
-    ['register-course', 'register-year'].forEach(id => {
-      const select = document.getElementById(id);
-      const wrap = select?.closest('.input-icon-wrap');
-      if (!select || !wrap || select.dataset.ddBound) return;
-      select.dataset.ddBound = '1';
+  function bindDropdown(select) {
+    if (!select || select.dataset.ddBound) return;
+    select.dataset.ddBound = '1';
 
-      const dd = document.createElement('div');
-      dd.className = 'dd';
+    const wrap = select.closest('.input-icon-wrap');
+    const dd = document.createElement('div');
+    dd.className = 'dd' + (wrap ? '' : ' dd-system');
+    // Filter-bar selects size themselves via inline min-width; carry it over
+    if (!wrap && select.style.minWidth) dd.style.minWidth = select.style.minWidth;
 
-      const trigger = document.createElement('button');
-      trigger.type = 'button';
-      trigger.className = 'dd-trigger';
-      trigger.setAttribute('aria-haspopup', 'listbox');
-      trigger.setAttribute('aria-expanded', 'false');
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'dd-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
 
-      const label = document.createElement('span');
-      label.className = 'dd-label';
+    const label = document.createElement('span');
+    label.className = 'dd-label';
 
-      const chevron = document.createElement('i');
-      chevron.className = 'dd-chevron ph ph-thin ph-caret-down';
+    const chevron = document.createElement('i');
+    chevron.className = 'dd-chevron ph ph-thin ph-caret-down';
 
-      trigger.append(label, chevron);
+    trigger.append(label, chevron);
 
-      const menu = document.createElement('ul');
-      menu.className = 'dd-menu';
-      menu.setAttribute('role', 'listbox');
+    const menu = document.createElement('ul');
+    menu.className = 'dd-menu';
+    menu.setAttribute('role', 'listbox');
 
+    function buildMenu() {
+      menu.innerHTML = '';
       [...select.options].forEach((opt, i) => {
         const li = document.createElement('li');
         li.textContent = opt.text;
+        if (opt.style?.color) li.style.color = opt.style.color;
         li.dataset.index = i;
         li.setAttribute('role', 'option');
         li.addEventListener('click', () => {
@@ -199,77 +205,91 @@
           select.selectedIndex = i;
           sync();
           markSelected();
+          select.dispatchEvent(new Event('change', { bubbles: true }));
           close();
         });
         menu.appendChild(li);
       });
+    }
 
-      // Clicking the menu's empty padding dismisses it instead of reaching a
-      // covered field below, so a stray click can't accidentally pick an option.
-      menu.addEventListener('click', e => {
-        if (e.target === menu) close();
-      });
-
-      function sync() {
-        const opt = select.options[select.selectedIndex];
-        const hasValue = opt && opt.value;
-        label.textContent = hasValue ? opt.text : select.options[0].text;
-        label.classList.toggle('dd-placeholder', !hasValue);
-      }
-
-      function markSelected() {
-        menu.querySelectorAll('li').forEach(li => {
-          li.classList.toggle('dd-selected', Number(li.dataset.index) === select.selectedIndex);
-        });
-      }
-
-      function open() {
-        dd.classList.add('dd-open');
-        trigger.setAttribute('aria-expanded', 'true');
-        markSelected();
-      }
-
-      function close() {
-        dd.classList.remove('dd-open');
-        trigger.setAttribute('aria-expanded', 'false');
-      }
-
-      trigger.addEventListener('click', e => {
-        // No stopPropagation: letting this bubble to the document-level
-        // listener closes any other open dropdown, so menus never overlap.
-        if (dd.classList.contains('dd-open')) close();
-        else open();
-      });
-
-      trigger.addEventListener('keydown', e => {
-        if (e.key === 'Escape') { close(); trigger.focus(); return; }
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          const delta = e.key === 'ArrowDown' ? 1 : -1;
-          const next = select.selectedIndex + delta;
-          if (next >= 0 && next < select.options.length) {
-            select.selectedIndex = next;
-            sync();
-            markSelected();
-          }
-        }
-      });
-
-      document.addEventListener('click', e => {
-        if (!dd.contains(e.target)) close();
-      });
-
-      dd.append(trigger, menu);
-      wrap.insertBefore(dd, select);
-      select.style.display = 'none';
-      wrap.querySelector('.input-icon-right')?.remove();
-
-      sync();
-      dropdowns.push({ sync });
+    // Clicking the menu's empty padding dismisses it instead of reaching a
+    // covered field below, so a stray click can't accidentally pick an option.
+    menu.addEventListener('click', e => {
+      if (e.target === menu) close();
     });
-}
 
-  initDropdowns();
+    function sync() {
+      const opt = select.options[select.selectedIndex];
+      const hasValue = opt && opt.value;
+      label.textContent = hasValue ? opt.text : select.options[0].text;
+      label.classList.toggle('dd-placeholder', !hasValue);
+    }
+
+    function markSelected() {
+      menu.querySelectorAll('li').forEach(li => {
+        li.classList.toggle('dd-selected', Number(li.dataset.index) === select.selectedIndex);
+      });
+    }
+
+    function open() {
+      buildMenu(); // rebuild so dynamically-added options appear
+      dd.classList.add('dd-open');
+      trigger.setAttribute('aria-expanded', 'true');
+      markSelected();
+    }
+
+    function close() {
+      dd.classList.remove('dd-open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    function pick(index) {
+      if (index >= 0 && index < select.options.length) {
+        select.selectedIndex = index;
+        sync();
+        markSelected();
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+
+    trigger.addEventListener('click', e => {
+      // No stopPropagation: letting this bubble to the document-level
+      // listener closes any other open dropdown, so menus never overlap.
+      if (dd.classList.contains('dd-open')) close();
+      else open();
+    });
+
+    trigger.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { close(); trigger.focus(); return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        pick(select.selectedIndex + (e.key === 'ArrowDown' ? 1 : -1));
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (!dd.contains(e.target)) close();
+    });
+
+    dd.append(trigger, menu);
+    if (wrap) wrap.insertBefore(dd, select);
+    else select.parentNode.insertBefore(dd, select);
+    select.style.display = 'none';
+    wrap?.querySelector('.input-icon-right')?.remove();
+
+    sync();
+    // Keep the label truthful when a form reset clears the hidden select.
+    const form = select.closest('form');
+    if (form) form.addEventListener('reset', sync);
+
+    dropdowns.push({ sync });
+  }
+
+  // Register form selects (have a left input icon + custom chevron in the wrap)
+  ['register-course', 'register-year'].forEach(id => bindDropdown(document.getElementById(id)));
+
+  // Every other select in the logged-in app
+  document.querySelectorAll('#app-screen select').forEach(bindDropdown);
 
   // ---- Logout (sidebar + mobile bottom nav) ----
   document.getElementById('logout-btn').addEventListener('click', async () => {

@@ -485,6 +485,21 @@ html body .hidden {
   font-weight: 600;
 }
 
+/* ---- Custom dropdowns in the logged-in app ----
+   System selects have no left input icon (unlike the register form), so the
+   trigger keeps a normal left padding; inside a .form-group it matches the
+   sizing of sibling inputs. Filter-bar selects keep their inline min-width. */
+.dd-system {
+  flex: 0 0 auto;
+}
+.dd-system .dd-trigger {
+  padding-left: 1rem;
+}
+.form-group .dd-system .dd-trigger {
+  padding: 0.85rem 1rem;
+  font-size: 1.05rem;
+}
+
 /* Lift the field holding an open menu above its siblings — the form fields'
    staggered entrance keeps a retained transform, which stacks them on top of
    the absolutely positioned menu regardless of the menu's own z-index. */

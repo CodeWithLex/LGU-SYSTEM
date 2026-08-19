@@ -70,7 +70,7 @@ async function sendAnnouncementEmail(title, body) {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.subject = `[COE LGU] ${title}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
-      subject: `📢 Announcement: ${title}`,
+      subject: `Announcement: ${title}`,
       preheader: body.slice(0, 100),
       content: `
         <div style="text-align:center;margin-bottom:24px;">
@@ -119,7 +119,7 @@ async function sendNewEventEmail(event) {
     if (!emails.length) return { sent: 0 };
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sendSmtpEmail.subject = `🎯 New Event: ${event.event_name}`;
+    sendSmtpEmail.subject = `New Event: ${event.event_name}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `New Event: ${event.event_name}`,
 preheader: `A new event has been scheduled${event.event_date ? ` for ${new Date(event.event_date).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })}` : ''} — view the full details inside.`,
@@ -210,7 +210,7 @@ content: `
                       text-align: center;
                       line-height: 32px;
                       font-size: 15px;
-                    ">📅</div>
+                    ">D</div>
                   </td>
                   <td style="padding-left: 12px; vertical-align: top;">
                     <p style="
@@ -256,7 +256,7 @@ content: `
                       text-align: center;
                       line-height: 32px;
                       font-size: 15px;
-                    ">💰</div>
+                    ">₱</div>
                   </td>
                   <td style="padding-left: 12px; vertical-align: top;">
                     <p style="
@@ -304,7 +304,7 @@ content: `
                       text-align: center;
                       line-height: 32px;
                       font-size: 15px;
-                    ">📋</div>
+                    ">…</div>
                   </td>
                   <td style="padding-left: 12px; vertical-align: top;">
                     <p style="
