@@ -1569,38 +1569,143 @@ html body.is-admin th.admin-only {
 }
 
 /* =============================================
-   Phase 5 — Custom Loading Splash Screen
+   Skeleton Loading Screen
    ============================================= */
+
+/* Shimmer keyframe */
+@keyframes sk-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+/* The full-screen overlay — mimics the app shell */
 .splash-screen {
   position: fixed;
   inset: 0;
   background: var(--bg-base);
   display: flex !important;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
   z-index: 10000;
-  transition: opacity 0.5s ease, visibility 0.5s;
+  transition: opacity 0.4s ease, visibility 0.4s;
+  overflow: hidden;
 }
 
-.splash-content {
-  text-align: center;
+/* Individual bone — the shimmer tile */
+.sk-bone {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface) 25%,
+    var(--bg-surface-raised) 50%,
+    var(--bg-surface) 75%
+  );
+  background-size: 600px 100%;
+  animation: sk-shimmer 1.6s infinite linear;
+  border-radius: 4px;
+}
+
+.sk-circle {
+  border-radius: 50%;
+}
+
+/* ---- Skeleton Sidebar ---- */
+.sk-sidebar {
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-default);
   display: flex;
   flex-direction: column;
+  padding: 1.5rem 1rem;
+  flex-shrink: 0;
+}
+
+.sk-sidebar-brand {
+  display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: 1.25rem;
 }
 
-.splash-logo {
-  position: relative;
-  color: var(--accent);
+.sk-sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 }
 
-.splash-text {
-  font-family: var(--font-fallback);
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  letter-spacing: 1px;
-  opacity: 0.8;
+.sk-nav-item {
+  height: 38px;
+  border-radius: 6px;
+}
+
+.sk-nav-item--active {
+  background: var(--accent-muted) !important;
+  animation: none; /* active item is a flat tint, not shimmer */
+}
+
+.sk-sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-default);
+}
+
+/* ---- Skeleton Main Content ---- */
+.sk-main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  overflow: hidden;
+}
+
+.sk-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Stat cards — 4 columns matching the real dashboard */
+.sk-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.sk-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Content cards — 1.6fr / 1fr matching the real dashboard grid */
+.sk-cards-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1.25rem;
+}
+
+.sk-content-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.sk-list-row {
+  height: 44px;
+  width: 100%;
+  border-radius: 6px;
 }
 
