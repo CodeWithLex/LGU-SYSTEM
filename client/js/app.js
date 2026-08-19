@@ -4,8 +4,7 @@
 
 (async () => {
 
-  // Initialize Theme and Lucide icons on load
-  UI.Theme.init();
+  // Initialize Lucide icons on load
   if (typeof lucide !== 'undefined') lucide.createIcons();
 
   // ---- Login ----
