@@ -5,9 +5,7 @@
 (async () => {
 
   // Initialize Lucide icons on load
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-
-  // Reveal the brand-panel artwork only after its PNG has finished loading,
+// Reveal the brand-panel artwork only after its PNG has finished loading,
   // so the fade-in always covers the moment it becomes visible.
   const brandPanel = document.querySelector('.auth-brand-panel');
   if (brandPanel) {
@@ -182,8 +180,7 @@
       label.className = 'dd-label';
 
       const chevron = document.createElement('i');
-      chevron.className = 'dd-chevron';
-      chevron.setAttribute('data-lucide', 'chevron-down');
+      chevron.className = 'dd-chevron ph ph-thin ph-caret-down';
 
       trigger.append(label, chevron);
 
@@ -270,9 +267,7 @@
       sync();
       dropdowns.push({ sync });
     });
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+}
 
   initDropdowns();
 

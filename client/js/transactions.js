@@ -25,9 +25,8 @@ const Transactions = (() => {
 
     if (!txs.length) {
       const colSpan = _isAdmin ? 8 : 7;
-      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><i data-lucide="credit-card"></i></span><p>No transactions found.</p></div></td></tr>`;
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      return;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><i class="ph ph-thin ph-credit-card"></i></span><p>No transactions found.</p></div></td></tr>`;
+return;
     }
 
     tbody.innerHTML = txs.map(tx => `
@@ -40,7 +39,7 @@ const Transactions = (() => {
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="paperclip" style="width:14px;"></i> View</a>`
+          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i class="ph ph-thin ph-paperclip" style="font-size:14px" ></i> View</a>`
           : '<span style="color:var(--text-tertiary)">—</span>'}</td>
         <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
         ${_isAdmin ? `
@@ -51,10 +50,10 @@ const Transactions = (() => {
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3" style="width:14px;"></i></button>
+              data-receipt="${tx.receipt_url || ''}"><i class="ph ph-thin ph-pencil-simple-line" style="font-size:14px" ></i></button>
             <button class="tx-action-btn tx-del-btn"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2" style="width:14px;"></i></button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i class="ph ph-thin ph-trash" style="font-size:14px" ></i></button>
           </div>
         </td>` : ''}
       </tr>
@@ -75,10 +74,10 @@ const Transactions = (() => {
                <span class="tx-amount ${tx.type}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
-              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><i data-lucide="paperclip" style="width:14px;"></i> Receipt</a>` : ''}
+              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><i class="ph ph-thin ph-paperclip" style="font-size:14px" ></i> Receipt</a>` : ''}
             </div>
             <div style="font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;">
-              <i data-lucide="user" style="width:10px;height:10px;"></i> ${tx.profiles?.full_name || 'System'}
+              <i class="ph ph-thin ph-user" style="font-size:10px" ></i> ${tx.profiles?.full_name || 'System'}
             </div>
           </div>
           ${_isAdmin ? `
@@ -88,17 +87,15 @@ const Transactions = (() => {
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><i data-lucide="edit-3"></i></button>
+              data-receipt="${tx.receipt_url || ''}"><i class="ph ph-thin ph-pencil-simple-line"></i></button>
             <button class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i data-lucide="trash-2"></i></button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i class="ph ph-thin ph-trash"></i></button>
           </div>` : ''}
         </div>
       `).join('');
     }
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+}
 
   function bindTableEvents() {
     const tbody = document.getElementById('tx-table-body');

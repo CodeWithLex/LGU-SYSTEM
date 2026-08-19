@@ -347,8 +347,7 @@ html body .hidden {
 .input-icon {
   position: absolute;
   left: 1rem;
-  width: 17px;
-  height: 17px;
+  font-size: 17px;
   color: var(--text-tertiary);
   pointer-events: none;
   flex-shrink: 0;
@@ -372,8 +371,7 @@ html body .hidden {
 .input-icon-right {
   left: auto;
   right: 0.9rem;
-  width: 15px;
-  height: 15px;
+  font-size: 15px;
   transition: color 0.2s ease, transform 0.2s ease;
 }
 .input-icon-wrap select:hover + .input-icon-right,
@@ -421,8 +419,7 @@ html body .hidden {
 
 .dd-chevron {
   flex-shrink: 0;
-  width: 15px;
-  height: 15px;
+  font-size: 15px;
   color: var(--text-tertiary);
   transition: color 0.2s ease, transform 0.25s ease;
 }

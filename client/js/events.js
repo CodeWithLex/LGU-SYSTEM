@@ -92,9 +92,7 @@ const Events = (() => {
     grid.querySelectorAll('.event-card').forEach(card => {
       card.addEventListener('click', () => loadEventDetail(card.dataset.id));
     });
-
-    if (window.lucide) lucide.createIcons();
-  }
+}
 
   async function loadEventDetail(id) {
     UI.showView('event-detail');
@@ -111,26 +109,26 @@ const Events = (() => {
           ${UI.renderStatusBadge(ev.status)}
           <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
           <p style="color:var(--text-secondary)">${ev.description || ''}</p>
-          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><i data-lucide="calendar" style="width:14px;"></i> ${UI.dateStr(ev.event_date)}</p>` : ''}
+          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><i class="ph ph-thin ph-calendar" style="font-size:14px" ></i> ${UI.dateStr(ev.event_date)}</p>` : ''}
         </div>
 
         <div class="stats-grid" style="margin-bottom:1.5rem">
           <div class="stat-card stat-balance">
-            <div class="stat-icon"><i data-lucide="wallet"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-wallet"></i></div>
             <div class="stat-body">
               <p class="stat-label">Allocated</p>
               <h3 class="stat-value">${UI.currency(ev.allocated_budget)}</h3>
             </div>
           </div>
           <div class="stat-card stat-expense">
-            <div class="stat-icon"><i data-lucide="trending-down"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-trend-down"></i></div>
             <div class="stat-body">
               <p class="stat-label">Expenses</p>
               <h3 class="stat-value">${UI.currency(spent)}</h3>
             </div>
           </div>
           <div class="stat-card stat-income">
-            <div class="stat-icon"><i data-lucide="building"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-building"></i></div>
             <div class="stat-body">
               <p class="stat-label">Remaining</p>
               <h3 class="stat-value">${UI.currency(ev.computed_remaining)}</h3>
@@ -156,15 +154,13 @@ const Events = (() => {
                     </div>
                     <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
                   </div>
-                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i data-lucide="paperclip" style="width:14px;"></i> Receipt</a>` : ''}
+                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i class="ph ph-thin ph-paperclip" style="font-size:14px" ></i> Receipt</a>` : ''}
                 </div>`).join('')
-              : '<div class="empty-state"><span class="empty-icon"><i data-lucide="credit-card"></i></span><p>No transactions recorded yet.</p></div>'
+              : '<div class="empty-state"><span class="empty-icon"><i class="ph ph-thin ph-credit-card"></i></span><p>No transactions recorded yet.</p></div>'
             }
           </div>
         </div>`;
-      
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    } catch (err) {
+} catch (err) {
       container.innerHTML = `<div class="loading-state">Failed to load event details.</div>`;
     }
   }

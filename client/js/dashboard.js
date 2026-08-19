@@ -102,9 +102,8 @@ const Dashboard = (() => {
         </div>
       `).join('');
     } catch (err) {
-      container.innerHTML = `<div class="loading-state"><i data-lucide="alert-triangle"></i> Failed to load transactions.</div>`;
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
+      container.innerHTML = `<div class="loading-state"><i class="ph ph-thin ph-warning"></i> Failed to load transactions.</div>`;
+}
   }
 
   async function loadAnnouncements() {
@@ -135,9 +134,8 @@ const Dashboard = (() => {
         });
       });
     } catch (err) {
-      container.innerHTML = `<div class="loading-state"><i data-lucide="alert-triangle"></i> Failed to load announcements.</div>`;
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-    }
+      container.innerHTML = `<div class="loading-state"><i class="ph ph-thin ph-warning"></i> Failed to load announcements.</div>`;
+}
   }
 
   function subscribeRealtime() {

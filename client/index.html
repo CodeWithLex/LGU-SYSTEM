@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/main.css" />
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/thin/style.css" />
 </head>
 <body>
 
@@ -42,20 +43,20 @@
           <div class="form-group">
             <label for="login-email">Email Address</label>
             <div class="input-icon-wrap">
-              <i data-lucide="mail" class="input-icon"></i>
+              <i class="ph ph-thin ph-envelope input-icon" ></i>
               <input type="email" id="login-email" placeholder="you@g.cjc.edu.ph" />
             </div>
           </div>
           <div class="form-group">
             <label for="login-password">Password</label>
             <div class="input-icon-wrap">
-              <i data-lucide="lock" class="input-icon"></i>
+              <i class="ph ph-thin ph-lock input-icon" ></i>
               <input type="password" id="login-password" placeholder="••••••••" />
             </div>
           </div>
           <div class="auth-error hidden" id="login-error"></div>
           <button class="btn btn-primary btn-full" id="login-btn" type="button">
-            <i data-lucide="log-in" style="width:16px;height:16px;"></i>
+            <i class="ph ph-thin ph-sign-in" style="font-size:16px" ></i>
             <span>Sign In</span>
           </button>
         </div>
@@ -69,27 +70,27 @@
           <div class="form-group">
             <label for="register-name">Full Name</label>
             <div class="input-icon-wrap">
-              <i data-lucide="user" class="input-icon"></i>
+              <i class="ph ph-thin ph-user input-icon" ></i>
               <input type="text" id="register-name" placeholder="Galawang Ideal Guy" />
             </div>
           </div>
           <div class="form-group">
             <label for="register-course">Course</label>
             <div class="input-icon-wrap">
-              <i data-lucide="book-open" class="input-icon"></i>
+              <i class="ph ph-thin ph-book-open input-icon" ></i>
               <select id="register-course">
                 <option value="" disabled selected>Select course</option>
                 <option value="BSCoE">Computer Engineering</option>
                 <option value="BSCE">Civil Engineering</option>
                 <option value="BSECE">Electronics Engineering</option>
               </select>
-              <i data-lucide="chevron-down" class="input-icon input-icon-right"></i>
+              <i class="ph ph-thin ph-caret-down input-icon input-icon-right" ></i>
             </div>
           </div>
           <div class="form-group">
             <label for="register-year">Year Level</label>
             <div class="input-icon-wrap">
-              <i data-lucide="graduation-cap" class="input-icon"></i>
+              <i class="ph ph-thin ph-graduation-cap input-icon" ></i>
               <select id="register-year">
                 <option value="" disabled selected>Select year level</option>
                 <option value="1">1st Year</option>
@@ -97,13 +98,13 @@
                 <option value="3">3rd Year</option>
                 <option value="4">4th Year</option>
               </select>
-              <i data-lucide="chevron-down" class="input-icon input-icon-right"></i>
+              <i class="ph ph-thin ph-caret-down input-icon input-icon-right" ></i>
             </div>
           </div>
           <div class="form-group">
             <label for="register-email">Email Address</label>
             <div class="input-icon-wrap">
-              <i data-lucide="mail" class="input-icon"></i>
+              <i class="ph ph-thin ph-envelope input-icon" ></i>
               <input type="email" id="register-email" placeholder="you@g.cjc.edu.ph" />
             </div>
             <p class="auth-field-hint">CJC Gmail school account required (@g.cjc.edu.ph)</p>
@@ -111,20 +112,20 @@
           <div class="form-group">
             <label for="register-password">Password</label>
             <div class="input-icon-wrap">
-              <i data-lucide="lock" class="input-icon"></i>
+              <i class="ph ph-thin ph-lock input-icon" ></i>
               <input type="password" id="register-password" placeholder="At least 8 characters" />
             </div>
           </div>
           <div class="form-group">
             <label for="register-confirm">Confirm Password</label>
             <div class="input-icon-wrap">
-              <i data-lucide="shield-check" class="input-icon"></i>
+              <i class="ph ph-thin ph-shield-check input-icon" ></i>
               <input type="password" id="register-confirm" placeholder="Repeat your password" />
             </div>
           </div>
           <div class="auth-error hidden" id="register-error"></div>
           <button class="btn btn-primary btn-full" id="register-btn" type="button">
-            <i data-lucide="user-plus" style="width:16px;height:16px;"></i>
+            <i class="ph ph-thin ph-user-plus" style="font-size:16px" ></i>
             <span>Register</span>
           </button>
         </div>
@@ -151,22 +152,22 @@
 
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-view="dashboard" id="nav-dashboard">
-          <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span>
+          <span class="nav-icon"><i class="ph ph-thin ph-squares-four"></i></span><span>Dashboard</span>
         </a>
         <a href="#" class="nav-item" data-view="events" id="nav-events">
-          <span class="nav-icon"><i data-lucide="calendar"></i></span><span>Events</span>
+          <span class="nav-icon"><i class="ph ph-thin ph-calendar"></i></span><span>Events</span>
         </a>
         <a href="#" class="nav-item" data-view="transactions" id="nav-transactions">
-          <span class="nav-icon"><i data-lucide="receipt"></i></span><span>Transactions</span>
+          <span class="nav-icon"><i class="ph ph-thin ph-receipt"></i></span><span>Transactions</span>
         </a>
         <a href="#" class="nav-item" data-view="income" id="nav-income">
-          <span class="nav-icon"><i data-lucide="piggy-bank"></i></span><span>Total Income</span>
+          <span class="nav-icon"><i class="ph ph-thin ph-piggy-bank"></i></span><span>Total Income</span>
         </a>
         <a href="#" class="nav-item" data-view="reports" id="nav-reports">
-          <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span><span>Reports</span>
+          <span class="nav-icon"><i class="ph ph-thin ph-chart-bar"></i></span><span>Reports</span>
         </a>
         <a href="#" class="nav-item admin-only hidden" data-view="admin" id="nav-admin">
-          <span class="nav-icon"><i data-lucide="shield-check"></i></span><span>Admin</span>
+          <span class="nav-icon"><i class="ph ph-thin ph-shield-check"></i></span><span>Admin</span>
         </a>
       </nav>
 
@@ -179,7 +180,7 @@
           </div>
         </div>
         <div class="sidebar-actions">
-          <button class="btn-icon" id="logout-btn" title="Sign Out"><i data-lucide="log-out"></i></button>
+          <button class="btn-icon" id="logout-btn" title="Sign Out"><i class="ph ph-thin ph-sign-out"></i></button>
         </div>
       </div>
     </aside>
@@ -198,22 +199,22 @@
 
         <div class="stats-grid">
           <div class="stat-card stat-income">
-            <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-trend-up"></i></div>
             <div class="stat-body"><p class="stat-label">Total Income</p><h3 class="stat-value" id="stat-income">₱0.00</h3></div>
             <div class="stat-popover" id="pop-income"></div>
           </div>
           <div class="stat-card stat-expense">
-            <div class="stat-icon"><i data-lucide="trending-down"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-trend-down"></i></div>
             <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value" id="stat-expense">₱0.00</h3></div>
             <div class="stat-popover" id="pop-expense"></div>
           </div>
           <div class="stat-card stat-balance">
-            <div class="stat-icon"><i data-lucide="wallet"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-wallet"></i></div>
             <div class="stat-body"><p class="stat-label">Remaining Balance</p><h3 class="stat-value" id="stat-balance">₱0.00</h3></div>
             <div class="stat-popover" id="pop-balance"></div>
           </div>
           <div class="stat-card stat-donations">
-            <div class="stat-icon"><i data-lucide="heart-handshake"></i></div>
+            <div class="stat-icon"><i class="ph ph-thin ph-hand-heart"></i></div>
             <div class="stat-body"><p class="stat-label">Total Donations</p><h3 class="stat-value" id="stat-donations">₱0.00</h3></div>
             <div class="stat-popover" id="pop-donations"></div>
           </div>
@@ -244,7 +245,7 @@
           </div>
           <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;">
             <div style="position:relative;display:flex;align-items:center;">
-              <i data-lucide="search" style="position:absolute;left:0.75rem;width:14px;height:14px;color:var(--col-text-muted);"></i>
+              <i class="ph ph-thin ph-magnifying-glass" style="position:absolute; left:0.75rem; font-size:14px; color:var(--col-text-muted)" ></i>
               <input type="text" id="events-search" placeholder="Search events…" style="padding:0.55rem 1rem 0.55rem 2.25rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;width:200px;" />
             </div>
             <select id="events-sort" style="padding:0.55rem 1rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;">
@@ -274,13 +275,13 @@
           <div style="display:flex;align-items:center;gap:0.75rem;">
             <h2 style="margin:0;">Financial Ledger</h2>
             <div id="tx-overbudget-alert" class="hidden" style="color:var(--col-danger);padding:0.4rem 0.8rem;background:rgba(239, 68, 68, 0.1);border-radius:100px;font-size:0.75rem;font-weight:700;display:flex;align-items:center;gap:0.4rem;border:1px solid rgba(239, 68, 68, 0.2)">
-              <i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Over Budget
+              <i class="ph ph-thin ph-warning-circle" style="font-size:14px" ></i> Over Budget
             </div>
           </div>
           <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
             <div class="search-input-wrapper" style="position:relative;flex:1;min-width:200px;">
               <input type="text" id="tx-search" placeholder="Search by description or source..." style="padding-left:2.5rem;width:100%;" />
-              <i data-lucide="search" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--col-text-dim);pointer-events:none;"></i>
+              <i class="ph ph-thin ph-magnifying-glass" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); font-size:16px; color:var(--col-text-dim); pointer-events:none" ></i>
             </div>
             <select id="filter-type" style="min-width:140px;">
               <option value="all">All Types</option>
@@ -340,7 +341,7 @@
 
           <!-- Right: Add Income Card (Admin Only) -->
           <div class="dashboard-card admin-only hidden" id="add-income-panel">
-            <h3><i data-lucide="plus-circle" style="color:var(--col-success);margin-right:0.4rem;"></i> Add General Income</h3>
+            <h3><i class="ph ph-thin ph-plus-circle" style="color:var(--col-success); margin-right:0.4rem" ></i> Add General Income</h3>
             <form id="add-income-form" class="admin-form" style="margin-top:1rem;">
               <div class="form-group">
                 <label>Income Type</label>
@@ -401,10 +402,10 @@
 
         <!-- Tab Navigation -->
         <div class="admin-tabs">
-          <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><i data-lucide="file-pen" style="width:16px;height:16px"></i> Create Records</button>
-          <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><i data-lucide="arrow-right-left" style="width:16px;height:16px"></i> Budget Transfer</button>
-          <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><i data-lucide="users" style="width:16px;height:16px"></i> User Management</button>
-          <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><i data-lucide="scroll-text" style="width:16px;height:16px"></i> Audit Log</button>
+          <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><i class="ph ph-thin ph-note-pencil" style="font-size:16px" ></i> Create Records</button>
+          <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><i class="ph ph-thin ph-arrows-left-right" style="font-size:16px" ></i> Budget Transfer</button>
+          <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><i class="ph ph-thin ph-users" style="font-size:16px" ></i> User Management</button>
+          <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><i class="ph ph-thin ph-scroll" style="font-size:16px" ></i> Audit Log</button>
         </div>
 
         <!-- Tab: Create Records -->
@@ -413,7 +414,7 @@
 
             <!-- Create Event -->
             <div class="dashboard-card">
-              <h3><i data-lucide="circle-plus"></i> Create New Event</h3>
+              <h3><i class="ph ph-thin ph-plus-circle"></i> Create New Event</h3>
               <form id="add-event-form" class="admin-form">
                 <div class="form-row">
                   <div class="form-group">
@@ -451,7 +452,7 @@
 
             <!-- Add Transaction -->
             <div class="dashboard-card">
-              <h3><i data-lucide="receipt"></i> Add Transaction</h3>
+              <h3><i class="ph ph-thin ph-receipt"></i> Add Transaction</h3>
               <form id="add-tx-form" class="admin-form">
                 <div class="form-row">
                   <div class="form-group">
@@ -507,7 +508,7 @@
 
             <!-- Post Announcement -->
             <div class="dashboard-card">
-              <h3><i data-lucide="megaphone"></i> Post Announcement</h3>
+              <h3><i class="ph ph-thin ph-megaphone"></i> Post Announcement</h3>
               <form id="add-announce-form" class="admin-form">
                 <div class="form-group">
                   <label>Title</label>
@@ -524,7 +525,7 @@
 
             <!-- Bulk Import Transactions -->
             <div class="dashboard-card">
-              <h3><i data-lucide="file-spreadsheet"></i> Bulk Import CSV</h3>
+              <h3><i class="ph ph-thin ph-file-csv"></i> Bulk Import CSV</h3>
               <p style="color:var(--col-text-muted);font-size:0.85rem;margin-bottom:1rem;line-height:1.4;">Insert multiple transactions at once. Ensure your file matches the template.</p>
               <form id="bulk-import-form" class="admin-form">
                 <div class="form-group">
@@ -539,7 +540,7 @@
                 </div>
                 <div class="form-error hidden" id="bulk-error" style="margin-top:0.75rem;"></div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; padding-top:1rem; border-top:1px solid var(--col-border);">
-                  <button type="button" class="btn btn-secondary" id="download-csv-template" style="font-size:0.8rem; padding:0.4rem 0.6rem;"><i data-lucide="download"></i> Template</button>
+                  <button type="button" class="btn btn-secondary" id="download-csv-template" style="font-size:0.8rem; padding:0.4rem 0.6rem;"><i class="ph ph-thin ph-download-simple"></i> Template</button>
                   <button class="btn btn-primary" type="submit" id="submit-bulk-btn">Import Data</button>
                 </div>
               </form>
@@ -551,7 +552,7 @@
         <!-- Tab: Budget Transfer -->
         <div class="admin-tab-panel" id="admin-tab-transfer">
           <div class="dashboard-card" style="max-width:600px;">
-            <h3><i data-lucide="arrow-right-left"></i> Budget Transfer</h3>
+            <h3><i class="ph ph-thin ph-arrows-left-right"></i> Budget Transfer</h3>
             <p style="color:var(--col-text-muted);margin-bottom:1.25rem;font-size:.9rem;">
               Move surplus funds from one event to another. A transfer record is automatically created on the target event.
             </p>
@@ -580,7 +581,7 @@
                     <div style="color:var(--col-text-muted);font-size:0.7rem;text-transform:uppercase;margin-bottom:0.25rem;">Source Balance</div>
                     <div id="tp-from-val" style="font-weight:700;">₱0.00</div>
                   </div>
-                  <div style="color:var(--col-text-muted);"><i data-lucide="arrow-right"></i></div>
+                  <div style="color:var(--col-text-muted);"><i class="ph ph-thin ph-arrow-right"></i></div>
                   <div id="tp-to" style="flex:1;text-align:right;">
                     <div style="color:var(--col-text-muted);font-size:0.7rem;text-transform:uppercase;margin-bottom:0.25rem;">Target Balance</div>
                     <div id="tp-to-val" style="font-weight:700;">₱0.00</div>
@@ -611,22 +612,22 @@
   <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
   <nav class="bottom-nav" id="bottom-nav">
     <a href="#" class="bottom-nav-item active" data-view="dashboard">
-      <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span><span>Dashboard</span>
+      <span class="nav-icon"><i class="ph ph-thin ph-squares-four"></i></span><span>Dashboard</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="events">
-      <span class="nav-icon"><i data-lucide="calendar"></i></span><span>Events</span>
+      <span class="nav-icon"><i class="ph ph-thin ph-calendar"></i></span><span>Events</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="transactions">
-      <span class="nav-icon"><i data-lucide="receipt"></i></span><span>Ledger</span>
+      <span class="nav-icon"><i class="ph ph-thin ph-receipt"></i></span><span>Ledger</span>
     </a>
     <a href="#" class="bottom-nav-item" data-view="reports">
-      <span class="nav-icon"><i data-lucide="bar-chart-2"></i></span><span>Reports</span>
+      <span class="nav-icon"><i class="ph ph-thin ph-chart-bar"></i></span><span>Reports</span>
     </a>
     <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
-      <span class="nav-icon"><i data-lucide="shield-check"></i></span><span>Admin</span>
+      <span class="nav-icon"><i class="ph ph-thin ph-shield-check"></i></span><span>Admin</span>
     </a>
     <button class="bottom-nav-item" id="bottom-logout-btn" style="background:none;border:none;cursor:pointer;">
-      <span class="nav-icon"><i data-lucide="log-out"></i></span><span>Logout</span>
+      <span class="nav-icon"><i class="ph ph-thin ph-sign-out"></i></span><span>Logout</span>
     </button>
   </nav>
 

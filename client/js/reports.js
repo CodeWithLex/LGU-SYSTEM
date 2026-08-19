@@ -21,9 +21,7 @@ async function initReports() {
     container.innerHTML = buildReportsHTML(summary, monthly, events);
 
     // CRITICAL: re-create Lucide icons after dynamic HTML injection
-    if (window.lucide) lucide.createIcons();
-
-    // Render charts after DOM is ready
+// Render charts after DOM is ready
     requestAnimationFrame(() => {
       renderMonthlyChart(monthly);
       renderBreakdownChart(summary.breakdown);
@@ -41,7 +39,7 @@ async function initReports() {
     const isSessionErr = err.message.includes('session');
     container.innerHTML = `
       <div class="empty-state">
-        <i data-lucide="alert-triangle" style="width:48px;height:48px;color:var(--col-danger);margin-bottom:1rem;"></i>
+        <i class="ph ph-thin ph-warning" style="font-size:48px; color:var(--col-danger); margin-bottom:1rem" ></i>
         <p style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">${isSessionErr ? 'Session Expired' : 'Failed to Load Reports'}</p>
         <p style="color:var(--col-text-muted);margin-bottom:1.5rem;max-width:300px;margin-left:auto;margin-right:auto;">
           ${err.message}
@@ -50,8 +48,7 @@ async function initReports() {
           ? `<button class="btn btn-primary" onclick="Auth.logout()">Sign In Again</button>` 
           : `<button class="btn btn-ghost" onclick="Reports.load()">Retry</button>`}
       </div>`;
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+}
 }
 
 function fmt(n) {
@@ -67,19 +64,19 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Summary Cards -->
     <div class="stats-grid" style="margin-bottom:2rem;">
       <div class="stat-card stat-income">
-        <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+        <div class="stat-icon"><i class="ph ph-thin ph-trend-up"></i></div>
         <div class="stat-body"><p class="stat-label">Total Income</p><h3 class="stat-value">${fmt(summary.totalIncome)}</h3></div>
       </div>
       <div class="stat-card stat-expense">
-        <div class="stat-icon"><i data-lucide="trending-down"></i></div>
+        <div class="stat-icon"><i class="ph ph-thin ph-trend-down"></i></div>
         <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value">${fmt(summary.totalExpense)}</h3></div>
       </div>
       <div class="stat-card stat-balance">
-        <div class="stat-icon"><i data-lucide="wallet"></i></div>
+        <div class="stat-icon"><i class="ph ph-thin ph-wallet"></i></div>
         <div class="stat-body"><p class="stat-label">Net Balance</p><h3 class="stat-value">${fmt(summary.remainingBalance)}</h3></div>
       </div>
       <div class="stat-card stat-donations">
-        <div class="stat-icon"><i data-lucide="percent"></i></div>
+        <div class="stat-icon"><i class="ph ph-thin ph-percent"></i></div>
         <div class="stat-body"><p class="stat-label">Budget Utilized</p><h3 class="stat-value">${utilized}%</h3></div>
       </div>
     </div>
@@ -87,13 +84,13 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Charts Row -->
     <div class="dashboard-grid" style="margin-bottom:2rem;">
       <div class="dashboard-card">
-        <h3><i data-lucide="bar-chart-2" style="width:1rem;height:1rem;margin-right:.4rem;vertical-align:middle;"></i>Monthly Income vs Expenses</h3>
+        <h3><i class="ph ph-thin ph-chart-bar" style="font-size:1rem; margin-right:.4rem; vertical-align:middle" ></i>Monthly Income vs Expenses</h3>
         <div style="position:relative;height:260px;">
           <canvas id="monthly-chart"></canvas>
         </div>
       </div>
       <div class="dashboard-card">
-        <h3><i data-lucide="pie-chart" style="width:1rem;height:1rem;margin-right:.4rem;vertical-align:middle;"></i>Breakdown by Type</h3>
+        <h3><i class="ph ph-thin ph-chart-pie" style="font-size:1rem; margin-right:.4rem; vertical-align:middle" ></i>Breakdown by Type</h3>
         <div style="position:relative;height:260px;">
           <canvas id="breakdown-chart"></canvas>
         </div>
@@ -103,11 +100,11 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Event Reports Table -->
     <div class="dashboard-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <h3 style="margin:0;"><i data-lucide="file-text" style="width:1rem;height:1rem;margin-right:.4rem;vertical-align:middle;"></i>Export Per-Event Reports</h3>
+        <h3 style="margin:0;"><i class="ph ph-thin ph-file-text" style="font-size:1rem; margin-right:.4rem; vertical-align:middle" ></i>Export Per-Event Reports</h3>
         <span style="font-size:.8rem;color:var(--text-secondary);">Admin only</span>
       </div>
       ${events.length === 0
-        ? `<div class="empty-state"><i data-lucide="info"></i> No events found.</div>`
+        ? `<div class="empty-state"><i class="ph ph-thin ph-info"></i> No events found.</div>`
         : `<div class="table-wrapper">
           <table class="data-table">
             <thead>
@@ -130,11 +127,11 @@ function buildReportsHTML(summary, monthly, events) {
                     <div style="display:inline-flex;gap:.5rem;">
                       <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-pdf="${ev.id}" data-name="${ev.event_name}">
-                        <i data-lucide="file-text" style="width:.85rem;height:.85rem;margin-right:.3rem;"></i>PDF
+                        <i class="ph ph-thin ph-file-text" style="font-size:.85rem; margin-right:.3rem" ></i>PDF
                       </button>
                       <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-excel="${ev.id}" data-name="${ev.event_name}">
-                        <i data-lucide="sheet" style="width:.85rem;height:.85rem;margin-right:.3rem;"></i>Excel
+                        <i class="ph ph-thin ph-table" style="font-size:.85rem; margin-right:.3rem" ></i>Excel
                       </button>
                     </div>
                   </td>
@@ -165,10 +162,10 @@ function buildReportsHTML(summary, monthly, events) {
 
               <div class="data-card-actions" style="margin-top:1rem;padding-top:0.5rem;gap:0.4rem;">
                 <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
-                  <i data-lucide="file-text"></i> PDF
+                  <i class="ph ph-thin ph-file-text"></i> PDF
                 </button>
                 <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-excel="${ev.id}" data-name="${ev.event_name}">
-                  <i data-lucide="sheet"></i> Excel
+                  <i class="ph ph-thin ph-table"></i> Excel
                 </button>
               </div>
             </div>
@@ -330,8 +327,7 @@ async function downloadReport(type, eventId, eventName) {
     alert(`Download failed: ${err.message}`);
   } finally {
     if (btn && originalHTML) { btn.disabled = false; btn.innerHTML = originalHTML; }
-    if (window.lucide) lucide.createIcons();
-  }
+}
 }
 
 // Export global namespace for app.js navigation

@@ -16,8 +16,7 @@ const UI = (() => {
     if (nav)  nav.classList.add('active');
 
     // Re-render Lucide icons in case this view has dynamic content
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+}
 
   function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -47,16 +46,14 @@ const UI = (() => {
       success: 'check-circle', 
       error: 'x-circle', 
       info: 'info', 
-      warning: 'alert-triangle' 
+      warning: 'warning' 
     };
     
     const iconName = icons[type] || 'check-circle';
-    iconEl.innerHTML = `<i data-lucide="${iconName}" style="width:18px;height:18px;"></i>`;
+    iconEl.innerHTML = `<i class="ph ph-thin ph-${iconName}" style="font-size:18px;"></i>`;
     msgEl.textContent = message;
     
     toastEl.classList.remove('hidden');
-
-    if (typeof lucide !== 'undefined') lucide.createIcons();
 
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.add('hidden'), 3500);
@@ -103,8 +100,6 @@ const UI = (() => {
       }
     });
 
-    // Re-render icons for any newly shown/hidden elements
-    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
 
   // ---- Loading / Empty states ----
@@ -119,15 +114,14 @@ const UI = (() => {
       </div>`;
   }
 
-  function setEmpty(containerId, icon = 'inbox', text = 'No data available.') {
+  function setEmpty(containerId, icon = 'tray', text = 'No data available.') {
     const el = document.getElementById(containerId);
     if (el) {
       el.innerHTML = `
         <div class="empty-state">
-          <span class="empty-icon"><i data-lucide="${icon}"></i></span>
+          <span class="empty-icon"><i class="ph ph-thin ph-${icon}"></i></span>
           <p>${text}</p>
         </div>`;
-      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   }
 

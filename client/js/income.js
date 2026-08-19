@@ -20,9 +20,8 @@ const Income = (() => {
   function renderTable(txs) {
     const tbody = document.getElementById('income-table-body');
     if (!txs.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span class="empty-icon"><i data-lucide="piggy-bank"></i></span><p>No income recorded yet.</p></div></td></tr>`;
-      if (typeof lucide !== 'undefined') lucide.createIcons();
-      return;
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span class="empty-icon"><i class="ph ph-thin ph-piggy-bank"></i></span><p>No income recorded yet.</p></div></td></tr>`;
+return;
     }
 
     tbody.innerHTML = txs.map(tx => `
@@ -34,9 +33,7 @@ const Income = (() => {
         <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || 'System'}</td>
       </tr>
     `).join('');
-    
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+}
 
   function bindForm() {
     const form = document.getElementById('add-income-form');
