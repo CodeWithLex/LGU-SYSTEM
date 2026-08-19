@@ -219,17 +219,7 @@ html body .hidden {
 .auth-brand-panel {
   position: relative;
   flex: 0 0 50%;
-  background:
-    /* Diagonal stripe layer */
-    repeating-linear-gradient(
-      -55deg,
-      transparent,
-      transparent 40px,
-      rgba(232, 135, 74, 0.03) 40px,
-      rgba(232, 135, 74, 0.03) 41px
-    ),
-    /* Base gradient: dark but not dead black */
-    linear-gradient(160deg, #111214 0%, #0D0E10 60%, #0A0B0D 100%);
+  background: #0D0E10;   /* flat, single color — no stripes, no gradients */
   border-right: 1px solid var(--border-default);
   display: flex;
   align-items: center;
@@ -250,17 +240,17 @@ html body .hidden {
   gap: 2rem;
 }
 
-/* Identity block — logo + title side by side */
+/* Identity block — logo stacked above title */
 .auth-identity {
   display: flex;
-  align-items: center;
-  gap: 1.1rem;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
 }
 
 .auth-brand-logo-img {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
   border-radius: 50%;
   flex-shrink: 0;
@@ -324,6 +314,19 @@ html body .hidden {
   margin-top: 0.25rem;
   line-height: 1.55;
   font-family: var(--font-body);
+}
+
+/* ---- Auth inputs — dark-on-dark, no white boxes ---- */
+.auth-form-panel .form-group input,
+.auth-form-panel .form-group select {
+  background: #131417;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+.auth-form-panel .form-group input:focus,
+.auth-form-panel .form-group select:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 /* Icon-wrapped input */
@@ -578,6 +581,8 @@ html body .hidden {
   background: var(--accent);
   color: var(--accent-text-on);
   border: 1px solid var(--accent);
+  padding: 0.78rem 1.4rem;
+  font-weight: 700;
 }
 
 .btn-primary:hover {
