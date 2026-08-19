@@ -4,8 +4,9 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-const { isPositiveNumber, isValidEnum, sanitizeText } = require('../lib/validate');
+const { isPositiveNumber, isValidEnum, isValidUUID, sanitizeText } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
+const { logError } = require('../lib/logger');
 
 function requireAdmin(req, res, next) {
   if (req.profile?.role !== 'admin') {
@@ -31,6 +32,9 @@ router.patch('/users/:id/role', async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
 
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
   if (!isValidEnum(role, ['admin', 'student'])) {
     return res.status(400).json({ error: 'Role must be "admin" or "student".' });
   }
@@ -65,8 +69,8 @@ router.get('/audit-logs', async (req, res) => {
     .range(offset, offset + limit - 1);
 
   if (error) {
-    console.error('Audit Log Error:', error);
-    return res.status(500).json({ error: error.message || 'Failed to fetch audit logs.' });
+    logError('Audit Log Error', error);
+    return res.status(500).json({ error: 'Failed to fetch audit logs.' });
   }
 
   // Manual join for profiles to bypass missing FK relationships
@@ -242,6 +246,10 @@ router.post('/budget-transfer', async (req, res) => {
 // ── PATCH /api/admin/events/:id/archive ──────────────────────────────────────
 router.patch('/events/:id/archive', async (req, res) => {
   const { id } = req.params;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
 
   const { data: ev, error: evErr } = await supabase
     .from('events')

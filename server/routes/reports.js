@@ -3,6 +3,8 @@ const router   = express.Router();
 const supabase = require('../lib/supabase');
 const PDFDocument = require('pdfkit');
 const ExcelJS    = require('exceljs');
+const { isValidUUID } = require('../lib/validate');
+const { logError } = require('../lib/logger');
 
 // Admin guard
 function requireAdmin(req, res, next) {
@@ -19,8 +21,8 @@ router.get('/summary', async (req, res) => {
     supabase.from('events').select('allocated_budget')
   ]);
 
-  if (txErr) return res.status(500).json({ error: txErr.message });
-  if (evErr) return res.status(500).json({ error: evErr.message });
+  if (txErr) { logError('Report Summary Error', txErr); return res.status(500).json({ error: 'Failed to fetch report summary.' }); }
+  if (evErr) { logError('Report Summary Error', evErr); return res.status(500).json({ error: 'Failed to fetch report summary.' }); }
 
   const summary = txs.reduce((acc, tx) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
@@ -66,7 +68,7 @@ router.get('/monthly', async (req, res) => {
     .select('type, amount, transaction_date')
     .order('transaction_date', { ascending: true });
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) { logError('Monthly Report Error', error); return res.status(500).json({ error: 'Failed to fetch monthly report.' }); }
 
   const monthly = {};
   data.forEach(tx => {
@@ -91,7 +93,7 @@ router.get('/events-summary', async (req, res) => {
     supabase.from('transactions').select('event_id, type, amount')
   ]);
 
-  if (evtErr) return res.status(500).json({ error: evtErr.message });
+  if (evtErr) { logError('Events Summary Error', evtErr); return res.status(500).json({ error: 'Failed to fetch events summary.' }); }
 
   const txStats = {};
   if (transactions) {
@@ -119,6 +121,10 @@ router.get('/events-summary', async (req, res) => {
 router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
   const { eventId } = req.params;
 
+  if (!isValidUUID(eventId)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
+
   const [{ data: event, error: evtErr }, { data: transactions, error: txErr }] =
     await Promise.all([
       supabase.from('events').select('*').eq('id', eventId).single(),
@@ -126,7 +132,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
     ]);
 
   if (evtErr) return res.status(404).json({ error: 'Event not found.' });
-  if (txErr)  return res.status(500).json({ error: txErr.message });
+  if (txErr)  { logError('Report PDF Error', txErr); return res.status(500).json({ error: 'Failed to fetch transactions.' }); }
 
   // ── Build PDF ──
   const doc = new PDFDocument({ margin: 50, size: 'A4' });
@@ -244,6 +250,10 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
 router.get('/excel/:eventId', requireAdmin, async (req, res) => {
   const { eventId } = req.params;
 
+  if (!isValidUUID(eventId)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
+
   const [{ data: event, error: evtErr }, { data: transactions, error: txErr }] =
     await Promise.all([
       supabase.from('events').select('*').eq('id', eventId).single(),
@@ -251,7 +261,7 @@ router.get('/excel/:eventId', requireAdmin, async (req, res) => {
     ]);
 
   if (evtErr) return res.status(404).json({ error: 'Event not found.' });
-  if (txErr)  return res.status(500).json({ error: txErr.message });
+  if (txErr)  { logError('Report Excel Error', txErr); return res.status(500).json({ error: 'Failed to fetch transactions.' }); }
 
   const workbook  = new ExcelJS.Workbook();
   workbook.creator = 'COE Financial Transparency System';

@@ -30,7 +30,7 @@ BEGIN
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'COE Member'),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'student'),
+    'student', -- Hard-coded: role must never come from client-supplied metadata (privilege escalation)
     NEW.raw_user_meta_data->>'course',
     NEW.raw_user_meta_data->>'year_level'
   );

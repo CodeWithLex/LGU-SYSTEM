@@ -14,6 +14,12 @@ window.API_BASE = window.IS_ELECTRON
 if (typeof supabase === 'undefined') {
   console.error('❌ Supabase CDN failed to load. Check your internet connection.');
 } else {
-  window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON);
+  window.supabaseClient = supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON, {
+    auth: {
+      storage: window.localStorage, // explicit — never fall back to cookie storage
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  });
 }
 

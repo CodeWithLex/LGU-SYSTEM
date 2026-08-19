@@ -2,6 +2,7 @@
 // server/lib/audit.js — Audit Logging
 // =============================================
 const supabase = require('./supabase');
+const { logError } = require('./logger');
 
 /**
  * Inserts an audit log entry for admin actions.
@@ -21,7 +22,7 @@ async function logAudit(userId, action, details = {}) {
     });
   } catch (err) {
     // Never crash the app over audit logging failure
-    console.error('[Audit] Failed to write audit log:', err.message);
+    logError('Audit', err);
   }
 }
 

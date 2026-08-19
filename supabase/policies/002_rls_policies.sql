@@ -31,6 +31,10 @@ CREATE POLICY "Profiles are viewable by authenticated users"
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE USING (id = auth.uid());
 
+-- Explicit admin-only delete (prevents accidental or foreign deletes via API keys)
+CREATE POLICY "Only admins can delete profiles"
+  ON public.profiles FOR DELETE USING (public.is_admin());
+
 -- =============================================
 -- POLICIES: events
 -- =============================================

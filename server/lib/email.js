@@ -3,6 +3,7 @@
 // =============================================
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 const supabase = require('./supabase');
+const { logError } = require('./logger');
 
 const APP_URL = 'https://coelgu-system.engineer';
 
@@ -101,7 +102,7 @@ async function sendAnnouncementEmail(title, body) {
     console.log(`[Email] Announcement sent via Brevo: ${data.messageId}`);
     return { sent: emails.length };
   } catch (err) {
-    console.error('[Email] ERROR sending announcement:', err);
+    logError('Email Announcement Error', err);
     return { sent: 0, error: err.message };
   }
 }
@@ -383,7 +384,7 @@ content: `
     console.log(`[Email] Event notification sent via Brevo: ${data.messageId}`);
     return { sent: emails.length };
   } catch (err) {
-    console.error('[Email] ERROR sending event notification:', err);
+    logError('Email Event Notification Error', err);
     return { sent: 0, error: err.message };
   }
 }

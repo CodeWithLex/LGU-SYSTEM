@@ -1,8 +1,9 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-const { sanitizeText, validateDriveUrl, isPositiveNumber, isValidEnum, assertRequired } = require('../lib/validate');
+const { sanitizeText, validateDriveUrl, isPositiveNumber, isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
+const { logError } = require('../lib/logger');
 
 const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation'];
 const MAX_LIMIT      = 100;
@@ -201,7 +202,8 @@ router.post('/bulk', requireAdmin, async (req, res) => {
     .select();
 
   if (error) {
-    return res.status(500).json({ error: 'Database bulk insert failed: ' + error.message });
+    logError('Bulk Insert Error', error);
+    return res.status(500).json({ error: 'Database bulk insert failed.' });
   }
 
   logAudit(req.user.id, 'BULK_IMPORT_TRANSACTIONS', { 
@@ -216,6 +218,10 @@ router.post('/bulk', requireAdmin, async (req, res) => {
 router.patch('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { amount, description, transaction_date, reason, receipt_url } = req.body;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
 
   if (!reason || String(reason).trim().length < 5) {
     return res.status(400).json({ error: 'A reason of at least 5 characters is required to edit a transaction.' });
@@ -251,6 +257,10 @@ router.patch('/:id', requireAdmin, async (req, res) => {
 router.delete('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { reason } = req.body;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
 
   if (!reason || String(reason).trim().length < 5) {
     return res.status(400).json({ error: 'A reason of at least 5 characters is required to delete a transaction.' });

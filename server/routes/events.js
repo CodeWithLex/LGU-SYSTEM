@@ -1,7 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-const { sanitizeText, isPositiveNumber, isValidEnum, assertRequired } = require('../lib/validate');
+const { sanitizeText, isPositiveNumber, isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { sendNewEventEmail } = require('../lib/email');
 
@@ -55,6 +55,10 @@ router.get('/', async (req, res) => {
 // GET /api/events/:id
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
 
   const [{ data: event, error: evtErr }, { data: transactions, error: txErr }] =
     await Promise.all([
@@ -155,6 +159,10 @@ router.post('/', requireAdmin, async (req, res) => {
 router.patch('/:id', requireAdmin, async (req, res) => {
   const { id }    = req.params;
   const { event_name, description, allocated_budget, event_date, status } = req.body;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid ID format.' });
+  }
 
   // Build a clean updates object — only include provided fields
   const updates = {};

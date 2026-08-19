@@ -3,7 +3,7 @@ const express    = require("express");
 const cors       = require("cors");
 const path       = require("path");
 const helmet     = require("helmet");
-const rateLimit  = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 
 const eventsRouter        = require("./routes/events");
 const transactionsRouter  = require("./routes/transactions");
@@ -15,6 +15,10 @@ const keepAlive           = require("./lib/keepAlive");
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// Trust the first proxy hop (Render/Vercel) so req.ip reflects the real client
+// IP — required for per-IP rate limiting to work behind a reverse proxy.
+app.set('trust proxy', 1);
 
 // =============================================
 // Security: Helmet (sets 11+ security headers)
@@ -40,6 +44,16 @@ app.use(helmet({
     }
   },
   crossOriginEmbedderPolicy: false, // needed for Supabase realtime
+  referrerPolicy: {
+    policy: 'strict-origin-when-cross-origin',
+  },
+  permissionsPolicy: {
+    features: {
+      camera:      [],
+      microphone:  [],
+      geolocation: [],
+    },
+  },
 }));
 
 // =============================================
@@ -70,26 +84,53 @@ app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 
 // =============================================
-// Global Rate Limiting — 1000 req / 15 min per IP
+// Rate Limiting
 // =============================================
+// Global cap — 1000 req / 15 min per IP
 const globalLimiter = rateLimit({
   windowMs:         15 * 60 * 1000, // 15 minutes
   max:              1000,
   standardHeaders:  true,
   legacyHeaders:    false,
   message:          { error: 'Too many requests. Please wait 15 minutes and try again.' },
-  skip: (req) => req.path === '/api/health', // exempt health check
+  skip: (req) => req.originalUrl === '/api/health', // exempt health check
 });
 app.use('/api/', globalLimiter);
 
-// Stricter limiter for specific operations if needed (presently just a reference)
+// Sensitive operations with high blast radius (email blasts, bulk imports,
+// role changes, budget transfers) — tight per-IP cap, applied before auth.
+// Note: req.path here is stripped of the '/api' mount prefix.
+const sensitiveLimiter = rateLimit({
+  windowMs:         10 * 60 * 1000, // 10 minutes
+  max:              20,
+  standardHeaders:  true,
+  legacyHeaders:    false,
+  message:          { error: 'Too many sensitive operations. Please slow down.' },
+  skip: (req) => !(
+    (req.method === 'POST' && ['/events', '/announcements', '/transactions/bulk', '/admin/budget-transfer'].includes(req.path)) ||
+    (req.method === 'PATCH' && /^\/admin\/users\/[^/]+\/role$/.test(req.path))
+  ),
+});
+app.use('/api/', sensitiveLimiter);
+
+// Write cap — 100 mutating requests / 5 min, keyed by authenticated user
+// (falls back to IP). Only counts POST/PATCH/DELETE; mounted after auth.
 const writeLimiter = rateLimit({
   windowMs:        5 * 60 * 1000, // 5 minutes
   max:             100,
   standardHeaders: true,
   legacyHeaders:   false,
   message:         { error: 'Too many write requests. Slow down.' },
+  keyGenerator:    (req) => req.user?.id || ipKeyGenerator(req),
 });
+
+// Wrapper so a limiter only counts mutating requests (GET/HEAD/OPTIONS pass through).
+function onlyWrites(limiter) {
+  return (req, res, next) => {
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+    return limiter(req, res, next);
+  };
+}
 
 // =============================================
 // Serve static frontend files
@@ -106,11 +147,11 @@ app.get("/api/health", (req, res) => {
 // =============================================
 // Protected API Routes
 // =============================================
-app.use("/api/events",        authMiddleware, eventsRouter);
-app.use("/api/transactions",  authMiddleware, transactionsRouter);
-app.use("/api/reports",       authMiddleware, reportsRouter);
-app.use("/api/announcements", authMiddleware, announcementsRouter);
-app.use("/api/admin",         authMiddleware, adminRouter);
+app.use("/api/events",        authMiddleware, onlyWrites(writeLimiter), eventsRouter);
+app.use("/api/transactions",  authMiddleware, onlyWrites(writeLimiter), transactionsRouter);
+app.use("/api/reports",       authMiddleware, onlyWrites(writeLimiter), reportsRouter);
+app.use("/api/announcements", authMiddleware, onlyWrites(writeLimiter), announcementsRouter);
+app.use("/api/admin",         authMiddleware, onlyWrites(writeLimiter), adminRouter);
 
 // =============================================
 // SPA Fallback

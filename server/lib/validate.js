@@ -54,6 +54,16 @@ function isValidEnum(val, allowed) {
 }
 
 /**
+ * Validates that a value is a canonical UUID (any version/variant).
+ * Prevents malformed IDs from reaching Supabase queries.
+ */
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUUID(val) {
+  return typeof val === 'string' && UUID_REGEX.test(val);
+}
+
+/**
  * Checks that all required fields are present and non-empty.
  * Returns null if valid, or an error message string if not.
  */
@@ -72,5 +82,6 @@ module.exports = {
   validateDriveUrl,
   isPositiveNumber,
   isValidEnum,
+  isValidUUID,
   assertRequired,
 };
