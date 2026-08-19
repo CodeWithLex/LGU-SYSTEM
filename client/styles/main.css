@@ -1,5 +1,5 @@
 /* =============================================
-   COE Budget Transparency System · Design System
+   College of Engineering · Official Student Portal · Design System
    ============================================= */
 
 /* ---- Design Tokens ---- */
@@ -380,7 +380,10 @@ html body .hidden {
   }
 
   .auth-identity h1 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
+  }
+  .auth-identity p {
+    font-size: 0.78rem;
   }
 
   .auth-form-panel {
@@ -647,16 +650,20 @@ html body .hidden {
 }
 
 .sidebar-header h2 {
-  font-size: 1.05rem;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .sidebar-tagline {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-tertiary);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .sidebar-nav {
