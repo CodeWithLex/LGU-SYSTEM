@@ -197,12 +197,20 @@
         li.dataset.index = i;
         li.setAttribute('role', 'option');
         li.addEventListener('click', () => {
+          // Disabled placeholder option — clicking it just dismisses the menu
+          if (opt.disabled) { close(); return; }
           select.selectedIndex = i;
           sync();
           markSelected();
           close();
         });
         menu.appendChild(li);
+      });
+
+      // Clicking the menu's empty padding dismisses it instead of reaching a
+      // covered field below, so a stray click can't accidentally pick an option.
+      menu.addEventListener('click', e => {
+        if (e.target === menu) close();
       });
 
       function sync() {
@@ -230,7 +238,8 @@
       }
 
       trigger.addEventListener('click', e => {
-        e.stopPropagation();
+        // No stopPropagation: letting this bubble to the document-level
+        // listener closes any other open dropdown, so menus never overlap.
         if (dd.classList.contains('dd-open')) close();
         else open();
       });
