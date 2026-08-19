@@ -105,11 +105,19 @@
       return;
     }
 
+    // School-only registration — personal email accounts are rejected
+    const schoolDomain = '@g.cjc.edu.ph';
+    if (!email.toLowerCase().endsWith(schoolDomain)) {
+      errEl.textContent = 'Only @g.cjc.edu.ph school accounts can register.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
     btn.textContent = 'Registering…';
     btn.disabled = true;
 
     try {
-      const data = await Auth.register(name, email, pass, { course, year });
+      const data = await Auth.register(name, email, pass, { course, year_level: year });
       if (data.session) {
         // Email confirmation disabled — session already active
         await bootApp(data.session);

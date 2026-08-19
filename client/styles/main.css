@@ -450,6 +450,13 @@ html body .hidden {
   margin-bottom: 1rem;
 }
 
+/* Small helper text under a form field (e.g. school-email requirement) */
+.auth-field-hint {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
 .auth-error {
   background: rgba(248, 113, 113, 0.1);
   border: 1px solid var(--col-danger);
