@@ -45,6 +45,95 @@
     if (e.key === 'Enter') document.getElementById('login-btn').click();
   });
 
+  // ---- Toggle between Sign in / Register ----
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  const switchBtn = document.getElementById('auth-switch-btn');
+  const switchHint = document.getElementById('auth-switch-hint');
+
+  function showAuthForm(which) {
+    const toLogin = which === 'login';
+    loginForm.classList.toggle('active', toLogin);
+    registerForm.classList.toggle('active', !toLogin);
+    switchHint.textContent = toLogin ? "Don't have an account?" : 'Already have an account?';
+    switchBtn.textContent = toLogin ? 'Register' : 'Sign in';
+    // Clear stale messages and reset register fields when switching
+    const loginErr = document.getElementById('login-error');
+    loginErr.classList.remove('auth-success');
+    loginErr.classList.add('auth-error');
+    loginErr.classList.add('hidden');
+    document.getElementById('register-error').classList.add('hidden');
+    if (!toLogin) {
+      ['register-name', 'register-email', 'register-password', 'register-confirm'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    }
+  }
+
+  switchBtn.addEventListener('click', () => {
+    showAuthForm(loginForm.classList.contains('active') ? 'register' : 'login');
+  });
+
+  // ---- Register ----
+  document.getElementById('register-btn').addEventListener('click', async () => {
+    const errEl = document.getElementById('register-error');
+    const btn = document.getElementById('register-btn');
+    const name = document.getElementById('register-name').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const pass = document.getElementById('register-password').value;
+    const confirm = document.getElementById('register-confirm').value;
+
+    errEl.classList.add('hidden');
+
+    if (!name || !email || !pass || !confirm) {
+      errEl.textContent = 'Please fill in all fields.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (pass.length < 8) {
+      errEl.textContent = 'Password must be at least 8 characters long.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (pass !== confirm) {
+      errEl.textContent = 'Passwords do not match.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    btn.textContent = 'Registering…';
+    btn.disabled = true;
+
+    try {
+      const data = await Auth.register(name, email, pass);
+      if (data.session) {
+        // Email confirmation disabled — session already active
+        await bootApp(data.session);
+      } else {
+        // Confirmation email sent — return to login with a success message
+        showAuthForm('login');
+        const loginErr = document.getElementById('login-error');
+        loginErr.classList.remove('auth-error');
+        loginErr.classList.add('auth-success');
+        loginErr.textContent = 'Account created! Please confirm your email address before signing in.';
+        loginErr.classList.remove('hidden');
+      }
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove('hidden');
+    } finally {
+      btn.textContent = 'Register';
+      btn.disabled = false;
+    }
+  });
+
+  // Allow Enter key on register form
+  ['register-password', 'register-confirm'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('register-btn').click();
+    });
+  });
+
   // ---- Logout (sidebar + mobile bottom nav) ----
   document.getElementById('logout-btn').addEventListener('click', async () => {
     await Auth.logout();

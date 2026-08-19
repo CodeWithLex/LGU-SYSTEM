@@ -10,6 +10,16 @@ const Auth = (() => {
     return data;
   }
 
+  async function register(fullName, email, password) {
+    const { data, error } = await window.supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: fullName } },
+    });
+    if (error) throw error;
+    return data;
+  }
+
   async function logout() {
     await window.supabaseClient.auth.signOut();
   }
@@ -40,5 +50,5 @@ const Auth = (() => {
     });
   }
 
-  return { login, logout, getSession, getProfile, onAuthChange };
+  return { login, register, logout, getSession, getProfile, onAuthChange };
 })();

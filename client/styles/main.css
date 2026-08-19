@@ -407,6 +407,41 @@ html body .hidden {
   display: block;
 }
 
+/* Auth form toggle — switch between Sign in / Register */
+.auth-switch {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.auth-switch-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 0.25rem;
+  font: inherit;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+  transition: filter var(--transition);
+}
+.auth-switch-btn:hover {
+  filter: brightness(1.2);
+  text-decoration: underline;
+}
+
+/* Success variant of the auth message box (used after registration) */
+.auth-success {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid var(--status-positive);
+  color: var(--status-positive);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
 .auth-error {
   background: rgba(248, 113, 113, 0.1);
   border: 1px solid var(--col-danger);

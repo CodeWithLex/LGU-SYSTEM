@@ -59,6 +59,52 @@
             <span>Sign In</span>
           </button>
         </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form">
+          <div class="auth-form-header">
+            <h2>Create account</h2>
+            <p>Register to access the student portal.</p>
+          </div>
+          <div class="form-group">
+            <label for="register-name">Full Name</label>
+            <div class="input-icon-wrap">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="register-name" placeholder="Juan Dela Cruz" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-email">Email Address</label>
+            <div class="input-icon-wrap">
+              <i data-lucide="mail" class="input-icon"></i>
+              <input type="email" id="register-email" placeholder="you@g.cjc.edu.ph" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <div class="input-icon-wrap">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="register-password" placeholder="At least 8 characters" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-confirm">Confirm Password</label>
+            <div class="input-icon-wrap">
+              <i data-lucide="shield-check" class="input-icon"></i>
+              <input type="password" id="register-confirm" placeholder="Repeat your password" />
+            </div>
+          </div>
+          <div class="auth-error hidden" id="register-error"></div>
+          <button class="btn btn-primary btn-full" id="register-btn" type="button">
+            <i data-lucide="user-plus" style="width:16px;height:16px;"></i>
+            <span>Register</span>
+          </button>
+        </div>
+
+        <p class="auth-switch">
+          <span id="auth-switch-hint">Don't have an account?</span>
+          <button type="button" id="auth-switch-btn" class="auth-switch-btn">Register</button>
+        </p>
       </div>
     </div>
   </div>
