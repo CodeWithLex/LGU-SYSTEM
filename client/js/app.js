@@ -23,17 +23,29 @@
 
   // ---- Google OAuth SSO ----
   document.getElementById('google-sso-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('google-sso-btn');
+    btn.disabled = true;
+    btn.querySelector('span').textContent = 'Redirecting…';
     try {
       const { error } = await window.supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
-          queryParams: { hd: 'g.cjc.edu.ph' }   // restrict to CJC domain
+          redirectTo: window.location.origin + '/index.html',
+          queryParams: {
+            hd: 'g.cjc.edu.ph'   // restrict login to CJC Google Workspace domain
+          }
         }
       });
-      if (error) UI.toast(error.message, 'error');
+      if (error) {
+        UI.toast(error.message, 'error');
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Continue with CJC Google Account';
+      }
+      // On success, browser redirects — no else needed
     } catch (e) {
-      UI.toast('Google sign-in failed. Try email instead.', 'error');
+      UI.toast('Google sign-in unavailable. Try email instead.', 'error');
+      btn.disabled = false;
+      btn.querySelector('span').textContent = 'Continue with CJC Google Account';
     }
   });
 
