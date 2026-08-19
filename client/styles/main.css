@@ -180,73 +180,13 @@ html body .hidden {
 
 /* ---- Left Brand Panel ---- */
 .auth-brand-panel {
-  position: relative;
   flex: 0 0 50%;
   background-color: #0D0E10; /* fallback while the image loads */
-  background-image:
-    linear-gradient(rgba(10, 10, 11, 0.68), rgba(10, 10, 11, 0.5)),
-    url('../assets/login-bg.png');
+  background-image: url('../assets/login-bg.png');
   background-size: cover;
   background-position: center;
   border-right: 1px solid var(--border-default);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
-}
-
-.auth-brand-content {
-  position: relative;
-  z-index: 1;
-  max-width: 380px;
-  padding: 3rem 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-/* Identity block — logo stacked above title */
-.auth-identity {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1.25rem;
-}
-
-.auth-brand-logo-img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  border-radius: 50%;
-  flex-shrink: 0;
-  /* No glow ring — too decorative for an institutional portal */
-  box-shadow: none;
-}
-
-.auth-identity h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.2;
-  color: var(--text-primary);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-}
-
-.auth-identity p {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin-top: 0.5rem;
-  line-height: 1.65;
-  font-family: var(--font-body);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.auth-brand-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  max-width: 340px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 /* ---- Right Form Panel ---- */
@@ -341,20 +281,8 @@ html body .hidden {
   .auth-brand-panel {
     border-right: none;
     border-bottom: 1px solid var(--border-default);
-    padding: 2.5rem 1.5rem;
+    height: 240px;
     flex: 0 0 auto;
-  }
-
-  .auth-brand-content {
-    padding: 0;
-    gap: 1.25rem;
-  }
-
-  .auth-identity h1 {
-    font-size: 1.35rem;
-  }
-  .auth-identity p {
-    font-size: 0.78rem;
   }
 
   .auth-form-panel {
