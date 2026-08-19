@@ -110,7 +110,13 @@ const UI = (() => {
   // ---- Loading / Empty states ----
   function setLoading(containerId, text = 'Loading…') {
     const el = document.getElementById(containerId);
-    if (el) el.innerHTML = `<div class="loading-state">${text}</div>`;
+    if (el) el.innerHTML = `
+      <div class="skeleton-stack" role="status" aria-label="${text}">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line short"></div>
+        <div class="skeleton skeleton-line"></div>
+      </div>`;
   }
 
   function setEmpty(containerId, icon = 'inbox', text = 'No data available.') {

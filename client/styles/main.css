@@ -40,10 +40,33 @@
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-fallback: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Typographic scale (used by base heading/body rules) */
+  --size-11: 11px;
+  --size-13: 13px;
+  --size-15: 15px;
+  --size-18: 18px;
+  --size-22: 22px;
+  --size-28: 28px;
 
   /* Layout & Animation Utilities (Retained for Structural Integrity) */
   --sidebar-w: 240px;
   --transition: 0.25s ease;
+
+  /* ---- Legacy aliases (kept for compatibility with older components) ----
+     These resolve to the current token system so leftover --col-* references
+     render correctly instead of silently falling back to browser defaults. */
+  --col-bg: var(--bg-base);
+  --col-card: var(--bg-surface);
+  --col-surface: var(--bg-surface);
+  --col-border: var(--border-default);
+  --col-text: var(--text-primary);
+  --col-text-muted: var(--text-secondary);
+  --col-text-dim: var(--text-tertiary);
+  --col-danger: var(--status-negative);
+  --col-success: var(--status-positive);
+  --col-primary: var(--accent);
 }
 
 [data-theme="light"] {
@@ -85,6 +108,19 @@
   animation: fadeIn 0.3s ease;
 }
 .view.active { display: block; }
+
+/* ---- Accessibility & input basics ---- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 16px minimum prevents iOS Safari zoom-on-focus for any unstyled input */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
 
 /* Smooth Theme Transition */
 body.theme-transitioning,
@@ -292,7 +328,7 @@ html body .hidden {
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
-  font-size: 0.95rem;
+  font-size: 1rem; /* 16px — prevents iOS zoom-on-focus */
   color: var(--text-primary);
   transition: border-color var(--transition);
   outline: none;
@@ -388,6 +424,13 @@ html body .hidden {
 .bottom-nav-item:active,
 .admin-tab-btn:active {
   transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
 }
 
 .btn-primary {
@@ -613,12 +656,15 @@ html body .hidden {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   margin-bottom: 1.75rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--col-bg);
-  padding: 0.5rem 0;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-default);
+  padding: 0.5rem 0 0.85rem;
 }
 
 .view-header h2 {
@@ -654,7 +700,6 @@ html body .hidden {
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  overflow: hidden;
   transition: border-color var(--transition);
   cursor: pointer;
 }
@@ -686,6 +731,13 @@ html body .hidden {
   opacity: 1;
   visibility: visible;
   transform: translateY(12px);
+}
+
+/* Right-column popovers align to the card's right edge so they never overflow
+   the viewport on wide screens or the second column on mobile. */
+.stat-card:nth-child(even) .stat-popover {
+  left: auto;
+  right: 0;
 }
 
 .stat-pop-row {
@@ -1056,7 +1108,7 @@ html body .hidden {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 0.87rem;
+  font-size: 1rem; /* 16px — prevents iOS zoom-on-focus */
   transition: all var(--transition);
 }
 
@@ -1176,6 +1228,39 @@ html body .hidden {
   font-size: 2.5rem;
   margin-bottom: 0.75rem;
   display: block;
+}
+
+/* ---- Skeleton Loading ---- */
+.skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-raised) 25%,
+    rgba(128, 128, 128, 0.12) 37%,
+    var(--bg-surface-raised) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skeleton-title { height: 18px; width: 55%; }
+.skeleton-line { height: 12px; }
+.skeleton-line.short { width: 40%; }
+.skeleton-card { height: 88px; }
+
+@keyframes shimmer {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
 }
 
 /* =============================================
@@ -1401,35 +1486,11 @@ html body .hidden {
    Phase 4 — Admin Tabs & Modals
    ============================================= */
 
-/* Admin Tab Navigation */
-.admin-tabs {
-  display: flex;
-  gap: .5rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-.admin-tab-btn {
-  background: var(--col-card);
-  border: 1px solid var(--col-border);
-  color: var(--col-text-muted);
-  padding: .55rem 1.1rem;
-  border-radius: var(--radius-sm);
-  font-size: .85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.admin-tab-btn:hover { color: var(--col-text); border-color: var(--col-primary); }
-.admin-tab-btn.active {
-  background: var(--col-primary);
-  color: #fff;
-  border-color: var(--col-primary);
-}
-
 /* Admin Tabs Navigation */
 .admin-tabs {
   display: flex;
   gap: 1.5rem;
+  flex-wrap: wrap;
   border-bottom: 1px solid var(--border-default);
   margin-bottom: 1.5rem;
 }
