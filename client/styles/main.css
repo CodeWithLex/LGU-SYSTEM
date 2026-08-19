@@ -276,19 +276,26 @@ html body .hidden {
   display: block;
 }
 
+.auth-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 .auth-brand-text h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.04em;
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--text-primary);
 }
 
 .auth-brand-text p {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  margin-top: 0.6rem;
-  line-height: 1.6;
+  margin-top: 0.5rem;
+  line-height: 1.65;
+  font-family: var(--font-body);
 }
 
 .auth-brand-features {
@@ -301,8 +308,9 @@ html body .hidden {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: 0.825rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
 }
 
 .auth-feat-dot {
@@ -348,16 +356,18 @@ html body .hidden {
 }
 
 .auth-form-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   color: var(--text-primary);
 }
 
 .auth-form-header p {
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   color: var(--text-secondary);
-  margin-top: 0.3rem;
+  margin-top: 0.25rem;
+  line-height: 1.55;
+  font-family: var(--font-body);
 }
 
 /* Icon-wrapped input */
@@ -502,12 +512,12 @@ html body .hidden {
 }
 .form-group label {
   display: block;
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 0.4rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
 }
 
 .form-group input,
