@@ -248,25 +248,26 @@ html body .hidden {
 
 .auth-form-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 460px;
 }
 
 .auth-form-header {
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
 .auth-form-header h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
 }
 
 .auth-form-header p {
-  font-size: 0.825rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
-  margin-top: 0.25rem;
-  line-height: 1.55;
+  margin-top: 0.5rem;
+  line-height: 1.6;
   font-family: var(--font-body);
 }
 
@@ -303,9 +304,9 @@ html body .hidden {
 
 .input-icon {
   position: absolute;
-  left: 0.85rem;
-  width: 15px;
-  height: 15px;
+  left: 1rem;
+  width: 17px;
+  height: 17px;
   color: var(--text-tertiary);
   pointer-events: none;
   flex-shrink: 0;
@@ -313,7 +314,7 @@ html body .hidden {
 
 .input-icon-wrap input {
   width: 100%;
-  padding-left: 2.65rem !important;
+  padding-left: 2.9rem !important;
 }
 
 .auth-error {
@@ -428,10 +429,10 @@ html body .hidden {
 }
 .form-group label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.45rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
@@ -440,11 +441,11 @@ html body .hidden {
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 0.7rem 1rem;
+  padding: 0.85rem 1rem;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
-  font-size: 1rem; /* 16px — prevents iOS zoom-on-focus */
+  font-size: 1.05rem; /* ≥16px — prevents iOS zoom-on-focus */
   color: var(--text-primary);
   transition: border-color var(--transition);
   outline: none;
@@ -580,6 +581,12 @@ html body .hidden {
 
 .btn-full {
   width: 100%;
+}
+
+/* Auth form button — scaled up to match the enlarged form typography */
+.auth-form .btn-primary {
+  padding: 0.9rem 1.4rem;
+  font-size: 1rem;
 }
 
 .btn-icon {
