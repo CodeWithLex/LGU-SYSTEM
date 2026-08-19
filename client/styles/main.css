@@ -1127,18 +1127,41 @@ html body .hidden {
 }
 
 .announce-item h4 {
-  font-size: 0.88rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--text-primary);
+  margin-bottom: 0.35rem;
 }
-.announce-item p {
-  font-size: 0.8rem;
+.announce-body {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.65;
+  font-size: 0.875rem;
   color: var(--text-secondary);
 }
-.announce-date {
-  font-size: 0.72rem;
-  color: var(--text-tertiary);
+.announce-body.expanded {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+.announce-expand-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.25rem 0;
+  cursor: pointer;
   margin-top: 0.3rem;
+}
+.announce-expand-btn:hover {
+  text-decoration: underline;
+}
+.announce-date {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 0.5rem;
 }
 
 /* =============================================

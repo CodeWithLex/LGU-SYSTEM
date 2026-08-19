@@ -121,10 +121,19 @@ const Dashboard = (() => {
       container.innerHTML = data.map(a => `
         <div class="announce-item">
           <h4>${a.title}</h4>
-          <p>${a.body}</p>
+          <p class="announce-body">${a.body.replace(/\n/g, '<br>')}</p>
+          ${a.body.length > 200 ? '<button class="announce-expand-btn" type="button">Show more</button>' : ''}
           <div class="announce-date">${UI.dateStr(a.created_at)}</div>
         </div>
       `).join('');
+
+      container.querySelectorAll('.announce-expand-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const bodyEl = btn.closest('.announce-item').querySelector('.announce-body');
+          const expanded = bodyEl.classList.toggle('expanded');
+          btn.textContent = expanded ? 'Show less' : 'Show more';
+        });
+      });
     } catch (err) {
       container.innerHTML = `<div class="loading-state"><i data-lucide="alert-triangle"></i> Failed to load announcements.</div>`;
       if (typeof lucide !== 'undefined') lucide.createIcons();
