@@ -283,6 +283,17 @@ html body .hidden {
   outline: none;
 }
 
+/* Force dark theme during browser autofill (UA default light-blue/yellow surfaces) */
+.auth-form-panel input:-webkit-autofill,
+.auth-form-panel input:-webkit-autofill:hover,
+.auth-form-panel input:-webkit-autofill:focus,
+.auth-form-panel input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  /* Translucent shadow override keeps the input dark-mode surface color */
+  box-shadow: 0 0 0 1000px #131417 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* Icon-wrapped input */
 .input-icon-wrap {
   position: relative;
@@ -544,13 +555,16 @@ html body .hidden {
   border: 1px solid var(--accent);
   padding: 0.78rem 1.4rem;
   font-weight: 700;
+  transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
 }
-
 .btn-primary:hover {
-  filter: brightness(0.92);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 16px rgba(232, 135, 74, 0.22);
 }
 .btn-primary:active {
-  filter: brightness(0.85);
+  transform: scale(0.98);
+  filter: brightness(0.95);
+  box-shadow: none;
 }
 
 .btn-ghost {
