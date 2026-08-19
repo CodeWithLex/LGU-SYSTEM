@@ -207,11 +207,12 @@ html body .hidden {
 }
 
 .auth-identity h1 {
-  font-size: 2.4rem;
+  font-size: clamp(1.8rem, 2.8vw, 2.25rem); /* fluid scale: fits on one line at any desktop width */
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.15;
   color: var(--text-primary);
+  white-space: nowrap; /* force single line — never allow wrapping on desktop */
 }
 
 .auth-subtitle {
