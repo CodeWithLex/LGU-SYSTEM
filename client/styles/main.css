@@ -185,14 +185,33 @@ html body .hidden {
   position: relative;
   flex: 0 0 50%;
   background-color: #0D0E10; /* fallback while the pattern loads */
-  background-image: url('../assets/bg-pattern-front.png');
-  background-size: cover;
-  background-position: center;
   border-right: 1px solid var(--border-default);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Pattern artwork — kept invisible until the PNG finishes loading, then it
+   fades in with a subtle zoom so it never pops onto the screen. */
+.auth-brand-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/bg-pattern-front.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.auth-brand-panel.brand-pattern-ready::before {
+  animation: brandPatternIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes brandPatternIn {
+  from { opacity: 0; transform: scale(1.06); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 /* Foreground branding content */
@@ -231,6 +250,21 @@ html body .hidden {
   color: var(--text-tertiary);
   line-height: 1.7;
   max-width: 400px;
+}
+
+/* Entrance cascade for brand typography — same rhythm as the auth form fields */
+.auth-brand-content .auth-identity h1,
+.auth-brand-content .auth-identity .auth-subtitle,
+.auth-brand-content .auth-brand-desc {
+  animation: brandTextIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.auth-brand-content .auth-identity h1            { animation-delay: 0.1s; }
+.auth-brand-content .auth-identity .auth-subtitle { animation-delay: 0.28s; }
+.auth-brand-content .auth-brand-desc             { animation-delay: 0.46s; }
+
+@keyframes brandTextIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ---- Right Form Panel ---- */
@@ -1547,6 +1581,11 @@ html body .hidden {
   .skeleton { animation: none; }
   .auth-form.active,
   .auth-form.active > * { animation: none !important; }
+  .auth-brand-panel::before { opacity: 1; }
+  .auth-brand-panel::before,
+  .auth-brand-content .auth-identity h1,
+  .auth-brand-content .auth-identity .auth-subtitle,
+  .auth-brand-content .auth-brand-desc { animation: none !important; }
 }
 
 /* =============================================

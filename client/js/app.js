@@ -7,6 +7,15 @@
   // Initialize Lucide icons on load
   if (typeof lucide !== 'undefined') lucide.createIcons();
 
+  // Reveal the brand-panel artwork only after its PNG has finished loading,
+  // so the fade-in always covers the moment it becomes visible.
+  const brandPanel = document.querySelector('.auth-brand-panel');
+  if (brandPanel) {
+    const pattern = new Image();
+    pattern.onload = pattern.onerror = () => brandPanel.classList.add('brand-pattern-ready');
+    pattern.src = 'assets/bg-pattern-front.png';
+  }
+
   // ---- Login ----
   document.getElementById('login-btn').addEventListener('click', async () => {
     const errEl = document.getElementById('login-error');
