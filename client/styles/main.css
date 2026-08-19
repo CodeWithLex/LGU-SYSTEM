@@ -192,7 +192,11 @@ html body .hidden {
 /* ---- Right Form Panel ---- */
 .auth-form-panel {
   flex: 0 0 50%;
-  background: var(--bg-base);
+  background-color: var(--bg-base);
+  /* Static engineering-grid hairlines — 1px, ~3% white, no blur/fade */
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 28px);
   display: flex;
   align-items: center;
   justify-content: center;
