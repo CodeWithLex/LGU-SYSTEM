@@ -313,7 +313,7 @@ html body .hidden {
 
 .input-icon-wrap input {
   width: 100%;
-  padding-left: 2.5rem;
+  padding-left: 2.65rem !important;
 }
 
 .auth-error {
