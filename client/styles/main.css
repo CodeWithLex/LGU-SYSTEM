@@ -627,7 +627,7 @@ html body .hidden {
   margin-left: 0.25rem;
   font: inherit;
   font-weight: 600;
-  color: var(--accent-blue);
+  color: var(--accent); /* primary action — orange, not blue */
   cursor: pointer;
   transition: filter var(--transition);
 }
@@ -652,6 +652,25 @@ html body .hidden {
   margin-top: 0.35rem;
   font-size: 0.75rem;
   color: var(--text-tertiary);
+}
+
+/* ---- Auth forms: neutral grays only ----
+   The app-wide slate text tokens carry a blue tint that reads wrong against
+   the navy brand panel. Labels, hints, placeholders, and chevrons here stay
+   neutral so the login/register forms have no blue in their icons or text. */
+.auth-form-panel .auth-form-header p,
+.auth-form-panel .form-group label {
+  color: rgba(255, 255, 255, 0.55);
+}
+.auth-form-panel .auth-field-hint {
+  color: rgba(255, 255, 255, 0.4);
+}
+.auth-form-panel .dd-label.dd-placeholder,
+.auth-form-panel .dd-chevron {
+  color: rgba(255, 255, 255, 0.35);
+}
+.auth-form-panel .dd-menu li {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .auth-error {
