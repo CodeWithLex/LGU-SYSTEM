@@ -2487,40 +2487,49 @@ html body.is-admin th.admin-only {
   font-size: 0.78rem;
 }
 
-/* Year filter tabs (sticky under the topbar while the checklist scrolls) */
-.unit-year-tabs {
+/* Year filter tabs — segmented pill with a sliding active backplate */
+.units-filter-tabs-wrapper {
   position: sticky;
   top: 5.5rem;
   z-index: 5;
-  display: flex;
-  gap: 0.4rem;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-  overflow-x: auto;
-  background: var(--bg-base);
-  border-bottom: 1px solid var(--border-default);
-}
-.unit-year-tab {
-  flex: 0 0 auto;
-  padding: 0.35rem 0.9rem;
+  display: inline-flex;
+  background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: 999px;
-  background: var(--bg-surface);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+.units-tab-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  bottom: 4px;
+  width: 0;
+  background: var(--accent); /* Engineering Orange */
+  border-radius: 999px;
+  transition: transform 0.28s cubic-bezier(0.25, 1, 0.5, 1),
+              width 0.28s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none;
+  z-index: 1;
+}
+.units-tab-btn {
+  position: relative;
+  z-index: 2;
+  background: transparent !important; /* Managed by slider */
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
   color: var(--text-secondary);
   font-size: 0.78rem;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all var(--transition);
+  outline: none;
+  transition: color 0.24s ease;
 }
-.unit-year-tab:hover {
-  color: var(--text-primary);
-  border-color: var(--border-hover);
-}
-.unit-year-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-text-on);
-}
+.units-tab-btn:hover { color: var(--text-primary); }
+.units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
 /* ---- Responsive ---- */
 @media (max-width: 1024px) {
@@ -2539,6 +2548,10 @@ html body.is-admin th.admin-only {
 @media (max-width: 480px) {
   .units-layout { grid-template-columns: 1fr !important; }
   .units-progress-stats { grid-template-columns: 1fr !important; }
+
+  /* Keep all five tabs on one row; the slider morphs to the tighter buttons */
+  .units-filter-tabs-wrapper { max-width: 100%; }
+  .units-tab-btn { padding: 0.4rem 0.7rem; font-size: 0.72rem; }
 
   .unit-row {
     display: flex !important;

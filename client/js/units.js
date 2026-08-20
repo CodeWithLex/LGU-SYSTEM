@@ -143,9 +143,10 @@ const Units = (() => {
     }).filter(y => y.sems.length);
 
     container.innerHTML = `
-      <div class="unit-year-tabs" role="group" aria-label="Filter subjects by year">
+      <div class="units-filter-tabs-wrapper" role="group" aria-label="Filter subjects by year">
+        <div class="units-tab-slider" id="units-tab-slider"></div>
         ${['all', '1', '2', '3', '4'].map(y => `
-          <button type="button" class="unit-year-tab${selectedYear === y ? ' active' : ''}" data-year="${y}">${y === 'all' ? 'All' : `Year ${y}`}</button>
+          <button type="button" class="units-tab-btn${selectedYear === y ? ' active' : ''}" data-year="${y}">${y === 'all' ? 'All' : `Year ${y}`}</button>
         `).join('')}
       </div>
       ${years.map(({ year, sems }) => `
@@ -160,7 +161,9 @@ const Units = (() => {
       </div>
     `).join('')}`;
 
+    sliderInit = false; // a fresh bar positions itself instantly, then animates
     applyYearFilter();
+    updateTabSlider();
   }
 
   // Show only the selected year's blocks (or all); keeps the active tab in sync.
@@ -168,9 +171,38 @@ const Units = (() => {
     document.querySelectorAll('#units-checklist .unit-year').forEach(el => {
       el.style.display = (selectedYear === 'all' || el.dataset.year === selectedYear) ? '' : 'none';
     });
-    document.querySelectorAll('#units-checklist .unit-year-tab').forEach(t => {
+    document.querySelectorAll('#units-checklist .units-tab-btn').forEach(t => {
       t.classList.toggle('active', t.dataset.year === selectedYear);
     });
+  }
+
+  // Slide + morph the orange backplate onto the active tab.
+  let sliderInit = false;
+
+  function updateTabSlider() {
+    const activeTab = document.querySelector('.units-tab-btn.active');
+    const slider = document.getElementById('units-tab-slider');
+    const wrapper = document.querySelector('.units-filter-tabs-wrapper');
+    if (!activeTab || !slider || !wrapper) return;
+
+    // The slider's absolute `left: 4px` rests at the content start (padding
+    // edge + padding), so translate relative to the content box — measuring
+    // from the border-box would leave the pill offset by the border width.
+    const cs = getComputedStyle(wrapper);
+    const contentLeft = wrapper.getBoundingClientRect().left
+      + (parseFloat(cs.borderLeftWidth) || 0)
+      + (parseFloat(cs.paddingLeft) || 0);
+
+    const tabRect = activeTab.getBoundingClientRect();
+
+    if (!sliderInit) slider.style.transition = 'none';
+    slider.style.width = `${tabRect.width}px`;
+    slider.style.transform = `translateX(${tabRect.left - contentLeft}px)`;
+    if (!sliderInit) {
+      void slider.offsetWidth; // commit position before enabling the transition
+      slider.style.transition = '';
+      sliderInit = true;
+    }
   }
 
   function subjectRow(s) {
@@ -296,6 +328,7 @@ const Units = (() => {
     if (tab) {
       selectedYear = tab.dataset.year;
       applyYearFilter();
+      updateTabSlider();
       return;
     }
 
@@ -322,6 +355,9 @@ const Units = (() => {
     e.target.dataset.userSet = '1';
     load();
   });
+
+  // Keep the slider pinned to the active tab when the layout resizes.
+  window.addEventListener('resize', updateTabSlider);
 
   return { load };
 })();
