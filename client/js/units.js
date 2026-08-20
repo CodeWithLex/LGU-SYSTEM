@@ -143,9 +143,15 @@ const Units = (() => {
     document.getElementById('units-completed').textContent = completed;
     document.getElementById('units-total').textContent = total || '—';
 
-    // Estimated graduation cohort: enrollment year + 4 (fallback: current year + 4)
-    const created = profile?.created_at ? new Date(profile.created_at) : null;
-    const cohort = (created && !isNaN(created)) ? created.getFullYear() + 4 : new Date().getFullYear() + 4;
+    // Estimated graduation cohort: enrollment year + 4. Prefer the stored
+    // enrollment_year (a student who enrolled in 2024 graduates 2028 even if
+    // they created their account later); fall back to the account creation
+    // year for profiles that predate the enrollment_year column.
+    const enrollmentYear =
+      profile?.enrollment_year
+        ? Number(profile.enrollment_year)
+        : (profile?.created_at ? new Date(profile.created_at).getFullYear() : new Date().getFullYear());
+    const cohort = enrollmentYear + 4;
     document.getElementById('units-cohort-year').textContent = cohort;
   }
 
