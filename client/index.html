@@ -403,7 +403,11 @@
             <h2>Credit Unit Tracker</h2>
             <p class="view-sub">Log your subjects, grades, and graduation progress</p>
           </div>
-          <div class="units-program-picker">
+          <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;">
+            <button class="btn btn-ghost" id="units-download-pdf" type="button">
+              <iconify-icon icon="icon-park-outline:download" style="font-size:1rem; margin-right:.35rem; vertical-align:middle;"></iconify-icon>Download Standing (PDF)
+            </button>
+            <div class="units-program-picker">
             <label for="units-program" class="text-label">Program</label>
             <select id="units-program" style="min-width:220px">
               <option value="BSCoE">Computer Engineering</option>
@@ -411,6 +415,7 @@
               <option value="BSECE">Electronics Engineering</option>
             </select>
             <span class="units-program-lock hidden" id="units-program-lock"><iconify-icon icon="icon-park-outline:lock"></iconify-icon> Locked to your enrolled program</span>
+            </div>
           </div>
         </div>
 

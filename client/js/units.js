@@ -350,6 +350,41 @@ const Units = (() => {
     }
   }
 
+  // ---- Download standing (PDF transcript of Yr 1–4) ----
+  async function downloadStanding() {
+    const btn = document.getElementById('units-download-pdf');
+    const token = window._authToken;
+    if (!token) { UI.toast('Please log in again.', 'error'); return; }
+
+    const originalHTML = btn ? btn.innerHTML : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = 'Generating…'; }
+
+    try {
+      const res = await fetch(`${window.API_BASE}/api/units/standing`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const cd   = res.headers.get('Content-Disposition') || '';
+      const name = cd.match(/filename="?([^";]+)"?/);
+      a.href     = url;
+      a.download = name ? name[1] : 'Academic-Standing.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      UI.toast(err.message, 'error');
+    } finally {
+      if (btn && originalHTML) { btn.disabled = false; btn.innerHTML = originalHTML; }
+    }
+  }
+
   // ---- Event wiring (runs once at script load) ----
   document.getElementById('units-filter-tabs-wrapper').addEventListener('click', e => {
     const tab = e.target.closest('[data-year]');
@@ -384,6 +419,8 @@ const Units = (() => {
     e.target.dataset.userSet = '1';
     load();
   });
+
+  document.getElementById('units-download-pdf').addEventListener('click', downloadStanding);
 
   // Keep the slider pinned to the active tab when the layout resizes.
   window.addEventListener('resize', updateTabSlider);
