@@ -1072,7 +1072,7 @@ html body .hidden {
 /* ---- Views ---- */
 .view {
   display: none;
-  padding: 2rem;
+  padding: 0 2rem 2rem;
   animation: fadeIn 0.3s ease;
 }
 .view.active {
@@ -1102,7 +1102,7 @@ html body .hidden {
   z-index: 100;
   background: var(--bg-base);
   border-bottom: 1px solid var(--border-default);
-  padding: 0.5rem 0 0.85rem;
+  padding: 2.5rem 0 0.85rem;
 }
 
 .view-header h2 {
@@ -1814,9 +1814,9 @@ iconify-icon {
 
   .form-row { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  .view { padding: 1.25rem 1rem; }
+  .view { padding: 0 1rem 1rem; }
 
-  .view-header { flex-wrap: wrap; gap: 0.75rem; }
+  .view-header { flex-wrap: wrap; gap: 0.75rem; padding-top: 1.75rem; }
   .view-header h2 { font-size: 1.3rem; }
 
   .data-table th,
@@ -1951,7 +1951,8 @@ iconify-icon {
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
   body .main-content { padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
-  body .view { padding: 0.75rem !important; }
+  body .view { padding: 0 0.75rem 0.75rem !important; }
+  body .view-header { padding-top: 1.25rem !important; }
   body .auth-card { margin: 0.5rem !important; padding: 1.25rem 1rem !important; }
   body .table-wrapper { 
     margin: 0 -0.75rem !important; 
@@ -2285,7 +2286,7 @@ html body.is-admin th.admin-only {
   border-radius: var(--radius-md);
   padding: 1.5rem;
   position: sticky;
-  top: 5.5rem;
+  top: 8rem; /* clears the taller pinned view-header */
 }
 
 .units-progress-head {
