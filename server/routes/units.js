@@ -6,6 +6,8 @@
 // =============================================
 const express  = require('express');
 const router   = express.Router();
+const fs       = require('fs');
+const path     = require('path');
 const supabase = require('../lib/supabase');
 const PDFDocument = require('pdfkit');
 const { isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
@@ -28,6 +30,7 @@ const STATUS_LABELS = {
   incomplete: 'Incomplete',
 };
 const SEM_LABELS = { 1: '1st Semester', 2: '2nd Semester', 3: 'Summer Term' };
+const SEM_SHORT  = { 1: '1st Sem', 2: '2nd Sem', 3: 'Summer' };
 
 function isValidGrade(val) {
   if (val === null || val === undefined || val === '') return true;
@@ -151,6 +154,8 @@ router.get('/standing', async (req, res) => {
     const fullName = req.profile?.full_name || req.user.email || 'Student';
 
     // ── Build PDF ──
+    // Institutional letterhead style: light pages, dark text, a single thin
+    // engineering-orange rule as the only accent. No heavy dark bands.
     const doc = new PDFDocument({ margin: 50, size: 'A4' });
 
     res.setHeader('Content-Type', 'application/pdf');
@@ -158,69 +163,90 @@ router.get('/standing', async (req, res) => {
       `attachment; filename="Academic-Standing-${fullName.replace(/[^a-zA-Z0-9]+/g, '-')}-${studentProgram}.pdf"`);
     doc.pipe(res);
 
-    const primary   = '#1a1f35';
-    const accent    = '#F97316'; /* engineering orange */
+    const primary   = '#1a1f35';  /* ink */
+    const accent    = '#F97316';  /* engineering orange — sole accent */
     const textMuted = '#64748b';
-    const pageWidth = doc.page.width - 100;
+    const faint     = '#e2e8f0';  /* hairlines / track */
+    const veryLight = '#f8fafc';  /* alternating row fill */
+    const pageWidth = doc.page.width - 100; /* 495 */
 
-    // Header band
-    doc.rect(0, 0, doc.page.width, 90).fill(primary);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18)
-       .text('COE Academic Standing', 50, 22);
-    doc.font('Helvetica').fontSize(10).fillColor('#a5b4fc')
-       .text('College of Engineering — Cor Jesu College', 50, 46);
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#ffffff')
-       .text('SUBJECT STATUS REPORT — YEAR 1 TO 4', 50, 64);
+    const generated = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-    doc.moveDown(3.2);
-
-    // Student info card
-    const infoY = doc.y;
-    doc.roundedRect(50, infoY, pageWidth, 96, 8).fillAndStroke('#f8fafc', '#e2e8f0');
+    // ── Letterhead ──
+    const logoPath = path.join(__dirname, '../../client/assets/coe-logo.png');
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 38, { width: 72, height: 72 });
+    }
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(19)
+       .text('COLLEGE OF ENGINEERING', 138, 42, { width: pageWidth - 88 });
+    doc.font('Helvetica').fontSize(11).fillColor(textMuted)
+       .text('Cor Jesu College', 138, 68);
+    doc.rect(50, 116, pageWidth, 3).fill(accent); // thin orange rule
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(14)
-       .text(fullName, 66, infoY + 14, { width: pageWidth - 32 });
-    doc.font('Helvetica').fontSize(9.5).fillColor(textMuted);
-    doc.text(`Program: ${PROGRAM_NAMES[studentProgram] || studentProgram} (${studentProgram})`, 66, infoY + 36);
-    doc.text(`Email: ${req.user.email}`, 66, infoY + 52);
-    doc.text(`Enrollment Year: ${enrolledYear || '—'}`, 66, infoY + 68);
-    doc.text(`Estimated Graduation: ${gradYear}`, 300, infoY + 68);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`, 66, infoY + 84);
+       .text('OFFICIAL ACADEMIC STANDING REPORT', 50, 134);
+    doc.font('Helvetica').fontSize(9.5).fillColor(textMuted)
+       .text('Subject Status Report — Year 1 to 4', 50, 155);
+    doc.moveDown(3);
 
+    // ── Student information — two-column metadata block ──
+    const metaTop = doc.y;
+    const metaH   = 12 + 4 * 16 + 10;
+    doc.rect(50, metaTop, pageWidth, metaH).fillAndStroke(veryLight, faint);
+    const leftMeta = [
+      ['Name',            fullName],
+      ['Email',           req.user.email],
+      ['Enrollment Year', enrolledYear || '—'],
+      ['Generated',       generated],
+    ];
+    const rightMeta = [
+      ['Program',              PROGRAM_NAMES[studentProgram] || studentProgram],
+      ['Estimated Graduation', String(gradYear)],
+    ];
+    leftMeta.forEach(([label, value], i) => {
+      const y = metaTop + 12 + i * 16;
+      doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8)
+         .text(label, 62, y);
+      doc.fillColor(primary).font('Helvetica').fontSize(9)
+         .text(value, 150, y, { width: 140 });
+    });
+    rightMeta.forEach(([label, value], i) => {
+      const y = metaTop + 12 + i * 16;
+      doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8)
+         .text(label, 300, y);
+      doc.fillColor(primary).font('Helvetica').fontSize(9)
+         .text(value, 410, y, { width: 130 });
+    });
+    doc.moveDown(6);
+
+    // ── Progress summary — vector bar (PDFKit has no text glyphs for block
+    //    characters in its built-in fonts, so the bar is drawn with shapes) ──
+    doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8.5)
+       .text('PROGRESS', 50, doc.y);
+    const trackTop = doc.y + 4;
+    doc.roundedRect(50, trackTop, pageWidth, 12, 6).fill(faint);
+    const fillW = total > 0 ? Math.max(12, (pageWidth * pct) / 100) : 0;
+    if (fillW > 0) doc.roundedRect(50, trackTop, fillW, 12, 6).fill(accent);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(9.5)
+       .text(`${pct}% complete (${completed} / ${total || '—'} units completed)`, 50, trackTop + 18, { width: pageWidth });
     doc.moveDown(5);
 
-    // Summary stat boxes
-    const boxes = [
-      { label: 'Units Completed', value: String(completed) },
-      { label: 'Required Units',  value: String(total || '—') },
-      { label: 'Progress',        value: `${pct}%` },
-      { label: 'Subjects Taken',  value: String(recordBySubject.size) },
-    ];
-    const boxW = (pageWidth - 30) / 4;
-    const boxY = doc.y;
-    boxes.forEach((b, i) => {
-      const x = 50 + i * (boxW + 10);
-      doc.roundedRect(x, boxY, boxW, 52, 6).fillAndStroke('#f8fafc', '#e2e8f0');
-      doc.fillColor(accent).font('Helvetica-Bold').fontSize(15)
-         .text(b.value, x + 12, boxY + 10, { width: boxW - 24, align: 'center' });
-      doc.fillColor(textMuted).font('Helvetica').fontSize(7.5)
-         .text(b.label.toUpperCase(), x + 12, boxY + 34, { width: boxW - 24, align: 'center' });
-    });
-    doc.moveDown(7);
+    // ── Subject table ──
+    const cols = { code: 50, title: 108, units: 292, sy: 328, sem: 392, status: 446, grade: 512 };
+    const colW = { code: 56, title: 182, units: 34, sy: 62, sem: 52, status: 64, grade: 33 };
 
-    // Subject table
-    const cols = { code: 50, title: 118, sem: 268, sy: 330, units: 405, status: 452, grade: 508 };
     function tableHeader() {
       const y = doc.y;
-      doc.rect(50, y, pageWidth, 22).fill(primary);
-      doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(8.5);
-      doc.text('CODE',        cols.code,  y + 7, { width: 60 });
-      doc.text('SUBJECT',     cols.title, y + 7, { width: 145 });
-      doc.text('SEM',         cols.sem,   y + 7, { width: 60 });
-      doc.text('SCHOOL YEAR', cols.sy,    y + 7, { width: 70 });
-      doc.text('UNITS',       cols.units, y + 7, { width: 42, align: 'right' });
-      doc.text('STATUS',      cols.status,y + 7, { width: 55 });
-      doc.text('GRADE',       cols.grade, y + 7, { width: 42, align: 'right' });
-      return y + 22;
+      doc.rect(50, y, pageWidth, 20).fill(veryLight);
+      doc.fillColor(primary).font('Helvetica-Bold').fontSize(7.5);
+      doc.text('CODE',         cols.code,  y + 7, { width: colW.code });
+      doc.text('SUBJECT TITLE', cols.title, y + 7, { width: colW.title });
+      doc.text('UNITS',        cols.units, y + 7, { width: colW.units, align: 'right' });
+      doc.text('SCHOOL YEAR',  cols.sy,    y + 7, { width: colW.sy });
+      doc.text('SEM',          cols.sem,   y + 7, { width: colW.sem });
+      doc.text('STATUS',       cols.status,y + 7, { width: colW.status });
+      doc.text('GRADE',        cols.grade, y + 7, { width: colW.grade, align: 'right' });
+      doc.rect(50, y + 20, pageWidth, 1).fill(faint); // hairline under the header
+      return y + 21;
     }
 
     const statusColors = {
@@ -237,44 +263,57 @@ router.get('/standing', async (req, res) => {
     const years = [1, 2, 3, 4].filter(y => subjects.some(s => s.year_level === y));
 
     years.forEach(year => {
-      // Year banner
+      // Year banner — light band with a 3px orange left bar, no heavy fill
       if (rowY > doc.page.height - 130) { doc.addPage(); rowY = tableHeader(); }
-      doc.rect(50, rowY, pageWidth, 20).fill('#f97316');
-      doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(9).text(`YEAR ${year}`, 56, rowY + 6);
+      doc.rect(50, rowY, pageWidth, 20).fill(veryLight);
+      doc.rect(50, rowY, 3, 20).fill(accent);
+      doc.fillColor(primary).font('Helvetica-Bold').fontSize(10).text(`YEAR ${year}`, 60, rowY + 5);
       rowY += 20;
 
-      subjects.filter(s => s.year_level === year).forEach(s => {
-        if (rowY > doc.page.height - 90) { doc.addPage(); rowY = tableHeader(); }
-        const rec = recordBySubject.get(s.id);
-        const status = rec?.status || 'not taken';
-        const bg = band % 2 === 0 ? '#ffffff' : '#f8fafc';
-        const rowH = 20;
-        doc.rect(50, rowY, pageWidth, rowH).fill(bg);
+      [1, 2, 3].filter(sem => subjects.some(s => s.year_level === year && s.semester === sem))
+        .forEach(sem => {
+          // Semester sub-header — italic gray
+          if (rowY > doc.page.height - 90) { doc.addPage(); rowY = tableHeader(); }
+          doc.fillColor(textMuted).font('Helvetica-Oblique').fontSize(8.5)
+             .text(`${SEM_LABELS[sem] || 'Semester ' + sem}`, 60, rowY + 2);
+          rowY += 15;
 
-        doc.fillColor(textMuted).font('Helvetica').fontSize(8.5);
-        doc.text(s.code, cols.code,  rowY + 6, { width: 60 });
-        doc.fillColor('#0f172a').font('Helvetica').fontSize(8.5)
-           .text(s.title, cols.title, rowY + 6, { width: 145 });
-        doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
-           .text(SEM_LABELS[rec?.semester ?? s.semester] || '—', cols.sem, rowY + 6, { width: 60 });
-        doc.text(rec?.school_year || '—', cols.sy, rowY + 6, { width: 70 });
-        doc.text(String(s.units), cols.units, rowY + 6, { width: 42, align: 'right' });
-        doc.fillColor(statusColors[status] || textMuted).font('Helvetica-Bold').fontSize(8.5)
-           .text((STATUS_LABELS[status] || status).toUpperCase(), cols.status, rowY + 6, { width: 55 });
-        doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
-           .text(rec?.grade != null ? String(rec.grade) : '—', cols.grade, rowY + 6, { width: 42, align: 'right' });
+          subjects.filter(s => s.year_level === year && s.semester === sem).forEach(s => {
+            const rec = recordBySubject.get(s.id);
+            const status = rec?.status || 'not taken';
+            const titleH = doc.heightOfString(s.title, { width: colW.title });
+            const rowH = Math.max(20, titleH + 10);
+            if (rowY + rowH > doc.page.height - 60) { doc.addPage(); rowY = tableHeader(); }
 
-        rowY += rowH;
-        band++;
-      });
+            const bg = band % 2 === 0 ? '#ffffff' : veryLight;
+            doc.rect(50, rowY, pageWidth, rowH).fill(bg);
+            doc.rect(50, rowY + rowH - 0.5, pageWidth, 0.5).fill(faint); // hairline row border
+
+            doc.fillColor('#475569').font('Helvetica').fontSize(8.5)
+               .text(s.code, cols.code, rowY + 6, { width: colW.code });
+            doc.fillColor(primary).font('Helvetica').fontSize(8.5)
+               .text(s.title, cols.title, rowY + 6, { width: colW.title, height: rowH - 8 });
+            doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
+               .text(String(s.units), cols.units, rowY + 6, { width: colW.units, align: 'right' });
+            doc.text(rec?.school_year || '—', cols.sy, rowY + 6, { width: colW.sy });
+            doc.text(SEM_SHORT[rec?.semester ?? s.semester] || '—', cols.sem, rowY + 6, { width: colW.sem });
+            doc.fillColor(statusColors[status] || textMuted).font('Helvetica-Bold').fontSize(8)
+               .text((STATUS_LABELS[status] || status).toUpperCase(), cols.status, rowY + 6, { width: colW.status });
+            doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
+               .text(rec?.grade != null ? String(rec.grade) : '—', cols.grade, rowY + 6, { width: colW.grade, align: 'right' });
+
+            rowY += rowH;
+            band++;
+          });
+        });
     });
 
-    // ── Machine-readable appendix (for AI / data analysis) ──
+    // ── Appendix — machine-readable dump, clearly a separate section ──
     doc.addPage();
-    doc.rect(0, 0, doc.page.width, 60).fill(primary);
-    doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(13).text('MACHINE-READABLE DATA', 50, 20);
-    doc.font('Helvetica').fontSize(9).fillColor('#a5b4fc')
-       .text('Plain-text record for AI analysis / data processing', 50, 42);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('APPENDIX A — MACHINE-READABLE DATA', 50, 50);
+    doc.rect(50, 62, 60, 2).fill(accent);
+    doc.font('Helvetica').fontSize(9).fillColor(textMuted)
+       .text('Plain-text transcript for AI analysis / data processing — auxiliary, not part of the official record.', 50, 74, { width: pageWidth });
 
     doc.moveDown(2.5);
     doc.font('Courier').fontSize(8).fillColor('#0f172a');
@@ -287,6 +326,40 @@ router.get('/standing', async (req, res) => {
       doc.text(`${s.code}|${s.title}|${s.units}|${s.year_level}|${s.semester}|${rec?.school_year || ''}|${rec?.status || 'not_taken'}|${rec?.grade ?? ''}`);
     });
     doc.text('END');
+
+    // ── Final page — summary + signature block ──
+    doc.addPage();
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('SUMMARY', 50, 50);
+    doc.rect(50, 62, 60, 2).fill(accent);
+
+    const sumY = 78;
+    doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
+       .text('Subjects Passed:', 50, sumY);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
+       .text(String(passedIds.size), 150, sumY);
+    doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
+       .text('Units Completed:', 50, sumY + 20);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
+       .text(`${completed} / ${total || '—'}`, 150, sumY + 20);
+    doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
+       .text('Progress:', 300, sumY);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
+       .text(`${pct}%`, 380, sumY);
+    doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
+       .text('Est. Graduation:', 300, sumY + 20);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
+       .text(String(gradYear), 380, sumY + 20);
+
+    // Signature block
+    const sigY = sumY + 70;
+    doc.moveTo(50, sigY).lineTo(230, sigY).lineWidth(1).strokeColor(faint).stroke();
+    doc.moveTo(300, sigY).lineTo(480, sigY).lineWidth(1).strokeColor(faint).stroke();
+    doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
+       .text('Student Signature', 50, sigY + 6);
+    doc.text('Date', 300, sigY + 6);
+    doc.moveDown(3);
+    doc.fillColor(textMuted).font('Helvetica-Oblique').fontSize(8)
+       .text('This document is system-generated and unofficial unless bearing the Office of the Registrar\'s seal.', 50, doc.y + 6, { width: pageWidth });
 
     doc.end();
   } catch (err) {
