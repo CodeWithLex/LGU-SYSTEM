@@ -2487,24 +2487,21 @@ html body.is-admin th.admin-only {
   font-size: 0.78rem;
 }
 
-/* Year filter tabs — segmented pill docked at the bottom of the viewport.
-   Lives outside the progress card (which now ends at Estimated Graduation);
-   sticky bottom keeps the filter visible while scrolling the checklist. */
+/* Year filter tabs — segmented pill that flows inline at the bottom of the
+   Graduation Progress card. Static (relative) so it never floats over the
+   checklist on mobile; the slider's absolute children still anchor to it. */
 .units-filter-tabs-wrapper {
-  position: sticky;
-  bottom: 1rem;
-  z-index: 30;
+  position: relative;
   display: flex;
   width: 100%;
   max-width: 480px;
-  margin: 0 auto;
+  margin: 1.25rem auto 0;
   box-sizing: border-box;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: 999px;
   padding: 4px;
   gap: 4px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
 .units-tab-slider {
   position: absolute;
@@ -2569,10 +2566,6 @@ html body.is-admin th.admin-only {
 @media (max-width: 480px) {
   .units-layout { grid-template-columns: 1fr !important; }
   .units-progress-stats { grid-template-columns: 1fr !important; }
-
-  /* The pill keeps its base `bottom: 1rem` — the scrollport's own 84px
-     padding-bottom (which clears the fixed bottom nav) already lifts the
-     sticky baseline above the nav, so no extra offset here. */
 
   /* Keep all five tabs on one row; the slider morphs to the tighter buttons */
   .units-tab-btn { padding: 0.4rem 0.7rem !important; font-size: 0.72rem !important; }

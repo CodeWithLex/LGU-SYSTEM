@@ -423,23 +423,22 @@
               <span class="units-cohort-label">Estimated Graduation</span>
               <span class="units-cohort-year" id="units-cohort-year">—</span>
             </div>
+            <!-- Year filter — inline at the bottom of the progress card, so it
+                 never floats over the checklist on mobile -->
+            <div class="units-filter-tabs-wrapper" id="units-filter-tabs-wrapper" role="group" aria-label="Filter subjects by year">
+              <div class="units-tab-slider" id="units-tab-slider"></div>
+              <button type="button" class="units-tab-btn active" data-year="all">All</button>
+              <button type="button" class="units-tab-btn" data-year="1">Year 1</button>
+              <button type="button" class="units-tab-btn" data-year="2">Year 2</button>
+              <button type="button" class="units-tab-btn" data-year="3">Year 3</button>
+              <button type="button" class="units-tab-btn" data-year="4">Year 4</button>
+            </div>
           </aside>
 
           <!-- Right: Grouped syllabus checklist -->
           <div class="units-checklist" id="units-checklist">
             <div class="loading-state">Loading curriculum…</div>
           </div>
-        </div>
-
-        <!-- Year filter — sticky pill docked at the bottom of the viewport,
-             outside the progress card so the card stays compact -->
-        <div class="units-filter-tabs-wrapper" id="units-filter-tabs-wrapper" role="group" aria-label="Filter subjects by year">
-          <div class="units-tab-slider" id="units-tab-slider"></div>
-          <button type="button" class="units-tab-btn active" data-year="all">All</button>
-          <button type="button" class="units-tab-btn" data-year="1">Year 1</button>
-          <button type="button" class="units-tab-btn" data-year="2">Year 2</button>
-          <button type="button" class="units-tab-btn" data-year="3">Year 3</button>
-          <button type="button" class="units-tab-btn" data-year="4">Year 4</button>
         </div>
       </section>
 
