@@ -2287,8 +2287,8 @@ html body.is-admin th.admin-only {
   gap: 0.3rem;
 }
 
-/* Header cluster — Download Standing button + program picker, centered as
-   one row so the button lines up with the dropdown on desktop. */
+/* Header cluster — program picker in the view header (the Download button
+   lives inside the Graduation Progress card). */
 .units-header-controls {
   display: flex;
   align-items: center;
@@ -2296,8 +2296,16 @@ html body.is-admin th.admin-only {
   flex-wrap: wrap;
 }
 
+/* Download Standing button — full-width action at the bottom of the
+   Graduation Progress card on desktop and mobile alike. */
+#units-download-pdf {
+  width: 100%;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 /* Desktop: keep the PROGRAM label inline with the select so the picker is a
-   single row and the button centers against the dropdown itself. */
+   single row and the header reads as one clean line. */
 @media (min-width: 1024px) {
   .units-program-picker {
     flex-direction: row;
@@ -2307,17 +2315,14 @@ html body.is-admin th.admin-only {
   .units-program-picker .units-program-lock { margin-top: 0; }
 }
 
-/* Mobile/tablet: stack the header controls — full-width button, then the
-   program picker with breathing room, and extra bottom padding on the header
-   to separate it from the Graduation Progress card below. */
+/* Mobile/tablet: stretch the picker across the header and give the header
+   extra bottom padding to separate it from the progress card below. */
 @media (max-width: 1023.98px) {
   .units-header-controls {
     width: 100%;
     flex-direction: column;
     align-items: stretch;
   }
-  #units-download-pdf { width: 100%; justify-content: center; }
-  .units-program-picker { margin-top: 0.75rem; }
   #view-units .view-header { padding-bottom: 1.25rem; }
 }
 
