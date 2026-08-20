@@ -2531,23 +2531,27 @@ html body.is-admin th.admin-only {
 .units-tab-btn:hover { color: var(--text-primary); }
 .units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
-/* Tabs live inside the progress card now — stretch to the exact same width as
-   the progress metrics; the card itself is the sticky element, so the wrapper
-   is relative here (absolute slider still anchors to it). */
+/* Tabs live inside the progress card now — the bar spans the same width as
+   the progress metrics and every button gets an equal share so the sliding
+   pill keeps a constant width. The card itself is the sticky element, so the
+   wrapper is relative here (absolute slider still anchors to it). */
 .units-progress-card .units-filter-tabs-wrapper {
   display: flex !important;
   width: 100% !important;
-  box-sizing: border-box;
-  margin-top: 1.5rem;
-  margin-bottom: 0;
-  position: relative;
+  box-sizing: border-box !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0 !important;
+  position: relative !important;
+  padding: 4px !important;
 }
+/* Equal 20% shares: zero base basis + width: 0 so label length can't bloat */
 .units-progress-card .units-tab-btn {
-  flex: 1 !important;
-  text-align: center;
-  font-size: 0.78rem;
-  padding: 0.5rem 0;
-  white-space: nowrap;
+  flex: 1 1 0% !important;
+  width: 0 !important;
+  text-align: center !important;
+  padding: 0.5rem 0 !important;
+  font-size: 0.76rem !important;
+  white-space: nowrap !important;
 }
 
 /* Program picker — locked to the student's enrolled course */
@@ -2580,8 +2584,8 @@ html body.is-admin th.admin-only {
   .units-progress-stats { grid-template-columns: 1fr !important; }
 
   /* Keep all five tabs on one row; the slider morphs to the tighter buttons */
-  .units-progress-card .units-filter-tabs-wrapper { max-width: 100%; }
-  .units-progress-card .units-tab-btn { padding: 0.4rem 0.7rem; font-size: 0.72rem; }
+  .units-progress-card .units-filter-tabs-wrapper { max-width: 100% !important; }
+  .units-progress-card .units-tab-btn { padding: 0.4rem 0.7rem !important; font-size: 0.72rem !important; }
 
   .unit-row {
     display: flex !important;
