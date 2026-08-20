@@ -2531,23 +2531,23 @@ html body.is-admin th.admin-only {
 .units-tab-btn:hover { color: var(--text-primary); }
 .units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
-/* Tabs live inside the progress card now — stretch full-width below the
-   Estimated Graduation line; the card itself is the sticky element, so the
-   wrapper is relative here (absolute slider still anchors to it). */
+/* Tabs live inside the progress card now — stretch to the exact same width as
+   the progress metrics; the card itself is the sticky element, so the wrapper
+   is relative here (absolute slider still anchors to it). */
 .units-progress-card .units-filter-tabs-wrapper {
-  display: flex;
-  position: relative;
-  width: 100%;
+  display: flex !important;
+  width: 100% !important;
   box-sizing: border-box;
-  justify-content: space-between;
   margin-top: 1.5rem;
   margin-bottom: 0;
+  position: relative;
 }
 .units-progress-card .units-tab-btn {
-  flex: 1;
+  flex: 1 !important;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   padding: 0.5rem 0;
+  white-space: nowrap;
 }
 
 /* Program picker — locked to the student's enrolled course */
