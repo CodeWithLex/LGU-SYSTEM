@@ -22,6 +22,7 @@ const Units = (() => {
     dropped:    'Dropped',
     incomplete: 'Incomplete',
   };
+  const SEM_LABELS = { 1: '1st Semester', 2: '2nd Semester', 3: 'Summer Term' };
 
   // ---- Small helpers ----
   function currentSchoolYear() {
@@ -133,7 +134,7 @@ const Units = (() => {
     }
 
     const years = [1, 2, 3, 4].map(year => {
-      const sems = [1, 2].map(sem => ({
+      const sems = [1, 2, 3].map(sem => ({
         sem,
         subjects: subjects.filter(s => s.year_level === year && s.semester === sem),
       })).filter(s => s.subjects.length);
@@ -145,7 +146,7 @@ const Units = (() => {
         <div class="unit-year-banner">Year ${year}</div>
         ${sems.map(({ sem, subjects: list }) => `
           <div class="unit-sem">
-            <div class="unit-sem-banner">${sem === 1 ? '1st' : '2nd'} Semester</div>
+            <div class="unit-sem-banner">${SEM_LABELS[sem] || `Semester ${sem}`}</div>
             ${list.map(subjectRow).join('')}
           </div>
         `).join('')}
@@ -166,10 +167,17 @@ const Units = (() => {
         <button class="unit-action-btn unit-action-btn--del" data-act="drop" data-id="${rec.id}" title="Remove record"><iconify-icon icon="icon-park-outline:delete"></iconify-icon></button>`
       : `<button class="btn btn-ghost unit-log-btn" data-act="log" data-subject="${s.id}">Log</button>`;
 
+    const prereq = s.prerequisites
+      ? `<div class="unit-prereq">Prerequisite: ${esc(s.prerequisites)}</div>`
+      : '';
+
     return `
       <div class="unit-row">
         <span class="unit-code">${esc(s.code)}</span>
-        <div class="unit-title">${esc(s.title)} <span class="unit-units">${s.units} unit${s.units === 1 ? '' : 's'}</span></div>
+        <div class="unit-title">
+          <div>${esc(s.title)} <span class="unit-units">${s.units} unit${s.units === 1 ? '' : 's'}</span></div>
+          ${prereq}
+        </div>
         ${badge}
         <div class="unit-actions">${actions}</div>
       </div>`;

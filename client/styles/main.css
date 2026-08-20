@@ -2413,6 +2413,7 @@ html body.is-admin th.admin-only {
 }
 .unit-title { font-size: 0.9rem; color: var(--text-primary); min-width: 0; }
 .unit-units { font-size: 0.72rem; color: var(--text-tertiary); white-space: nowrap; }
+.unit-prereq { font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.2rem; }
 
 /* Status — 6px dot + text, mirroring the system status-badge language */
 .unit-badge {

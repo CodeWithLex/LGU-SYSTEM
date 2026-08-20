@@ -93,7 +93,7 @@ router.post('/enroll', async (req, res) => {
     if (missing) return res.status(400).json({ error: missing });
     if (!isValidUUID(subject_id))                return res.status(400).json({ error: 'Invalid subject id.' });
     if (!SCHOOL_YEAR_RE.test(school_year))       return res.status(400).json({ error: 'School year must look like "2026-2027".' });
-    if (![1, 2].includes(Number(semester)))      return res.status(400).json({ error: 'Semester must be 1 or 2.' });
+    if (![1, 2, 3].includes(Number(semester)))   return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
     if (!isValidEnum(status, VALID_STATUSES))    return res.status(400).json({ error: 'Invalid status.' });
     if (!isValidGrade(grade))                    return res.status(400).json({ error: 'Grade must be between 1.0 and 5.0.' });
 
@@ -162,7 +162,7 @@ router.patch('/update/:id', async (req, res) => {
       updates.school_year = school_year;
     }
     if (semester !== undefined) {
-      if (![1, 2].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1 or 2.' });
+      if (![1, 2, 3].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
       updates.semester = Number(semester);
     }
     if (Object.keys(updates).length === 0) {
