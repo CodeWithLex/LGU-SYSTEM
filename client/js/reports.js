@@ -5,11 +5,53 @@
 let _monthlyChart = null;
 let _breakdownChart = null;
 
+// Shimmer skeleton that mirrors the reports layout (stat cards, charts,
+// event table) while the API calls are in flight. Reuses the global .sk-*
+// system, which already adapts the grids between desktop and mobile.
+function reportsSkeleton() {
+  return `
+    <div class="sk-reports" aria-hidden="true">
+      <!-- Summary stat cards -->
+      <div class="sk-stats-grid">
+        ${[0, 1, 2, 3].map(() => `
+          <div class="sk-stat-card">
+            <div class="sk-bone sk-circle" style="width:38px;height:38px;flex-shrink:0;"></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+              <div class="sk-bone" style="height:10px;width:60%;border-radius:4px;"></div>
+              <div class="sk-bone" style="height:22px;width:80%;border-radius:5px;"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <!-- Charts row -->
+      <div class="sk-cards-grid">
+        <div class="sk-content-card">
+          <div class="sk-bone" style="height:14px;width:45%;border-radius:4px;margin-bottom:18px;"></div>
+          <div class="sk-bone sk-chart"></div>
+        </div>
+        <div class="sk-content-card">
+          <div class="sk-bone" style="height:14px;width:40%;border-radius:4px;margin-bottom:18px;"></div>
+          <div class="sk-bone sk-chart"></div>
+        </div>
+      </div>
+
+      <!-- Event reports table -->
+      <div class="sk-content-card">
+        <div class="sk-bone" style="height:14px;width:30%;border-radius:4px;margin-bottom:18px;"></div>
+        <div class="sk-bone sk-list-row"></div>
+        <div class="sk-bone sk-list-row"></div>
+        <div class="sk-bone sk-list-row"></div>
+        <div class="sk-bone sk-list-row"></div>
+        <div class="sk-bone sk-list-row" style="width:70%;"></div>
+      </div>
+    </div>`;
+}
+
 async function initReports() {
   const container = document.getElementById('reports-content');
   if (!container) return;
 
-  container.innerHTML = `<div class="loading-state">Loading reports…</div>`;
+  container.innerHTML = reportsSkeleton();
 
   try {
     const [summary, monthly, events] = await Promise.all([

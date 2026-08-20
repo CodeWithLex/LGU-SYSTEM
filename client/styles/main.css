@@ -2194,6 +2194,21 @@ html body.is-admin th.admin-only {
   border-radius: 6px;
 }
 
+/* ---- Reports skeleton ---- */
+/* Stack the skeleton sections with the same vertical rhythm as the real
+   reports page (stats → charts → table). */
+.sk-reports {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Chart placeholder — matches the 260px real chart canvases */
+.sk-chart {
+  height: 260px;
+  border-radius: 8px;
+}
+
 /* ---- Skeleton Bottom Nav (mobile only) ---- */
 .sk-bottom-nav {
   display: none; /* Hidden on desktop, like the real .bottom-nav */
