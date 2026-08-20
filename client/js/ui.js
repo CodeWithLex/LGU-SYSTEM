@@ -40,6 +40,18 @@ const UI = (() => {
     if (bottomNav) bottomNav.classList.toggle('visible', screenId === 'app');
   }
 
+  // Shape the boot splash skeleton to match the view being loaded, so a
+  // refresh on Units doesn't show a dashboard-shaped skeleton.
+  function setSplashView(view) {
+    const splash = document.getElementById('splash-screen');
+    if (!splash) return;
+    const shape = view === 'units'
+      ? 'units'
+      : (['events', 'transactions', 'income', 'admin'].includes(view) ? 'list' : 'default');
+    splash.classList.remove('splash-view-units', 'splash-view-list', 'splash-view-default');
+    splash.classList.add(`splash-view-${shape}`);
+  }
+
   // ---- Toast Notifications ----
   let toastTimer = null;
 
@@ -131,5 +143,5 @@ const UI = (() => {
     }
   }
 
-  return { showView, showScreen, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setLoading, setEmpty };
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setLoading, setEmpty };
 })();

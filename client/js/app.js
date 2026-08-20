@@ -376,10 +376,16 @@
       return;
     }
 
+    // Determine the view to restore on a refresh, so the splash skeleton
+    // already matches it before the splash is revealed.
+    let saved = null;
+    try { saved = sessionStorage.getItem('lastView'); } catch { /* storage unavailable */ }
+
     // Show splash screen during boot and record start time
     const splash = document.getElementById('splash-screen');
     const splashStart = Date.now();
     if (splash) {
+      UI.setSplashView(saved && document.getElementById(`view-${saved}`) ? saved : 'dashboard');
       splash.style.opacity = '1';
       splash.style.visibility = 'visible';
       splash.classList.remove('hidden');
@@ -396,11 +402,9 @@
 
     UI.setAdminVisibility(profile?.role === 'admin');
 
-    // On a refresh, return the user to the view they were last on instead of
-    // resetting to the dashboard. Fall back to the dashboard when nothing is
-    // saved, the view no longer exists, or a non-admin somehow saved 'admin'.
-    let saved = null;
-    try { saved = sessionStorage.getItem('lastView'); } catch { /* storage unavailable */ }
+    // Return the user to the view they were last on instead of resetting to
+    // the dashboard. Fall back to the dashboard when nothing is saved, the
+    // view no longer exists, or a non-admin somehow saved 'admin'.
     const isAdmin = profile?.role === 'admin';
     const target = saved
       && document.getElementById(`view-${saved}`)

@@ -2194,6 +2194,34 @@ html body.is-admin th.admin-only {
   border-radius: 6px;
 }
 
+/* ---- Splash view variants ----
+   The boot skeleton matches the view being restored: the default shape
+   (dashboard / reports) uses display:contents so its children keep flowing
+   straight into .sk-main; the units and list shapes swap in instead. */
+.sk-splash-default { display: contents; }
+.sk-splash-units,
+.sk-splash-list   { display: none; }
+
+.splash-view-units .sk-splash-default { display: none; }
+.splash-view-units .sk-splash-units   { display: flex; flex-direction: column; gap: 1.75rem; }
+.splash-view-list  .sk-splash-default { display: none; }
+.splash-view-list  .sk-splash-list    { display: flex; flex-direction: column; gap: 1.75rem; }
+
+/* Units shape — progress card beside the subject checklist, like the view */
+.sk-units {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+.sk-unit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.sk-progress-track { height: 12px; border-radius: 999px; }
+.sk-tab-pill       { height: 38px; border-radius: 999px; }
+
 /* ---- Reports skeleton ---- */
 /* Stack the skeleton sections with the same vertical rhythm as the real
    reports page (stats → charts → table). */
@@ -2241,9 +2269,11 @@ html body.is-admin th.admin-only {
    swap at 480px, 60px rail at 768px).
    ============================================= */
 
-/* ≤1024px — content cards stack 2-up like .dashboard-grid */
+/* ≤1024px — content cards stack 2-up like .dashboard-grid; the units
+   skeleton stacks its progress card above the checklist like the view */
 @media (max-width: 1024px) {
   .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .sk-units { grid-template-columns: 1fr; }
 }
 
 /* ≤768px — skeleton mirrors the 60px sidebar rail */
