@@ -23,7 +23,7 @@ module.exports = async function authMiddleware(req, res, next) {
   // Fetch profile for role info
   const { data: profile } = await supabaseAdmin
     .from('profiles')
-    .select('role, full_name')
+    .select('role, full_name, course')
     .eq('id', user.id)
     .single();
 

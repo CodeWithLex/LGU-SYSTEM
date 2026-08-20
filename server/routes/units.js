@@ -97,13 +97,17 @@ router.post('/enroll', async (req, res) => {
     if (!isValidEnum(status, VALID_STATUSES))    return res.status(400).json({ error: 'Invalid status.' });
     if (!isValidGrade(grade))                    return res.status(400).json({ error: 'Grade must be between 1.0 and 5.0.' });
 
-    // Subject must exist
+    // Subject must exist and belong to the student's enrolled program —
+    // students can only log subjects from their own course.
     const { data: subject, error: subjErr } = await supabase
       .from('subjects')
-      .select('id')
+      .select('id, program')
       .eq('id', subject_id)
       .single();
     if (subjErr || !subject) return res.status(404).json({ error: 'Subject not found.' });
+    if (!req.profile?.course || subject.program !== req.profile.course) {
+      return res.status(403).json({ error: 'You can only log subjects from your enrolled program.' });
+    }
 
     const { error } = await supabase
       .from('student_units')

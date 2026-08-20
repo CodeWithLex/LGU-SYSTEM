@@ -43,11 +43,17 @@ const Units = (() => {
     }[c]));
   }
 
+  // The custom dropdown (.dd) is inserted as the select's previous sibling
+  // by app.js bindDropdown, so it is not reachable via closest().
+  function ddWrap(select) {
+    return (select && select.parentNode) ? select.parentNode.querySelector('.dd') : null;
+  }
+
   // Keep a hidden select and its custom .dd trigger in sync when we
   // pre-fill modal fields programmatically.
   function setDDValue(select, value) {
     select.value = value;
-    const wrap = select.closest('.dd');
+    const wrap = ddWrap(select);
     if (wrap) {
       const label = wrap.querySelector('.dd-label');
       const opt = select.options[select.selectedIndex];
@@ -61,14 +67,25 @@ const Units = (() => {
   // ---- Load ----
   async function load() {
     const profile = await Auth.getProfile().catch(() => null);
-    if (!program) {
-      program = (profile?.course && VALID_PROGRAMS.includes(profile.course))
-        ? profile.course
-        : 'BSCoE';
+    const isAdmin    = profile?.role === 'admin';
+    const courseLock = !!(profile?.course && VALID_PROGRAMS.includes(profile.course));
+
+    // Students are locked to their enrolled program; anyone without a course
+    // (e.g. admins) can browse any program.
+    if (courseLock && !isAdmin) {
+      program = profile.course;
+    } else if (!program) {
+      program = courseLock ? profile.course : 'BSCoE';
     }
 
     const sel = document.getElementById('units-program');
-    if (sel && !sel.dataset.userSet) setDDValue(sel, program);
+    if (sel) {
+      sel.disabled = courseLock && !isAdmin;
+      const wrap = ddWrap(sel);
+      if (wrap) wrap.classList.toggle('dd-disabled', sel.disabled);
+      document.getElementById('units-program-lock')?.classList.toggle('hidden', !sel.disabled);
+      if (!sel.dataset.userSet || sel.disabled) setDDValue(sel, program);
+    }
 
     try {
       const [checklists, mine] = await Promise.all([
@@ -351,6 +368,7 @@ const Units = (() => {
   });
 
   document.getElementById('units-program').addEventListener('change', e => {
+    if (e.target.disabled) return; // locked to the student's enrolled program
     program = e.target.value;
     e.target.dataset.userSet = '1';
     load();

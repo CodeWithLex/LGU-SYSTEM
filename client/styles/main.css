@@ -2531,6 +2531,17 @@ html body.is-admin th.admin-only {
 .units-tab-btn:hover { color: var(--text-primary); }
 .units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
+/* Program picker — locked to the student's enrolled course */
+.dd.dd-disabled { opacity: 0.65; pointer-events: none; }
+.units-program-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 0.35rem;
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 1024px) {
   .units-layout { grid-template-columns: 1fr; }
