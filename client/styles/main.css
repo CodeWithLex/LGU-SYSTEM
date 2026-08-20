@@ -2265,49 +2265,27 @@ html body.is-admin th.admin-only {
 /* =============================================
    CREDIT UNIT TRACKER
    ============================================= */
-/* CJC Engineering Orange + dark-gray card surfaces — scoped to the tracker so
-   the rest of the portal keeps the default graphite palette. */
-#view-units {
-  --accent: #FF7A00;                      /* CJC Engineering Orange */
-  --accent-muted: rgba(255, 122, 0, 0.14);
-  --units-surface: #1E1E24;               /* subtle dark-gray card layer */
-  --units-surface-raised: #26262F;        /* inputs / raised surfaces */
-  --units-border: rgba(255, 255, 255, 0.07);     /* soft hairline, not stark */
-  --units-border-strong: rgba(255, 255, 255, 0.12);
-}
-
 .units-program-picker {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
-/* 12-col grid: 8-col main (picker + filter + checklist), 4-col sticky sidebar */
 .units-layout {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-areas: 'main main main main main main main main side side side side';
-  gap: 1.5rem;
-  align-items: start;
-}
-
-.units-main {
-  grid-area: main;
-  min-width: 0; /* let the checklist's grid rows shrink inside the column */
-  display: flex;
-  flex-direction: column;
+  grid-template-columns: 300px 1fr;
   gap: 1.25rem;
+  align-items: start;
 }
 
 /* ---- Progress panel ---- */
 .units-progress-card {
-  grid-area: side;
-  background: var(--units-surface);
-  border: 1px solid var(--units-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   padding: 1.5rem;
   position: sticky;
-  top: 5.5rem; /* clears the sticky view-header */
+  top: 5.5rem;
 }
 
 .units-progress-head {
@@ -2327,15 +2305,15 @@ html body.is-admin th.admin-only {
 .units-progress-track {
   height: 12px;
   border-radius: 999px;
-  background: var(--units-surface-raised);
-  border: 1px solid var(--units-border);
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
   overflow: hidden;
 }
 .units-progress-fill {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent) 0%, #ff8c3a 100%);
-  box-shadow: 0 0 8px rgba(255, 122, 0, 0.4);
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -2346,8 +2324,8 @@ html body.is-admin th.admin-only {
   margin: 1.25rem 0;
 }
 .units-stat {
-  background: var(--units-surface-raised);
-  border: 1px solid var(--units-border);
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: 0.75rem;
   text-align: center;
@@ -2371,7 +2349,7 @@ html body.is-admin th.admin-only {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--units-border);
+  border-top: 1px solid var(--border-default);
   padding-top: 1rem;
 }
 .units-cohort-label { font-size: 0.75rem; color: var(--text-secondary); }
@@ -2385,8 +2363,8 @@ html body.is-admin th.admin-only {
 }
 
 .unit-year {
-  background: var(--units-surface);
-  border: 1px solid var(--units-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   overflow: hidden;
 }
@@ -2396,8 +2374,8 @@ html body.is-admin th.admin-only {
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1rem;
-  background: var(--units-surface-raised);
-  border-bottom: 1px solid var(--units-border);
+  background: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-default);
   border-left: 3px solid var(--accent);
   font-size: 0.78rem;
   font-weight: 700;
@@ -2406,7 +2384,7 @@ html body.is-admin th.admin-only {
   color: var(--text-primary);
 }
 
-.unit-sem { border-top: 1px solid var(--units-border); }
+.unit-sem { border-top: 1px solid var(--border-default); }
 .unit-sem-banner {
   padding: 0.5rem 1rem 0.25rem;
   font-size: 0.68rem;
@@ -2423,7 +2401,7 @@ html body.is-admin th.admin-only {
   min-height: 52px;
   gap: 0.75rem;
   padding: 0.65rem 1rem;
-  border-top: 1px solid var(--units-border);
+  border-top: 1px solid var(--border-default);
   transition: background var(--transition), opacity var(--transition);
 }
 .unit-row:hover { background: var(--surface-hover); }
@@ -2509,18 +2487,18 @@ html body.is-admin th.admin-only {
   font-size: 0.78rem;
 }
 
-/* Year filter tabs — segmented pill that sits at the top of the main panel
-   (desktop) and pins below the summary bar on mobile. The slider's absolute
-   children anchor to this wrapper. */
+/* Year filter tabs — segmented pill that flows inline at the bottom of the
+   Graduation Progress card. Static (relative) so it never floats over the
+   checklist on mobile; the slider's absolute children still anchor to it. */
 .units-filter-tabs-wrapper {
   position: relative;
   display: flex;
   width: 100%;
   max-width: 480px;
-  margin: 0 auto;
+  margin: 1.25rem auto 0;
   box-sizing: border-box;
-  background: var(--units-surface-raised);
-  border: 1px solid var(--units-border);
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
   border-radius: 999px;
   padding: 4px;
   gap: 4px;
@@ -2571,91 +2549,10 @@ html body.is-admin th.admin-only {
   margin-top: 0.35rem;
 }
 
-/* The tracker's modal reuses the CJC orange for its primary action */
-#units-modal { --accent: #FF7A00; }
-
-/* ---- Responsive ----
-   < 1024px: single column. The tall progress card collapses into a compact
-   summary bar; the year-filter tabs pin below it; the subject list sits first
-   so students reach it with minimal scrolling. */
-@media (max-width: 1023.98px) {
-  #view-units .view-header { position: static; margin-bottom: 0.75rem; }
-
-  .units-layout {
-    grid-template-columns: 1fr;
-    grid-template-areas: 'side' 'main';
-    gap: 1rem;
-  }
-
-  /* Compact metrics bar — % / completed·required / graduation in one row,
-     thin progress bar underneath */
-  .units-progress-card {
-    position: static;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto auto;
-    gap: 0.75rem 0.5rem;
-    align-items: center;
-    padding: 0.85rem 1rem;
-  }
-  .units-progress-head {
-    grid-column: 1;
-    grid-row: 1;
-    margin: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-  .units-progress-head h3 { display: none; }
-  .units-progress-pct { font-size: 1.4rem; line-height: 1.1; }
-  .units-progress-track { grid-column: 1 / -1; grid-row: 2; height: 6px; }
-  .units-progress-stats {
-    grid-column: 2;
-    grid-row: 1;
-    display: flex;
-    justify-content: center;
-    gap: 0.4rem;
-    margin: 0;
-  }
-  .units-stat {
-    flex: 1 1 0%;
-    background: none;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    text-align: center;
-  }
-  .units-stat-value { font-size: 1.05rem; line-height: 1.2; }
-  .units-stat-label { font-size: 0.55rem; margin-top: 0.1rem; }
-  .units-cohort {
-    grid-column: 3;
-    grid-row: 1;
-    border: none;
-    padding: 0;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.15rem;
-    text-align: right;
-  }
-  .units-cohort-label { font-size: 0.6rem; }
-  .units-cohort-year { font-size: 1.05rem; }
-
-  /* Main column — filter tabs pin below the summary bar */
-  .units-main { gap: 0.9rem; }
-
-  .units-filter-tabs-wrapper {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-    order: 1;
-  }
-  .units-program-picker { order: 2; }
-  .units-checklist { order: 3; }
-
-  /* Students can't change programs — hide the picker so the list sits higher */
-  .units-program-picker:has(select[disabled]) { display: none; }
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+  .units-layout { grid-template-columns: 1fr; }
+  .units-progress-card { position: static; }
 }
 
 @media (max-width: 768px) {
@@ -2667,6 +2564,9 @@ html body.is-admin th.admin-only {
 }
 
 @media (max-width: 480px) {
+  .units-layout { grid-template-columns: 1fr !important; }
+  .units-progress-stats { grid-template-columns: 1fr !important; }
+
   /* Keep all five tabs on one row; the slider morphs to the tighter buttons */
   .units-tab-btn { padding: 0.4rem 0.7rem !important; font-size: 0.72rem !important; }
 
