@@ -378,7 +378,7 @@ const Admin = (() => {
 
       if (toEv) {
         const newBal = toEv.remaining_budget + amount;
-        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <i class="ph ph-thin ph-arrow-right" style="font-size:12px" ></i> <span style="color:#10b981">${UI.currency(newBal)}</span>`;
+        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <i class="ph ph-thin ph-arrow-right" style="font-size:12px" ></i> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
       } else {
         toBalEl.textContent = '—';
       }
@@ -535,16 +535,16 @@ const Admin = (() => {
 
     const actionLabel = a => {
       const icons = {
-        CREATE_TRANSACTION: { icon: 'plus-circle', color: '#10b981', label: 'Created Transaction' },
-        EDIT_TRANSACTION:   { icon: 'pencil-simple-line', color: '#3b82f6', label: 'Edited Transaction' },
+        CREATE_TRANSACTION: { icon: 'plus-circle', color: '#22C55E', label: 'Created Transaction' },
+        EDIT_TRANSACTION:   { icon: 'pencil-simple-line', color: '#38BDF8', label: 'Edited Transaction' },
         DELETE_TRANSACTION: { icon: 'trash', color: '#ef4444', label: 'Deleted Transaction' },
-        CREATE_EVENT:       { icon: 'calendar-plus', color: '#10b981', label: 'Created Event' },
-        UPDATE_EVENT:       { icon: 'calendar', color: '#3b82f6', label: 'Updated Event' },
+        CREATE_EVENT:       { icon: 'calendar-plus', color: '#22C55E', label: 'Created Event' },
+        UPDATE_EVENT:       { icon: 'calendar', color: '#38BDF8', label: 'Updated Event' },
         ARCHIVE_EVENT:      { icon: 'archive', color: '#8b5cf6', label: 'Archived Event' },
         POST_ANNOUNCEMENT:  { icon: 'megaphone', color: '#f59e0b', label: 'Posted Announcement' },
         SET_USER_ROLE:      { icon: 'shield', color: '#6366f1', label: 'Changed User Role' },
         BUDGET_TRANSFER:    { icon: 'arrows-clockwise', color: '#14b8a6', label: 'Budget Transfer' },
-        OVER_BUDGET_ALERT:  { icon: 'warning', color: '#f97316', label: 'Over Budget Alert' },
+        OVER_BUDGET_ALERT:  { icon: 'warning', color: '#F59E0B', label: 'Over Budget Alert' },
       };
       const item = icons[a] || { icon: 'activity', color: 'var(--text-secondary)', label: a };
       return `

@@ -194,7 +194,7 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: '#C2410C',
+          backgroundColor: '#38BDF8', /* steel blue — data-viz accent */
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 35,
@@ -204,7 +204,7 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Expenses',
           data: monthly.map(m => m.expense),
-          backgroundColor: '#3F3F46',
+          backgroundColor: '#475569',
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 35,
@@ -217,7 +217,7 @@ function renderMonthlyChart(monthly) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top', labels: { color: '#8F8F94', font: { family: 'Inter' } } },
+        legend: { position: 'top', labels: { color: '#94A3B8', font: { family: 'Inter' } } },
         tooltip: {
           callbacks: {
             label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
@@ -227,12 +227,12 @@ function renderMonthlyChart(monthly) {
       scales: {
         x: { 
           grid: { display: false },
-          ticks: { color: '#8F8F94' }
+          ticks: { color: '#94A3B8' }
         },
         y: {
-          grid: { color: 'rgba(255, 255, 255, 0.08)' },
+          grid: { color: '#28313A' },
           ticks: {
-            color: '#8F8F94',
+            color: '#94A3B8',
             callback: v => `₱${(v / 1000).toFixed(0)}k`
           }
         }
@@ -248,10 +248,10 @@ function renderBreakdownChart(breakdown) {
 
   // Fixed order so colors always match the right type
   const typeMap = [
-    { key: 'expense',    label: 'Expenses',   color: '#F87171' },
-    { key: 'allocation', label: 'Allocation', color: '#8F8F94' },
-    { key: 'donation',   label: 'Donations',  color: '#4ADE80' },
-    { key: 'collection', label: 'Collection', color: '#C2410C' },
+    { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
+    { key: 'allocation', label: 'Allocation', color: '#94A3B8' },
+    { key: 'donation',   label: 'Donations',  color: '#22C55E' },
+    { key: 'collection', label: 'Collection', color: '#38BDF8' },
   ];
 
   // Filter out zero-value types so the chart isn't cluttered
@@ -266,7 +266,7 @@ function renderBreakdownChart(breakdown) {
         data: hasData ? active.map(t => breakdown[t.key]) : [1],
         backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
         borderWidth: 2,
-        borderColor: '#0d0e10',
+        borderColor: '#111820',
         hoverOffset: 6
       }]
     },
@@ -278,7 +278,7 @@ function renderBreakdownChart(breakdown) {
         legend: {
           position: 'bottom',
           labels: {
-            color: '#8F8F94',
+            color: '#94A3B8',
             font: { family: 'Inter', size: 12 },
             padding: 16,
             usePointStyle: true,
