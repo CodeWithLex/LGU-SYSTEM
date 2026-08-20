@@ -194,7 +194,7 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: '#E8874A',
+          backgroundColor: '#C2410C',
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 35,
@@ -251,7 +251,7 @@ function renderBreakdownChart(breakdown) {
     { key: 'expense',    label: 'Expenses',   color: '#F87171' },
     { key: 'allocation', label: 'Allocation', color: '#8F8F94' },
     { key: 'donation',   label: 'Donations',  color: '#4ADE80' },
-    { key: 'collection', label: 'Collection', color: '#E8874A' },
+    { key: 'collection', label: 'Collection', color: '#C2410C' },
   ];
 
   // Filter out zero-value types so the chart isn't cluttered

@@ -22,11 +22,11 @@
   --text-tertiary: rgba(255, 255, 255, 0.35);
 
   /* Accent — exactly ONE, used only for: primary buttons, active nav indicator,
-     links, focus rings, and chart fill on progress bars. Confirm exact hex with
-     Lex before finalizing — sample from the COE crest orange if unsure. */
-  --accent: #E8874A; /* placeholder — confirm exact hex */
-  --accent-muted: rgba(232, 135, 74, 0.15);
-  --accent-text-on: #1A0800; /* text color on accent fill — >=4.5:1 contrast on #E8874A */
+     links, focus rings, and chart fill on progress bars. Burnt orange — deep
+     enough to read as institutional, unlike the original coral shade. */
+  --accent: #C2410C;
+  --accent-muted: rgba(194, 65, 12, 0.15);
+  --accent-text-on: #FFFFFF; /* text color on accent fill — 4.5:1 on #C2410C */
 
   /* Status — use ONLY as a 6px dot + text color, NEVER as a badge background */
   --status-positive: #4ADE80; /* income / donation / collection */
@@ -323,7 +323,7 @@ html body .hidden {
 .auth-form-panel .form-group select:focus {
   border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(232, 135, 74, 0.15);
+  box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
 }
 
 /* Force dark theme during browser autofill (UA default light-blue/yellow surfaces) */
@@ -337,47 +337,16 @@ html body .hidden {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Icon-wrapped input */
+/* Icon-wrapped input — kept as the structural wrapper for the register
+   custom dropdowns; the auth fields no longer carry leading icons. */
 .input-icon-wrap {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.input-icon {
-  position: absolute;
-  left: 1rem;
-  font-size: 17px;
-  color: var(--text-tertiary);
-  pointer-events: none;
-  flex-shrink: 0;
-}
-
 .input-icon-wrap input {
   width: 100%;
-  padding-left: 2.9rem !important;
-}
-
-.input-icon-wrap select {
-  width: 100%;
-  padding-left: 2.9rem !important;
-  padding-right: 2.75rem !important; /* room for the custom chevron */
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-/* Right-aligned chevron for selects (replaces the native arrow) */
-.input-icon-right {
-  left: auto;
-  right: 0.9rem;
-  font-size: 15px;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-.input-icon-wrap select:hover + .input-icon-right,
-.input-icon-wrap select:focus + .input-icon-right {
-  color: var(--accent);
-  transform: translateY(2px);
 }
 
 /* ---- Custom animated dropdown (register selects) ---- */
@@ -393,7 +362,7 @@ html body .hidden {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.55rem 1rem 0.55rem 2.9rem; /* 2.9rem clears the left input icon */
+  padding: 0.55rem 1rem;
   background: #131417;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-sm);
@@ -411,7 +380,7 @@ html body .hidden {
 .dd-trigger:focus-visible {
   border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(232, 135, 74, 0.15);
+  box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.15);
 }
 
 .dd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -486,14 +455,10 @@ html body .hidden {
 }
 
 /* ---- Custom dropdowns in the logged-in app ----
-   System selects have no left input icon (unlike the register form), so the
-   trigger keeps a normal left padding; inside a .form-group it matches the
-   sizing of sibling inputs. Filter-bar selects keep their inline min-width. */
+   Inside a .form-group the trigger matches the sizing of sibling inputs;
+   filter-bar selects keep their inline min-width. */
 .dd-system {
   flex: 0 0 auto;
-}
-.dd-system .dd-trigger {
-  padding-left: 1rem;
 }
 .form-group .dd-system .dd-trigger {
   padding: 0.85rem 1rem;
@@ -819,7 +784,7 @@ html body .hidden {
 }
 .btn-primary:hover {
   filter: brightness(1.1);
-  box-shadow: 0 4px 16px rgba(232, 135, 74, 0.22);
+  box-shadow: 0 4px 16px rgba(194, 65, 12, 0.22);
 }
 .btn-primary:active {
   transform: scale(0.98);
