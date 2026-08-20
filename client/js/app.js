@@ -306,6 +306,8 @@
     if (session) {
       await bootApp(session);
     } else {
+      // Fresh login should start at the dashboard, not a stale last view
+      try { sessionStorage.removeItem('lastView'); } catch { /* storage unavailable */ }
       UI.showScreen('auth');
       Dashboard.destroy();
     }
@@ -394,8 +396,17 @@
 
     UI.setAdminVisibility(profile?.role === 'admin');
 
-    UI.showView('dashboard');
-    await Dashboard.load();
+    // On a refresh, return the user to the view they were last on instead of
+    // resetting to the dashboard. Fall back to the dashboard when nothing is
+    // saved, the view no longer exists, or a non-admin somehow saved 'admin'.
+    let saved = null;
+    try { saved = sessionStorage.getItem('lastView'); } catch { /* storage unavailable */ }
+    const isAdmin = profile?.role === 'admin';
+    const target = saved
+      && document.getElementById(`view-${saved}`)
+      && (saved !== 'admin' || isAdmin)
+      ? saved : 'dashboard';
+    navigateTo(target);
 
     // Ensure splash stays visible for at least 1.2s to show off the animation smoothly
     const elapsed = Date.now() - splashStart;

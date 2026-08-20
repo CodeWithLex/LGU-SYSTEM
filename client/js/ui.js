@@ -15,8 +15,14 @@ const UI = (() => {
     if (view) view.classList.add('active');
     if (nav)  nav.classList.add('active');
 
-    // Re-render Lucide icons in case this view has dynamic content
-}
+    // Remember the last navigable view so a page refresh returns the user
+    // here instead of resetting to the dashboard. Sub-views that need their
+    // own state (e.g. event-detail) are not stored.
+    const NAV_VIEWS = ['dashboard', 'events', 'transactions', 'income', 'reports', 'units', 'admin'];
+    if (NAV_VIEWS.includes(viewId)) {
+      try { sessionStorage.setItem('lastView', viewId); } catch { /* storage unavailable */ }
+    }
+  }
 
   function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
