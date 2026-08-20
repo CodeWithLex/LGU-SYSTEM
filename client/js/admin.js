@@ -352,7 +352,7 @@ const Admin = (() => {
 
       if (fromId === 'GENERAL') {
         const newBal = _genFundBalance - amount;
-        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <i class="ph ph-thin ph-arrow-right" style="font-size:12px" ></i> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <iconify-icon icon="icon-park-outline:arrow-right" style="font-size:12px" ></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
           errEl.textContent = "Insufficient funds in General Fund!";
           errEl.classList.remove('hidden');
@@ -363,7 +363,7 @@ const Admin = (() => {
         }
       } else if (fromId && fromEv) {
         const newBal = fromEv.remaining_budget - amount;
-        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <i class="ph ph-thin ph-arrow-right" style="font-size:12px" ></i> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <iconify-icon icon="icon-park-outline:arrow-right" style="font-size:12px" ></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
           errEl.textContent = "Source event has insufficient funds!";
           errEl.classList.remove('hidden');
@@ -378,7 +378,7 @@ const Admin = (() => {
 
       if (toEv) {
         const newBal = toEv.remaining_budget + amount;
-        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <i class="ph ph-thin ph-arrow-right" style="font-size:12px" ></i> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
+        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <iconify-icon icon="icon-park-outline:arrow-right" style="font-size:12px" ></iconify-icon> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
       } else {
         toBalEl.textContent = '—';
       }
@@ -434,7 +434,7 @@ const Admin = (() => {
       _allUsers = await Api.admin.users();
       renderUsersTable(document.getElementById('users-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><i class="ph ph-thin ph-warning"></i> ${err.message}</div>`;
+      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="icon-park-outline:caution"></iconify-icon> ${err.message}</div>`;
 }
   }
 
@@ -511,7 +511,7 @@ const Admin = (() => {
       _allLogs = await Api.admin.auditLogs({ limit: 100 });
       renderAuditTable(document.getElementById('audit-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state"><i class="ph ph-thin ph-warning"></i> ${err.message}</div>`;
+      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="icon-park-outline:caution"></iconify-icon> ${err.message}</div>`;
 }
   }
 
@@ -535,21 +535,21 @@ const Admin = (() => {
 
     const actionLabel = a => {
       const icons = {
-        CREATE_TRANSACTION: { icon: 'plus-circle', color: '#22C55E', label: 'Created Transaction' },
-        EDIT_TRANSACTION:   { icon: 'pencil-simple-line', color: '#38BDF8', label: 'Edited Transaction' },
-        DELETE_TRANSACTION: { icon: 'trash', color: '#ef4444', label: 'Deleted Transaction' },
-        CREATE_EVENT:       { icon: 'calendar-plus', color: '#22C55E', label: 'Created Event' },
-        UPDATE_EVENT:       { icon: 'calendar', color: '#38BDF8', label: 'Updated Event' },
-        ARCHIVE_EVENT:      { icon: 'archive', color: '#8b5cf6', label: 'Archived Event' },
-        POST_ANNOUNCEMENT:  { icon: 'megaphone', color: '#f59e0b', label: 'Posted Announcement' },
+        CREATE_TRANSACTION: { icon: 'add-one', color: '#22C55E', label: 'Created Transaction' },
+        EDIT_TRANSACTION:   { icon: 'write', color: '#F97316', label: 'Edited Transaction' },
+        DELETE_TRANSACTION: { icon: 'delete', color: '#ef4444', label: 'Deleted Transaction' },
+        CREATE_EVENT:       { icon: 'calendar', color: '#22C55E', label: 'Created Event' },
+        UPDATE_EVENT:       { icon: 'calendar', color: '#F97316', label: 'Updated Event' },
+        ARCHIVE_EVENT:      { icon: 'box', color: '#8b5cf6', label: 'Archived Event' },
+        POST_ANNOUNCEMENT:  { icon: 'volume-notice', color: '#f59e0b', label: 'Posted Announcement' },
         SET_USER_ROLE:      { icon: 'shield', color: '#6366f1', label: 'Changed User Role' },
-        BUDGET_TRANSFER:    { icon: 'arrows-clockwise', color: '#14b8a6', label: 'Budget Transfer' },
-        OVER_BUDGET_ALERT:  { icon: 'warning', color: '#F59E0B', label: 'Over Budget Alert' },
+        BUDGET_TRANSFER:    { icon: 'bank-transfer', color: '#14b8a6', label: 'Budget Transfer' },
+        OVER_BUDGET_ALERT:  { icon: 'caution', color: '#F59E0B', label: 'Over Budget Alert' },
       };
-      const item = icons[a] || { icon: 'activity', color: 'var(--text-secondary)', label: a };
+      const item = icons[a] || { icon: 'info', color: 'var(--text-secondary)', label: a };
       return `
         <div style="display:flex;align-items:center;gap:0.5rem;">
-          <i class="ph ph-thin ph-${item.icon}" style="font-size:14px;color:${item.color}"></i>
+          <iconify-icon icon="icon-park-outline:${item.icon}" style="font-size:14px;color:${item.color}"></iconify-icon>
           <span style="font-size:.82rem">${item.label}</span>
         </div>`;
     };

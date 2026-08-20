@@ -87,7 +87,7 @@ const Dashboard = (() => {
     const container = document.getElementById('recent-tx-list');
     try {
       const txs = await Api.transactions.list({ limit: 8 });
-      if (!txs.length) { UI.setEmpty('recent-tx-list', 'credit-card', 'No transactions yet.'); return; }
+      if (!txs.length) { UI.setEmpty('recent-tx-list', 'bank-card', 'No transactions yet.'); return; }
 
       container.innerHTML = txs.map(tx => `
         <div class="tx-item">
@@ -102,7 +102,7 @@ const Dashboard = (() => {
         </div>
       `).join('');
     } catch (err) {
-      container.innerHTML = `<div class="loading-state"><i class="ph ph-thin ph-warning"></i> Failed to load transactions.</div>`;
+      container.innerHTML = `<div class="loading-state"><iconify-icon icon="icon-park-outline:caution"></iconify-icon> Failed to load transactions.</div>`;
 }
   }
 
@@ -115,7 +115,7 @@ const Dashboard = (() => {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      if (!data?.length) { UI.setEmpty('announcement-list', 'megaphone', 'No announcements yet.'); return; }
+      if (!data?.length) { UI.setEmpty('announcement-list', 'volume-notice', 'No announcements yet.'); return; }
 
       container.innerHTML = data.map(a => `
         <div class="announce-item">
@@ -134,7 +134,7 @@ const Dashboard = (() => {
         });
       });
     } catch (err) {
-      container.innerHTML = `<div class="loading-state"><i class="ph ph-thin ph-warning"></i> Failed to load announcements.</div>`;
+      container.innerHTML = `<div class="loading-state"><iconify-icon icon="icon-park-outline:caution"></iconify-icon> Failed to load announcements.</div>`;
 }
   }
 

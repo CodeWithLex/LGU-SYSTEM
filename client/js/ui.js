@@ -43,14 +43,14 @@ const UI = (() => {
     const msgEl    = document.getElementById('toast-message');
 
     const icons = { 
-      success: 'check-circle', 
-      error: 'x-circle', 
+      success: 'check-one', 
+      error: 'close-one', 
       info: 'info', 
-      warning: 'warning' 
+      warning: 'caution' 
     };
     
     const iconName = icons[type] || 'check-circle';
-    iconEl.innerHTML = `<i class="ph ph-thin ph-${iconName}" style="font-size:18px;"></i>`;
+    iconEl.innerHTML = `<iconify-icon icon="icon-park-outline:${iconName}" style="font-size:18px;"></iconify-icon>`;
     msgEl.textContent = message;
     
     toastEl.classList.remove('hidden');
@@ -114,12 +114,12 @@ const UI = (() => {
       </div>`;
   }
 
-  function setEmpty(containerId, icon = 'tray', text = 'No data available.') {
+  function setEmpty(containerId, icon = 'inbox', text = 'No data available.') {
     const el = document.getElementById(containerId);
     if (el) {
       el.innerHTML = `
         <div class="empty-state">
-          <span class="empty-icon"><i class="ph ph-thin ph-${icon}"></i></span>
+          <span class="empty-icon"><iconify-icon icon="icon-park-outline:${icon}"></iconify-icon></span>
           <p>${text}</p>
         </div>`;
     }

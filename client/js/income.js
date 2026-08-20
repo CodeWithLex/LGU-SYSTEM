@@ -20,7 +20,7 @@ const Income = (() => {
   function renderTable(txs) {
     const tbody = document.getElementById('income-table-body');
     if (!txs.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span class="empty-icon"><i class="ph ph-thin ph-piggy-bank"></i></span><p>No income recorded yet.</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span class="empty-icon"><iconify-icon icon="icon-park-outline:pig"></iconify-icon></span><p>No income recorded yet.</p></div></td></tr>`;
 return;
     }
 

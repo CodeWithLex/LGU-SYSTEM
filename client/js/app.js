@@ -183,7 +183,8 @@
     label.className = 'dd-label';
 
     const chevron = document.createElement('i');
-    chevron.className = 'dd-chevron ph ph-thin ph-caret-down';
+    chevron.innerHTML = '<iconify-icon icon="icon-park-outline:down"></iconify-icon>';
+    chevron.className = 'dd-chevron';
 
     trigger.append(label, chevron);
 

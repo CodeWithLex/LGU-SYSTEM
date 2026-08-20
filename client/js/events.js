@@ -28,7 +28,7 @@ const Events = (() => {
       allEvents = await Api.events.list();
       applyFilters(); // Apply current search/sort to newly loaded data
     } catch (err) {
-      UI.setEmpty('events-grid', 'warning', 'Failed to load events.');
+      UI.setEmpty('events-grid', 'caution', 'Failed to load events.');
     }
   }
 
@@ -63,7 +63,7 @@ const Events = (() => {
     const grid = document.getElementById('events-grid');
     if (!events.length) {
       if (isSearching) {
-        UI.setEmpty('events-grid', 'magnifying-glass', 'No events match your search.');
+        UI.setEmpty('events-grid', 'search', 'No events match your search.');
       } else {
         UI.setEmpty('events-grid', 'target', 'No events posted yet.');
       }
@@ -109,26 +109,26 @@ const Events = (() => {
           ${UI.renderStatusBadge(ev.status)}
           <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
           <p style="color:var(--text-secondary)">${ev.description || ''}</p>
-          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><i class="ph ph-thin ph-calendar" style="font-size:14px" ></i> ${UI.dateStr(ev.event_date)}</p>` : ''}
+          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="icon-park-outline:calendar" style="font-size:14px" ></iconify-icon> ${UI.dateStr(ev.event_date)}</p>` : ''}
         </div>
 
         <div class="stats-grid" style="margin-bottom:1.5rem">
           <div class="stat-card stat-balance">
-            <div class="stat-icon"><i class="ph ph-thin ph-wallet"></i></div>
+            <div class="stat-icon"><iconify-icon icon="icon-park-outline:wallet-one"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Allocated</p>
               <h3 class="stat-value">${UI.currency(ev.allocated_budget)}</h3>
             </div>
           </div>
           <div class="stat-card stat-expense">
-            <div class="stat-icon"><i class="ph ph-thin ph-trend-down"></i></div>
+            <div class="stat-icon"><iconify-icon icon="icon-park-outline:trending-down"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Expenses</p>
               <h3 class="stat-value">${UI.currency(spent)}</h3>
             </div>
           </div>
           <div class="stat-card stat-income">
-            <div class="stat-icon"><i class="ph ph-thin ph-building"></i></div>
+            <div class="stat-icon"><iconify-icon icon="icon-park-outline:building-one"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Remaining</p>
               <h3 class="stat-value">${UI.currency(ev.computed_remaining)}</h3>
@@ -154,9 +154,9 @@ const Events = (() => {
                     </div>
                     <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
                   </div>
-                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i class="ph ph-thin ph-paperclip" style="font-size:14px" ></i> Receipt</a>` : ''}
+                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="icon-park-outline:paperclip" style="font-size:14px" ></iconify-icon> Receipt</a>` : ''}
                 </div>`).join('')
-              : '<div class="empty-state"><span class="empty-icon"><i class="ph ph-thin ph-credit-card"></i></span><p>No transactions recorded yet.</p></div>'
+              : '<div class="empty-state"><span class="empty-icon"><iconify-icon icon="icon-park-outline:bank-card"></iconify-icon></span><p>No transactions recorded yet.</p></div>'
             }
           </div>
         </div>`;

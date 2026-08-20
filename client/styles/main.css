@@ -21,7 +21,6 @@
 
   --primary: #F97316;           /* engineering orange — action/active only */
   --primary-hover: #FB923C;
-  --accent-blue: #38BDF8;       /* steel blue — links, focus, data viz */
 
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
@@ -42,8 +41,7 @@
   --accent-muted: rgba(249, 115, 22, 0.12);
   --accent-text-on: #FFFFFF; /* CTA text on #F97316 ≈2.8:1 — carried by bold button text */
 
-  --focus: var(--accent-blue); /* restrained steel-blue focus — no orange outlines */
-  --border-focus: var(--focus);
+  --border-focus: var(--accent); /* focus = orange, matching the action color */
 
   --status-positive: var(--success); /* income / donation / collection */
   --status-negative: var(--error);   /* expense */
@@ -111,7 +109,7 @@
 
 /* ---- Accessibility & input basics ---- */
 :focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -155,7 +153,7 @@ h4 { font-size: var(--size-15); }
 .text-secondary { font-size: var(--size-13); color: var(--text-secondary); }
 .text-label { font-size: var(--size-11); text-transform: uppercase; letter-spacing: 0.05em; }
 a {
-  color: var(--accent-blue);
+  color: var(--accent);
   text-decoration: none;
 }
 a:hover {
@@ -201,9 +199,7 @@ html body .hidden {
 .auth-brand-panel {
   position: relative;
   flex: 0 0 50%;
-  /* Cool navy-tinted graphite — reads as an institutional portal, never pure black */
-  background-color: #0D1520; /* fallback while the pattern loads */
-  background-image: linear-gradient(160deg, #101B2B 0%, #0B111A 55%, #0A0F16 100%);
+  background-color: #0D0E10; /* neutral graphite — the pattern overlays it */
   border-right: 1px solid var(--border-default);
   overflow: hidden;
   display: flex;
@@ -340,9 +336,9 @@ html body .hidden {
 }
 .auth-form-panel .form-group input:focus,
 .auth-form-panel .form-group select:focus {
-  border-color: var(--focus);
+  border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
 /* Force dark theme during browser autofill (UA default light-blue/yellow surfaces) */
@@ -402,9 +398,9 @@ html body .hidden {
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 .dd-trigger:focus-visible {
-  border-color: var(--focus);
+  border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
 .dd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -654,12 +650,13 @@ html body .hidden {
   color: var(--text-tertiary);
 }
 
-/* ---- Auth forms: neutral grays only ----
-   The app-wide slate text tokens carry a blue tint that reads wrong against
-   the navy brand panel. Labels, hints, placeholders, and chevrons here stay
-   neutral so the login/register forms have no blue in their icons or text. */
+/* ---- Auth screens: neutral grays only ----
+   The app-wide slate text tokens carry a blue tint that reads wrong on the
+   auth screens. Labels, hints, placeholders, chevrons, and brand copy here
+   stay neutral so the login/register screens have no blue in icons or text. */
 .auth-form-panel .auth-form-header p,
-.auth-form-panel .form-group label {
+.auth-form-panel .form-group label,
+.auth-form-panel .auth-switch {
   color: rgba(255, 255, 255, 0.55);
 }
 .auth-form-panel .auth-field-hint {
@@ -671,6 +668,12 @@ html body .hidden {
 }
 .auth-form-panel .dd-menu li {
   color: rgba(255, 255, 255, 0.55);
+}
+.auth-brand-content .auth-subtitle {
+  color: rgba(255, 255, 255, 0.55);
+}
+.auth-brand-content .auth-brand-desc {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .auth-error {
@@ -722,7 +725,7 @@ html body .hidden {
 .form-group select:focus,
 .form-group textarea:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); /* restrained steel-blue glow */
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); /* restrained orange glow */
 }
 
 .form-group select option {
@@ -754,8 +757,8 @@ html body .hidden {
 
 .file-drop-zone:hover,
 .file-drop-zone.drag-over {
-  border-color: var(--accent-blue);
-  background: rgba(56, 189, 248, 0.06);
+  border-color: var(--accent);
+  background: rgba(249, 115, 22, 0.06);
 }
 
 .file-input {
@@ -778,7 +781,7 @@ html body .hidden {
   color: var(--col-text-dim);
 }
 .file-drop-label .link {
-  color: var(--accent-blue);
+  color: var(--accent);
 }
 .file-preview {
   font-size: 0.85rem;
@@ -970,8 +973,7 @@ html body .hidden {
   color: var(--accent); /* subtle orange icon on the active item */
 }
 
-.nav-item i, .nav-item svg {
-  stroke: currentColor;
+.nav-item iconify-icon {
   color: inherit;
 }
 
@@ -1201,10 +1203,10 @@ html body .hidden {
 .stat-icon {
   font-size: 1.5rem;
   line-height: 1;
-  color: var(--accent-blue);
+  color: var(--text-secondary); /* neutral — not a brand accent */
 }
-.stat-icon i, .stat-icon svg {
-  stroke: currentColor;
+.stat-icon iconify-icon {
+  color: inherit;
 }
 .stat-label {
   font-size: 0.75rem;
@@ -1363,7 +1365,7 @@ html body .hidden {
 /* ---- Announcements ---- */
 .announce-item {
   padding: 0.85rem;
-  border-left: 2px solid var(--accent-blue);
+  border-left: 2px solid var(--accent);
   background: var(--bg-surface-raised);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-bottom: 0.6rem;
@@ -1391,7 +1393,7 @@ html body .hidden {
 .announce-expand-btn {
   background: none;
   border: none;
-  color: var(--accent-blue);
+  color: var(--accent);
   font-size: 0.8rem;
   font-weight: 500;
   padding: 0.25rem 0;
@@ -1454,7 +1456,7 @@ html body .hidden {
 .event-budget-fill {
   height: 100%;
   border-radius: var(--radius-sm);
-  background: var(--accent-blue); /* data-viz fill — steel blue, not orange */
+  background: var(--accent); /* budget bar fill — orange */
   transition: width 0.6s ease;
 }
 
@@ -1550,7 +1552,7 @@ html body .hidden {
 }
 
 .receipt-link {
-  color: var(--accent-blue);
+  color: var(--accent);
   font-size: 0.8rem;
   display: inline-flex;
   align-items: center;
@@ -1574,7 +1576,7 @@ html body .hidden {
 .filter-bar select:focus, .search-input-wrapper input:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
 }
 
 .search-input-wrapper i {
@@ -1691,11 +1693,11 @@ html body .hidden {
 }
 
 /* =========================================
-   Phosphor Icons — global normalization
-   Ensures all ph icons render at the right
-   weight, line-height and display context.
+   Iconify — icon-park-outline global normalization
+   Ensures all iconify-icon elements render at the
+   right size, line-height and display context.
    ========================================= */
-.ph {
+iconify-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;

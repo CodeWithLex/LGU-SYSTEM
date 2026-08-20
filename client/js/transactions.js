@@ -25,7 +25,7 @@ const Transactions = (() => {
 
     if (!txs.length) {
       const colSpan = _isAdmin ? 8 : 7;
-      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><i class="ph ph-thin ph-credit-card"></i></span><p>No transactions found.</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><iconify-icon icon="icon-park-outline:bank-card"></iconify-icon></span><p>No transactions found.</p></div></td></tr>`;
 return;
     }
 
@@ -39,7 +39,7 @@ return;
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><i class="ph ph-thin ph-paperclip" style="font-size:14px" ></i> View</a>`
+          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="icon-park-outline:paperclip" style="font-size:14px" ></iconify-icon> View</a>`
           : '<span style="color:var(--text-tertiary)">—</span>'}</td>
         <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
         ${_isAdmin ? `
@@ -50,10 +50,10 @@ return;
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><i class="ph ph-thin ph-pencil-simple-line" style="font-size:14px" ></i></button>
+              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="icon-park-outline:write" style="font-size:14px" ></iconify-icon></button>
             <button class="tx-action-btn tx-del-btn"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i class="ph ph-thin ph-trash" style="font-size:14px" ></i></button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="icon-park-outline:delete" style="font-size:14px" ></iconify-icon></button>
           </div>
         </td>` : ''}
       </tr>
@@ -74,10 +74,10 @@ return;
                <span class="tx-amount ${tx.type}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
-              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><i class="ph ph-thin ph-paperclip" style="font-size:14px" ></i> Receipt</a>` : ''}
+              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><iconify-icon icon="icon-park-outline:paperclip" style="font-size:14px" ></iconify-icon> Receipt</a>` : ''}
             </div>
             <div style="font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;">
-              <i class="ph ph-thin ph-user" style="font-size:10px" ></i> ${tx.profiles?.full_name || 'System'}
+              <iconify-icon icon="icon-park-outline:user" style="font-size:10px" ></iconify-icon> ${tx.profiles?.full_name || 'System'}
             </div>
           </div>
           ${_isAdmin ? `
@@ -87,10 +87,10 @@ return;
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><i class="ph ph-thin ph-pencil-simple-line"></i></button>
+              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="icon-park-outline:write"></iconify-icon></button>
             <button class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><i class="ph ph-thin ph-trash"></i></button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="icon-park-outline:delete"></iconify-icon></button>
           </div>` : ''}
         </div>
       `).join('');
