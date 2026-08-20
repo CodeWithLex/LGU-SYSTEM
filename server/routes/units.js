@@ -105,7 +105,14 @@ router.post('/enroll', async (req, res) => {
       .eq('id', subject_id)
       .single();
     if (subjErr || !subject) return res.status(404).json({ error: 'Subject not found.' });
-    if (!req.profile?.course || subject.program !== req.profile.course) {
+
+    // Students can only log subjects from their own course. Match
+    // case/whitespace-insensitively so profiles storing " bscoe " or
+    // "BSCOE" still resolve to the canonical program code.
+    const studentProgram = VALID_PROGRAMS.find(
+      p => p.toUpperCase() === String(req.profile?.course || '').trim().toUpperCase()
+    );
+    if (!studentProgram || subject.program !== studentProgram) {
       return res.status(403).json({ error: 'You can only log subjects from your enrolled program.' });
     }
 

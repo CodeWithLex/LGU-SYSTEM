@@ -67,15 +67,19 @@ const Units = (() => {
   // ---- Load ----
   async function load() {
     const profile = await Auth.getProfile().catch(() => null);
-    const isAdmin    = profile?.role === 'admin';
-    const courseLock = !!(profile?.course && VALID_PROGRAMS.includes(profile.course));
+    const isAdmin = profile?.role === 'admin';
+    // Match case/whitespace-insensitively so legacy profiles storing
+    // "BS Computer Engineering" or " bscoe " still resolve to the code.
+    const normCourse    = (profile?.course || '').trim().toUpperCase();
+    const enrolledProgram = VALID_PROGRAMS.find(p => p.toUpperCase() === normCourse) || null;
+    const courseLock    = !!enrolledProgram;
 
     // Students are locked to their enrolled program; anyone without a course
     // (e.g. admins) can browse any program.
     if (courseLock && !isAdmin) {
-      program = profile.course;
+      program = enrolledProgram;
     } else if (!program) {
-      program = courseLock ? profile.course : 'BSCoE';
+      program = courseLock ? enrolledProgram : 'BSCoE';
     }
 
     const sel = document.getElementById('units-program');
