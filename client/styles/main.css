@@ -2531,6 +2531,25 @@ html body.is-admin th.admin-only {
 .units-tab-btn:hover { color: var(--text-primary); }
 .units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
+/* Tabs live inside the progress card now — stretch full-width below the
+   Estimated Graduation line; the card itself is the sticky element, so the
+   wrapper is relative here (absolute slider still anchors to it). */
+.units-progress-card .units-filter-tabs-wrapper {
+  display: flex;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+.units-progress-card .units-tab-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+}
+
 /* Program picker — locked to the student's enrolled course */
 .dd.dd-disabled { opacity: 0.65; pointer-events: none; }
 .units-program-lock {
@@ -2561,8 +2580,8 @@ html body.is-admin th.admin-only {
   .units-progress-stats { grid-template-columns: 1fr !important; }
 
   /* Keep all five tabs on one row; the slider morphs to the tighter buttons */
-  .units-filter-tabs-wrapper { max-width: 100%; }
-  .units-tab-btn { padding: 0.4rem 0.7rem; font-size: 0.72rem; }
+  .units-progress-card .units-filter-tabs-wrapper { max-width: 100%; }
+  .units-progress-card .units-tab-btn { padding: 0.4rem 0.7rem; font-size: 0.72rem; }
 
   .unit-row {
     display: flex !important;

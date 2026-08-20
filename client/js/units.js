@@ -159,14 +159,7 @@ const Units = (() => {
       return { year, sems };
     }).filter(y => y.sems.length);
 
-    container.innerHTML = `
-      <div class="units-filter-tabs-wrapper" role="group" aria-label="Filter subjects by year">
-        <div class="units-tab-slider" id="units-tab-slider"></div>
-        ${['all', '1', '2', '3', '4'].map(y => `
-          <button type="button" class="units-tab-btn${selectedYear === y ? ' active' : ''}" data-year="${y}">${y === 'all' ? 'All' : `Year ${y}`}</button>
-        `).join('')}
-      </div>
-      ${years.map(({ year, sems }) => `
+    container.innerHTML = years.map(({ year, sems }) => `
       <div class="unit-year" data-year="${year}">
         <div class="unit-year-banner">Year ${year}</div>
         ${sems.map(({ sem, subjects: list }) => `
@@ -176,7 +169,7 @@ const Units = (() => {
           </div>
         `).join('')}
       </div>
-    `).join('')}`;
+    `).join('');
 
     sliderInit = false; // a fresh bar positions itself instantly, then animates
     applyYearFilter();
@@ -188,7 +181,7 @@ const Units = (() => {
     document.querySelectorAll('#units-checklist .unit-year').forEach(el => {
       el.style.display = (selectedYear === 'all' || el.dataset.year === selectedYear) ? '' : 'none';
     });
-    document.querySelectorAll('#units-checklist .units-tab-btn').forEach(t => {
+    document.querySelectorAll('#units-filter-tabs-wrapper .units-tab-btn').forEach(t => {
       t.classList.toggle('active', t.dataset.year === selectedYear);
     });
   }
@@ -197,9 +190,9 @@ const Units = (() => {
   let sliderInit = false;
 
   function updateTabSlider() {
-    const activeTab = document.querySelector('.units-tab-btn.active');
+    const activeTab = document.querySelector('#units-filter-tabs-wrapper .units-tab-btn.active');
     const slider = document.getElementById('units-tab-slider');
-    const wrapper = document.querySelector('.units-filter-tabs-wrapper');
+    const wrapper = document.getElementById('units-filter-tabs-wrapper');
     if (!activeTab || !slider || !wrapper) return;
 
     // The slider's absolute `left: 4px` rests at the content start (padding
@@ -340,15 +333,15 @@ const Units = (() => {
   }
 
   // ---- Event wiring (runs once at script load) ----
-  document.getElementById('units-checklist').addEventListener('click', e => {
+  document.getElementById('units-filter-tabs-wrapper').addEventListener('click', e => {
     const tab = e.target.closest('[data-year]');
-    if (tab) {
-      selectedYear = tab.dataset.year;
-      applyYearFilter();
-      updateTabSlider();
-      return;
-    }
+    if (!tab) return;
+    selectedYear = tab.dataset.year;
+    applyYearFilter();
+    updateTabSlider();
+  });
 
+  document.getElementById('units-checklist').addEventListener('click', e => {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
