@@ -9,6 +9,7 @@ const Units = (() => {
   let myUnits      = []; // the student's enrollment records
   let program      = null;
   let selectedYear = 'all'; // 'all' | '1' | '2' | '3' | '4'
+  let enrollmentYear = null; // profile.enrollment_year — cohort that anchors prospectus SY prefill
 
   const VALID_PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
   const PROGRAM_NAMES = {
@@ -35,6 +36,16 @@ const Units = (() => {
   function currentSemester() {
     const m = new Date().getMonth() + 1;
     return m >= 6 && m <= 10 ? 1 : 2;
+  }
+
+  // Prospectus school year for a subject's year level, anchored to the
+  // student's enrollment year (e.g. enrolled 2025 → a Year 2 subject is
+  // 2026-2027). Falls back to the current school year when the profile
+  // has no enrollment year recorded yet.
+  function prospectusSchoolYear(subject) {
+    const base = enrollmentYear || Number(currentSchoolYear().split('-')[0]);
+    const start = base + Number(subject.year_level) - 1;
+    return `${start}-${start + 1}`;
   }
 
   function esc(str) {
@@ -73,6 +84,7 @@ const Units = (() => {
     const normCourse    = (profile?.course || '').trim().toUpperCase();
     const enrolledProgram = VALID_PROGRAMS.find(p => p.toUpperCase() === normCourse) || null;
     const courseLock    = !!enrolledProgram;
+    enrollmentYear      = Number(profile?.enrollment_year) || null;
 
     // Students are locked to their enrolled program; anyone without a course
     // (e.g. admins) can browse any program.
@@ -263,7 +275,9 @@ const Units = (() => {
       `${subject.code} · ${subject.title} · ${subject.units} unit${subject.units === 1 ? '' : 's'}`;
 
     setDDValue(document.getElementById('units-sem'), String(record?.semester ?? currentSemester()));
-    document.getElementById('units-sy').value = record?.school_year || currentSchoolYear();
+    // New records default to the subject's prospectus school year (derived
+    // from the student's enrollment year); edits keep their stored year.
+    document.getElementById('units-sy').value = record?.school_year || prospectusSchoolYear(subject);
     setDDValue(document.getElementById('units-status'), record?.status || 'enrolled');
     document.getElementById('units-grade').value = record?.grade != null ? record.grade : '';
 
