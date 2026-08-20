@@ -8,6 +8,7 @@ const Units = (() => {
   let subjects     = []; // subjects for the current program
   let myUnits      = []; // the student's enrollment records
   let program      = null;
+  let selectedYear = 'all'; // 'all' | '1' | '2' | '3' | '4'
 
   const VALID_PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
   const PROGRAM_NAMES = {
@@ -141,8 +142,14 @@ const Units = (() => {
       return { year, sems };
     }).filter(y => y.sems.length);
 
-    container.innerHTML = years.map(({ year, sems }) => `
-      <div class="unit-year">
+    container.innerHTML = `
+      <div class="unit-year-tabs" role="group" aria-label="Filter subjects by year">
+        ${['all', '1', '2', '3', '4'].map(y => `
+          <button type="button" class="unit-year-tab${selectedYear === y ? ' active' : ''}" data-year="${y}">${y === 'all' ? 'All' : `Year ${y}`}</button>
+        `).join('')}
+      </div>
+      ${years.map(({ year, sems }) => `
+      <div class="unit-year" data-year="${year}">
         <div class="unit-year-banner">Year ${year}</div>
         ${sems.map(({ sem, subjects: list }) => `
           <div class="unit-sem">
@@ -151,7 +158,19 @@ const Units = (() => {
           </div>
         `).join('')}
       </div>
-    `).join('');
+    `).join('')}`;
+
+    applyYearFilter();
+  }
+
+  // Show only the selected year's blocks (or all); keeps the active tab in sync.
+  function applyYearFilter() {
+    document.querySelectorAll('#units-checklist .unit-year').forEach(el => {
+      el.style.display = (selectedYear === 'all' || el.dataset.year === selectedYear) ? '' : 'none';
+    });
+    document.querySelectorAll('#units-checklist .unit-year-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.year === selectedYear);
+    });
   }
 
   function subjectRow(s) {
@@ -273,6 +292,13 @@ const Units = (() => {
 
   // ---- Event wiring (runs once at script load) ----
   document.getElementById('units-checklist').addEventListener('click', e => {
+    const tab = e.target.closest('[data-year]');
+    if (tab) {
+      selectedYear = tab.dataset.year;
+      applyYearFilter();
+      return;
+    }
+
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;

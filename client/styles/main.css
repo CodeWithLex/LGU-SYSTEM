@@ -2312,7 +2312,8 @@ html body.is-admin th.admin-only {
 .units-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent) 0%, #ff8c3a 100%);
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -2397,12 +2398,17 @@ html body.is-admin th.admin-only {
   display: grid;
   grid-template-columns: 88px 1fr auto auto;
   align-items: center;
+  min-height: 52px;
   gap: 0.75rem;
   padding: 0.65rem 1rem;
   border-top: 1px solid var(--border-default);
-  transition: background var(--transition);
+  transition: background var(--transition), opacity var(--transition);
 }
 .unit-row:hover { background: var(--surface-hover); }
+
+/* Untaken rows read as secondary until hovered */
+.unit-row:has(.unit-badge--none) { opacity: 0.65; }
+.unit-row:has(.unit-badge--none):hover { opacity: 1; }
 
 .unit-code {
   font-size: 0.78rem;
@@ -2481,6 +2487,41 @@ html body.is-admin th.admin-only {
   font-size: 0.78rem;
 }
 
+/* Year filter tabs (sticky under the topbar while the checklist scrolls) */
+.unit-year-tabs {
+  position: sticky;
+  top: 5.5rem;
+  z-index: 5;
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  overflow-x: auto;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-default);
+}
+.unit-year-tab {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.unit-year-tab:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+.unit-year-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text-on);
+}
+
 /* ---- Responsive ---- */
 @media (max-width: 1024px) {
   .units-layout { grid-template-columns: 1fr; }
@@ -2493,4 +2534,21 @@ html body.is-admin th.admin-only {
   .unit-actions { grid-column: 2; grid-row: 1; }
   .unit-title   { grid-column: 1; grid-row: 2; }
   .unit-badge   { grid-column: 2; grid-row: 2; justify-self: end; }
+}
+
+@media (max-width: 480px) {
+  .units-layout { grid-template-columns: 1fr !important; }
+  .units-progress-stats { grid-template-columns: 1fr !important; }
+
+  .unit-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    padding: 1rem !important;
+    align-items: flex-start !important;
+  }
+  .unit-code    { flex: 0 0 100% !important; }
+  .unit-title   { flex: 0 0 100% !important; } /* own line so badge + actions share the bottom row */
+  .unit-badge   { margin-top: 0.25rem !important; margin-right: auto !important; }
+  .unit-actions { margin-top: 0.25rem !important; }
 }
