@@ -2531,15 +2531,12 @@ html body.is-admin th.admin-only {
 .units-tab-btn:hover { color: var(--text-primary); }
 .units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
-/* Tabs live inside the progress card now — negative margins cancel the card's
-   1.5rem padding so the pill's outer edges align with the card's borders.
-   Every button still gets an equal share so the sliding pill keeps a
-   constant width; the wrapper is relative so the absolute slider anchors to it. */
+/* Tabs live inside the progress card now — base (mobile/tablet) pill spans the
+   card's content width; every button gets an equal share so the sliding pill
+   keeps a constant width. The wrapper is relative so the slider anchors to it. */
 .units-progress-card .units-filter-tabs-wrapper {
   display: flex !important;
-  margin-left: -1.5rem !important;
-  margin-right: -1.5rem !important;
-  width: calc(100% + 3rem) !important;
+  width: 100% !important;
   box-sizing: border-box !important;
   margin-top: 1.5rem !important;
   margin-bottom: 0 !important;
@@ -2556,6 +2553,33 @@ html body.is-admin th.admin-only {
   text-align: center !important;
   padding: 0.5rem 0 !important;
   font-size: 0.76rem !important;
+}
+
+/* Desktop only (≥1025px): pull the pill's edges out to the card's borders by
+   cancelling the card's 1.5rem padding with negative margins. */
+@media (min-width: 1025px) {
+  .units-progress-card .units-filter-tabs-wrapper {
+    display: flex !important;
+    margin-left: -1.5rem !important;
+    margin-right: -1.5rem !important;
+    width: calc(100% + 3rem) !important;
+    box-sizing: border-box !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0 !important;
+    position: relative !important;
+    padding: 4px !important;
+    border-radius: 999px !important;
+    background: var(--bg-surface-raised) !important;
+    border: 1px solid var(--border-default) !important;
+  }
+  /* Buttons grow equally inside the lengthened wrapper on desktop */
+  .units-progress-card .units-tab-btn {
+    flex: 1 1 0% !important;
+    width: 0 !important;
+    text-align: center !important;
+    padding: 0.5rem 0 !important;
+    font-size: 0.76rem !important;
+  }
 }
 
 /* Program picker — locked to the student's enrolled course */
