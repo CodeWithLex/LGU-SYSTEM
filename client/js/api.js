@@ -68,5 +68,13 @@ const Api = (() => {
     transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
   };
 
-  return { events, transactions, reports, admin, request: _request };
+  const units = {
+    checklists: (program) => _request('GET', `/units/checklists${program ? '?program=' + encodeURIComponent(program) : ''}`),
+    my:         ()        => _request('GET', '/units/my'),
+    enroll:     (body)    => _request('POST',  '/units/enroll', body),
+    update:     (id, b)   => _request('PATCH', `/units/update/${id}`, b),
+    drop:       (id)      => _request('DELETE', `/units/drop/${id}`),
+  };
+
+  return { events, transactions, reports, admin, units, request: _request };
 })();

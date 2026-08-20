@@ -335,6 +335,7 @@
         Income.load();
         Income.bindForm();
     }
+    if (view === 'units')       Units.load();
     if (view === 'admin')        Admin.init();
   }
 

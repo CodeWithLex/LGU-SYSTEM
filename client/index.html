@@ -153,6 +153,9 @@
         <a href="#" class="nav-item" data-view="reports" id="nav-reports">
           <span class="nav-icon"><iconify-icon icon="icon-park-outline:chart-histogram"></iconify-icon></span><span>Reports</span>
         </a>
+        <a href="#" class="nav-item" data-view="units" id="nav-units">
+          <span class="nav-icon"><iconify-icon icon="icon-park-outline:checklist"></iconify-icon></span><span>My Units</span>
+        </a>
         <a href="#" class="nav-item admin-only hidden" data-view="admin" id="nav-admin">
           <span class="nav-icon"><iconify-icon icon="icon-park-outline:shield"></iconify-icon></span><span>Admin</span>
         </a>
@@ -378,6 +381,56 @@
         </div>
       </section>
 
+      <!-- CREDIT UNIT TRACKER -->
+      <section class="view" id="view-units">
+        <div class="view-header">
+          <div>
+            <h2>Credit Unit Tracker</h2>
+            <p class="view-sub">Log your subjects, grades, and graduation progress</p>
+          </div>
+          <div class="units-program-picker">
+            <label for="units-program" class="text-label">Program</label>
+            <select id="units-program" style="min-width:220px">
+              <option value="BSCoE">BSCoE — Computer Engineering</option>
+              <option value="BSCE">BSCE — Civil Engineering</option>
+              <option value="BSECE">BSECE — Electronics Engineering</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="units-layout">
+          <!-- Left: Graduation progress -->
+          <aside class="units-progress-card" id="units-progress-card">
+            <div class="units-progress-head">
+              <h3>Graduation Progress</h3>
+              <div class="units-progress-pct" id="units-progress-pct">0%</div>
+            </div>
+            <div class="units-progress-track">
+              <div class="units-progress-fill" id="units-progress-fill" style="width:0%"></div>
+            </div>
+            <div class="units-progress-stats">
+              <div class="units-stat">
+                <span class="units-stat-value" id="units-completed">0</span>
+                <span class="units-stat-label">Units Completed</span>
+              </div>
+              <div class="units-stat">
+                <span class="units-stat-value" id="units-total">—</span>
+                <span class="units-stat-label">Required Units</span>
+              </div>
+            </div>
+            <div class="units-cohort" id="units-cohort">
+              <span class="units-cohort-label">Estimated Graduation</span>
+              <span class="units-cohort-year" id="units-cohort-year">—</span>
+            </div>
+          </aside>
+
+          <!-- Right: Grouped syllabus checklist -->
+          <div class="units-checklist" id="units-checklist">
+            <div class="loading-state">Loading curriculum…</div>
+          </div>
+        </div>
+      </section>
+
       <!-- ADMIN -->
       <section class="view admin-only" id="view-admin">
         <div class="view-header">
@@ -594,6 +647,46 @@
       </section>
 
     </main>
+
+    <!-- Units Modal — Log / Edit a subject record -->
+    <div class="modal-overlay hidden" id="units-modal">
+      <div class="modal-card">
+        <h3 id="units-modal-title" style="margin-bottom:0.25rem;">Log Subject</h3>
+        <p id="units-modal-subject" class="view-sub" style="margin-bottom:1rem;"></p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>School Year</label>
+            <input type="text" id="units-sy" placeholder="2026-2027" />
+          </div>
+          <div class="form-group">
+            <label>Semester</label>
+            <select id="units-sem">
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="units-status">
+            <option value="enrolled">Enrolled</option>
+            <option value="passed">Passed</option>
+            <option value="failed">Failed</option>
+            <option value="dropped">Dropped</option>
+            <option value="incomplete">Incomplete</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Grade (1.0 – 5.0)</label>
+          <input type="number" id="units-grade" min="1" max="5" step="0.25" placeholder="e.g. 1.5" />
+        </div>
+        <div class="auth-error hidden" id="units-modal-error"></div>
+        <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
+          <button class="btn btn-ghost" id="units-modal-cancel" type="button">Cancel</button>
+          <button class="btn btn-primary" id="units-modal-save" type="button">Save</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
@@ -609,6 +702,9 @@
     </a>
     <a href="#" class="bottom-nav-item" data-view="reports">
       <span class="nav-icon"><iconify-icon icon="icon-park-outline:chart-histogram"></iconify-icon></span><span>Reports</span>
+    </a>
+    <a href="#" class="bottom-nav-item" data-view="units">
+      <span class="nav-icon"><iconify-icon icon="icon-park-outline:checklist"></iconify-icon></span><span>Units</span>
     </a>
     <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
       <span class="nav-icon"><iconify-icon icon="icon-park-outline:shield"></iconify-icon></span><span>Admin</span>
@@ -730,6 +826,7 @@
   <script src="js/transactions.js"></script>
   <script src="js/reports.js"></script>
   <script src="js/income.js"></script>
+  <script src="js/units.js"></script>
   <script src="js/admin.js"></script>
   <script src="js/app.js"></script>
 </body>
