@@ -25,6 +25,7 @@ const Units = (() => {
     incomplete: 'Incomplete',
   };
   const SEM_LABELS = { 1: '1st Semester', 2: '2nd Semester', 3: 'Summer Term' };
+  const SEM_SHORT = { 1: '1st Sem', 2: '2nd Sem', 3: 'Summer' };
 
   // ---- Small helpers ----
   function currentSchoolYear() {
@@ -155,6 +156,55 @@ const Units = (() => {
     document.getElementById('units-cohort-year').textContent = cohort;
   }
 
+  // ---- Current semester card (read-only snapshot of this term) ----
+  // Management (edit / drop / mark passed) stays in the year checklist.
+  function currentTermRecords() {
+    const sy = currentSchoolYear();
+    const sem = currentSemester();
+    return myUnits.filter(u =>
+      u.status === 'enrolled' &&
+      u.school_year === sy &&
+      Number(u.semester) === sem &&
+      u.subjects?.id
+    );
+  }
+
+  function currentCardRow(u) {
+    const s = u.subjects;
+    const meta = [u.schedule, u.instructor].filter(Boolean).join(' · ');
+    return `
+      <div class="units-current-row">
+        <span class="unit-code">${esc(s.code)}</span>
+        <div class="unit-title">
+          <div>${esc(s.title)}</div>
+          ${meta ? `<div class="units-current-meta">${esc(meta)}</div>` : ''}
+        </div>
+        <span class="units-current-count">${s.units}</span>
+      </div>`;
+  }
+
+  function currentSemesterCard() {
+    const rows = [...currentTermRecords()].sort((a, b) =>
+      a.subjects.code.localeCompare(b.subjects.code)
+    );
+    const totalUnits = rows.reduce((sum, u) => sum + Number(u.subjects.units || 0), 0);
+    const term = `${SEM_SHORT[currentSemester()]}, AY ${currentSchoolYear()}`;
+
+    const body = rows.length
+      ? rows.map(currentCardRow).join('')
+      : `<div class="units-current-empty">No courses logged for this semester yet — log them in the checklist below.</div>`;
+
+    return `
+      <div class="units-current" id="units-current">
+        <div class="units-current-head">
+          <h3>Current Semester</h3>
+          <span class="units-current-term">${term}</span>
+          <span class="units-current-units">${totalUnits} unit${totalUnits === 1 ? '' : 's'}</span>
+        </div>
+        ${body}
+      </div>`;
+  }
+
   // ---- Checklist ----
   function recordFor(subjectId) {
     // API returns newest first — the first match is the latest record
@@ -163,9 +213,10 @@ const Units = (() => {
 
   function renderChecklist() {
     const container = document.getElementById('units-checklist');
+    const card = currentSemesterCard();
 
     if (!subjects.length) {
-      container.innerHTML = `
+      container.innerHTML = card + `
         <div class="empty-state">
           <iconify-icon icon="icon-park-outline:checklist" class="empty-icon"></iconify-icon>
           <p>No subjects are set up for ${esc(program)} — ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
@@ -181,7 +232,7 @@ const Units = (() => {
       return { year, sems };
     }).filter(y => y.sems.length);
 
-    container.innerHTML = years.map(({ year, sems }) => `
+    container.innerHTML = card + years.map(({ year, sems }) => `
       <div class="unit-year" data-year="${year}">
         <div class="unit-year-banner">Year ${year}</div>
         ${sems.map(({ sem, subjects: list }) => `

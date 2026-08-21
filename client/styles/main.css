@@ -2447,6 +2447,61 @@ html body.is-admin th.admin-only {
   gap: 1.25rem;
 }
 
+/* ---- Current semester card (read-only snapshot above the checklist) ---- */
+.units-current {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.units-current-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1rem;
+  background: var(--bg-surface-raised);
+  border-bottom: 1px solid var(--border-default);
+}
+.units-current-head h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.units-current-term { font-size: 0.72rem; color: var(--text-secondary); }
+.units-current-units {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.units-current-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+}
+.units-current-row + .units-current-row { border-top: 1px solid var(--border-default); }
+.units-current-meta {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 0.15rem;
+}
+.units-current-count {
+  margin-left: auto;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.units-current-empty {
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 .unit-year {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
