@@ -38,6 +38,14 @@ function isValidGrade(val) {
   return Number.isFinite(n) && n >= 1 && n <= 5;
 }
 
+// Optional free-text details (instructor / schedule): trim, cap at 120
+// chars, and normalize empty → NULL so "never filled" == "cleared".
+function sanitizeOptionalText(val) {
+  if (val === null || val === undefined) return null;
+  const s = String(val).trim().slice(0, 120);
+  return s === '' ? null : s;
+}
+
 function isMissingRelation(err) {
   return /relation .* does not exist/i.test(err?.message || '');
 }
@@ -82,7 +90,7 @@ router.get('/my', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('student_units')
-      .select('id, school_year, semester, grade, status, created_at, subjects(id, code, title, units, program, year_level, semester)')
+      .select('id, school_year, semester, grade, status, created_at, instructor, schedule, subjects(id, code, title, units, program, year_level, semester)')
       .eq('student_id', req.user.id)
       .order('created_at', { ascending: false });
 
@@ -385,7 +393,7 @@ router.get('/standing', async (req, res) => {
 // Log a subject for the current student.
 router.post('/enroll', async (req, res) => {
   try {
-    const { subject_id, school_year, semester, status = 'enrolled', grade = null } = req.body || {};
+    const { subject_id, school_year, semester, status = 'enrolled', grade = null, instructor = null, schedule = null } = req.body || {};
 
     const missing = assertRequired({ subject_id, school_year, semester });
     if (missing) return res.status(400).json({ error: missing });
@@ -423,6 +431,8 @@ router.post('/enroll', async (req, res) => {
         semester: Number(semester),
         status,
         grade: grade === '' ? null : (grade === null || grade === undefined ? null : Number(grade)),
+        instructor: sanitizeOptionalText(instructor),
+        schedule: sanitizeOptionalText(schedule),
       });
 
     if (error) {
@@ -455,7 +465,7 @@ router.patch('/update/:id', async (req, res) => {
       .single();
     if (fetchErr || !existing) return res.status(404).json({ error: 'Record not found.' });
 
-    const { status, grade, school_year, semester } = req.body || {};
+    const { status, grade, school_year, semester, instructor, schedule } = req.body || {};
     const updates = {};
 
     if (status !== undefined) {
@@ -474,6 +484,8 @@ router.patch('/update/:id', async (req, res) => {
       if (![1, 2, 3].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
       updates.semester = Number(semester);
     }
+    if (instructor !== undefined) updates.instructor = sanitizeOptionalText(instructor);
+    if (schedule !== undefined)   updates.schedule   = sanitizeOptionalText(schedule);
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'Nothing to update.' });
     }
