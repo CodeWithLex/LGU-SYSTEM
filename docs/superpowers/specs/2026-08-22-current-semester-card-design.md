@@ -116,3 +116,12 @@ No automated test harness in the repo; use a manual QA checklist plus one smoke 
 - Counting enrolled units as completed
 - Changes to the Standing PDF
 - Notifications or reminders
+
+## Amendment (2026-08-22): Card → Trigger Button + Popup Modal
+
+After seeing the card in the live layout, it occupied too much permanent vertical space above the checklist. The card is replaced by:
+
+- **Slim trigger button** at the top of the checklist column (same slot the card occupied): calendar icon, "Enrolled This Semester", term label, right-aligned unit subtotal, chevron. One line tall; always visible so page structure stays stable and the unit subtotal stays glanceable.
+- **Popup modal** (`#units-current-modal`) using the existing `.modal-overlay` / `.modal-card` pattern: header with term + unit subtotal, the same rows as the card (code · title · plain-number units, optional `schedule · instructor` second line, escaped), list capped at `50vh` with scroll, friendly empty state, Close button + overlay-click to dismiss.
+- The shared `.modal-overlay` gains `backdrop-filter: blur(4px)` so popups blur the background — this also applies to the existing log/edit modal for consistency.
+- Everything else (read-only rows, current-term filtering, stale-row exclusion, two-tone progress bar, endpoints, migration) is unchanged.

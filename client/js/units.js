@@ -194,26 +194,39 @@ const Units = (() => {
       </div>`;
   }
 
-  function currentSemesterCard() {
+  // Slim trigger above the checklist — the full list lives in the popup
+  // modal so the card doesn't occupy permanent vertical space.
+  function currentSemesterButton() {
+    const rows = currentTermRecords();
+    const totalUnits = rows.reduce((sum, u) => sum + Number(u.subjects.units || 0), 0);
+    const term = `${SEM_SHORT[currentSemester()]}, AY ${currentSchoolYear()}`;
+    return `
+      <button type="button" class="units-current-trigger" data-act="view-current" id="units-current-trigger" title="View enrolled subjects this semester">
+        <iconify-icon icon="icon-park-outline:calendar"></iconify-icon>
+        <span class="units-current-trigger-label">Enrolled This Semester</span>
+        <span class="units-current-trigger-term">${term}</span>
+        <span class="units-current-trigger-units">${totalUnits} unit${totalUnits === 1 ? '' : 's'}</span>
+        <iconify-icon icon="icon-park-outline:right" class="units-current-trigger-chevron"></iconify-icon>
+      </button>`;
+  }
+
+  function openCurrentModal() {
     const rows = [...currentTermRecords()].sort((a, b) =>
       a.subjects.code.localeCompare(b.subjects.code)
     );
     const totalUnits = rows.reduce((sum, u) => sum + Number(u.subjects.units || 0), 0);
-    const term = `${SEM_SHORT[currentSemester()]}, AY ${currentSchoolYear()}`;
-
-    const body = rows.length
+    document.getElementById('units-current-modal-term').textContent =
+      `${SEM_SHORT[currentSemester()]}, AY ${currentSchoolYear()}`;
+    document.getElementById('units-current-modal-units').textContent =
+      `${totalUnits} unit${totalUnits === 1 ? '' : 's'}`;
+    document.getElementById('units-current-modal-body').innerHTML = rows.length
       ? rows.map(currentCardRow).join('')
       : `<div class="units-current-empty">No courses logged for this semester yet — log them in the checklist below.</div>`;
+    document.getElementById('units-current-modal').classList.remove('hidden');
+  }
 
-    return `
-      <div class="units-current" id="units-current">
-        <div class="units-current-head">
-          <h3>Current Semester</h3>
-          <span class="units-current-term">${term}</span>
-          <span class="units-current-units">${totalUnits} unit${totalUnits === 1 ? '' : 's'}</span>
-        </div>
-        ${body}
-      </div>`;
+  function closeCurrentModal() {
+    document.getElementById('units-current-modal').classList.add('hidden');
   }
 
   // ---- Checklist ----
@@ -224,7 +237,7 @@ const Units = (() => {
 
   function renderChecklist() {
     const container = document.getElementById('units-checklist');
-    const card = currentSemesterCard();
+    const card = currentSemesterButton();
 
     if (!subjects.length) {
       container.innerHTML = card + `
@@ -477,6 +490,7 @@ const Units = (() => {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
+    if (act === 'view-current') { openCurrentModal(); return; }
     const subject = subjects.find(s => s.id === btn.dataset.subject);
     const record = btn.dataset.id ? myUnits.find(u => u.id === btn.dataset.id) : null;
 
@@ -490,6 +504,11 @@ const Units = (() => {
   document.getElementById('units-modal-cancel').addEventListener('click', closeModal);
   document.getElementById('units-modal').addEventListener('click', e => {
     if (e.target.id === 'units-modal') closeModal();
+  });
+
+  document.getElementById('units-current-modal-close').addEventListener('click', closeCurrentModal);
+  document.getElementById('units-current-modal').addEventListener('click', e => {
+    if (e.target.id === 'units-current-modal') closeCurrentModal();
   });
 
   document.getElementById('units-program').addEventListener('change', e => {

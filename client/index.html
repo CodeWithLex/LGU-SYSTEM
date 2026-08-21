@@ -731,6 +731,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Current Semester Modal — enrolled subjects this term -->
+    <div class="modal-overlay hidden" id="units-current-modal">
+      <div class="modal-card">
+        <div class="units-current-modal-head">
+          <div>
+            <h3>Enrolled This Semester</h3>
+            <span class="units-current-term" id="units-current-modal-term"></span>
+          </div>
+          <span class="units-current-units" id="units-current-modal-units"></span>
+        </div>
+        <div class="units-current-list" id="units-current-modal-body"></div>
+        <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
+          <button class="btn btn-ghost" id="units-current-modal-close" type="button">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
