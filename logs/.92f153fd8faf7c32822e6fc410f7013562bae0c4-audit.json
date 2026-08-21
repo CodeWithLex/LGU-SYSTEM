@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\User\\Documents\\LGU System\\logs\\.92f153fd8faf7c32822e6fc410f7013562bae0c4-audit.json",
+    "files": [
+        {
+            "date": 1787293384022,
+            "name": "C:\\Users\\User\\Documents\\LGU System\\logs\\mcp-puppeteer-2026-08-21.log",
+            "hash": "15452ed5d2c9504d27c974598bc820027dc9165bc8691db8444d2b8d4d37a4ec"
+        }
+    ],
+    "hashType": "sha256"
+}
