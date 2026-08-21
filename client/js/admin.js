@@ -43,7 +43,7 @@ const Admin = (() => {
     );
     if (tab === 'users')  loadUsers();
     if (tab === 'audit')  loadAuditLog();
-    if (tab === 'academics' && window.AdminUnits) AdminUnits.load();
+    if (tab === 'academics' && typeof AdminUnits !== 'undefined') AdminUnits.load();
   }
 
   // ── Event Dropdown ─────────────────────────────────────────────────────────
