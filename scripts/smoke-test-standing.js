@@ -1,13 +1,14 @@
 // Smoke test for the academic standing PDF: runs the exact drawing code
-// extracted from server/routes/units.js with mock data, so we can verify the
-// letterhead (banner + footer) lands on every page and the appendix is gone.
+// extracted from server/lib/standing-pdf.js (shared by the self route and
+// the admin endpoint) with mock data, so we can verify the letterhead
+// (banner + footer) lands on every page and the appendix is gone.
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const PDFDocument = require('pdfkit');
 
 const root = path.resolve(__dirname, '..');
-const source = fs.readFileSync(path.join(root, 'server', 'routes', 'units.js'), 'utf8');
+const source = fs.readFileSync(path.join(root, 'server', 'lib', 'standing-pdf.js'), 'utf8');
 const start = source.indexOf('const doc = new PDFDocument');
 const end = source.indexOf('doc.end();') + 'doc.end();'.length;
 const block = source.slice(start, end);
@@ -63,15 +64,15 @@ const res = Object.assign(out, { setHeader() {} });
 
 const sandbox = {
   fs, path, PDFDocument,
-  __dirname: path.join(root, 'server', 'routes'),
+  __dirname: path.join(root, 'server', 'lib'),
   console,
   doc: null,
   fullName: 'Juan Dela Cruz',
+  email: 'juan@corjesu.edu.ph',
   studentProgram: 'BSCoE',
   enrolledYear: 2022,
   gradYear: 2026,
   subjects, records, total, passedIds, completed, pct, recordBySubject,
-  req: { user: { email: 'juan@corjesu.edu.ph' } },
   res,
   PROGRAM_NAMES, SEM_LABELS, SEM_SHORT, STATUS_LABELS,
 };
