@@ -154,9 +154,11 @@ router.get('/standing', async (req, res) => {
     const fullName = req.profile?.full_name || req.user.email || 'Student';
 
     // ── Build PDF ──
-    // Institutional letterhead style: light pages, dark text, a single thin
-    // engineering-orange rule as the only accent. No heavy dark bands.
-    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    // Institutional letter format from LETTER TEMPLATE.docx: long-bond paper
+    // (8.5" × 13"), 1" margins, the letterhead banner repeated on every page,
+    // and a footer with the school seal + institution name. The template's
+    // Calibri/Georgia are approximated by Helvetica (pdfkit's built-in fonts).
+    const doc = new PDFDocument({ size: [612, 936], margin: 72 });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition',
@@ -164,34 +166,53 @@ router.get('/standing', async (req, res) => {
     doc.pipe(res);
 
     const primary   = '#1a1f35';  /* ink */
-    const accent    = '#F97316';  /* engineering orange — sole accent */
+    const accent    = '#ed2024';  /* template letterhead red — sole accent */
     const textMuted = '#64748b';
     const faint     = '#e2e8f0';  /* hairlines / track */
     const veryLight = '#f8fafc';  /* alternating row fill */
-    const pageWidth = doc.page.width - 100; /* 495 */
+    const contentLeft  = 72;
+    const contentRight = 540;
+    const pageWidth    = contentRight - contentLeft; /* 468 */
 
     const generated = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-    // ── Letterhead ──
-    const logoPath = path.join(__dirname, '../../client/assets/coe-logo.png');
-    if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, 50, 38, { width: 72, height: 72 });
+    // Letterhead assets extracted from the template (repeated on every page)
+    const bannerPath = path.join(__dirname, '../../client/assets/letterhead-banner.jpg');
+    const sealPath   = path.join(__dirname, '../../client/assets/coe-school-seal.png');
+    const hasBanner  = fs.existsSync(bannerPath);
+    const hasSeal    = fs.existsSync(sealPath);
+
+    function drawLetterhead() {
+      // Preserve the caller's cursor — doc.text()/doc.image() move doc.x/doc.y,
+      // and this handler runs inside addPage() where tableHeader() then reads
+      // the cursor to position the next table on the fresh page.
+      const savedX = doc.x, savedY = doc.y;
+      // Full-bleed letterhead banner across the top
+      if (hasBanner) doc.image(bannerPath, 0, 0, { width: 612 });
+      // Footer: school seal + institution name + hairline rule. Text must stay
+      // above the page's bottom margin (936 - 72 = 864) or pdfkit tries to
+      // continue it on a new page — which re-fires pageAdded, recursing.
+      if (hasSeal) doc.image(sealPath, contentLeft, 820, { width: 34, height: 34 });
+      doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8)
+         .text('COLLEGE OF ENGINEERING', 114, 826);
+      doc.font('Helvetica').fontSize(7.5)
+         .text('Cor Jesu College — Official Standing Report', 114, 836);
+      doc.moveTo(contentLeft, 854).lineTo(contentRight, 854)
+         .lineWidth(1).strokeColor(faint).stroke();
+      doc.x = savedX; doc.y = savedY;
     }
-    doc.fillColor(primary).font('Helvetica-Bold').fontSize(19)
-       .text('COLLEGE OF ENGINEERING', 138, 42, { width: pageWidth - 88 });
-    doc.font('Helvetica').fontSize(11).fillColor(textMuted)
-       .text('Cor Jesu College', 138, 68);
-    doc.rect(50, 116, pageWidth, 3).fill(accent); // thin orange rule
+    doc.on('pageAdded', drawLetterhead);
+
+    // ── Page 1: report title below the banner ──
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(14)
-       .text('OFFICIAL ACADEMIC STANDING REPORT', 50, 134);
+       .text('OFFICIAL ACADEMIC STANDING REPORT', contentLeft, 94);
     doc.font('Helvetica').fontSize(9.5).fillColor(textMuted)
-       .text('Subject Status Report — Year 1 to 4', 50, 155);
-    doc.moveDown(3);
+       .text('Subject Status Report — Year 1 to 4', contentLeft, 115);
 
     // ── Student information — two-column metadata block ──
-    const metaTop = doc.y;
+    const metaTop = 136;
     const metaH   = 12 + 4 * 16 + 10;
-    doc.rect(50, metaTop, pageWidth, metaH).fillAndStroke(veryLight, faint);
+    doc.rect(contentLeft, metaTop, pageWidth, metaH).fillAndStroke(veryLight, faint);
     const leftMeta = [
       ['Name',            fullName],
       ['Email',           req.user.email],
@@ -205,38 +226,38 @@ router.get('/standing', async (req, res) => {
     leftMeta.forEach(([label, value], i) => {
       const y = metaTop + 12 + i * 16;
       doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8)
-         .text(label, 62, y);
+         .text(label, contentLeft + 12, y);
       doc.fillColor(primary).font('Helvetica').fontSize(9)
-         .text(value, 150, y, { width: 140 });
+         .text(value, contentLeft + 100, y, { width: 140 });
     });
     rightMeta.forEach(([label, value], i) => {
       const y = metaTop + 12 + i * 16;
       doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8)
-         .text(label, 300, y);
-      doc.fillColor(primary).font('Helvetica').fontSize(9)
-         .text(value, 410, y, { width: 130 });
+         .text(label, 305, y);
+      doc.fillColor(primary).font('Helvetica').fontSize(8.5)
+         .text(value, 428, y, { width: 110 });
     });
-    doc.moveDown(6);
+    doc.y = metaTop + metaH + 10;
 
     // ── Progress summary — vector bar (PDFKit has no text glyphs for block
     //    characters in its built-in fonts, so the bar is drawn with shapes) ──
     doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8.5)
-       .text('PROGRESS', 50, doc.y);
+       .text('PROGRESS', contentLeft, doc.y);
     const trackTop = doc.y + 4;
-    doc.roundedRect(50, trackTop, pageWidth, 12, 6).fill(faint);
+    doc.roundedRect(contentLeft, trackTop, pageWidth, 12, 6).fill(faint);
     const fillW = total > 0 ? Math.max(12, (pageWidth * pct) / 100) : 0;
-    if (fillW > 0) doc.roundedRect(50, trackTop, fillW, 12, 6).fill(accent);
+    if (fillW > 0) doc.roundedRect(contentLeft, trackTop, fillW, 12, 6).fill(accent);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(9.5)
-       .text(`${pct}% complete (${completed} / ${total || '—'} units completed)`, 50, trackTop + 18, { width: pageWidth });
+       .text(`${pct}% complete (${completed} / ${total || '—'} units completed)`, contentLeft, trackTop + 18, { width: pageWidth });
     doc.moveDown(5);
 
     // ── Subject table ──
-    const cols = { code: 50, title: 108, units: 292, sy: 328, sem: 392, status: 446, grade: 512 };
-    const colW = { code: 56, title: 182, units: 34, sy: 62, sem: 52, status: 64, grade: 33 };
+    const cols = { code: 72, title: 126, units: 298, sy: 332, sem: 392, status: 442, grade: 504 };
+    const colW = { code: 52, title: 170, units: 32, sy: 58, sem: 48, status: 60, grade: 36 };
 
     function tableHeader() {
       const y = doc.y;
-      doc.rect(50, y, pageWidth, 20).fill(veryLight);
+      doc.rect(contentLeft, y, pageWidth, 20).fill(veryLight);
       doc.fillColor(primary).font('Helvetica-Bold').fontSize(7.5);
       doc.text('CODE',         cols.code,  y + 7, { width: colW.code });
       doc.text('SUBJECT TITLE', cols.title, y + 7, { width: colW.title });
@@ -245,7 +266,7 @@ router.get('/standing', async (req, res) => {
       doc.text('SEM',          cols.sem,   y + 7, { width: colW.sem });
       doc.text('STATUS',       cols.status,y + 7, { width: colW.status });
       doc.text('GRADE',        cols.grade, y + 7, { width: colW.grade, align: 'right' });
-      doc.rect(50, y + 20, pageWidth, 1).fill(faint); // hairline under the header
+      doc.rect(contentLeft, y + 20, pageWidth, 1).fill(faint); // hairline under the header
       return y + 21;
     }
 
@@ -258,24 +279,27 @@ router.get('/standing', async (req, res) => {
       'not taken': '#94a3b8',
     };
 
+    // Keep rows clear of the footer letterhead (footer sits at ~820–854)
+    const pageBottom = 800;
+
     let rowY = tableHeader();
     let band = 0;
     const years = [1, 2, 3, 4].filter(y => subjects.some(s => s.year_level === y));
 
     years.forEach(year => {
-      // Year banner — light band with a 3px orange left bar, no heavy fill
-      if (rowY > doc.page.height - 130) { doc.addPage(); rowY = tableHeader(); }
-      doc.rect(50, rowY, pageWidth, 20).fill(veryLight);
-      doc.rect(50, rowY, 3, 20).fill(accent);
-      doc.fillColor(primary).font('Helvetica-Bold').fontSize(10).text(`YEAR ${year}`, 60, rowY + 5);
+      // Year banner — light band with a 3px accent left bar, no heavy fill
+      if (rowY > pageBottom - 60) { doc.addPage(); rowY = tableHeader(); }
+      doc.rect(contentLeft, rowY, pageWidth, 20).fill(veryLight);
+      doc.rect(contentLeft, rowY, 3, 20).fill(accent);
+      doc.fillColor(primary).font('Helvetica-Bold').fontSize(10).text(`YEAR ${year}`, contentLeft + 10, rowY + 5);
       rowY += 20;
 
       [1, 2, 3].filter(sem => subjects.some(s => s.year_level === year && s.semester === sem))
         .forEach(sem => {
           // Semester sub-header — italic gray
-          if (rowY > doc.page.height - 90) { doc.addPage(); rowY = tableHeader(); }
+          if (rowY > pageBottom - 40) { doc.addPage(); rowY = tableHeader(); }
           doc.fillColor(textMuted).font('Helvetica-Oblique').fontSize(8.5)
-             .text(`${SEM_LABELS[sem] || 'Semester ' + sem}`, 60, rowY + 2);
+             .text(`${SEM_LABELS[sem] || 'Semester ' + sem}`, contentLeft + 10, rowY + 2);
           rowY += 15;
 
           subjects.filter(s => s.year_level === year && s.semester === sem).forEach(s => {
@@ -283,11 +307,11 @@ router.get('/standing', async (req, res) => {
             const status = rec?.status || 'not taken';
             const titleH = doc.heightOfString(s.title, { width: colW.title });
             const rowH = Math.max(20, titleH + 10);
-            if (rowY + rowH > doc.page.height - 60) { doc.addPage(); rowY = tableHeader(); }
+            if (rowY + rowH > pageBottom) { doc.addPage(); rowY = tableHeader(); }
 
             const bg = band % 2 === 0 ? '#ffffff' : veryLight;
-            doc.rect(50, rowY, pageWidth, rowH).fill(bg);
-            doc.rect(50, rowY + rowH - 0.5, pageWidth, 0.5).fill(faint); // hairline row border
+            doc.rect(contentLeft, rowY, pageWidth, rowH).fill(bg);
+            doc.rect(contentLeft, rowY + rowH - 0.5, pageWidth, 0.5).fill(faint); // hairline row border
 
             doc.fillColor('#475569').font('Helvetica').fontSize(8.5)
                .text(s.code, cols.code, rowY + 6, { width: colW.code });
@@ -310,10 +334,10 @@ router.get('/standing', async (req, res) => {
 
     // ── Appendix — machine-readable dump, clearly a separate section ──
     doc.addPage();
-    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('APPENDIX A — MACHINE-READABLE DATA', 50, 50);
-    doc.rect(50, 62, 60, 2).fill(accent);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('APPENDIX A — MACHINE-READABLE DATA', contentLeft, 94);
+    doc.rect(contentLeft, 106, 60, 2).fill(accent);
     doc.font('Helvetica').fontSize(9).fillColor(textMuted)
-       .text('Plain-text transcript for AI analysis / data processing — auxiliary, not part of the official record.', 50, 74, { width: pageWidth });
+       .text('Plain-text transcript for AI analysis / data processing — auxiliary, not part of the official record.', contentLeft, 118, { width: pageWidth });
 
     doc.moveDown(2.5);
     doc.font('Courier').fontSize(8).fillColor('#0f172a');
@@ -322,6 +346,7 @@ router.get('/standing', async (req, res) => {
     doc.text('FIELDS|code|title|units|year_level|semester|school_year|status|grade');
     doc.text('SUBJECTS');
     subjects.forEach(s => {
+      if (doc.y > pageBottom) doc.addPage();
       const rec = recordBySubject.get(s.id);
       doc.text(`${s.code}|${s.title}|${s.units}|${s.year_level}|${s.semester}|${rec?.school_year || ''}|${rec?.status || 'not_taken'}|${rec?.grade ?? ''}`);
     });
@@ -329,18 +354,18 @@ router.get('/standing', async (req, res) => {
 
     // ── Final page — summary + signature block ──
     doc.addPage();
-    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('SUMMARY', 50, 50);
-    doc.rect(50, 62, 60, 2).fill(accent);
+    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('SUMMARY', contentLeft, 94);
+    doc.rect(contentLeft, 106, 60, 2).fill(accent);
 
-    const sumY = 78;
+    const sumY = 122;
     doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
-       .text('Subjects Passed:', 50, sumY);
+       .text('Subjects Passed:', contentLeft, sumY);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
-       .text(String(passedIds.size), 150, sumY);
+       .text(String(passedIds.size), contentLeft + 100, sumY);
     doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
-       .text('Units Completed:', 50, sumY + 20);
+       .text('Units Completed:', contentLeft, sumY + 20);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
-       .text(`${completed} / ${total || '—'}`, 150, sumY + 20);
+       .text(`${completed} / ${total || '—'}`, contentLeft + 100, sumY + 20);
     doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
        .text('Progress:', 300, sumY);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
@@ -352,14 +377,14 @@ router.get('/standing', async (req, res) => {
 
     // Signature block
     const sigY = sumY + 70;
-    doc.moveTo(50, sigY).lineTo(230, sigY).lineWidth(1).strokeColor(faint).stroke();
+    doc.moveTo(contentLeft, sigY).lineTo(contentLeft + 180, sigY).lineWidth(1).strokeColor(faint).stroke();
     doc.moveTo(300, sigY).lineTo(480, sigY).lineWidth(1).strokeColor(faint).stroke();
     doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
-       .text('Student Signature', 50, sigY + 6);
+       .text('Student Signature', contentLeft, sigY + 6);
     doc.text('Date', 300, sigY + 6);
     doc.moveDown(3);
     doc.fillColor(textMuted).font('Helvetica-Oblique').fontSize(8)
-       .text('This document is system-generated and unofficial unless bearing the Office of the Registrar\'s seal.', 50, doc.y + 6, { width: pageWidth });
+       .text('This document is system-generated and unofficial unless bearing the Office of the Registrar\'s seal.', contentLeft, doc.y + 6, { width: pageWidth });
 
     doc.end();
   } catch (err) {
