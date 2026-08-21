@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-22
 **Status:** Approved (brainstorming complete)
-**Scope:** `client/index.html`, `client/js/admin-units.js` (new), `client/js/api.js`, `client/js/units.js` (stamping only), `server/routes/admin-units.js` (new), `server/routes/units.js` (PDF extraction + stamping), `server/lib/standing-pdf.js` (new), `supabase/migrations/008_admin_academics.sql`, `scripts/smoke-test-standing.js`
+**Scope:** `client/index.html`, `client/js/admin-units.js` (new), `client/js/api.js`, `server/routes/admin-units.js` (new), `server/routes/units.js` (PDF extraction + stamping), `server/lib/standing-pdf.js` (new), `supabase/migrations/008_admin_academics.sql`, `scripts/smoke-test-standing.js`
 
 ## Problem
 
