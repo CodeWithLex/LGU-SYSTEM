@@ -84,27 +84,32 @@ const AdminUnits = (() => {
       bindCurriculum();
       _loaded = true;
     }
+    refreshStudents();
     loadCurriculum();
   }
 
-  // ---- Student search ----
+  // ---- Student search / browse ----
   let _searchTimer = null;
 
   function bindSearch() {
     document.getElementById('au-search').addEventListener('input', e => {
       clearTimeout(_searchTimer);
       const q = e.target.value.trim();
-      const box = document.getElementById('au-results');
-      if (q.length < 2) { box.innerHTML = ''; return; }
-      _searchTimer = setTimeout(() => searchStudents(q), 300);
+      if (q.length === 0) { refreshStudents(); return; }
+      if (q.length < 2) { document.getElementById('au-results').innerHTML = ''; return; }
+      _searchTimer = setTimeout(() => refreshStudents(q), 300);
     });
+    document.getElementById('au-filter-program').addEventListener('change', () => refreshStudents());
+    // Browse mode: list everyone (filtered by course dropdown) on first open.
+    refreshStudents();
   }
 
-  async function searchStudents(q) {
+  async function refreshStudents(q = '') {
     const box = document.getElementById('au-results');
-    box.innerHTML = '<div class="loading-state">Searching…</div>';
+    box.innerHTML = '<div class="loading-state">Loading students…</div>';
     try {
-      const list = await Api.admin.studentsSearch(q);
+      const program = document.getElementById('au-filter-program').value;
+      const list = await Api.admin.studentsSearch(q, program);
       renderResults(list || []);
     } catch (err) {
       box.innerHTML = `
@@ -124,14 +129,15 @@ const AdminUnits = (() => {
     box.innerHTML = `
       <div class="table-wrapper">
         <table class="data-table">
-          <thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Year</th><th></th></tr></thead>
+          <thead><tr><th>Name</th><th>Email</th><th>Course</th><th>Year</th><th>Role</th><th></th></tr></thead>
           <tbody>
             ${list.map(u => `
               <tr>
                 <td><strong>${esc(u.full_name || '—')}</strong></td>
                 <td style="font-size:.8rem;color:var(--text-secondary)">${esc(u.email || '—')}</td>
-                <td style="font-size:.8rem">${esc(u.course || '—')}</td>
-                <td style="font-size:.8rem">${esc(String(u.year_level ?? '—'))}</td>
+                <td style="font-size:.8rem;">${esc(u.course || '—')}${programOf(u) ? '' : ' <span style="font-size:.65rem;color:var(--status-warning);">(not a COE program)</span>'}</td>
+                <td style="font-size:.8rem;">${esc(String(u.year_level ?? '—'))}</td>
+                <td>${UI.renderStatusBadge(u.role)}</td>
                 <td style="text-align:center;"><button class="tx-action-btn" data-au="pick" data-id="${u.id}">Open</button></td>
               </tr>`).join('')}
           </tbody>
@@ -208,6 +214,15 @@ const AdminUnits = (() => {
     const { total, completed, pct } = summary();
     const fmtDate = d => d ? new Date(d).toLocaleString('en-PH', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
+    // A course that doesn't resolve to a COE program (e.g. a typo like
+    // "BS Nusring") blocks everything downstream — say so instead of
+    // rendering a silently empty workspace.
+    const courseWarning = program ? '' : `
+      <div style="border:1px solid var(--status-warning);border-radius:var(--radius-sm);padding:0.6rem 0.9rem;margin-bottom:0.75rem;background:rgba(245,158,11,0.08);color:var(--text-primary);font-size:0.82rem;">
+        <strong>Course not recognized.</strong> "${esc(_student.course || '—')}" doesn't match any COE program (BSCoE, BSCE, BSECE).
+        Records can't be logged and no PDF can be generated until the student's course is corrected.
+      </div>`;
+
     const rows = _records.map(r => `
       <tr>
         <td><strong>${esc(r.subjects?.code || r.subject_id)}</strong></td>
@@ -229,20 +244,22 @@ const AdminUnits = (() => {
 
     ws.innerHTML = `
       <div style="border-top:1px solid var(--border-default);margin-top:1rem;padding-top:1rem;">
+        ${courseWarning}
         <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;margin-bottom:0.75rem;">
           <div>
             <strong>${esc(_student.full_name || '—')}</strong>
             <span style="color:var(--text-secondary);font-size:.82rem;"> · ${esc(PROGRAM_NAMES[program] || _student.course || 'No valid program')} · Enrolled ${esc(String(_student.enrollment_year ?? '—'))}</span>
             <div style="font-size:.82rem;color:var(--text-secondary);margin-top:.15rem;">
-              Progress: <strong>${pct}%</strong> (${completed} / ${total || '—'} units)
+              ${program ? `Progress: <strong>${pct}%</strong> (${completed} / ${total || '—'} units)` : 'Progress: <strong>—</strong> (no valid program)'}
             </div>
           </div>
+          ${program ? `
           <div style="margin-left:auto;display:flex;gap:0.5rem;flex-wrap:wrap;">
             <button class="btn btn-ghost" data-au="pdf" type="button">
               <iconify-icon icon="icon-park-outline:download" style="font-size:1rem;margin-right:.3rem;vertical-align:middle;"></iconify-icon>Standing PDF
             </button>
             <button class="btn btn-primary" data-au="add-record" type="button">Add Record</button>
-          </div>
+          </div>` : ''}
         </div>
         ${_records.length ? `
           <div class="table-wrapper">
@@ -251,7 +268,7 @@ const AdminUnits = (() => {
               <tbody>${rows}</tbody>
             </table>
           </div>` : `
-          <div class="empty-state">No records yet — add the first one with “Add Record”.</div>`}
+          <div class="empty-state">No records yet${program ? ' — add the first one with "Add Record"' : ''}.</div>`}
       </div>`;
   }
 

@@ -45,20 +45,30 @@ function resolveProgram(course) {
   ) || null;
 }
 
-// ── GET /api/admin/students?q= ─────────────────────────────────────────
+// ── GET /api/admin/students?q=&program= ───────────────────────────────
+// Browse (no q) or search (q ≥ 2 chars) profiles. All roles are returned
+// — the role is displayed so admins are findable too — optionally
+// filtered to one program's canonical course code.
 router.get('/students', async (req, res) => {
   try {
     const q = String(req.query.q || '').trim().slice(0, 60);
-    if (q.length < 2) return res.status(400).json({ error: 'Enter at least 2 characters to search.' });
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('profiles')
-      .select('id, full_name, email, course, year_level, enrollment_year')
-      .eq('role', 'student')
-      .or(`full_name.ilike.%${q}%,email.ilike.%${q}%`)
+      .select('id, full_name, email, course, year_level, enrollment_year, role')
       .order('full_name')
-      .limit(20);
+      .limit(50);
 
+    if (req.query.program) {
+      const program = resolveProgram(req.query.program);
+      if (!program) return res.status(400).json({ error: 'Invalid program.' });
+      query = query.eq('course', program);
+    }
+    if (q.length >= 2) {
+      query = query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%`);
+    }
+
+    const { data, error } = await query;
     if (error) { logError('admin/students', error); return res.status(500).json({ error: 'Failed to search students.' }); }
     res.json(data || []);
   } catch (err) {

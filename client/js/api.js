@@ -66,7 +66,13 @@ const Api = (() => {
       return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`);
     },
     transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
-    studentsSearch:      (q)      => _request('GET',    `/admin/students?q=${encodeURIComponent(q)}`),
+    studentsSearch:      (q = '', program = '') => {
+      const params = new URLSearchParams();
+      if (q) params.set('q', q);
+      if (program) params.set('program', program);
+      const qs = params.toString();
+      return _request('GET', `/admin/students${qs ? '?' + qs : ''}`);
+    },
     studentUnits:        (id)     => _request('GET',    `/admin/students/${id}/units`),
     addStudentUnit:      (id, b)  => _request('POST',   `/admin/students/${id}/units`, b),
     updateStudentUnit:   (rid, b) => _request('PATCH',  `/admin/units/${rid}`, b),
