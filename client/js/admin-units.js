@@ -283,5 +283,117 @@ const AdminUnits = (() => {
     }
   }
 
+  // ---- Record modal (admin add / edit) ----
+  let _recordMode   = 'add'; // 'add' | 'edit'
+  let _recordEditId = null;
+
+  function bindRecordModal() {
+    document.getElementById('au-record-save').addEventListener('click', saveRecordModal);
+    document.getElementById('au-record-cancel').addEventListener('click', () => closeModalOverlay('au-record-modal'));
+    document.getElementById('au-record-modal').addEventListener('click', e => {
+      if (e.target.id === 'au-record-modal') closeModalOverlay('au-record-modal');
+    });
+  }
+
+  function openRecordModal(mode, record) {
+    if (!_student) return;
+    _recordMode   = mode;
+    _recordEditId = record?.id || null;
+
+    document.getElementById('au-record-title').textContent = mode === 'edit' ? 'Edit Record' : 'Add Record';
+    document.getElementById('au-record-student').textContent =
+      `${_student.full_name} · ${PROGRAM_NAMES[programOf(_student)] || _student.course || 'No valid program'}`;
+
+    // Subject options: the student's program subjects (student-facing list),
+    // plus the record's own subject when editing (it may be archived).
+    const subjectSel = document.getElementById('au-record-subject');
+    const opts = new Map();
+    if (record?.subjects) opts.set(record.subjects.id, record.subjects);
+    _subjects.forEach(s => opts.set(s.id, s));
+    subjectSel.innerHTML = [...opts.values()]
+      .map(s => `<option value="${s.id}">${esc(s.code)} — ${esc(s.title)} (${s.units}u)</option>`).join('');
+    subjectSel.value = record?.subject_id || record?.subjects?.id || (opts.size ? [...opts.keys()][0] : '');
+    subjectSel.disabled = mode === 'edit'; // the row's subject is fixed; edits change status/grade/details
+
+    document.getElementById('au-record-sy').value   = record?.school_year || currentSchoolYear();
+    document.getElementById('au-record-sem').value  = String(record?.semester ?? currentSemester());
+    document.getElementById('au-record-status').value = record?.status || 'enrolled';
+    document.getElementById('au-record-grade').value  = record?.grade != null ? record.grade : '';
+    document.getElementById('au-record-schedule').value   = record?.schedule || '';
+    document.getElementById('au-record-instructor').value = record?.instructor || '';
+    document.getElementById('au-record-reason').value = '';
+
+    const errEl = document.getElementById('au-record-error');
+    errEl.classList.add('hidden');
+    openModalOverlay('au-record-modal');
+  }
+
+  async function saveRecordModal() {
+    if (!_student) return;
+    const errEl = document.getElementById('au-record-error');
+    errEl.classList.add('hidden');
+
+    const school_year = document.getElementById('au-record-sy').value.trim();
+    const subjectId   = document.getElementById('au-record-subject').value;
+    const gradeRaw    = document.getElementById('au-record-grade').value;
+    const schedule    = document.getElementById('au-record-schedule').value.trim().slice(0, 120);
+    const instructor  = document.getElementById('au-record-instructor').value.trim().slice(0, 120);
+    const reason      = document.getElementById('au-record-reason').value.trim();
+
+    if (_recordMode === 'add' && !subjectId) {
+      errEl.textContent = 'Pick a subject.'; errEl.classList.remove('hidden'); return;
+    }
+    if (!/^\d{4}-\d{4}$/.test(school_year)) {
+      errEl.textContent = 'School year must look like "2026-2027".'; errEl.classList.remove('hidden'); return;
+    }
+    if (gradeRaw !== '' && (Number(gradeRaw) < 1 || Number(gradeRaw) > 5)) {
+      errEl.textContent = 'Grade must be between 1.0 and 5.0.'; errEl.classList.remove('hidden'); return;
+    }
+    if (reason.length < 5) {
+      errEl.textContent = 'A reason of at least 5 characters is required.'; errEl.classList.remove('hidden'); return;
+    }
+
+    const body = {
+      school_year,
+      semester: Number(document.getElementById('au-record-sem').value),
+      status: document.getElementById('au-record-status').value,
+      grade: gradeRaw === '' ? null : Number(gradeRaw),
+      schedule: schedule || null,
+      instructor: instructor || null,
+      reason,
+    };
+
+    try {
+      if (_recordMode === 'edit') {
+        await Api.admin.updateStudentUnit(_recordEditId, body);
+        UI.toast('Record updated.', 'success');
+      } else {
+        await Api.admin.addStudentUnit(_student.id, { ...body, subject_id: subjectId });
+        UI.toast('Record added.', 'success');
+      }
+      closeModalOverlay('au-record-modal');
+      await pickStudent(_student.id);
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove('hidden');
+    }
+  }
+
+  async function removeRecord(id) {
+    if (!_student) return;
+    const reason = window.prompt('Reason for removing this record (min. 5 characters):');
+    if (reason === null) return;
+    if (reason.trim().length < 5) { UI.toast('Reason must be at least 5 characters.', 'error'); return; }
+    if (!confirm('Remove this record? This cannot be undone.')) return;
+
+    try {
+      await Api.admin.deleteStudentUnit(id, { reason: reason.trim() });
+      UI.toast('Record removed.', 'success');
+      await pickStudent(_student.id);
+    } catch (err) {
+      UI.toast(err.message, 'error');
+    }
+  }
+
   return { load };
 })();
