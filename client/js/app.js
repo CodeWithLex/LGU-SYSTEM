@@ -223,7 +223,11 @@
     function sync() {
       const opt = select.options[select.selectedIndex];
       const hasValue = opt && opt.value;
-      label.textContent = hasValue ? opt.text : select.options[0].text;
+      // Selects that start empty (e.g. #au-record-subject, populated on
+      // modal open) have no options[0] — render a blank label instead of
+      // crashing, which would kill the rest of the startup wiring.
+      const fallback = select.options[0] ? select.options[0].text : '';
+      label.textContent = hasValue ? opt.text : fallback;
       label.classList.toggle('dd-placeholder', !hasValue);
     }
 
