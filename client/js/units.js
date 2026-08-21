@@ -222,11 +222,11 @@ const Units = (() => {
     document.getElementById('units-current-modal-body').innerHTML = rows.length
       ? rows.map(currentCardRow).join('')
       : `<div class="units-current-empty">No courses logged for this semester yet — log them in the checklist below.</div>`;
-    document.getElementById('units-current-modal').classList.remove('hidden');
+    openModalOverlay('units-current-modal');
   }
 
   function closeCurrentModal() {
-    document.getElementById('units-current-modal').classList.add('hidden');
+    closeModalOverlay('units-current-modal');
   }
 
   // ---- Checklist ----
@@ -366,11 +366,32 @@ const Units = (() => {
 
     const errEl = document.getElementById('units-modal-error');
     errEl.classList.add('hidden');
-    document.getElementById('units-modal').classList.remove('hidden');
+    openModalOverlay('units-modal');
+  }
+
+  // Modal show/hide with a close animation: hide only after the
+  // fadeOut finishes. Reopening mid-close cancels cleanly.
+  function openModalOverlay(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('modal-closing');
+    el.classList.remove('hidden');
+  }
+
+  function closeModalOverlay(id) {
+    const el = document.getElementById(id);
+    if (el.classList.contains('hidden') || el.classList.contains('modal-closing')) return;
+    el.classList.add('modal-closing');
+    el.addEventListener('animationend', function done(e) {
+      if (e.target !== el) return; // the card's animation bubbles up
+      el.removeEventListener('animationend', done);
+      if (!el.classList.contains('modal-closing')) return; // reopened mid-close
+      el.classList.remove('modal-closing');
+      el.classList.add('hidden');
+    });
   }
 
   function closeModal() {
-    document.getElementById('units-modal').classList.add('hidden');
+    closeModalOverlay('units-modal');
   }
 
   async function saveModal() {

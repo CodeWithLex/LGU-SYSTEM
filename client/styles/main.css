@@ -2037,6 +2037,31 @@ iconify-icon {
   width: 100%;
   max-width: 480px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: modalIn .16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Smooth dismiss — closeModalOverlay() adds .modal-closing, waits for
+   animationend, then applies .hidden. `forwards` holds the end state
+   so the modal never flashes back before hiding. */
+.modal-overlay.modal-closing {
+  animation: fadeOut .16s ease forwards;
+  pointer-events: none;
+}
+.modal-overlay.modal-closing .modal-card {
+  animation: modalOut .16s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes modalOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(.96); }
 }
 
 /* Hide admin-only elements by default unless the body has is-admin */
