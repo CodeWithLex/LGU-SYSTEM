@@ -283,4 +283,157 @@ router.delete('/units/:recordId', async (req, res) => {
   }
 });
 
+// ── GET /api/admin/subjects?program=BSCoE ─────────────────────────────
+router.get('/subjects', async (req, res) => {
+  try {
+    const program = req.query.program;
+    if (!isValidEnum(program, VALID_PROGRAMS)) return res.status(400).json({ error: 'Invalid program.' });
+
+    const [reqRes, subjRes] = await Promise.all([
+      supabase.from('curriculum_requirements').select('*').eq('program', program).single(),
+      supabase.from('subjects').select('*').eq('program', program)
+        .order('year_level', { ascending: true })
+        .order('semester',   { ascending: true })
+        .order('code',       { ascending: true }),
+    ]);
+    if (reqRes.error || subjRes.error) {
+      logError('admin/subjects', reqRes.error || subjRes.error);
+      return res.status(500).json({ error: 'Failed to load the curriculum.' });
+    }
+
+    const subjects = subjRes.data || [];
+    const ids = subjects.map(s => s.id);
+    const counts = {};
+    if (ids.length) {
+      const { data: refs } = await supabase
+        .from('student_units')
+        .select('subject_id')
+        .in('subject_id', ids);
+      (refs || []).forEach(r => { counts[r.subject_id] = (counts[r.subject_id] || 0) + 1; });
+    }
+    subjects.forEach(s => { s.record_count = counts[s.id] || 0; });
+
+    res.json({ requirements: reqRes.data, subjects });
+  } catch (err) {
+    logError('admin/subjects', err);
+    res.status(500).json({ error: 'Failed to load the curriculum.' });
+  }
+});
+
+// ── POST /api/admin/subjects ──────────────────────────────────────────
+router.post('/subjects', async (req, res) => {
+  try {
+    const { program, code, title, units, year_level, semester, prerequisites = null, is_elective = false, reason } = req.body || {};
+    if (!isValidReason(reason)) return res.status(400).json({ error: 'A reason of at least 5 characters is required.' });
+    if (!isValidEnum(program, VALID_PROGRAMS)) return res.status(400).json({ error: 'Invalid program.' });
+    if (!code || String(code).trim().length > 20) return res.status(400).json({ error: 'Subject code is required (max 20 characters).' });
+    if (!title || String(title).trim().length > 120) return res.status(400).json({ error: 'Subject title is required (max 120 characters).' });
+    const u = Number(units);
+    if (!Number.isFinite(u) || u < 0.5 || u > 6) return res.status(400).json({ error: 'Units must be between 0.5 and 6.' });
+    if (![1, 2, 3, 4].includes(Number(year_level))) return res.status(400).json({ error: 'Year level must be 1–4.' });
+    if (![1, 2, 3].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
+
+    const { error } = await supabase.from('subjects').insert({
+      program, code: String(code).trim().toUpperCase(), title: String(title).trim(),
+      units: u, year_level: Number(year_level), semester: Number(semester),
+      prerequisites: prerequisites ? String(prerequisites).trim().slice(0, 240) : null,
+      is_elective: !!is_elective,
+    });
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({ error: 'That subject code already exists for this program.' });
+      logError('admin/create-subject', error);
+      return res.status(500).json({ error: 'Failed to create the subject.' });
+    }
+
+    logAudit(req.user.id, 'ADMIN_EDIT_SUBJECT', { program, subject_code: String(code).trim().toUpperCase(), created: true, reason: reason.trim().slice(0, 300) });
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    logError('admin/create-subject', err);
+    res.status(500).json({ error: 'Failed to create the subject.' });
+  }
+});
+
+// ── PATCH /api/admin/subjects/:id ─────────────────────────────────────
+router.patch('/subjects/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!isValidUUID(id)) return res.status(400).json({ error: 'Invalid subject id.' });
+
+    const { code, title, units, year_level, semester, prerequisites, is_elective, is_archived, reason } = req.body || {};
+    if (!isValidReason(reason)) return res.status(400).json({ error: 'A reason of at least 5 characters is required.' });
+
+    const { data: subject, error: fErr } = await supabase
+      .from('subjects').select('id, code, program').eq('id', id).single();
+    if (fErr || !subject) return res.status(404).json({ error: 'Subject not found.' });
+
+    const updates = {};
+    if (code !== undefined) {
+      if (!code || String(code).trim().length > 20) return res.status(400).json({ error: 'Subject code is required (max 20 characters).' });
+      updates.code = String(code).trim().toUpperCase();
+    }
+    if (title !== undefined) {
+      if (!title || String(title).trim().length > 120) return res.status(400).json({ error: 'Subject title is required (max 120 characters).' });
+      updates.title = String(title).trim();
+    }
+    if (units !== undefined) {
+      const u = Number(units);
+      if (!Number.isFinite(u) || u < 0.5 || u > 6) return res.status(400).json({ error: 'Units must be between 0.5 and 6.' });
+      updates.units = u;
+    }
+    if (year_level !== undefined) {
+      if (![1, 2, 3, 4].includes(Number(year_level))) return res.status(400).json({ error: 'Year level must be 1–4.' });
+      updates.year_level = Number(year_level);
+    }
+    if (semester !== undefined) {
+      if (![1, 2, 3].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
+      updates.semester = Number(semester);
+    }
+    if (prerequisites !== undefined) updates.prerequisites = prerequisites ? String(prerequisites).trim().slice(0, 240) : null;
+    if (is_elective !== undefined) updates.is_elective = !!is_elective;
+    if (is_archived !== undefined) updates.is_archived = !!is_archived;
+    if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'Nothing to update.' });
+
+    const { error } = await supabase.from('subjects').update(updates).eq('id', id);
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({ error: 'That subject code already exists for this program.' });
+      logError('admin/edit-subject', error);
+      return res.status(500).json({ error: 'Failed to update the subject.' });
+    }
+
+    if (is_archived !== undefined) {
+      logAudit(req.user.id, 'ADMIN_ARCHIVE_SUBJECT', { subject_code: subject.code, program: subject.program, archived: !!is_archived, reason: reason.trim().slice(0, 300) });
+    }
+    const dataKeys = Object.keys(updates).filter(k => k !== 'is_archived');
+    if (dataKeys.length) {
+      logAudit(req.user.id, 'ADMIN_EDIT_SUBJECT', { subject_code: updates.code || subject.code, program: subject.program, fields: dataKeys, reason: reason.trim().slice(0, 300) });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    logError('admin/edit-subject', err);
+    res.status(500).json({ error: 'Failed to update the subject.' });
+  }
+});
+
+// ── PATCH /api/admin/curriculum/:program ──────────────────────────────
+router.patch('/curriculum/:program', async (req, res) => {
+  try {
+    const program = req.params.program;
+    if (!isValidEnum(program, VALID_PROGRAMS)) return res.status(400).json({ error: 'Invalid program.' });
+
+    const { total_units, reason } = req.body || {};
+    if (!isValidReason(reason)) return res.status(400).json({ error: 'A reason of at least 5 characters is required.' });
+    const t = Number(total_units);
+    if (!Number.isInteger(t) || t < 1 || t > 500) return res.status(400).json({ error: 'Total units must be a whole number between 1 and 500.' });
+
+    const { error } = await supabase.from('curriculum_requirements').update({ total_units: t }).eq('program', program);
+    if (error) { logError('admin/edit-curriculum', error); return res.status(500).json({ error: 'Failed to update total units.' }); }
+
+    logAudit(req.user.id, 'ADMIN_EDIT_CURRICULUM', { program, total_units: t, reason: reason.trim().slice(0, 300) });
+    res.json({ ok: true });
+  } catch (err) {
+    logError('admin/edit-curriculum', err);
+    res.status(500).json({ error: 'Failed to update total units.' });
+  }
+});
+
 module.exports = router;

@@ -63,7 +63,8 @@ router.get('/checklists', async (req, res) => {
       .select('*')
       .order('year_level', { ascending: true })
       .order('semester',   { ascending: true })
-      .order('code',       { ascending: true });
+      .order('code',       { ascending: true })
+      .eq('is_archived', false); // archived subjects stay out of the student checklist
     if (program) subjQuery = subjQuery.eq('program', program);
 
     const [reqRes, subjRes] = await Promise.all([reqQuery, subjQuery]);
