@@ -141,4 +141,146 @@ router.get('/students/:id/standing', async (req, res) => {
   }
 });
 
+// ── POST /api/admin/students/:id/units ────────────────────────────────
+router.post('/students/:id/units', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!isValidUUID(id)) return res.status(400).json({ error: 'Invalid student id.' });
+
+    const { subject_id, school_year, semester, status = 'enrolled', grade = null, instructor = null, schedule = null, reason } = req.body || {};
+    if (!isValidReason(reason)) return res.status(400).json({ error: 'A reason of at least 5 characters is required.' });
+    if (!isValidUUID(subject_id))          return res.status(400).json({ error: 'Invalid subject id.' });
+    if (!SCHOOL_YEAR_RE.test(school_year)) return res.status(400).json({ error: 'School year must look like "2026-2027".' });
+    if (![1, 2, 3].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
+    if (!isValidEnum(status, VALID_STATUSES))  return res.status(400).json({ error: 'Invalid status.' });
+    if (!isValidGrade(grade))                  return res.status(400).json({ error: 'Grade must be between 1.0 and 5.0.' });
+
+    const [{ data: profile, error: pErr }, { data: subject, error: sErr }] = await Promise.all([
+      supabase.from('profiles').select('id, full_name, course').eq('id', id).single(),
+      supabase.from('subjects').select('id, code, program').eq('id', subject_id).single(),
+    ]);
+    if (pErr || !profile)  return res.status(404).json({ error: 'Student not found.' });
+    if (sErr || !subject)  return res.status(404).json({ error: 'Subject not found.' });
+
+    const studentProgram = resolveProgram(profile.course);
+    if (!studentProgram || subject.program !== studentProgram) {
+      return res.status(403).json({ error: 'The subject does not belong to this student\'s program.' });
+    }
+
+    const { error } = await supabase.from('student_units').insert({
+      student_id: id,
+      subject_id,
+      school_year,
+      semester: Number(semester),
+      status,
+      grade: grade === '' ? null : (grade === null || grade === undefined ? null : Number(grade)),
+      instructor: sanitizeOptionalText(instructor),
+      schedule: sanitizeOptionalText(schedule),
+      last_edited_by: req.user.email,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({ error: 'This subject is already logged for that school year and semester.' });
+      logError('admin/add-student-unit', error);
+      return res.status(500).json({ error: 'Failed to add the record.' });
+    }
+
+    logAudit(req.user.id, 'ADMIN_ADD_STUDENT_UNIT', {
+      target_user_id: id, user_name: profile.full_name,
+      subject_code: subject.code, reason: reason.trim().slice(0, 300),
+    });
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    logError('admin/add-student-unit', err);
+    res.status(500).json({ error: 'Failed to add the record.' });
+  }
+});
+
+// ── PATCH /api/admin/units/:recordId ──────────────────────────────────
+router.patch('/units/:recordId', async (req, res) => {
+  try {
+    const rid = req.params.recordId;
+    if (!isValidUUID(rid)) return res.status(400).json({ error: 'Invalid record id.' });
+
+    const { status, grade, school_year, semester, instructor, schedule, reason } = req.body || {};
+    if (!isValidReason(reason)) return res.status(400).json({ error: 'A reason of at least 5 characters is required.' });
+
+    const { data: existing, error: fetchErr } = await supabase
+      .from('student_units')
+      .select('id, student_id, subjects(code)')
+      .eq('id', rid).single();
+    if (fetchErr || !existing) return res.status(404).json({ error: 'Record not found.' });
+
+    const updates = {};
+    if (status !== undefined) {
+      if (!isValidEnum(status, VALID_STATUSES)) return res.status(400).json({ error: 'Invalid status.' });
+      updates.status = status;
+    }
+    if (grade !== undefined) {
+      if (!isValidGrade(grade)) return res.status(400).json({ error: 'Grade must be between 1.0 and 5.0.' });
+      updates.grade = grade === '' ? null : Number(grade);
+    }
+    if (school_year !== undefined) {
+      if (!SCHOOL_YEAR_RE.test(school_year)) return res.status(400).json({ error: 'School year must look like "2026-2027".' });
+      updates.school_year = school_year;
+    }
+    if (semester !== undefined) {
+      if (![1, 2, 3].includes(Number(semester))) return res.status(400).json({ error: 'Semester must be 1, 2, or 3 (summer).' });
+      updates.semester = Number(semester);
+    }
+    if (instructor !== undefined) updates.instructor = sanitizeOptionalText(instructor);
+    if (schedule !== undefined) updates.schedule = sanitizeOptionalText(schedule);
+    if (Object.keys(updates).length === 0) return res.status(400).json({ error: 'Nothing to update.' });
+    updates.last_edited_by = req.user.email;
+    updates.updated_at = new Date().toISOString();
+
+    const { error } = await supabase.from('student_units').update(updates).eq('id', rid);
+    if (error) {
+      if (error.code === '23505') return res.status(409).json({ error: 'Another record already exists for that school year and semester.' });
+      logError('admin/edit-student-unit', error);
+      return res.status(500).json({ error: 'Failed to update the record.' });
+    }
+
+    logAudit(req.user.id, 'ADMIN_EDIT_STUDENT_UNIT', {
+      target_user_id: existing.student_id,
+      subject_code: existing.subjects?.code,
+      reason: reason.trim().slice(0, 300),
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    logError('admin/edit-student-unit', err);
+    res.status(500).json({ error: 'Failed to update the record.' });
+  }
+});
+
+// ── DELETE /api/admin/units/:recordId ─────────────────────────────────
+router.delete('/units/:recordId', async (req, res) => {
+  try {
+    const rid = req.params.recordId;
+    if (!isValidUUID(rid)) return res.status(400).json({ error: 'Invalid record id.' });
+
+    const { reason } = req.body || {};
+    if (!isValidReason(reason)) return res.status(400).json({ error: 'A reason of at least 5 characters is required.' });
+
+    const { data: existing, error: fetchErr } = await supabase
+      .from('student_units')
+      .select('id, student_id, subjects(code)')
+      .eq('id', rid).single();
+    if (fetchErr || !existing) return res.status(404).json({ error: 'Record not found.' });
+
+    const { error } = await supabase.from('student_units').delete().eq('id', rid);
+    if (error) { logError('admin/delete-student-unit', error); return res.status(500).json({ error: 'Failed to remove the record.' }); }
+
+    logAudit(req.user.id, 'ADMIN_DELETE_STUDENT_UNIT', {
+      target_user_id: existing.student_id,
+      subject_code: existing.subjects?.code,
+      reason: reason.trim().slice(0, 300),
+    });
+    res.json({ ok: true });
+  } catch (err) {
+    logError('admin/delete-student-unit', err);
+    res.status(500).json({ error: 'Failed to remove the record.' });
+  }
+});
+
 module.exports = router;
