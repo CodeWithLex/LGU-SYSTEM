@@ -66,21 +66,6 @@ const Api = (() => {
       return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`);
     },
     transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
-    studentsSearch:      (q = '', program = '') => {
-      const params = new URLSearchParams();
-      if (q) params.set('q', q);
-      if (program) params.set('program', program);
-      const qs = params.toString();
-      return _request('GET', `/admin/students${qs ? '?' + qs : ''}`);
-    },
-    studentUnits:        (id)     => _request('GET',    `/admin/students/${id}/units`),
-    addStudentUnit:      (id, b)  => _request('POST',   `/admin/students/${id}/units`, b),
-    updateStudentUnit:   (rid, b) => _request('PATCH',  `/admin/units/${rid}`, b),
-    deleteStudentUnit:   (rid, b) => _request('DELETE', `/admin/units/${rid}`, b),
-    adminSubjects:       (p)      => _request('GET',    `/admin/subjects?program=${encodeURIComponent(p)}`),
-    createSubject:       (b)      => _request('POST',   `/admin/subjects`, b),
-    updateSubject:       (id, b)  => _request('PATCH',  `/admin/subjects/${id}`, b),
-    updateCurriculum:    (p, b)   => _request('PATCH',  `/admin/curriculum/${encodeURIComponent(p)}`, b),
   };
 
   const units = {

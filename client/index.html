@@ -475,62 +475,10 @@
 
         <!-- Tab Navigation -->
         <div class="admin-tabs">
-          <button class="admin-tab-btn" data-tab="academics" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="icon-park-outline:checklist" style="font-size:16px" ></iconify-icon> Academics</button>
           <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="icon-park-outline:edit" style="font-size:16px" ></iconify-icon> Create Records</button>
           <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="icon-park-outline:transfer-data" style="font-size:16px" ></iconify-icon> Budget Transfer</button>
           <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="icon-park-outline:people" style="font-size:16px" ></iconify-icon> User Management</button>
           <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="icon-park-outline:doc-detail" style="font-size:16px" ></iconify-icon> Audit Log</button>
-        </div>
-
-        <!-- Tab: Academics -->
-        <div class="admin-tab-panel" id="admin-tab-academics">
-          <div class="admin-panels">
-            <div class="dashboard-card">
-              <h3><iconify-icon icon="icon-park-outline:people"></iconify-icon> Student Records</h3>
-              <p style="color:var(--col-text-muted);font-size:0.85rem;margin-bottom:1rem;">Search a student to view and correct their academic records. Every change requires a reason and is audit-logged.</p>
-              <div class="form-row">
-                <div class="form-group" style="flex:2;">
-                  <input type="text" id="au-search" placeholder="Search by name or email…" />
-                </div>
-                <div class="form-group" style="flex:1;">
-                  <label>Course</label>
-                  <select id="au-filter-program">
-                    <option value="">All courses</option>
-                    <option value="BSCoE">Computer Engineering</option>
-                    <option value="BSCE">Civil Engineering</option>
-                    <option value="BSECE">Electronics Engineering</option>
-                  </select>
-                </div>
-              </div>
-              <div id="au-results"></div>
-              <div id="au-workspace" class="hidden"></div>
-            </div>
-            <div class="dashboard-card">
-              <h3><iconify-icon icon="icon-park-outline:checklist"></iconify-icon> Curriculum Manager</h3>
-              <p style="color:var(--col-text-muted);font-size:0.85rem;margin-bottom:1rem;">Add, edit, or archive subjects per program. Archived subjects keep existing records but disappear from student checklists.</p>
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Program</label>
-                  <select id="au-cur-program">
-                    <option value="BSCoE">Computer Engineering</option>
-                    <option value="BSCE">Civil Engineering</option>
-                    <option value="BSECE">Electronics Engineering</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Total Units Required</label>
-                  <div style="display:flex;gap:0.5rem;align-items:center;">
-                    <input type="number" id="au-cur-total" min="1" max="500" step="1" style="max-width:120px" />
-                    <button class="btn btn-ghost" id="au-cur-save" type="button">Save Total</button>
-                  </div>
-                </div>
-                <div class="form-group" style="align-self:flex-end;">
-                  <button class="btn btn-primary" id="au-subject-add" type="button">Add Subject</button>
-                </div>
-              </div>
-              <div id="au-cur-table"><div class="loading-state">Loading curriculum…</div></div>
-            </div>
-          </div>
         </div>
 
         <!-- Tab: Create Records -->
@@ -800,127 +748,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Admin: Record Modal — add/edit a student's subject record -->
-    <div class="modal-overlay hidden" id="au-record-modal">
-      <div class="modal-card">
-        <h3 id="au-record-title" style="margin-bottom:0.25rem;">Add Record</h3>
-        <p id="au-record-student" class="view-sub" style="margin-bottom:1rem;"></p>
-        <div class="form-group">
-          <label>Subject</label>
-          <select id="au-record-subject"><option value="">No subject selected</option></select>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>School Year</label>
-            <input type="text" id="au-record-sy" placeholder="2026-2027" />
-          </div>
-          <div class="form-group">
-            <label>Semester</label>
-            <select id="au-record-sem">
-              <option value="1">1st Semester</option>
-              <option value="2">2nd Semester</option>
-              <option value="3">Summer Term</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Status</label>
-            <select id="au-record-status">
-              <option value="enrolled">Enrolled</option>
-              <option value="passed">Passed</option>
-              <option value="failed">Failed</option>
-              <option value="dropped">Dropped</option>
-              <option value="incomplete">Incomplete</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Grade (1.0 – 5.0)</label>
-            <input type="number" id="au-record-grade" min="1" max="5" step="0.25" placeholder="e.g. 1.5" />
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Schedule <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
-            <input type="text" id="au-record-schedule" maxlength="120" placeholder="e.g. MWF 9:00–10:00 AM" />
-          </div>
-          <div class="form-group">
-            <label>Instructor <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
-            <input type="text" id="au-record-instructor" maxlength="120" placeholder="e.g. Engr. Juan Dela Cruz" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Reason (required)</label>
-          <input type="text" id="au-record-reason" maxlength="200" placeholder="Why are you making this change?" />
-        </div>
-        <div class="auth-error hidden" id="au-record-error"></div>
-        <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
-          <button class="btn btn-ghost" id="au-record-cancel" type="button">Cancel</button>
-          <button class="btn btn-primary" id="au-record-save" type="button">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Admin: Subject Modal — add/edit a curriculum subject -->
-    <div class="modal-overlay hidden" id="au-subject-modal">
-      <div class="modal-card">
-        <h3 id="au-subject-modal-title" style="margin-bottom:0.25rem;">Add Subject</h3>
-        <p id="au-subject-modal-sub" class="view-sub" style="margin-bottom:1rem;"></p>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Subject Code</label>
-            <input type="text" id="au-subject-code" maxlength="20" placeholder="e.g. CPE 315" />
-          </div>
-          <div class="form-group">
-            <label>Units</label>
-            <input type="number" id="au-subject-units" min="0.5" max="6" step="0.5" placeholder="3" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Subject Title</label>
-          <input type="text" id="au-subject-title" maxlength="120" placeholder="e.g. Computer Programming 2" />
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Year Level</label>
-            <select id="au-subject-year">
-              <option value="1">Year 1</option>
-              <option value="2">Year 2</option>
-              <option value="3">Year 3</option>
-              <option value="4">Year 4</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Semester</label>
-            <select id="au-subject-sem">
-              <option value="1">1st Semester</option>
-              <option value="2">2nd Semester</option>
-              <option value="3">Summer Term</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Prerequisites <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
-            <input type="text" id="au-subject-prereqs" maxlength="240" placeholder="e.g. CPE 211" />
-          </div>
-          <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.4rem;">
-            <input type="checkbox" id="au-subject-elective" style="width:1.1rem;height:1.1rem;" />
-            <label for="au-subject-elective" style="margin:0;">Elective</label>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Reason (required)</label>
-          <input type="text" id="au-subject-reason" maxlength="200" placeholder="Why are you making this change?" />
-        </div>
-        <div class="auth-error hidden" id="au-subject-error"></div>
-        <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
-          <button class="btn btn-ghost" id="au-subject-cancel" type="button">Cancel</button>
-          <button class="btn btn-primary" id="au-subject-save" type="button">Save</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
@@ -1117,7 +944,6 @@
   <script src="js/income.js"></script>
   <script src="js/units.js"></script>
   <script src="js/admin.js"></script>
-  <script src="js/admin-units.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

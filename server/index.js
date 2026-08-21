@@ -10,7 +10,6 @@ const transactionsRouter  = require("./routes/transactions");
 const reportsRouter       = require("./routes/reports");
 const announcementsRouter = require("./routes/announcements");
 const adminRouter         = require("./routes/admin");
-const adminUnitsRouter    = require("./routes/admin-units");
 const unitsRouter         = require("./routes/units");
 const authMiddleware      = require("./middleware/auth");
 const keepAlive           = require("./lib/keepAlive");
@@ -154,7 +153,6 @@ app.use("/api/transactions",  authMiddleware, onlyWrites(writeLimiter), transact
 app.use("/api/reports",       authMiddleware, onlyWrites(writeLimiter), reportsRouter);
 app.use("/api/announcements", authMiddleware, onlyWrites(writeLimiter), announcementsRouter);
 app.use("/api/admin",         authMiddleware, onlyWrites(writeLimiter), adminRouter);
-app.use("/api/admin",         authMiddleware, onlyWrites(writeLimiter), adminUnitsRouter);
 app.use("/api/units",         authMiddleware, onlyWrites(writeLimiter), unitsRouter);
 
 // =============================================
