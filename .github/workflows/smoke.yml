@@ -1,0 +1,34 @@
+name: UI Smoke
+
+# Post-deploy gate: Vercel/Render auto-deploy every push to main, so this
+# runs right after and verifies the deployed site actually works — the
+# same checks that would have caught the 2026-08 empty-select crash that
+# broke login for every user. Optional authenticated checks run when
+# TEST_EMAIL / TEST_PASSWORD secrets are configured (create a dedicated
+# test account for this — never use a real admin's credentials).
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *' # daily 06:00 UTC = 14:00 PHT
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Wait for Vercel/Render deploy
+        run: sleep 90
+      - name: Run UI smoke checks
+        run: node scripts/smoke-ui.mjs
+        env:
+          SITE_URL: https://www.coelgu-system.engineer
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}

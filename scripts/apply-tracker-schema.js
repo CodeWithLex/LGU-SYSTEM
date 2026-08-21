@@ -13,6 +13,17 @@ if (!url || !key) {
 
 const supabase = createClient(url, key);
 
+// 005 drops and recreates the tracker tables — running it against a
+// database that already has student data WIPES every student record.
+// It is only safe for fresh environments; require an explicit opt-in.
+if (!process.argv.includes('--force')) {
+  console.error('⚠️  005_credit_unit_tracker.sql DROPs and recreates subjects/student_units/');
+  console.error('   curriculum_requirements. Re-running it on a live database deletes all');
+  console.error('   student academic records. If this is truly a FRESH environment, rerun with:');
+  console.error('       node scripts/apply-tracker-schema.js --force');
+  process.exit(1);
+}
+
 async function run() {
   console.log('🚀 Reading 005_credit_unit_tracker.sql...');
   const sqlPath = path.join(__dirname, '../supabase/migrations/005_credit_unit_tracker.sql');
