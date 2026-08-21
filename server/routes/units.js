@@ -103,8 +103,8 @@ router.get('/my', async (req, res) => {
 
 // GET /api/units/standing
 // PDF transcript of the student's academic standing — every subject from
-// Year 1 to 4 with units, status, grade, and school year. Text-based, so it
-// can be handed to an AI for analysis (a plain-text dump is appended).
+// Year 1 to 4 with units, status, grade, and school year, laid out on the
+// institutional letterhead (LETTER TEMPLATE.docx).
 router.get('/standing', async (req, res) => {
   try {
     const studentProgram = VALID_PROGRAMS.find(
@@ -189,19 +189,25 @@ router.get('/standing', async (req, res) => {
       const savedX = doc.x, savedY = doc.y;
       // Full-bleed letterhead banner across the top
       if (hasBanner) doc.image(bannerPath, 0, 0, { width: 612 });
-      // Footer: school seal + institution name + hairline rule. Text must stay
-      // above the page's bottom margin (936 - 72 = 864) or pdfkit tries to
-      // continue it on a new page — which re-fires pageAdded, recursing.
-      if (hasSeal) doc.image(sealPath, contentLeft, 820, { width: 34, height: 34 });
-      doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8)
-         .text('COLLEGE OF ENGINEERING', 114, 826);
-      doc.font('Helvetica').fontSize(7.5)
-         .text('Cor Jesu College — Official Standing Report', 114, 836);
-      doc.moveTo(contentLeft, 854).lineTo(contentRight, 854)
-         .lineWidth(1).strokeColor(faint).stroke();
+      // Footer — matches LETTER TEMPLATE.docx: a full-width gray strip with the
+      // school seal and COLLEGE OF ENGINEERING text at the bottom-left. The
+      // template anchors this in the footer zone below the 1" bottom margin
+      // (936 - 72 = 864), so relax the page's bottom margin while drawing;
+      // text flowing past the margin would otherwise open a new page, which
+      // re-fires pageAdded and recurses.
+      const savedBottom = doc.page.margins.bottom;
+      doc.page.margins.bottom = 0;
+      doc.fillColor('#9c9898').rect(0, 878, 612, 4).fill();
+      if (hasSeal) doc.image(sealPath, 24, 887, { width: 34, height: 34 });
+      doc.fillColor(primary).font('Helvetica-Bold').fontSize(12)
+         .text('COLLEGE OF ENGINEERING', 68, 893);
+      doc.page.margins.bottom = savedBottom;
       doc.x = savedX; doc.y = savedY;
     }
     doc.on('pageAdded', drawLetterhead);
+    // The first page is created inside the PDFDocument constructor, before the
+    // pageAdded handler above is attached, so draw the letterhead on it once.
+    drawLetterhead();
 
     // ── Page 1: report title below the banner ──
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(14)
@@ -331,26 +337,6 @@ router.get('/standing', async (req, res) => {
           });
         });
     });
-
-    // ── Appendix — machine-readable dump, clearly a separate section ──
-    doc.addPage();
-    doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('APPENDIX A — MACHINE-READABLE DATA', contentLeft, 94);
-    doc.rect(contentLeft, 106, 60, 2).fill(accent);
-    doc.font('Helvetica').fontSize(9).fillColor(textMuted)
-       .text('Plain-text transcript for AI analysis / data processing — auxiliary, not part of the official record.', contentLeft, 118, { width: pageWidth });
-
-    doc.moveDown(2.5);
-    doc.font('Courier').fontSize(8).fillColor('#0f172a');
-    doc.text(`STUDENT|${fullName}|${studentProgram}|${PROGRAM_NAMES[studentProgram] || ''}|${enrolledYear || ''}|${gradYear}|${req.user.email}`);
-    doc.text(`SUMMARY|required_units=${total}|completed_units=${completed}|progress_pct=${pct}|subjects_taken=${recordBySubject.size}|subjects_passed=${passedIds.size}`);
-    doc.text('FIELDS|code|title|units|year_level|semester|school_year|status|grade');
-    doc.text('SUBJECTS');
-    subjects.forEach(s => {
-      if (doc.y > pageBottom) doc.addPage();
-      const rec = recordBySubject.get(s.id);
-      doc.text(`${s.code}|${s.title}|${s.units}|${s.year_level}|${s.semester}|${rec?.school_year || ''}|${rec?.status || 'not_taken'}|${rec?.grade ?? ''}`);
-    });
-    doc.text('END');
 
     // ── Final page — summary + signature block ──
     doc.addPage();
