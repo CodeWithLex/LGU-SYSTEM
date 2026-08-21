@@ -178,9 +178,9 @@ router.get('/standing', async (req, res) => {
 
     // Letterhead assets extracted from the template (repeated on every page)
     const bannerPath = path.join(__dirname, '../../client/assets/letterhead-banner.jpg');
-    const sealPath   = path.join(__dirname, '../../client/assets/coe-school-seal.png');
+    const logoPath   = path.join(__dirname, '../../client/assets/coe-logo.png');
     const hasBanner  = fs.existsSync(bannerPath);
-    const hasSeal    = fs.existsSync(sealPath);
+    const hasLogo    = fs.existsSync(logoPath);
 
     function drawLetterhead() {
       // Preserve the caller's cursor — doc.text()/doc.image() move doc.x/doc.y,
@@ -189,20 +189,22 @@ router.get('/standing', async (req, res) => {
       const savedX = doc.x, savedY = doc.y;
       // Full-bleed letterhead banner across the top
       if (hasBanner) doc.image(bannerPath, 0, 0, { width: 612 });
-      // Footer — matches LETTER TEMPLATE.docx: a full-width gray strip with the
-      // school seal and COLLEGE OF ENGINEERING text at the bottom-left. The
-      // template anchors this in the footer zone below the 1" bottom margin
-      // (936 - 72 = 864), so relax the page's bottom margin while drawing;
-      // text flowing past the margin would otherwise open a new page, which
-      // re-fires pageAdded and recurses.
+      // Footer — matches LETTER TEMPLATE.docx: a light rule, then the COE logo
+      // with COLLEGE OF ENGINEERING in Times bold (the template's footer type)
+      // at the bottom-left. The template anchors this in the footer zone below
+      // the 1" bottom margin (936 - 72 = 864), so relax the page's bottom
+      // margin while drawing; text flowing past the margin would otherwise
+      // open a new page, which re-fires pageAdded and recurses.
       const savedBottom = doc.page.margins.bottom;
       doc.page.margins.bottom = 0;
       doc.fillColor('#9c9898').rect(0, 878, 612, 4).fill();
-      if (hasSeal) doc.image(sealPath, 24, 887, { width: 34, height: 34 });
-      doc.fillColor(primary).font('Helvetica-Bold').fontSize(12)
-         .text('COLLEGE OF ENGINEERING', 68, 893);
+      if (hasLogo) doc.image(logoPath, 40, 886, { width: 36, height: 36 });
+      doc.fillColor(primary).font('Times-Bold').fontSize(12)
+         .text('COLLEGE OF ENGINEERING', 84, 897);
       doc.page.margins.bottom = savedBottom;
-      doc.x = savedX; doc.y = savedY;
+      // Continuation pages start their content below the letterhead banner
+      // (which fills the top ~80pt), not at the top margin.
+      doc.x = savedX; doc.y = Math.max(savedY, 92);
     }
     doc.on('pageAdded', drawLetterhead);
     // The first page is created inside the PDFDocument constructor, before the
