@@ -228,8 +228,8 @@ router.get('/standing', async (req, res) => {
       ['Generated',       generated],
     ];
     const rightMeta = [
-      ['Program',              PROGRAM_NAMES[studentProgram] || studentProgram],
-      ['Estimated Graduation', String(gradYear)],
+      ['     Program',              PROGRAM_NAMES[studentProgram] || studentProgram],
+      ['     Estimated Graduation', String(gradYear)],
     ];
     leftMeta.forEach(([label, value], i) => {
       const y = metaTop + 12 + i * 16;
