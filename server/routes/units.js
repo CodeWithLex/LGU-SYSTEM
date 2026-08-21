@@ -485,7 +485,7 @@ router.patch('/update/:id', async (req, res) => {
       updates.semester = Number(semester);
     }
     if (instructor !== undefined) updates.instructor = sanitizeOptionalText(instructor);
-    if (schedule !== undefined)   updates.schedule   = sanitizeOptionalText(schedule);
+    if (schedule !== undefined) updates.schedule = sanitizeOptionalText(schedule);
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'Nothing to update.' });
     }
