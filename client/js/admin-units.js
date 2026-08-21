@@ -395,5 +395,183 @@ const AdminUnits = (() => {
     }
   }
 
+  // ---- Curriculum Manager ----
+  let _subjectEditId = null;
+
+  function bindCurriculum() {
+    document.getElementById('au-cur-program').addEventListener('change', e => {
+      _currProgram = e.target.value;
+      loadCurriculum();
+    });
+    document.getElementById('au-cur-save').addEventListener('click', saveTotalUnits);
+    document.getElementById('au-subject-add').addEventListener('click', () => openSubjectModal(null));
+
+    document.getElementById('au-cur-table').addEventListener('click', e => {
+      const btn = e.target.closest('[data-cact]');
+      if (!btn) return;
+      const subject = _currSubjects.find(s => s.id === btn.dataset.id);
+      if (!subject) return;
+      if (btn.dataset.cact === 'edit') openSubjectModal(subject);
+      if (btn.dataset.cact === 'archive') toggleArchive(subject);
+    });
+  }
+
+  async function loadCurriculum() {
+    const box = document.getElementById('au-cur-table');
+    box.innerHTML = '<div class="loading-state">Loading curriculum…</div>';
+    try {
+      const { requirements, subjects } = await Api.admin.adminSubjects(_currProgram);
+      _currSubjects = subjects || [];
+      document.getElementById('au-cur-total').value = requirements?.total_units ?? '';
+      renderCurriculum();
+    } catch (err) {
+      box.innerHTML = `
+        <div class="empty-state">
+          <iconify-icon icon="icon-park-outline:caution" class="empty-icon"></iconify-icon>
+          <p>${esc(err.message)}</p>
+        </div>`;
+    }
+  }
+
+  function renderCurriculum() {
+    const box = document.getElementById('au-cur-table');
+    if (!_currSubjects.length) {
+      box.innerHTML = '<div class="empty-state">No subjects for this program yet — add the first one.</div>';
+      return;
+    }
+
+    box.innerHTML = `
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead><tr><th>Code</th><th>Title</th><th>Units</th><th>Yr</th><th>Sem</th><th>Prereqs</th><th>Records</th><th>Status</th><th style="text-align:center;">Actions</th></tr></thead>
+          <tbody>
+            ${_currSubjects.map(s => `
+              <tr style="${s.is_archived ? 'opacity:.55;' : ''}">
+                <td><strong>${esc(s.code)}</strong>${s.is_elective ? ' <span style="font-size:.65rem;color:var(--text-tertiary);">(elective)</span>' : ''}</td>
+                <td style="font-size:.82rem;min-width:180px;">${esc(s.title)}</td>
+                <td style="text-align:center;">${s.units}</td>
+                <td style="text-align:center;">${s.year_level}</td>
+                <td style="font-size:.8rem;">${SEM_SHORT[s.semester] || s.semester}</td>
+                <td style="font-size:.75rem;color:var(--text-tertiary);">${esc(s.prerequisites || '—')}</td>
+                <td style="text-align:center;">${s.record_count ?? 0}</td>
+                <td>${s.is_archived ? '<span class="unit-badge unit-badge--none">Archived</span>' : '<span class="unit-badge unit-badge--passed">Active</span>'}</td>
+                <td style="text-align:center;white-space:nowrap;">
+                  <button class="tx-action-btn" data-cact="edit" data-id="${s.id}" style="font-size:.78rem;padding:.25rem .55rem;margin-right:.25rem;">Edit</button>
+                  <button class="tx-action-btn" data-cact="archive" data-id="${s.id}" style="font-size:.78rem;padding:.25rem .55rem;">${s.is_archived ? 'Unarchive' : 'Archive'}</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function bindSubjectModal() {
+    document.getElementById('au-subject-save').addEventListener('click', saveSubjectModal);
+    document.getElementById('au-subject-cancel').addEventListener('click', () => closeModalOverlay('au-subject-modal'));
+    document.getElementById('au-subject-modal').addEventListener('click', e => {
+      if (e.target.id === 'au-subject-modal') closeModalOverlay('au-subject-modal');
+    });
+  }
+
+  function openSubjectModal(subject) {
+    _subjectEditId = subject?.id || null;
+
+    document.getElementById('au-subject-modal-title').textContent = subject ? 'Edit Subject' : 'Add Subject';
+    document.getElementById('au-subject-modal-sub').textContent =
+      `${PROGRAM_NAMES[_currProgram] || _currProgram}${subject?.record_count ? ` · ${subject.record_count} student record(s) reference this subject` : ''}`;
+
+    document.getElementById('au-subject-code').value    = subject?.code || '';
+    document.getElementById('au-subject-title').value   = subject?.title || '';
+    document.getElementById('au-subject-units').value   = subject?.units ?? '';
+    document.getElementById('au-subject-year').value    = String(subject?.year_level ?? 1);
+    document.getElementById('au-subject-sem').value     = String(subject?.semester ?? 1);
+    document.getElementById('au-subject-prereqs').value = subject?.prerequisites || '';
+    document.getElementById('au-subject-elective').checked = !!subject?.is_elective;
+    document.getElementById('au-subject-reason').value  = '';
+
+    const errEl = document.getElementById('au-subject-error');
+    errEl.classList.add('hidden');
+    openModalOverlay('au-subject-modal');
+  }
+
+  async function saveSubjectModal() {
+    const errEl = document.getElementById('au-subject-error');
+    errEl.classList.add('hidden');
+
+    const code    = document.getElementById('au-subject-code').value.trim();
+    const title   = document.getElementById('au-subject-title').value.trim();
+    const units   = Number(document.getElementById('au-subject-units').value);
+    const year    = Number(document.getElementById('au-subject-year').value);
+    const sem     = Number(document.getElementById('au-subject-sem').value);
+    const prereqs = document.getElementById('au-subject-prereqs').value.trim();
+    const elective = document.getElementById('au-subject-elective').checked;
+    const reason  = document.getElementById('au-subject-reason').value.trim();
+
+    if (!code || code.length > 20)  { errEl.textContent = 'Subject code is required (max 20 characters).'; errEl.classList.remove('hidden'); return; }
+    if (!title || title.length > 120) { errEl.textContent = 'Subject title is required (max 120 characters).'; errEl.classList.remove('hidden'); return; }
+    if (!Number.isFinite(units) || units < 0.5 || units > 6) { errEl.textContent = 'Units must be between 0.5 and 6.'; errEl.classList.remove('hidden'); return; }
+    if (reason.length < 5) { errEl.textContent = 'A reason of at least 5 characters is required.'; errEl.classList.remove('hidden'); return; }
+
+    const existing = _subjectEditId ? _currSubjects.find(s => s.id === _subjectEditId) : null;
+    if (existing && existing.record_count > 0 && Number(existing.units) !== units) {
+      if (!confirm(`Warning: ${existing.record_count} student record(s) reference this subject. Changing its units retroactively changes those students' progress computation. Continue?`)) return;
+    }
+
+    const body = {
+      code, title, units, year_level: year, semester: sem,
+      prerequisites: prereqs || null,
+      is_elective: elective,
+      reason,
+    };
+
+    try {
+      if (_subjectEditId) {
+        await Api.admin.updateSubject(_subjectEditId, body);
+        UI.toast('Subject updated.', 'success');
+      } else {
+        await Api.admin.createSubject({ ...body, program: _currProgram });
+        UI.toast('Subject created.', 'success');
+      }
+      closeModalOverlay('au-subject-modal');
+      await loadCurriculum();
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.classList.remove('hidden');
+    }
+  }
+
+  async function toggleArchive(subject) {
+    const verb = subject.is_archived ? 'unarchive' : 'archive';
+    const reason = window.prompt(`Reason for archiving/unarchiving "${subject.code}" (min. 5 characters):`);
+    if (reason === null) return;
+    if (reason.trim().length < 5) { UI.toast('Reason must be at least 5 characters.', 'error'); return; }
+    if (!confirm(`${verb === 'archive' ? 'Archive' : 'Unarchive'} "${subject.code}"? ${subject.record_count ? `${subject.record_count} existing record(s) will keep it (PDFs stay accurate); students just won't see it in their checklist.` : ''}`)) return;
+
+    try {
+      await Api.admin.updateSubject(subject.id, { is_archived: !subject.is_archived, reason: reason.trim() });
+      UI.toast(`Subject ${verb}d.`, 'success');
+      await loadCurriculum();
+    } catch (err) {
+      UI.toast(err.message, 'error');
+    }
+  }
+
+  async function saveTotalUnits() {
+    const input = document.getElementById('au-cur-total');
+    const t = Number(input.value);
+    if (!Number.isInteger(t) || t < 1 || t > 500) { UI.toast('Total units must be a whole number between 1 and 500.', 'error'); return; }
+
+    const reason = window.prompt(`Reason for changing total units for ${_currProgram} (min. 5 characters):`);
+    if (reason === null) return;
+    if (reason.trim().length < 5) { UI.toast('Reason must be at least 5 characters.', 'error'); return; }
+
+    try {
+      await Api.admin.updateCurriculum(_currProgram, { total_units: t, reason: reason.trim() });
+      UI.toast('Total units saved — students\' progress will recompute.', 'success');
+    } catch (err) {
+      UI.toast(err.message, 'error');
+    }
+  }
+
   return { load };
 })();
