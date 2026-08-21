@@ -286,6 +286,8 @@ const Units = (() => {
     document.getElementById('units-sy').value = record?.school_year || prospectusSchoolYear(subject);
     setDDValue(document.getElementById('units-status'), record?.status || 'enrolled');
     document.getElementById('units-grade').value = record?.grade != null ? record.grade : '';
+    document.getElementById('units-schedule').value = record?.schedule || '';
+    document.getElementById('units-instructor').value = record?.instructor || '';
 
     const errEl = document.getElementById('units-modal-error');
     errEl.classList.add('hidden');
@@ -304,6 +306,8 @@ const Units = (() => {
     const semester = document.getElementById('units-sem').value;
     const status = document.getElementById('units-status').value;
     const gradeRaw = document.getElementById('units-grade').value;
+    const schedule   = document.getElementById('units-schedule').value.trim().slice(0, 120);
+    const instructor = document.getElementById('units-instructor').value.trim().slice(0, 120);
 
     if (!/^\d{4}-\d{4}$/.test(school_year)) {
       errEl.textContent = 'School year must look like "2026-2027".';
@@ -316,7 +320,14 @@ const Units = (() => {
       return;
     }
 
-    const body = { school_year, semester: Number(semester), status, grade: gradeRaw === '' ? null : Number(gradeRaw) };
+    const body = {
+      school_year,
+      semester: Number(semester),
+      status,
+      grade: gradeRaw === '' ? null : Number(gradeRaw),
+      schedule: schedule || null,
+      instructor: instructor || null,
+    };
 
     try {
       if (modalMode === 'edit') {

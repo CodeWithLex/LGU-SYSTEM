@@ -712,6 +712,16 @@
           <label>Grade (1.0 – 5.0)</label>
           <input type="number" id="units-grade" min="1" max="5" step="0.25" placeholder="e.g. 1.5" />
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Schedule <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+            <input type="text" id="units-schedule" maxlength="120" placeholder="e.g. MWF 9:00–10:00 AM" />
+          </div>
+          <div class="form-group">
+            <label>Instructor <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
+            <input type="text" id="units-instructor" maxlength="120" placeholder="e.g. Engr. Juan Dela Cruz" />
+          </div>
+        </div>
         <div class="auth-error hidden" id="units-modal-error"></div>
         <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
           <button class="btn btn-ghost" id="units-modal-cancel" type="button">Cancel</button>
