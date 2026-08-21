@@ -139,8 +139,19 @@ const Units = (() => {
 
     const pct = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
 
+    // In-progress: current-term enrolled units render as a lighter
+    // segment behind the passed fill — pct stays passed-only.
+    const inProgressUnits = currentTermRecords()
+      .reduce((sum, u) => sum + Number(u.subjects.units || 0), 0);
+    const inPct = total > 0
+      ? Math.min(100 - pct, Math.round((inProgressUnits / total) * 100))
+      : 0;
+
     document.getElementById('units-progress-pct').textContent = `${pct}%`;
     document.getElementById('units-progress-fill').style.width = `${pct}%`;
+    document.getElementById('units-progress-progress').style.width = `${Math.min(100, pct + inPct)}%`;
+    document.getElementById('units-progress-caption').textContent =
+      `${completed} / ${total || '—'} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`;
     document.getElementById('units-completed').textContent = completed;
     document.getElementById('units-total').textContent = total || '—';
 

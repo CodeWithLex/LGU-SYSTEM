@@ -2388,6 +2388,7 @@ html body.is-admin th.admin-only {
 }
 
 .units-progress-track {
+  position: relative;
   height: 12px;
   border-radius: 999px;
   background: var(--bg-surface-raised);
@@ -2395,11 +2396,32 @@ html body.is-admin th.admin-only {
   overflow: hidden;
 }
 .units-progress-fill {
+  position: relative;
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent) 0%, #ff8c3a 100%);
   box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* In-progress extension — translucent, painted under the passed fill
+   (earlier in the DOM, and .units-progress-fill is position:relative),
+   so the bar reads solid-accent → translucent → track. */
+.units-progress-fill-progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.22);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.units-progress-caption {
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .units-progress-stats {
