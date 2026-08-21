@@ -193,6 +193,8 @@ router.post('/enroll', async (req, res) => {
         grade: grade === '' ? null : (grade === null || grade === undefined ? null : Number(grade)),
         instructor: sanitizeOptionalText(instructor),
         schedule: sanitizeOptionalText(schedule),
+        last_edited_by: req.user.email,
+        updated_at: new Date().toISOString(),
       });
 
     if (error) {
@@ -246,6 +248,8 @@ router.patch('/update/:id', async (req, res) => {
     }
     if (instructor !== undefined) updates.instructor = sanitizeOptionalText(instructor);
     if (schedule !== undefined) updates.schedule = sanitizeOptionalText(schedule);
+    updates.last_edited_by = req.user.email;
+    updates.updated_at = new Date().toISOString();
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ error: 'Nothing to update.' });
     }
