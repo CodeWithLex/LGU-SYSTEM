@@ -53,6 +53,26 @@ const AdminUnits = (() => {
     return m >= 6 && m <= 10 ? 1 : 2;
   }
 
+  // The custom dropdown (.dd) is inserted as the select's previous sibling
+  // by app.js bindDropdown, so setting select.value alone leaves its label
+  // stale — sync it the way units.js does.
+  function ddWrap(select) {
+    return (select && select.parentNode) ? select.parentNode.querySelector('.dd') : null;
+  }
+
+  function setDDValue(select, value) {
+    select.value = value;
+    const wrap = ddWrap(select);
+    if (wrap) {
+      const label = wrap.querySelector('.dd-label');
+      const opt = select.options[select.selectedIndex];
+      if (label) {
+        label.textContent = opt ? opt.text : '';
+        label.classList.toggle('dd-placeholder', !(opt && opt.value));
+      }
+    }
+  }
+
   // Modal show/hide with the shared close animation (same behavior as
   // units.js — kept local so the modules stay independent).
   function openModalOverlay(id) {
@@ -329,12 +349,13 @@ const AdminUnits = (() => {
     _subjects.forEach(s => opts.set(s.id, s));
     subjectSel.innerHTML = [...opts.values()]
       .map(s => `<option value="${s.id}">${esc(s.code)} — ${esc(s.title)} (${s.units}u)</option>`).join('');
-    subjectSel.value = record?.subject_id || record?.subjects?.id || (opts.size ? [...opts.keys()][0] : '');
+    setDDValue(subjectSel, record?.subject_id || record?.subjects?.id || (opts.size ? [...opts.keys()][0] : ''));
     subjectSel.disabled = mode === 'edit'; // the row's subject is fixed; edits change status/grade/details
+    ddWrap(subjectSel)?.classList.toggle('dd-disabled', subjectSel.disabled);
 
-    document.getElementById('au-record-sy').value   = record?.school_year || currentSchoolYear();
-    document.getElementById('au-record-sem').value  = String(record?.semester ?? currentSemester());
-    document.getElementById('au-record-status').value = record?.status || 'enrolled';
+    document.getElementById('au-record-sy').value = record?.school_year || currentSchoolYear();
+    setDDValue(document.getElementById('au-record-sem'), String(record?.semester ?? currentSemester()));
+    setDDValue(document.getElementById('au-record-status'), record?.status || 'enrolled');
     document.getElementById('au-record-grade').value  = record?.grade != null ? record.grade : '';
     document.getElementById('au-record-schedule').value   = record?.schedule || '';
     document.getElementById('au-record-instructor').value = record?.instructor || '';
@@ -500,8 +521,8 @@ const AdminUnits = (() => {
     document.getElementById('au-subject-code').value    = subject?.code || '';
     document.getElementById('au-subject-title').value   = subject?.title || '';
     document.getElementById('au-subject-units').value   = subject?.units ?? '';
-    document.getElementById('au-subject-year').value    = String(subject?.year_level ?? 1);
-    document.getElementById('au-subject-sem').value     = String(subject?.semester ?? 1);
+    setDDValue(document.getElementById('au-subject-year'), String(subject?.year_level ?? 1));
+    setDDValue(document.getElementById('au-subject-sem'), String(subject?.semester ?? 1));
     document.getElementById('au-subject-prereqs').value = subject?.prerequisites || '';
     document.getElementById('au-subject-elective').checked = !!subject?.is_elective;
     document.getElementById('au-subject-reason').value  = '';

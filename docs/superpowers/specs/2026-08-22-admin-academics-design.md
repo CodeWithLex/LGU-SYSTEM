@@ -53,7 +53,7 @@ New **Academics** tab in `#view-admin` (admin-only via existing `body.is-admin` 
 | `PATCH /api/admin/subjects/:id` | Edit subject (incl. `is_archived`) |
 | `PATCH /api/admin/curriculum/:program` | Edit `total_units` |
 
-Validations mirror the student endpoints verbatim (school-year regex, grade 1.0–5.0, status enum, `sanitizeOptionalText`). Audit actions: `ADMIN_VIEW_STUDENT_UNITS`, `ADMIN_ADD_STUDENT_UNIT`, `ADMIN_EDIT_STUDENT_UNIT`, `ADMIN_DELETE_STUDENT_UNIT`, `ADMIN_EDIT_SUBJECT`, `ADMIN_ARCHIVE_SUBJECT`, `ADMIN_EDIT_CURRICULUM`, `ADMIN_STANDING_PDF`.
+Validations mirror the student endpoints verbatim (school-year regex, grade 1.0–5.0, status enum, `sanitizeOptionalText`). Audit actions: `ADMIN_ADD_STUDENT_UNIT`, `ADMIN_EDIT_STUDENT_UNIT`, `ADMIN_DELETE_STUDENT_UNIT`, `ADMIN_EDIT_SUBJECT`, `ADMIN_ARCHIVE_SUBJECT`, `ADMIN_EDIT_CURRICULUM`, `ADMIN_STANDING_PDF`. *(Amendment 2026-08-22: `ADMIN_VIEW_STUDENT_UNITS` was dropped — logging every workspace open flooded the audit viewer; reads are not audited, only mutations.)*
 
 **PDF refactor:** the standing-PDF builder (~280 lines inline in `GET /units/standing`) moves to `server/lib/standing-pdf.js` — `buildStandingPDF({ profile, program, subjects, records, res })` — called by both the self route and the admin route. `scripts/smoke-test-standing.js` is updated to extract from the new lib (same vm technique).
 

@@ -419,7 +419,7 @@ const Admin = (() => {
   // ── Users Tab ─────────────────────────────────────────────────────────────
   async function loadUsers() {
     const container = document.getElementById('admin-tab-users');
-    if (!container.innerHTML.includes('tx-search')) {
+    if (!container.innerHTML.includes('users-search')) {
       container.innerHTML = `
         <div style="margin-bottom:1rem;">
           <input type="text" id="users-search" placeholder="Search users by name, email, or course…" style="width:100%;max-width:400px;padding:0.5rem;border-radius:4px;border:1px solid var(--col-border);background:var(--col-surface);color:white;font-size:0.9rem;" />
@@ -546,6 +546,14 @@ const Admin = (() => {
         SET_USER_ROLE:      { icon: 'shield', color: '#6366f1', label: 'Changed User Role' },
         BUDGET_TRANSFER:    { icon: 'bank-transfer', color: '#14b8a6', label: 'Budget Transfer' },
         OVER_BUDGET_ALERT:  { icon: 'caution', color: '#F59E0B', label: 'Over Budget Alert' },
+        BULK_IMPORT_TRANSACTIONS: { icon: 'upload-two', color: '#22C55E', label: 'Bulk Imported Transactions' },
+        ADMIN_ADD_STUDENT_UNIT:    { icon: 'add-one',   color: '#22C55E', label: 'Added Student Record' },
+        ADMIN_EDIT_STUDENT_UNIT:   { icon: 'write',     color: '#F97316', label: 'Edited Student Record' },
+        ADMIN_DELETE_STUDENT_UNIT: { icon: 'delete',    color: '#ef4444', label: 'Removed Student Record' },
+        ADMIN_EDIT_SUBJECT:        { icon: 'checklist', color: '#6366f1', label: 'Edited Curriculum Subject' },
+        ADMIN_ARCHIVE_SUBJECT:     { icon: 'box',       color: '#8b5cf6', label: 'Changed Subject Archive' },
+        ADMIN_EDIT_CURRICULUM:     { icon: 'book-one',  color: '#14b8a6', label: 'Edited Curriculum Totals' },
+        ADMIN_STANDING_PDF:        { icon: 'download',  color: '#0ea5e9', label: 'Generated Standing PDF' },
       };
       const item = icons[a] || { icon: 'info', color: 'var(--text-secondary)', label: a };
       return `
@@ -577,6 +585,22 @@ const Admin = (() => {
             return `Posted: "${d.title}"`;
           case 'OVER_BUDGET_ALERT':
             return `Budget Alert: ₱${Number(d.remaining_budget).toLocaleString()} remaining`;
+          case 'BULK_IMPORT_TRANSACTIONS':
+            return `Imported ${d.count ?? 'multiple'} transactions in bulk`;
+          case 'ADMIN_ADD_STUDENT_UNIT':
+            return `Added ${d.subject_code || 'record'} to ${d.user_name || 'student'}. Reason: ${d.reason}`;
+          case 'ADMIN_EDIT_STUDENT_UNIT':
+            return `Edited ${d.subject_code || 'record'} for student. Reason: ${d.reason}`;
+          case 'ADMIN_DELETE_STUDENT_UNIT':
+            return `Removed ${d.subject_code || 'record'} from student. Reason: ${d.reason}`;
+          case 'ADMIN_EDIT_SUBJECT':
+            return `${d.created ? 'Created' : 'Edited'} subject ${d.subject_code || ''}${d.fields ? ` (${d.fields.join(', ')})` : ''}. Reason: ${d.reason}`;
+          case 'ADMIN_ARCHIVE_SUBJECT':
+            return `${d.archived ? 'Archived' : 'Unarchived'} subject ${d.subject_code || ''}. Reason: ${d.reason}`;
+          case 'ADMIN_EDIT_CURRICULUM':
+            return `Set ${d.program || ''} total units to ${d.total_units}. Reason: ${d.reason}`;
+          case 'ADMIN_STANDING_PDF':
+            return `Generated standing PDF for ${d.user_name || 'student'}`;
           default:
             return JSON.stringify(d);
         }
