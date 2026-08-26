@@ -251,13 +251,19 @@ const GrizzAI = (() => {
         </div>
         <div class="ursa-dash-chips">
           <button type="button" class="ursa-dash-chip" data-action="next-sem" data-title="Next Sem Subject Recommendations">
-            <iconify-icon icon="icon-park-outline:checklist" style="color:var(--primary);"></iconify-icon> Next Sem Recommendations
+            <iconify-icon icon="icon-park-outline:checklist" style="color:var(--primary);font-size:14px;"></iconify-icon>
+            <span class="ursa-chip-label">Next Sem Recommendations</span>
+            <span class="ursa-chip-label-mobile">Next Sem</span>
           </button>
           <button type="button" class="ursa-dash-chip" data-action="current-subjects" data-title="Ask About Current Subjects">
-            <iconify-icon icon="icon-park-outline:book-open" style="color:var(--primary);"></iconify-icon> Current Subjects
+            <iconify-icon icon="icon-park-outline:book-open" style="color:var(--primary);font-size:14px;"></iconify-icon>
+            <span class="ursa-chip-label">Current Subjects</span>
+            <span class="ursa-chip-label-mobile">Current</span>
           </button>
           <button type="button" class="ursa-dash-chip" data-action="financial-summary" data-title="Explain Financial Summary">
-            <iconify-icon icon="icon-park-outline:chart-pie" style="color:var(--primary);"></iconify-icon> Explain Financials
+            <iconify-icon icon="icon-park-outline:chart-pie" style="color:var(--primary);font-size:14px;"></iconify-icon>
+            <span class="ursa-chip-label">Explain Financials</span>
+            <span class="ursa-chip-label-mobile">Financials</span>
           </button>
         </div>
       </div>
