@@ -402,6 +402,10 @@
 
     UI.setAdminVisibility(profile?.role === 'admin');
 
+    if (window.UrsaAI) {
+      UrsaAI.init();
+    }
+
     // Return the user to the view they were last on instead of resetting to
     // the dashboard. Fall back to the dashboard when nothing is saved, the
     // view no longer exists, or a non-admin somehow saved 'admin'.

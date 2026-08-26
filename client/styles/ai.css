@@ -1,0 +1,673 @@
+/* =============================================
+   Ursa — COE Bear AI Assistant Styles
+   ============================================= */
+
+/* Floating Launcher Button */
+.ursa-launcher {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.15rem 0.7rem 0.85rem;
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  color: var(--text-primary);
+  border: 1px solid rgba(249, 115, 22, 0.4);
+  border-radius: 100px;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 20px -4px rgba(249, 115, 22, 0.25);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-family);
+  font-size: 0.88rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+.ursa-launcher:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: var(--primary);
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6), 0 0 25px -2px rgba(249, 115, 22, 0.4);
+}
+
+.ursa-launcher:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.ursa-avatar-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+  position: relative;
+}
+
+.ursa-avatar-badge::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 9px;
+  height: 9px;
+  background: #22C55E;
+  border: 2px solid #0F172A;
+  border-radius: 50%;
+}
+
+.ursa-launcher-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.ursa-launcher-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ursa-launcher-sub {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Slide-out Backdrop */
+.ursa-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.ursa-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Slide-out Drawer Panel */
+.ursa-drawer {
+  position: fixed;
+  top: 0;
+  right: -480px;
+  width: 460px;
+  max-width: 92vw;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.6);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-family);
+  color: var(--text-primary);
+}
+
+.ursa-drawer.active {
+  right: 0;
+}
+
+/* Drawer Header */
+.ursa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem;
+  background: var(--surface-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
+.ursa-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ursa-header-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
+
+.ursa-header-info h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ursa-tag-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--primary);
+  border-radius: 4px;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ursa-status-pill {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.ursa-dot-online {
+  width: 7px;
+  height: 7px;
+  background: #22C55E;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #22C55E;
+}
+
+.ursa-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ursa-btn-icon {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-size: 1rem;
+}
+
+.ursa-btn-icon:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+/* Chat Stream / Message Feed */
+.ursa-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.ursa-body::-webkit-scrollbar {
+  width: 5px;
+}
+.ursa-body::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* Messages */
+.ursa-msg {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 100%;
+  animation: ursaSlideUp 0.25s ease-out;
+}
+
+@keyframes ursaSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ursa-msg.user {
+  flex-direction: row-reverse;
+}
+
+.ursa-msg-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.ursa-msg.bot .ursa-msg-avatar {
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.ursa-msg-content {
+  flex: 1;
+  max-width: 88%;
+}
+
+.ursa-msg.user .ursa-bubble {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-radius: 12px 12px 2px 12px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-left: auto;
+  width: fit-content;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+}
+
+.ursa-msg.bot .ursa-bubble {
+  background: var(--surface-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 12px 12px 12px 2px;
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.ursa-bubble h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ursa-bubble p {
+  margin: 0 0 0.5rem 0;
+}
+.ursa-bubble p:last-child {
+  margin-bottom: 0;
+}
+
+/* Card Lists inside AI response */
+.ursa-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.65rem 0;
+}
+
+.ursa-subject-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: background 0.15s;
+}
+
+.ursa-subject-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.ursa-subject-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.ursa-subject-code {
+  font-weight: 700;
+  font-size: 0.83rem;
+  color: var(--text-primary);
+}
+
+.ursa-subject-title {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 210px;
+}
+
+.ursa-subject-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ADE80;
+  border-radius: 4px;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  white-space: nowrap;
+}
+
+.ursa-subject-badge.prereq {
+  background: rgba(245, 158, 11, 0.12);
+  color: #FBBF24;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.ursa-stat-highlight {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 0.65rem 0;
+}
+
+.ursa-stat-box {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  text-align: center;
+}
+
+.ursa-stat-box-val {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+.ursa-stat-box-lbl {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-top: 0.15rem;
+}
+
+/* Follow-up / Response Action Chips */
+.ursa-response-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.ursa-chip-action {
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  background: rgba(249, 115, 22, 0.09);
+  color: var(--primary-hover);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 100px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.ursa-chip-action:hover {
+  background: var(--primary);
+  color: #FFFFFF;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.ursa-chip-action:active {
+  transform: scale(0.96);
+}
+
+/* Prompt Picker Section (Bottom Drawer Area) */
+.ursa-footer {
+  padding: 1rem 1.15rem;
+  background: var(--surface-secondary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.ursa-prompt-tabs {
+  display: flex;
+  gap: 0.35rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.ursa-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ursa-tab-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+.ursa-tab-btn.active {
+  color: var(--primary);
+  background: rgba(249, 115, 22, 0.12);
+}
+
+.ursa-prompts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding-right: 0.2rem;
+}
+
+.ursa-prompt-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  color: var(--text-primary);
+}
+
+.ursa-prompt-card:hover {
+  border-color: var(--primary);
+  background: var(--surface-hover);
+  transform: translateX(2px);
+}
+
+.ursa-prompt-card:active {
+  transform: scale(0.98);
+}
+
+.ursa-prompt-left {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.ursa-prompt-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(249, 115, 22, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.ursa-prompt-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ursa-prompt-arrow {
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.ursa-prompt-card:hover .ursa-prompt-arrow {
+  transform: translateX(3px);
+  color: var(--primary);
+}
+
+/* Dashboard Embedded Quick Bar */
+.ursa-dashboard-widget {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: var(--radius-md, 8px);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.ursa-dash-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.ursa-dash-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+  flex-shrink: 0;
+}
+
+.ursa-dash-meta h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ursa-dash-meta p {
+  margin: 0.15rem 0 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.ursa-dash-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.ursa-dash-chip {
+  padding: 0.45rem 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.ursa-dash-chip:hover {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: var(--primary);
+  color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .ursa-drawer {
+    width: 100%;
+    max-width: 100%;
+    right: -100%;
+  }
+
+  .ursa-launcher {
+    bottom: 4.8rem; /* above bottom navigation bar */
+    right: 1rem;
+    padding: 0.6rem 0.9rem;
+  }
+
+  .ursa-launcher-sub {
+    display: none;
+  }
+
+  .ursa-dashboard-widget {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ursa-dash-chips {
+    width: 100%;
+  }
+
+  .ursa-dash-chip {
+    flex: 1;
+    justify-content: center;
+  }
+}

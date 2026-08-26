@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/ai.css" />
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
 </head>
 <body>
@@ -201,6 +202,9 @@
             <p class="view-sub">Real-time overview of COE LGU funds</p>
           </div>
         </div>
+
+        <!-- URSA AI Mascot Quick-Prompt Bar -->
+        <div id="dashboard-ursa-container"></div>
 
         <div class="stats-grid">
           <div class="stat-card stat-income">
@@ -748,6 +752,68 @@
         </div>
       </div>
     </div>
+
+    <!-- URSA AI FLOATING LAUNCHER -->
+    <button type="button" class="ursa-launcher" id="ursa-launcher-btn" aria-label="Open Ursa AI Assistant">
+      <div class="ursa-avatar-badge">🐾</div>
+      <div class="ursa-launcher-text">
+        <span class="ursa-launcher-title">Ask Ursa <iconify-icon icon="icon-park-outline:sparkles" style="color:#F97316;"></iconify-icon></span>
+        <span class="ursa-launcher-sub">COE Mascot AI Guide</span>
+      </div>
+    </button>
+
+    <!-- URSA AI SLIDE-OUT DRAWER -->
+    <div class="ursa-overlay" id="ursa-overlay"></div>
+    <aside class="ursa-drawer" id="ursa-drawer" aria-label="Ursa AI Assistant Drawer">
+      <!-- Drawer Header -->
+      <div class="ursa-header">
+        <div class="ursa-header-brand">
+          <div class="ursa-header-avatar">🐾</div>
+          <div class="ursa-header-info">
+            <h3>Ursa <span class="ursa-tag-badge">Navigator</span></h3>
+            <div class="ursa-status-pill">
+              <span class="ursa-dot-online"></span> COE Mascot • Click-to-Explore
+            </div>
+          </div>
+        </div>
+        <div class="ursa-header-actions">
+          <button type="button" class="ursa-btn-icon" id="ursa-clear-btn" title="Reset Conversation">
+            <iconify-icon icon="icon-park-outline:clear"></iconify-icon>
+          </button>
+          <button type="button" class="ursa-btn-icon" id="ursa-close-btn" title="Close Drawer">
+            <iconify-icon icon="icon-park-outline:close"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Drawer Body / Stream -->
+      <div class="ursa-body" id="ursa-body">
+        <div id="ursa-chat-stream">
+          <div class="ursa-msg bot">
+            <div class="ursa-msg-avatar">🐾</div>
+            <div class="ursa-msg-content">
+              <div class="ursa-bubble">
+                <h4>👋 Roar! Hello, Engineer!</h4>
+                <p>I'm <strong>Ursa</strong>, your official College of Engineering companion. Click any prompt below to check your subjects, get next semester recommendations, or understand council funds.</p>
+                <p style="color:var(--text-secondary);font-size:0.78rem;">Zero typing required — simply click what you want to explore!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawer Prompt Picker (Clickable-Only) -->
+      <div class="ursa-footer">
+        <div class="ursa-prompt-tabs">
+          <button type="button" class="ursa-tab-btn active" data-tab="academic">🎓 Academic</button>
+          <button type="button" class="ursa-tab-btn" data-tab="financial">💰 Financials</button>
+          <button type="button" class="ursa-tab-btn" data-tab="guide">📋 Guide</button>
+        </div>
+        <div class="ursa-prompts-grid" id="ursa-prompts-list">
+          <!-- Dynamically populated prompt cards -->
+        </div>
+      </div>
+    </aside>
   </div>
 
   <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
@@ -944,6 +1010,7 @@
   <script src="js/income.js"></script>
   <script src="js/units.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/ai-assistant.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
