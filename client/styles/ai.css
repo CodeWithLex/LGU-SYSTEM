@@ -24,7 +24,7 @@
   font-size: 0.88rem;
   font-weight: 600;
   user-select: none;
-  touch-action: none; /* enables smooth touch drag without scrolling window */
+  touch-action: none;
 }
 
 .ursa-launcher:hover,
@@ -133,7 +133,7 @@
   position: fixed;
   top: 0;
   right: -480px;
-  width: 460px;
+  width: 450px;
   max-width: 92vw;
   height: 100vh;
   height: 100dvh;
@@ -157,7 +157,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.1rem 1.25rem;
+  padding: 1rem 1.25rem;
   background: var(--surface-secondary);
   border-bottom: 1px solid var(--border);
 }
@@ -169,8 +169,8 @@
 }
 
 .ursa-header-avatar {
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border-radius: 12px;
   background: #1E293B;
   border: 1.5px solid rgba(249, 115, 22, 0.5);
@@ -190,7 +190,7 @@
 
 .ursa-header-info h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.96rem;
   font-weight: 700;
   color: var(--text-primary);
   display: flex;
@@ -258,10 +258,10 @@
 .ursa-body {
   flex: 1;
   overflow-y: auto;
-  padding: 1.25rem;
+  padding: 1.15rem;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1rem;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
@@ -277,15 +277,15 @@
 /* Messages */
 .ursa-msg {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.65rem;
   max-width: 100%;
-  animation: ursaSlideUp 0.25s ease-out;
+  animation: ursaSlideUp 0.2s ease-out;
 }
 
 @keyframes ursaSlideUp {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
@@ -298,15 +298,14 @@
 }
 
 .ursa-msg-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   background: var(--surface-secondary);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -327,38 +326,40 @@
   max-width: 88%;
 }
 
+/* Refined User Bubble */
 .ursa-msg.user .ursa-bubble {
-  background: var(--primary);
-  color: #FFFFFF;
+  background: rgba(249, 115, 22, 0.16);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  color: var(--text-primary);
   border-radius: 12px 12px 2px 12px;
-  padding: 0.65rem 0.9rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  line-height: 1.4;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
   margin-left: auto;
   width: fit-content;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
 }
 
+/* Refined Bot Bubble */
 .ursa-msg.bot .ursa-bubble {
   background: var(--surface-secondary);
   border: 1px solid var(--border);
   color: var(--text-primary);
   border-radius: 12px 12px 12px 2px;
   padding: 0.85rem 1rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .ursa-bubble h4 {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.92rem;
+  margin: 0 0 0.45rem 0;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--primary);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .ursa-bubble p {
@@ -368,115 +369,201 @@
   margin-bottom: 0;
 }
 
-/* Card Lists inside AI response */
+/* Simplified Compact Summary Bar */
+.ursa-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  margin: 0.6rem 0;
+}
+
+.ursa-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.ursa-summary-val {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.ursa-summary-label {
+  font-size: 0.66rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-top: 0.1rem;
+}
+
+.ursa-summary-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+}
+
+/* Progress Track */
+.ursa-progress-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 100px;
+  height: 6px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+
+.ursa-progress-fill {
+  background: linear-gradient(90deg, #F97316, #22C55E);
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+/* Simplified Subject Cards */
 .ursa-card-list {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  margin: 0.65rem 0;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
 }
 
 .ursa-subject-item {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.025);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 0.55rem 0.75rem;
+  padding: 0.5rem 0.65rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  transition: background 0.15s;
-}
-
-.ursa-subject-item:hover {
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .ursa-subject-meta {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .ursa-subject-code {
   font-weight: 700;
-  font-size: 0.83rem;
+  font-size: 0.8rem;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ursa-units-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
 }
 
 .ursa-subject-title {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 210px;
+  max-width: 230px;
 }
 
-.ursa-subject-badge {
-  font-size: 0.7rem;
+.ursa-subject-tag {
+  font-size: 0.68rem;
   font-weight: 600;
-  padding: 0.2rem 0.5rem;
-  background: rgba(34, 197, 94, 0.12);
-  color: #4ADE80;
+  padding: 0.18rem 0.45rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
   border-radius: 4px;
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  border: 1px solid var(--border);
   white-space: nowrap;
 }
 
-.ursa-subject-badge.prereq {
+.ursa-subject-tag.active {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ADE80;
+  border-color: rgba(34, 197, 94, 0.25);
+}
+
+.ursa-subject-tag.req {
   background: rgba(245, 158, 11, 0.12);
   color: #FBBF24;
   border-color: rgba(245, 158, 11, 0.25);
 }
 
-.ursa-stat-highlight {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-  margin: 0.65rem 0;
-}
-
-.ursa-stat-box {
-  background: rgba(0, 0, 0, 0.2);
+/* Data Box (Financials) */
+.ursa-data-box {
+  background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 0.55rem 0.65rem;
-  text-align: center;
+  padding: 0.6rem 0.75rem;
+  margin: 0.5rem 0;
+  font-size: 0.78rem;
 }
 
-.ursa-stat-box-val {
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--primary);
+.ursa-data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.15rem 0;
 }
 
-.ursa-stat-box-lbl {
-  font-size: 0.68rem;
+.ursa-data-row.muted {
   color: var(--text-secondary);
-  text-transform: uppercase;
-  margin-top: 0.15rem;
+  font-size: 0.73rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
 }
 
-/* Follow-up / Response Action Chips */
+/* Note Text */
+.ursa-note-text {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 0.45rem;
+  line-height: 1.35;
+}
+
+/* Alert Box */
+.ursa-alert-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #FCA5A5;
+  line-height: 1.35;
+}
+
+/* Follow-up Action Chips */
 .ursa-response-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.75rem;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.55rem;
 }
 
 .ursa-chip-action {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  padding: 0.35rem 0.65rem;
-  background: rgba(249, 115, 22, 0.09);
+  padding: 0.3rem 0.6rem;
+  background: rgba(249, 115, 22, 0.08);
   color: var(--primary-hover);
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  border: 1px solid rgba(249, 115, 22, 0.25);
   border-radius: 100px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   transition: all 0.15s ease;
   user-select: none;
 }
@@ -485,37 +572,32 @@
   background: var(--primary);
   color: #FFFFFF;
   border-color: var(--primary);
-  transform: translateY(-1px);
 }
 
-.ursa-chip-action:active {
-  transform: scale(0.96);
-}
-
-/* Prompt Picker Section (Bottom Drawer Area) */
+/* Bottom Prompt Picker */
 .ursa-footer {
-  padding: 1rem 1.15rem;
+  padding: 0.85rem 1rem;
   background: var(--surface-secondary);
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.5rem;
 }
 
 .ursa-prompt-tabs {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.3rem;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.45rem;
 }
 
 .ursa-tab-btn {
   background: transparent;
   border: none;
   color: var(--text-tertiary);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 600;
-  padding: 0.25rem 0.55rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -534,8 +616,8 @@
 .ursa-prompts-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  max-height: 180px;
+  gap: 0.4rem;
+  max-height: 175px;
   overflow-y: auto;
   scrollbar-width: thin;
   padding-right: 0.2rem;
@@ -544,69 +626,58 @@
 .ursa-prompt-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  padding: 0.45rem 0.65rem;
   text-align: left;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.15s ease;
   color: var(--text-primary);
 }
 
 .ursa-prompt-card:hover {
   border-color: var(--primary);
   background: var(--surface-hover);
-  transform: translateX(2px);
-}
-
-.ursa-prompt-card:active {
-  transform: scale(0.98);
 }
 
 .ursa-prompt-left {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
 }
 
 .ursa-prompt-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
   background: rgba(249, 115, 22, 0.1);
   color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
 .ursa-prompt-text {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
 .ursa-prompt-arrow {
   color: var(--text-tertiary);
-  font-size: 0.85rem;
-  transition: transform 0.15s ease, color 0.15s ease;
+  font-size: 0.8rem;
 }
 
-.ursa-prompt-card:hover .ursa-prompt-arrow {
-  transform: translateX(3px);
-  color: var(--primary);
-}
-
-/* Dashboard Embedded Quick Bar */
+/* Dashboard Embedded Widget */
 .ursa-dashboard-widget {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.85) 100%);
   border: 1px solid rgba(249, 115, 22, 0.25);
   border-radius: var(--radius-md, 8px);
-  padding: 1rem 1.25rem;
+  padding: 0.85rem 1.15rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
@@ -619,19 +690,19 @@
 .ursa-dash-left {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .ursa-dash-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   background: #1E293B;
   border: 1.5px solid rgba(249, 115, 22, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -644,7 +715,7 @@
 
 .ursa-dash-meta h4 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
   display: flex;
@@ -653,31 +724,31 @@
 }
 
 .ursa-dash-meta p {
-  margin: 0.15rem 0 0 0;
-  font-size: 0.78rem;
+  margin: 0.1rem 0 0 0;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 
 .ursa-dash-chips {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
 .ursa-dash-chip {
-  padding: 0.45rem 0.85rem;
+  padding: 0.4rem 0.75rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 100px;
   color: var(--text-primary);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  transition: all 0.18s ease;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
   user-select: none;
 }
 
@@ -685,7 +756,6 @@
   background: rgba(249, 115, 22, 0.12);
   border-color: var(--primary);
   color: var(--primary-hover);
-  transform: translateY(-1px);
 }
 
 /* Mobile Responsiveness — Compact Circle Launcher */
@@ -698,10 +768,10 @@
 
   .ursa-launcher,
   .grizz-launcher {
-    bottom: 4.8rem; /* above bottom navigation bar */
+    bottom: 4.8rem;
     right: 1.1rem;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     padding: 0;
     border-radius: 50%;
     justify-content: center;
@@ -715,8 +785,8 @@
 
   .ursa-avatar-badge,
   .grizz-avatar-badge {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border: none;
   }
 
