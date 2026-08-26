@@ -18,24 +18,35 @@
   border: 1px solid rgba(249, 115, 22, 0.4);
   border-radius: 100px;
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 20px -4px rgba(249, 115, 22, 0.25);
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: grab;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
   font-family: var(--font-family);
   font-size: 0.88rem;
   font-weight: 600;
   user-select: none;
+  touch-action: none; /* enables smooth touch drag without scrolling window */
 }
 
 .ursa-launcher:hover,
 .grizz-launcher:hover {
-  transform: translateY(-2px) scale(1.03);
+  transform: scale(1.03);
   border-color: var(--primary);
   box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6), 0 0 25px -2px rgba(249, 115, 22, 0.4);
 }
 
 .ursa-launcher:active,
 .grizz-launcher:active {
-  transform: translateY(0) scale(0.98);
+  cursor: grabbing;
+}
+
+/* Dragging Active State */
+.ursa-launcher.is-dragging,
+.grizz-launcher.is-dragging {
+  cursor: grabbing !important;
+  transition: none !important;
+  transform: scale(1.06) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 30px rgba(249, 115, 22, 0.5) !important;
+  opacity: 0.95;
 }
 
 .ursa-avatar-badge,
@@ -51,6 +62,7 @@
   position: relative;
   overflow: visible;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
 .grizz-mascot-img {
@@ -58,6 +70,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  pointer-events: none;
 }
 
 .ursa-avatar-badge::after,
@@ -79,6 +92,7 @@
   flex-direction: column;
   text-align: left;
   line-height: 1.2;
+  pointer-events: none;
 }
 
 .ursa-launcher-title {
@@ -674,7 +688,7 @@
   transform: translateY(-1px);
 }
 
-/* Mobile Responsiveness */
+/* Mobile Responsiveness — Compact Circle Launcher */
 @media (max-width: 640px) {
   .ursa-drawer {
     width: 100%;
@@ -685,12 +699,25 @@
   .ursa-launcher,
   .grizz-launcher {
     bottom: 4.8rem; /* above bottom navigation bar */
-    right: 1rem;
-    padding: 0.55rem 0.9rem;
+    right: 1.1rem;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(249, 115, 22, 0.3);
   }
 
-  .ursa-launcher-sub {
-    display: none;
+  .ursa-launcher .ursa-launcher-text,
+  .grizz-launcher .ursa-launcher-text {
+    display: none !important;
+  }
+
+  .ursa-avatar-badge,
+  .grizz-avatar-badge {
+    width: 44px;
+    height: 44px;
+    border: none;
   }
 
   .ursa-dashboard-widget {

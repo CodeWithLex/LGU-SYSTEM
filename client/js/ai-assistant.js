@@ -25,10 +25,10 @@ const GrizzAI = (() => {
   }
 
   function bindEvents() {
-    // Launcher button click
+    // Draggable Launcher button
     const launcher = document.getElementById('ursa-launcher-btn');
     if (launcher) {
-      launcher.addEventListener('click', () => open());
+      bindDraggableLauncher(launcher);
     }
 
     // Close buttons & overlay
@@ -80,6 +80,111 @@ const GrizzAI = (() => {
         const targetView = navLink.dataset.view;
         const navItem = document.querySelector(`.nav-item[data-view="${targetView}"]`) || document.querySelector(`.bottom-nav-item[data-view="${targetView}"]`);
         if (navItem) navItem.click();
+      }
+    });
+  }
+
+  // ---- Draggable Launcher Engine (Desktop & Mobile Touch) ----
+  function bindDraggableLauncher(launcher) {
+    if (!launcher) return;
+
+    let isPointerDown = false;
+    let hasMoved = false;
+    let startX = 0;
+    let startY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    let dragOccurred = false;
+
+    launcher.addEventListener('pointerdown', (e) => {
+      // Allow primary button (left mouse click) or touch
+      if (e.button !== 0 && e.pointerType === 'mouse') return;
+
+      const rect = launcher.getBoundingClientRect();
+      startX = e.clientX;
+      startY = e.clientY;
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      isPointerDown = true;
+      hasMoved = false;
+
+      try {
+        launcher.setPointerCapture(e.pointerId);
+      } catch (err) {}
+    });
+
+    launcher.addEventListener('pointermove', (e) => {
+      if (!isPointerDown) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (!hasMoved && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+        hasMoved = true;
+        dragOccurred = true;
+        launcher.classList.add('is-dragging');
+      }
+
+      if (hasMoved) {
+        const newLeft = e.clientX - offsetX;
+        const newTop = e.clientY - offsetY;
+
+        const pad = 8;
+        const maxLeft = window.innerWidth - launcher.offsetWidth - pad;
+        const maxTop = window.innerHeight - launcher.offsetHeight - pad;
+
+        const clampedLeft = Math.max(pad, Math.min(maxLeft, newLeft));
+        const clampedTop = Math.max(pad, Math.min(maxTop, newTop));
+
+        launcher.style.left = `${clampedLeft}px`;
+        launcher.style.top = `${clampedTop}px`;
+        launcher.style.right = 'auto';
+        launcher.style.bottom = 'auto';
+      }
+    });
+
+    const endDrag = (e) => {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      launcher.classList.remove('is-dragging');
+
+      try {
+        launcher.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+
+      if (hasMoved) {
+        setTimeout(() => {
+          dragOccurred = false;
+        }, 120);
+      }
+    };
+
+    launcher.addEventListener('pointerup', endDrag);
+    launcher.addEventListener('pointercancel', endDrag);
+
+    // Click handler to open assistant (only if not dragged)
+    launcher.addEventListener('click', (e) => {
+      if (dragOccurred || hasMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      open();
+    });
+
+    // Re-clamp position on window resize
+    window.addEventListener('resize', () => {
+      if (launcher.style.left && launcher.style.left !== 'auto') {
+        const rect = launcher.getBoundingClientRect();
+        const pad = 8;
+        const maxLeft = window.innerWidth - launcher.offsetWidth - pad;
+        const maxTop = window.innerHeight - launcher.offsetHeight - pad;
+
+        const clampedLeft = Math.max(pad, Math.min(maxLeft, rect.left));
+        const clampedTop = Math.max(pad, Math.min(maxTop, rect.top));
+
+        launcher.style.left = `${clampedLeft}px`;
+        launcher.style.top = `${clampedTop}px`;
       }
     });
   }
