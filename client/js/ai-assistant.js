@@ -500,20 +500,20 @@ const GrizzAI = (() => {
 
     const currentYear = Number(profile?.year_level) || 1;
     
-    const unpassed = subjects.filter(s => {
+    // Find uncompleted subjects (exclude both PASSED and CURRENTLY ENROLLED subjects)
+    const uncompleted = subjects.filter(s => {
       const c = s.code.trim().toUpperCase();
-      return !passedCodes.has(c);
+      return !passedCodes.has(c) && !enrolledCodes.has(c);
     });
 
     const eligible = [];
     const blockedByPrereq = [];
 
-    unpassed.forEach(s => {
-      const isCurrentlyEnrolled = enrolledCodes.has(s.code.trim().toUpperCase());
+    uncompleted.forEach(s => {
       const prereqStr = (s.prerequisites || '').trim();
 
       if (!prereqStr || prereqStr === 'None' || prereqStr === '-') {
-        eligible.push({ ...s, isCurrentlyEnrolled, missingPrereq: null });
+        eligible.push({ ...s, missingPrereq: null });
         return;
       }
 
@@ -532,7 +532,8 @@ const GrizzAI = (() => {
 
       rawTokens.forEach(token => {
         const normToken = token.trim().toUpperCase();
-        if (normToken && !normToken.includes('STANDING') && !passedCodes.has(normToken)) {
+        // Prerequisite is satisfied if passed or currently enrolled in active semester
+        if (normToken && !normToken.includes('STANDING') && !passedCodes.has(normToken) && !enrolledCodes.has(normToken)) {
           if (/^[A-Z0-9\s-]+$/.test(normToken)) {
             satisfies = false;
             missing.push(token.trim());
@@ -541,7 +542,7 @@ const GrizzAI = (() => {
       });
 
       if (satisfies) {
-        eligible.push({ ...s, isCurrentlyEnrolled, missingPrereq: null });
+        eligible.push({ ...s, missingPrereq: null });
       } else {
         blockedByPrereq.push({ ...s, reason: `Missing prerequisite: ${missing.join(', ')}` });
       }
@@ -561,7 +562,7 @@ const GrizzAI = (() => {
     if (recommended.length === 0) {
       appendBotMessage(
         'Curriculum Recommendations',
-        `<p>You have completed all available prerequisite-cleared courses in your curriculum.</p>`,
+        `<p>You have completed or are currently enrolled in all available prerequisite-cleared courses for <strong>${esc(progTitle)}</strong>.</p>`,
         [
           { action: 'academic-progress', label: 'View Academic Progress', icon: 'icon-park-outline:degree-hat' },
         ]
@@ -575,8 +576,8 @@ const GrizzAI = (() => {
           <span class="ursa-subject-code">${esc(s.code)} <span class="ursa-units-badge">${s.units} Units</span></span>
           <span class="ursa-subject-title" title="${esc(s.title)}">${esc(s.title)}</span>
         </div>
-        <span class="ursa-subject-tag ${s.isCurrentlyEnrolled ? 'active' : ''}">
-          ${s.isCurrentlyEnrolled ? 'Enrolled' : `Yr ${s.year_level} · Sem ${s.semester}`}
+        <span class="ursa-subject-tag">
+          Yr ${s.year_level} · Sem ${s.semester}
         </span>
       </div>
     `).join('');
