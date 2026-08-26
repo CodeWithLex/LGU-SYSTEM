@@ -137,7 +137,7 @@ const GrizzAI = (() => {
           </div>
           <div class="ursa-dash-meta">
             <h4>Grizz • COE Mascot AI <span class="ursa-tag-badge">Navigator</span></h4>
-            <p>Click any quick prompt to explore your subjects or council funds</p>
+            <p>Click any prompt to explore your subjects or council funds</p>
           </div>
         </div>
         <div class="ursa-dash-chips">
@@ -162,13 +162,13 @@ const GrizzAI = (() => {
         action: 'next-sem',
         title: 'Next Sem Subject Recommendations',
         icon: 'icon-park-outline:checklist',
-        text: 'Analyze my passed prerequisites and suggest next subjects',
+        text: 'Analyze passed prerequisites and suggest next subjects',
       },
       {
         action: 'current-subjects',
         title: 'Ask About Current Subjects',
         icon: 'icon-park-outline:book-open',
-        text: 'Review my enrolled subjects and unlocked senior courses',
+        text: 'Review enrolled subjects and unlocked senior courses',
       },
       {
         action: 'academic-progress',
@@ -188,7 +188,7 @@ const GrizzAI = (() => {
         action: 'financial-summary',
         title: 'Explain Financial Dashboard',
         icon: 'icon-park-outline:chart-pie',
-        text: 'Plain-English breakdown of collections, expenses & cash balance',
+        text: 'Breakdown of collections, expenses and cash balance',
       },
       {
         action: 'upcoming-events',
@@ -206,9 +206,9 @@ const GrizzAI = (() => {
     guide: [
       {
         action: 'guide-logging',
-        title: 'How to Log My Subjects & Grades',
+        title: 'How to Log Subjects & Grades',
         icon: 'icon-park-outline:help',
-        text: 'Step-by-step guide on tracking credits and marking passed units',
+        text: 'Guide on tracking credits and marking passed units',
       },
       {
         action: 'guide-transparency',
@@ -246,7 +246,9 @@ const GrizzAI = (() => {
     const msg = document.createElement('div');
     msg.className = 'ursa-msg user';
     msg.innerHTML = `
-      <div class="ursa-msg-avatar">👤</div>
+      <div class="ursa-msg-avatar">
+        <iconify-icon icon="icon-park-outline:user" style="font-size:16px;color:var(--text-secondary);"></iconify-icon>
+      </div>
       <div class="ursa-msg-content">
         <div class="ursa-bubble">${esc(text)}</div>
       </div>
@@ -268,7 +270,7 @@ const GrizzAI = (() => {
         <div class="ursa-response-actions">
           ${followUpChips.map(c => `
             <button type="button" class="ursa-chip-action" data-action="${c.action}" data-title="${esc(c.title || c.label)}">
-              ${c.icon ? `<iconify-icon icon="${c.icon}"></iconify-icon>` : '💡'} ${esc(c.label)}
+              ${c.icon ? `<iconify-icon icon="${c.icon}"></iconify-icon>` : ''} ${esc(c.label)}
             </button>
           `).join('')}
         </div>
@@ -281,7 +283,7 @@ const GrizzAI = (() => {
       </div>
       <div class="ursa-msg-content">
         <div class="ursa-bubble">
-          <h4><iconify-icon icon="icon-park-outline:sparkles"></iconify-icon> ${esc(title)}</h4>
+          <h4>${esc(title)}</h4>
           ${htmlContent}
           ${chipsHtml}
         </div>
@@ -314,9 +316,9 @@ const GrizzAI = (() => {
         </div>
         <div class="ursa-msg-content">
           <div class="ursa-bubble">
-            <h4>👋 Roar! Hello, ${esc(studentName)}!</h4>
-            <p>I'm <strong>Grizz</strong>, your official College of Engineering companion. I can analyze your <strong>${esc(progName)}</strong> subjects, recommend your next semester load, or explain the LGU's financial records.</p>
-            <p style="color:var(--text-secondary);font-size:0.78rem;">Click any prompt card below or quick action to start!</p>
+            <h4>Hello, ${esc(studentName)}</h4>
+            <p>I am <strong>Grizz</strong>, your official College of Engineering advisor. I can analyze your <strong>${esc(progName)}</strong> subjects, recommend your next semester load, or explain the LGU financial records.</p>
+            <p style="color:var(--text-secondary);font-size:0.78rem;">Zero typing required — select any prompt card below or quick action to start.</p>
           </div>
         </div>
       </div>
@@ -358,7 +360,7 @@ const GrizzAI = (() => {
         handleGuideTransparency();
         break;
       default:
-        appendBotMessage('Grizz Navigator', `<p>I have ready-to-use insights for this inquiry!</p>`);
+        appendBotMessage('Grizz Navigator', `<p>Information is ready for this topic.</p>`);
         break;
     }
   }
@@ -448,7 +450,7 @@ const GrizzAI = (() => {
     if (recommended.length === 0) {
       appendBotMessage(
         'Curriculum Recommendations',
-        `<p>🎉 Exceptional work! You have completed all prerequisite-cleared subjects for <strong>${esc(progTitle)}</strong>!</p>`,
+        `<p>You have completed all prerequisite-cleared subjects for <strong>${esc(progTitle)}</strong>.</p>`,
         [
           { action: 'academic-progress', label: 'View Progress Summary', icon: 'icon-park-outline:degree-hat' },
         ]
@@ -487,7 +489,7 @@ const GrizzAI = (() => {
       </div>
 
       <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:0.5rem;">
-        📌 Tip: You can log your actual enrollment grades directly in the <strong>Academic Progress</strong> tab.
+        Note: You can log your actual enrollment grades directly in the <strong>Academic Progress</strong> tab.
       </p>
     `;
 
@@ -506,7 +508,7 @@ const GrizzAI = (() => {
         'Current Subjects',
         `
           <p>You do not have any subjects marked as <strong>Enrolled</strong> right now.</p>
-          <p>Head to the <a href="#" class="ursa-nav-link" data-view="units" style="color:var(--primary);font-weight:600;">Academic Progress tab</a> to add your current semester subjects!</p>
+          <p>Go to the <a href="#" class="ursa-nav-link" data-view="units" style="color:var(--primary);font-weight:600;">Academic Progress tab</a> to record your current semester subjects.</p>
         `,
         [
           { action: 'next-sem', label: 'Recommended Subjects', icon: 'icon-park-outline:checklist' },
@@ -547,7 +549,7 @@ const GrizzAI = (() => {
       </div>
 
       <p style="font-size:0.75rem;color:var(--text-secondary);">
-        🌟 Passing these subjects will unlock your upcoming major courses in the next semester!
+        Passing these subjects will unlock your upcoming major courses in the next semester.
       </p>
     `;
 
@@ -573,7 +575,7 @@ const GrizzAI = (() => {
     if (failed.length > 0) {
       backlogNote = `
         <div style="margin-top:0.65rem;padding:0.6rem 0.75rem;background:rgba(239, 68, 68, 0.1);border:1px solid rgba(239, 68, 68, 0.25);border-radius:6px;font-size:0.78rem;color:#FCA5A5;">
-          ⚠️ <strong>Backlog Notice:</strong> You have ${failed.length} subject(s) marked as Failed or Dropped. Check your prerequisites to retake them before senior year.
+          <strong>Backlog Notice:</strong> You have ${failed.length} subject(s) marked as Failed or Dropped. Check your prerequisites to retake them before senior year.
         </div>
       `;
     }
@@ -632,7 +634,7 @@ const GrizzAI = (() => {
       </div>
 
       <p style="font-size:0.75rem;color:var(--text-secondary);">
-        💡 Grizz automatically checks all these requirements when computing your <strong>Next Sem Recommendations</strong>!
+        Grizz automatically evaluates prerequisite requirements when generating your <strong>Next Sem Recommendations</strong>.
       </p>
     `;
 
@@ -652,7 +654,7 @@ const GrizzAI = (() => {
       const reservedStr = UI.currency(summary.breakdown.reserved_envelopes);
 
       const html = `
-        <p>Here is an easy-to-understand breakdown of our College of Engineering LGU finances:</p>
+        <p>Financial overview of College of Engineering LGU funds:</p>
         
         <div class="ursa-stat-highlight">
           <div class="ursa-stat-box">
@@ -667,17 +669,17 @@ const GrizzAI = (() => {
 
         <div style="padding:0.75rem;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:8px;margin:0.5rem 0;font-size:0.8rem;line-height:1.4;">
           <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;">
-            <span>💵 Available Unreserved Cash:</span>
+            <span>Available Unreserved Cash:</span>
             <strong style="color:var(--primary);">${balanceStr}</strong>
           </div>
           <div style="display:flex;justify-content:space-between;color:var(--text-secondary);font-size:0.74rem;">
-            <span>🎯 Reserved for Events:</span>
+            <span>Reserved for Events:</span>
             <span>${reservedStr}</span>
           </div>
         </div>
 
         <p style="font-size:0.75rem;color:var(--text-secondary);">
-          Every peso is audited and transparently recorded in the official COE ledger.
+          All transactions are audited and recorded in the official COE ledger.
         </p>
       `;
 
@@ -712,7 +714,7 @@ const GrizzAI = (() => {
       `).join('');
 
       const html = `
-        <p>Here are the upcoming College of Engineering activities and allocated budgets:</p>
+        <p>Upcoming College of Engineering activities and allocated budgets:</p>
         <div class="ursa-card-list">
           ${cardsHtml}
         </div>
@@ -751,7 +753,7 @@ const GrizzAI = (() => {
       `).join('');
 
       const html = `
-        <p>Here are the latest recorded expenditures from the council ledger:</p>
+        <p>Latest recorded expenditures from the council ledger:</p>
         <div class="ursa-card-list">
           ${cardsHtml}
         </div>
@@ -769,14 +771,14 @@ const GrizzAI = (() => {
   // 8. Guide - How to Log Units
   function handleGuideLogging() {
     const html = `
-      <p>Tracking your credit units in the portal takes just 3 simple steps:</p>
+      <p>Tracking your credit units in the portal:</p>
       <ol style="padding-left:1.15rem;font-size:0.8rem;line-height:1.6;margin:0.5rem 0;">
         <li>Navigate to the <strong>Academic Progress</strong> tab.</li>
         <li>Click <strong>+ Log Subject</strong> to record a course from your curriculum.</li>
-        <li>Select the <strong>School Year</strong>, <strong>Semester</strong>, and set the status to <em>Passed</em> with your final numerical grade (e.g. 1.50).</li>
+        <li>Select the <strong>School Year</strong>, <strong>Semester</strong>, and set the status to <em>Passed</em> with your numerical grade (e.g. 1.50).</li>
       </ol>
       <p style="font-size:0.75rem;color:var(--text-secondary);">
-        Grizz uses these logged grades to automatically unlock your prerequisite-cleared subjects!
+        Grizz uses logged grades to evaluate your prerequisite-cleared subjects.
       </p>
     `;
 
@@ -789,11 +791,11 @@ const GrizzAI = (() => {
   // 9. Guide - Transparency & Auditing
   function handleGuideTransparency() {
     const html = `
-      <p>The College of Engineering LGU portal ensures complete financial transparency:</p>
+      <p>The College of Engineering LGU portal financial transparency features:</p>
       <ul style="padding-left:1.15rem;font-size:0.8rem;line-height:1.6;margin:0.5rem 0;">
-        <li><strong>Real-time Ledger:</strong> All collections, donations, and expenses are logged with official receipt references.</li>
-        <li><strong>Audited Reports:</strong> Students can review monthly balance sheets and event breakdown summaries at any time in the <strong>Reports</strong> tab.</li>
-        <li><strong>Encrypted Records:</strong> Immutable audit logs ensure budget transfers and updates cannot be tampered with.</li>
+        <li><strong>Real-time Ledger:</strong> All collections, donations, and expenses are recorded with official references.</li>
+        <li><strong>Audited Reports:</strong> Monthly balance sheets and event breakdown summaries are available in the <strong>Reports</strong> tab.</li>
+        <li><strong>Audit Logging:</strong> Immutable audit logs ensure budget transfers and updates are tracked.</li>
       </ul>
     `;
 
