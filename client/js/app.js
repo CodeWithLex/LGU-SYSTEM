@@ -402,7 +402,9 @@
 
     UI.setAdminVisibility(profile?.role === 'admin');
 
-    if (window.UrsaAI) {
+    if (window.GrizzAI) {
+      GrizzAI.init();
+    } else if (window.UrsaAI) {
       UrsaAI.init();
     }
 

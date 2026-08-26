@@ -1,17 +1,18 @@
 /* =============================================
-   Ursa — COE Bear AI Assistant Styles
+   Grizz — COE Bear AI Assistant Styles
    ============================================= */
 
 /* Floating Launcher Button */
-.ursa-launcher {
+.ursa-launcher,
+.grizz-launcher {
   position: fixed;
   bottom: 1.75rem;
   right: 1.75rem;
   z-index: 900;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.7rem 1.15rem 0.7rem 0.85rem;
+  gap: 0.75rem;
+  padding: 0.65rem 1.15rem 0.65rem 0.75rem;
   background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   color: var(--text-primary);
   border: 1px solid rgba(249, 115, 22, 0.4);
@@ -25,40 +26,52 @@
   user-select: none;
 }
 
-.ursa-launcher:hover {
+.ursa-launcher:hover,
+.grizz-launcher:hover {
   transform: translateY(-2px) scale(1.03);
   border-color: var(--primary);
   box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6), 0 0 25px -2px rgba(249, 115, 22, 0.4);
 }
 
-.ursa-launcher:active {
+.ursa-launcher:active,
+.grizz-launcher:active {
   transform: translateY(0) scale(0.98);
 }
 
-.ursa-avatar-badge {
+.ursa-avatar-badge,
+.grizz-avatar-badge {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
-  color: #FFFFFF;
+  width: 36px;
+  height: 36px;
+  background: #1E293B;
+  border: 1.5px solid var(--primary);
   border-radius: 50%;
-  font-size: 1.1rem;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
   position: relative;
+  overflow: visible;
+  flex-shrink: 0;
 }
 
-.ursa-avatar-badge::after {
+.grizz-mascot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.ursa-avatar-badge::after,
+.grizz-avatar-badge::after {
   content: '';
   position: absolute;
-  bottom: 0px;
-  right: 0px;
-  width: 9px;
-  height: 9px;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
   background: #22C55E;
   border: 2px solid #0F172A;
   border-radius: 50%;
+  box-shadow: 0 0 4px #22C55E;
 }
 
 .ursa-launcher-text {
@@ -142,15 +155,23 @@
 }
 
 .ursa-header-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #1E293B;
+  border: 1.5px solid rgba(249, 115, 22, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ursa-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .ursa-header-info h3 {
@@ -263,8 +284,8 @@
 }
 
 .ursa-msg-avatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   background: var(--surface-secondary);
   border: 1px solid var(--border);
@@ -273,11 +294,18 @@
   justify-content: center;
   font-size: 0.95rem;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.ursa-msg-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .ursa-msg.bot .ursa-msg-avatar {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.3);
+  background: #1E293B;
+  border-color: rgba(249, 115, 22, 0.4);
 }
 
 .ursa-msg-content {
@@ -581,16 +609,23 @@
 }
 
 .ursa-dash-avatar {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
+  background: #1E293B;
+  border: 1.5px solid rgba(249, 115, 22, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
   box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.ursa-dash-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .ursa-dash-meta h4 {
@@ -647,10 +682,11 @@
     right: -100%;
   }
 
-  .ursa-launcher {
+  .ursa-launcher,
+  .grizz-launcher {
     bottom: 4.8rem; /* above bottom navigation bar */
     right: 1rem;
-    padding: 0.6rem 0.9rem;
+    padding: 0.55rem 0.9rem;
   }
 
   .ursa-launcher-sub {

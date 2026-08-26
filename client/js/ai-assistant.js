@@ -1,9 +1,9 @@
 // =============================================
-// ai-assistant.js — Ursa: COE Mascot AI Assistant
+// ai-assistant.js — Grizz: COE Mascot AI Assistant
 // Clickable-only intelligent academic & financial guide
 // =============================================
 
-const UrsaAI = (() => {
+const GrizzAI = (() => {
 
   let profile = null;
   let subjects = [];
@@ -17,8 +17,6 @@ const UrsaAI = (() => {
     BSCE:  'BS Civil Engineering',
     BSECE: 'BS Electronics Engineering',
   };
-
-  const SEM_LABELS = { 1: '1st Semester', 2: '2nd Semester', 3: 'Summer Term' };
 
   // ---- Initialize ----
   async function init() {
@@ -122,7 +120,7 @@ const UrsaAI = (() => {
       requirements = checklistRes.requirements || [];
       myUnits = unitsRes || [];
     } catch (err) {
-      console.warn('Ursa data preload notice:', err);
+      console.warn('Grizz data preload notice:', err);
     }
   }
 
@@ -134,9 +132,11 @@ const UrsaAI = (() => {
     container.innerHTML = `
       <div class="ursa-dashboard-widget">
         <div class="ursa-dash-left">
-          <div class="ursa-dash-avatar">🐾</div>
+          <div class="ursa-dash-avatar">
+            <img src="assets/grizz.png" alt="Grizz" />
+          </div>
           <div class="ursa-dash-meta">
-            <h4>Ursa • COE Mascot AI <span class="ursa-tag-badge">Navigator</span></h4>
+            <h4>Grizz • COE Mascot AI <span class="ursa-tag-badge">Navigator</span></h4>
             <p>Click any quick prompt to explore your subjects or council funds</p>
           </div>
         </div>
@@ -276,7 +276,9 @@ const UrsaAI = (() => {
     }
 
     msg.innerHTML = `
-      <div class="ursa-msg-avatar">🐾</div>
+      <div class="ursa-msg-avatar">
+        <img src="assets/grizz.png" alt="Grizz" />
+      </div>
       <div class="ursa-msg-content">
         <div class="ursa-bubble">
           <h4><iconify-icon icon="icon-park-outline:sparkles"></iconify-icon> ${esc(title)}</h4>
@@ -307,11 +309,13 @@ const UrsaAI = (() => {
 
     stream.innerHTML = `
       <div class="ursa-msg bot">
-        <div class="ursa-msg-avatar">🐾</div>
+        <div class="ursa-msg-avatar">
+          <img src="assets/grizz.png" alt="Grizz" />
+        </div>
         <div class="ursa-msg-content">
           <div class="ursa-bubble">
             <h4>👋 Roar! Hello, ${esc(studentName)}!</h4>
-            <p>I'm <strong>Ursa</strong>, your official College of Engineering companion. I can analyze your <strong>${esc(progName)}</strong> subjects, recommend your next semester load, or explain the LGU's financial records.</p>
+            <p>I'm <strong>Grizz</strong>, your official College of Engineering companion. I can analyze your <strong>${esc(progName)}</strong> subjects, recommend your next semester load, or explain the LGU's financial records.</p>
             <p style="color:var(--text-secondary);font-size:0.78rem;">Click any prompt card below or quick action to start!</p>
           </div>
         </div>
@@ -354,7 +358,7 @@ const UrsaAI = (() => {
         handleGuideTransparency();
         break;
       default:
-        appendBotMessage('Ursa Navigator', `<p>I have ready-to-use insights for this inquiry!</p>`);
+        appendBotMessage('Grizz Navigator', `<p>I have ready-to-use insights for this inquiry!</p>`);
         break;
     }
   }
@@ -412,10 +416,8 @@ const UrsaAI = (() => {
       let missing = [];
 
       rawTokens.forEach(token => {
-        // Simple code match
         const normToken = token.trim().toUpperCase();
         if (normToken && !normToken.includes('STANDING') && !passedCodes.has(normToken)) {
-          // If token looks like a subject code (letters + numbers)
           if (/^[A-Z0-9\s-]+$/.test(normToken)) {
             satisfies = false;
             missing.push(token.trim());
@@ -433,7 +435,7 @@ const UrsaAI = (() => {
     // Sort eligible by year level and semester
     eligible.sort((a, b) => a.year_level - b.year_level || a.semester - b.semester);
 
-    // Take top ~6-8 subjects up to ~23 units (typical semester load)
+    // Take top ~6-8 subjects up to ~24 units
     let totalUnits = 0;
     const recommended = [];
     for (const s of eligible) {
@@ -630,7 +632,7 @@ const UrsaAI = (() => {
       </div>
 
       <p style="font-size:0.75rem;color:var(--text-secondary);">
-        💡 Ursa automatically checks all these requirements when computing your <strong>Next Sem Recommendations</strong>!
+        💡 Grizz automatically checks all these requirements when computing your <strong>Next Sem Recommendations</strong>!
       </p>
     `;
 
@@ -774,7 +776,7 @@ const UrsaAI = (() => {
         <li>Select the <strong>School Year</strong>, <strong>Semester</strong>, and set the status to <em>Passed</em> with your final numerical grade (e.g. 1.50).</li>
       </ol>
       <p style="font-size:0.75rem;color:var(--text-secondary);">
-        Ursa uses these logged grades to automatically unlock your prerequisite-cleared subjects!
+        Grizz uses these logged grades to automatically unlock your prerequisite-cleared subjects!
       </p>
     `;
 
@@ -815,3 +817,7 @@ const UrsaAI = (() => {
     renderDashboardWidget,
   };
 })();
+
+// Provide aliases for global access
+window.GrizzAI = GrizzAI;
+window.UrsaAI = GrizzAI;
