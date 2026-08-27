@@ -51,7 +51,10 @@ async function initReports() {
   const container = document.getElementById('reports-content');
   if (!container) return;
 
-  container.innerHTML = reportsSkeleton();
+  const hasCached = Api.hasCache('/reports/summary') && Api.hasCache('/reports/monthly') && Api.hasCache('/reports/events-summary');
+  if (!hasCached && (!container.children.length || container.querySelector('.empty-state') || container.querySelector('.sk-reports'))) {
+    container.innerHTML = reportsSkeleton();
+  }
 
   try {
     const [summary, monthly, events] = await Promise.all([

@@ -1,72 +1,123 @@
 // =============================================
-// api.js — API Helper Module
+// api.js — API Helper Module with SWR Pre-Caching
 // =============================================
 
 const Api = (() => {
 
   async function _getToken() {
+    if (!window.supabaseClient?.auth) return null;
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     return session?.access_token || null;
   }
 
+  // Cache Map stores: key -> { data, timestamp, ttlMs }
   const _cache = new Map();
+  // In-flight Promise Map to deduplicate concurrent requests
   const _inFlight = new Map();
 
-  function invalidateCache(prefix = '') {
-    if (!prefix) {
+  function invalidateCache(...prefixes) {
+    if (prefixes.length === 0 || (prefixes.length === 1 && !prefixes[0])) {
       _cache.clear();
       return;
     }
+    const flat = prefixes.flat().filter(Boolean);
     for (const key of _cache.keys()) {
-      if (key.startsWith(prefix)) _cache.delete(key);
+      if (flat.some(p => key.startsWith(p) || key.includes(p))) {
+        _cache.delete(key);
+      }
     }
+  }
+
+  function hasCache(path) {
+    return _cache.has(path);
+  }
+
+  function getCache(path) {
+    const entry = _cache.get(path);
+    return entry ? JSON.parse(JSON.stringify(entry.data)) : null;
+  }
+
+  async function _fetchRaw(method, path, body = null, isFormData = false) {
+    const token = await _getToken();
+    const headers = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (!isFormData) headers['Content-Type'] = 'application/json';
+
+    const opts = { method, headers };
+    if (body) opts.body = isFormData ? body : JSON.stringify(body);
+
+    const res = await fetch(`${window.API_BASE}/api${path}`, opts);
+
+    if (res.status === 401) {
+      if (window.supabaseClient?.auth) window.supabaseClient.auth.signOut();
+      throw new Error('Invalid or expired session token. Please log in again.');
+    }
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
+    return data;
   }
 
   async function _request(method, path, body = null, isFormData = false, ttlMs = 0) {
     const isGet = method.toUpperCase() === 'GET';
     const cacheKey = `${path}`;
 
-    // Return cached response if within TTL
+    // 1. SWR Cache check for GET requests
     if (isGet && ttlMs > 0 && _cache.has(cacheKey)) {
       const entry = _cache.get(cacheKey);
-      if (Date.now() - entry.timestamp < ttlMs) {
+      const isFresh = (Date.now() - entry.timestamp) < ttlMs;
+
+      if (isFresh) {
+        // Return fresh cached copy immediately
         return JSON.parse(JSON.stringify(entry.data));
       }
-      _cache.delete(cacheKey);
+
+      // Stale cache hit: return cached data immediately, then revalidate in background
+      if (!_inFlight.has(cacheKey)) {
+        const bgFetch = (async () => {
+          try {
+            const freshData = await _fetchRaw('GET', path);
+            _cache.set(cacheKey, { data: freshData, timestamp: Date.now(), ttlMs });
+            // Notify active listeners that fresh data arrived in background
+            document.dispatchEvent(new CustomEvent('api:cache-updated', { detail: { path, data: freshData } }));
+          } catch (err) {
+            // Silently ignore background revalidation errors so user keeps stale UI
+            console.debug('[SWR] Background revalidation failed for', path, err?.message);
+          } finally {
+            _inFlight.delete(cacheKey);
+          }
+        })();
+        _inFlight.set(cacheKey, bgFetch);
+      }
+
+      return JSON.parse(JSON.stringify(entry.data));
     }
 
-    // Deduplicate in-flight GET requests
+    // 2. Deduplicate in-flight GET requests
     if (isGet && _inFlight.has(cacheKey)) {
       return _inFlight.get(cacheKey);
     }
 
+    // 3. Perform network request
     const fetchPromise = (async () => {
       try {
-        const token = await _getToken();
-        const headers = { Authorization: `Bearer ${token}` };
+        const data = await _fetchRaw(method, path, body, isFormData);
 
-        if (!isFormData) headers['Content-Type'] = 'application/json';
-
-        const opts = { method, headers };
-        if (body) opts.body = isFormData ? body : JSON.stringify(body);
-
-        const res = await fetch(`${window.API_BASE}/api${path}`, opts);
-        
-        if (res.status === 401) {
-          if (window.supabaseClient) window.supabaseClient.auth.signOut();
-          throw new Error('Invalid or expired session token. Please log in again.');
-        }
-
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.error || `Request failed: ${res.status}`);
-
-        // Cache successful GET request
         if (isGet && ttlMs > 0) {
-          _cache.set(cacheKey, { data, timestamp: Date.now() });
+          _cache.set(cacheKey, { data, timestamp: Date.now(), ttlMs });
         } else if (!isGet) {
-          // Mutating request invalidates relevant cache
-          invalidateCache();
+          // Mutating calls invalidate caches based on target route
+          if (path.startsWith('/events')) {
+            invalidateCache('/events', '/reports', '/dashboard');
+          } else if (path.startsWith('/transactions')) {
+            invalidateCache('/transactions', '/reports', '/dashboard', '/income');
+          } else if (path.startsWith('/admin')) {
+            invalidateCache('/admin', '/reports', '/transactions', '/dashboard');
+          } else if (path.startsWith('/units')) {
+            invalidateCache('/units/my');
+          } else {
+            invalidateCache();
+          }
         }
 
         return data;
@@ -79,10 +130,10 @@ const Api = (() => {
     return fetchPromise;
   }
 
-
+  // ---- Endpoints with Calibrated SWR TTLs ----
   const events = {
-    list:    ()       => _request('GET', '/events', null, false, 8000),
-    get:     (id)     => _request('GET', `/events/${id}`),
+    list:    ()       => _request('GET', '/events', null, false, 60000),
+    get:     (id)     => _request('GET', `/events/${id}`, null, false, 60000),
     create:  (body)   => _request('POST', '/events', body),
     update:  (id, b)  => _request('PATCH', `/events/${id}`, b),
     archive: (id)     => _request('PATCH', `/admin/events/${id}/archive`),
@@ -91,7 +142,7 @@ const Api = (() => {
   const transactions = {
     list:   (params = {}) => {
       const q = new URLSearchParams(params).toString();
-      return _request('GET', `/transactions${q ? '?' + q : ''}`);
+      return _request('GET', `/transactions${q ? '?' + q : ''}`, null, false, 30000);
     },
     create: (body)        => _request('POST',   '/transactions', body),
     bulkCreate: (body)    => _request('POST',   '/transactions/bulk', { transactions: body }),
@@ -100,29 +151,71 @@ const Api = (() => {
   };
 
   const reports = {
-    summary:       () => _request('GET', '/reports/summary', null, false, 15000),
-    monthly:       () => _request('GET', '/reports/monthly', null, false, 15000),
-    eventsSummary: () => _request('GET', '/reports/events-summary', null, false, 15000),
+    summary:       () => _request('GET', '/reports/summary', null, false, 45000),
+    monthly:       () => _request('GET', '/reports/monthly', null, false, 45000),
+    eventsSummary: () => _request('GET', '/reports/events-summary', null, false, 45000),
   };
 
   const admin = {
-    users:          ()         => _request('GET',   '/admin/users'),
+    users:          ()         => _request('GET',   '/admin/users', null, false, 30000),
     setRole:        (id, role) => _request('PATCH', `/admin/users/${id}/role`, { role }),
     auditLogs:      (params={})=> {
       const q = new URLSearchParams(params).toString();
-      return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`);
+      return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`, null, false, 30000);
     },
     transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
   };
 
   const units = {
-    checklists: (program) => _request('GET', `/units/checklists${program ? '?program=' + encodeURIComponent(program) : ''}`, null, false, 60000),
-    my:         ()        => _request('GET', '/units/my', null, false, 5000),
+    checklists: (program) => _request('GET', `/units/checklists${program ? '?program=' + encodeURIComponent(program) : ''}`, null, false, 180000),
+    my:         ()        => _request('GET', '/units/my', null, false, 30000),
     enroll:     (body)    => _request('POST',  '/units/enroll', body),
     update:     (id, b)   => _request('PATCH', `/units/update/${id}`, b),
     drop:       (id)      => _request('DELETE', `/units/drop/${id}`),
   };
 
-  return { events, transactions, reports, admin, units, request: _request, invalidateCache };
+  // ---- Background Pre-fetch Queue ----
+  async function prefetchAll(role = 'student', program = 'BSCoE') {
+    try {
+      // Step 1: Core data (Events, Transactions, Dashboard summary)
+      await Promise.allSettled([
+        events.list(),
+        transactions.list({ limit: 200 }),
+        reports.summary(),
+      ]);
+
+      // Step 2: Reports trends and student tracker data
+      const step2 = [
+        reports.monthly(),
+        reports.eventsSummary(),
+        units.my(),
+      ];
+      if (program) step2.push(units.checklists(program));
+      await Promise.allSettled(step2);
+
+      // Step 3: Admin tools (only when user role is admin)
+      if (role === 'admin') {
+        await Promise.allSettled([
+          admin.users(),
+          admin.auditLogs({ limit: 100 }),
+        ]);
+      }
+    } catch (err) {
+      console.debug('[Api.prefetchAll] Notice:', err?.message || err);
+    }
+  }
+
+  return {
+    events,
+    transactions,
+    reports,
+    admin,
+    units,
+    request: _request,
+    invalidateCache,
+    hasCache,
+    getCache,
+    prefetchAll,
+  };
 })();
 

@@ -23,12 +23,18 @@ const Events = (() => {
 
   async function load() {
     init(); // Ensure listeners are bound
-    UI.setLoading('events-grid', 'Loading events…');
+    const hasCached = Api.hasCache('/events');
+    const grid = document.getElementById('events-grid');
+    if (!hasCached && (!allEvents.length || !grid?.children?.length)) {
+      UI.setLoading('events-grid', 'Loading events…');
+    }
     try {
       allEvents = await Api.events.list();
       applyFilters(); // Apply current search/sort to newly loaded data
     } catch (err) {
-      UI.setEmpty('events-grid', 'caution', 'Failed to load events.');
+      if (!allEvents.length) {
+        UI.setEmpty('events-grid', 'caution', 'Failed to load events.');
+      }
     }
   }
 

@@ -6,8 +6,8 @@ const Income = (() => {
 
   async function load() {
     try {
-      // Fetch transactions
-      const txs = await Api.transactions.list({ limit: 1000 });
+      // Fetch transactions (shares SWR cache with Transactions view)
+      const txs = await Api.transactions.list({ limit: 200 });
       // Filter out only incomes
       const incomes = txs.filter(t => ['donation', 'collection', 'allocation'].includes(t.type));
       renderTable(incomes);
