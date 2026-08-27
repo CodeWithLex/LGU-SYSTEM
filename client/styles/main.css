@@ -191,7 +191,12 @@ body.modal-open {
 .units-current-units,
 .data-table td:nth-child(5),
 .data-table td:nth-child(4),
-.stat-pop-row span:last-child {
+.stat-pop-row span:last-child,
+.tx-item .tx-amount,
+.data-card-row span:last-child,
+.units-pct-badge,
+.fee-amount {
+  font-family: var(--font-proxima) !important;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
