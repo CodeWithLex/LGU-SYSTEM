@@ -450,11 +450,19 @@
     await Auth.logout();
   });
 
+  let _bootedUserId = null;
+
   // ---- Auth State Observer ----
   Auth.onAuthChange(async (event, session) => {
     if (session) {
+      // Ignore background token refresh or window refocus events if already booted
+      if (_bootedUserId === session.user.id) {
+        return;
+      }
+      _bootedUserId = session.user.id;
       await bootApp(session);
     } else {
+      _bootedUserId = null;
       // Fresh login should start at the dashboard, not a stale last view
       try { sessionStorage.removeItem('lastView'); } catch { /* storage unavailable */ }
       UI.showScreen('auth');
@@ -465,7 +473,10 @@
   // ---- Boot on existing session ----
   const session = await Auth.getSession();
   if (session) {
-    await bootApp(session);
+    if (_bootedUserId !== session.user.id) {
+      _bootedUserId = session.user.id;
+      await bootApp(session);
+    }
   } else {
     UI.showScreen('auth');
   }
