@@ -338,15 +338,20 @@
     if (!onboardingModal) return;
     const nameInput = document.getElementById('onboarding-name');
     if (nameInput) {
-      nameInput.value = profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || user.email;
+      nameInput.value = ''; // Empty so the placeholder 'COE Numbawan' is displayed
+      nameInput.placeholder = 'COE Numbawan';
     }
     const courseSel = document.getElementById('onboarding-course');
     const yearSel = document.getElementById('onboarding-year');
     const enrollSel = document.getElementById('onboarding-enrollment-year');
+    const passInput = document.getElementById('onboarding-password');
+    const confirmInput = document.getElementById('onboarding-confirm');
 
     if (courseSel && profile?.course) courseSel.value = profile.course;
     if (yearSel && profile?.year_level) yearSel.value = profile.year_level;
     if (enrollSel && profile?.enrollment_year) enrollSel.value = profile.enrollment_year;
+    if (passInput) passInput.value = '';
+    if (confirmInput) confirmInput.value = '';
 
     dropdowns.forEach(d => d.sync());
     onboardingModal.classList.remove('hidden');
@@ -358,13 +363,34 @@
       const course = document.getElementById('onboarding-course')?.value;
       const year = document.getElementById('onboarding-year')?.value;
       const enrollYear = document.getElementById('onboarding-enrollment-year')?.value;
+      const pass = document.getElementById('onboarding-password')?.value;
+      const confirm = document.getElementById('onboarding-confirm')?.value;
 
       onboardingError.classList.add('hidden');
 
-      if (!name || !course || !year || !enrollYear) {
-        onboardingError.textContent = 'Please fill in your Full Name and select your Program, Year Level, and Enrollment Year.';
+      if (!name) {
+        onboardingError.textContent = 'Please enter your Full Name.';
         onboardingError.classList.remove('hidden');
         return;
+      }
+
+      if (!course || !year || !enrollYear) {
+        onboardingError.textContent = 'Please select your Engineering Program, Year Level, and Enrollment Year.';
+        onboardingError.classList.remove('hidden');
+        return;
+      }
+
+      if (pass || confirm) {
+        if (!pass || pass.length < 8) {
+          onboardingError.textContent = 'Password must be at least 8 characters long.';
+          onboardingError.classList.remove('hidden');
+          return;
+        }
+        if (pass !== confirm) {
+          onboardingError.textContent = 'Passwords do not match.';
+          onboardingError.classList.remove('hidden');
+          return;
+        }
       }
 
       onboardingSubmitBtn.disabled = true;
@@ -382,6 +408,11 @@
           enrollment_year: Number(enrollYear)
         });
 
+        // Set/update account password if provided
+        if (pass) {
+          await Auth.updatePassword(pass);
+        }
+
         // Update user display in sidebar immediately
         const displayName = name || session.user.email;
         document.getElementById('user-name').textContent   = displayName;
@@ -394,7 +425,7 @@
           onboardingModal.classList.remove('modal-closing');
         }, 160);
 
-        UI.toast('Profile setup complete! Welcome to COE Portal.', 'success');
+        UI.toast('Profile & credentials setup complete! Welcome to COE Portal.', 'success');
 
         // Refresh units tracker if open
         if (window.Units && typeof Units.init === 'function') {

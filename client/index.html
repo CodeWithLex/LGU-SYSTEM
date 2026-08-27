@@ -783,53 +783,59 @@
       </div>
     </div>
 
-    <!-- First-Time Google OAuth Profile Completion Modal -->
+    <!-- First-Time Profile & Credentials Completion Modal -->
     <div class="modal-overlay hidden" id="onboarding-modal">
       <div class="modal-card onboarding-card">
         <div class="modal-header">
           <div class="modal-header-icon">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
           </div>
           <div>
-            <h3 class="modal-title">Welcome to COE Portal! 🎓</h3>
-            <p class="modal-subtitle">Please complete your student credentials to proceed.</p>
+            <h3 class="modal-title">Welcome to COE Portal</h3>
+            <p class="modal-subtitle">Set up your academic profile and login credentials to proceed.</p>
           </div>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="onboarding-name">Full Name <span style="color:var(--col-danger, #ef4444);">*</span></label>
+            <label for="onboarding-name">Full Name <span class="req-star">*</span></label>
             <div class="input-icon-wrap">
-              <input type="text" id="onboarding-name" placeholder="e.g. Juan Dela Cruz" required />
+              <input type="text" id="onboarding-name" placeholder="COE Numbawan" autocomplete="name" />
             </div>
           </div>
-          <div class="form-group">
-            <label for="onboarding-course">Engineering Program <span style="color:var(--col-danger, #ef4444);">*</span></label>
-            <div class="input-icon-wrap">
-              <select id="onboarding-course" required>
-                <option value="" disabled selected>Select program</option>
-                <option value="BSCoE">Computer Engineering (BSCoE)</option>
-                <option value="BSCE">Civil Engineering (BSCE)</option>
-                <option value="BSECE">Electronics Engineering (BSECE)</option>
-              </select>
+
+          <div class="onboarding-grid-row">
+            <div class="form-group">
+              <label for="onboarding-course">Engineering Program <span class="req-star">*</span></label>
+              <div class="input-icon-wrap">
+                <select id="onboarding-course" required>
+                  <option value="" disabled selected>Select program</option>
+                  <option value="BSCoE">Computer Engineering (BSCoE)</option>
+                  <option value="BSCE">Civil Engineering (BSCE)</option>
+                  <option value="BSECE">Electronics Engineering (BSECE)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="onboarding-year">Year Level <span class="req-star">*</span></label>
+              <div class="input-icon-wrap">
+                <select id="onboarding-year" required>
+                  <option value="" disabled selected>Select year level</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                </select>
+              </div>
             </div>
           </div>
+
           <div class="form-group">
-            <label for="onboarding-year">Current Year Level <span style="color:var(--col-danger, #ef4444);">*</span></label>
-            <div class="input-icon-wrap">
-              <select id="onboarding-year" required>
-                <option value="" disabled selected>Select year level</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="onboarding-enrollment-year">Enrollment Year <span style="color:var(--col-danger, #ef4444);">*</span></label>
+            <label for="onboarding-enrollment-year">Enrollment Year <span class="req-star">*</span></label>
             <div class="input-icon-wrap">
               <select id="onboarding-enrollment-year" required>
                 <option value="" disabled selected>Select enrollment year</option>
@@ -843,6 +849,22 @@
             </div>
             <p class="auth-field-hint">Used to calibrate your Prospectus & Credit Unit Tracker</p>
           </div>
+
+          <div class="onboarding-grid-row">
+            <div class="form-group">
+              <label for="onboarding-password">Password <span class="req-star">*</span></label>
+              <div class="input-icon-wrap">
+                <input type="password" id="onboarding-password" placeholder="At least 8 characters" autocomplete="new-password" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="onboarding-confirm">Confirm Password <span class="req-star">*</span></label>
+              <div class="input-icon-wrap">
+                <input type="password" id="onboarding-confirm" placeholder="Repeat password" autocomplete="new-password" />
+              </div>
+            </div>
+          </div>
+
           <div class="auth-error hidden" id="onboarding-error"></div>
         </div>
         <div class="modal-footer" style="margin-top:1.25rem;">

@@ -68,6 +68,12 @@ const Auth = (() => {
     return data;
   }
 
+  async function updatePassword(password) {
+    const { data, error } = await window.supabaseClient.auth.updateUser({ password });
+    if (error) throw error;
+    return data;
+  }
+
   function onAuthChange(callback) {
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
       // Expose token globally so reports downloads can authenticate
@@ -76,6 +82,7 @@ const Auth = (() => {
     });
   }
 
-  return { login, loginWithGoogle, register, logout, getSession, getProfile, updateProfile, onAuthChange };
+  return { login, loginWithGoogle, register, logout, getSession, getProfile, updateProfile, updatePassword, onAuthChange };
 })();
+
 
