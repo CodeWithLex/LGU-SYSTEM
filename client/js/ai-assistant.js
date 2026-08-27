@@ -347,12 +347,12 @@ const GrizzAI = (() => {
 
     const items = PROMPT_DATABASE[activeTab] || PROMPT_DATABASE.academic;
     listEl.innerHTML = items.map(item => `
-      <div class="ursa-prompt-card" data-action="${item.action}" data-title="${item.title}">
+      <div class="ursa-prompt-card" data-action="${item.action}" data-title="${item.title}" role="button" tabindex="0">
         <div class="ursa-prompt-left">
           <div class="ursa-prompt-icon"><iconify-icon icon="${item.icon}"></iconify-icon></div>
-          <div>
-            <div class="ursa-prompt-text">${item.title}</div>
-            <div style="font-size:0.7rem;color:var(--text-secondary);">${item.text}</div>
+          <div class="ursa-prompt-info">
+            <span class="ursa-prompt-text">${item.title}</span>
+            <span class="ursa-prompt-desc">${item.text}</span>
           </div>
         </div>
         <div class="ursa-prompt-arrow"><iconify-icon icon="icon-park-outline:right"></iconify-icon></div>

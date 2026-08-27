@@ -896,19 +896,21 @@
         <div class="ursa-header-brand">
           <div class="ursa-header-avatar">
             <img src="assets/grizz.png" alt="Grizz" />
+            <span class="ursa-dot-online" title="Online"></span>
           </div>
           <div class="ursa-header-info">
-            <h3>Grizz <span class="ursa-tag-badge">Navigator</span></h3>
-            <div class="ursa-status-pill">
-              <span class="ursa-dot-online"></span> COE Mascot • Click-to-Explore
+            <div class="ursa-header-title-row">
+              <h3>Grizz</h3>
+              <span class="ursa-status-badge">Online</span>
             </div>
+            <span class="ursa-header-sub">Academic & Financial Copilot</span>
           </div>
         </div>
         <div class="ursa-header-actions">
-          <button type="button" class="ursa-btn-icon" id="ursa-clear-btn" title="Reset Conversation">
-            <iconify-icon icon="icon-park-outline:clear"></iconify-icon>
+          <button type="button" class="ursa-btn-icon" id="ursa-clear-btn" title="Reset Conversation" aria-label="Reset Conversation">
+            <iconify-icon icon="icon-park-outline:refresh"></iconify-icon>
           </button>
-          <button type="button" class="ursa-btn-icon" id="ursa-close-btn" title="Close Drawer">
+          <button type="button" class="ursa-btn-icon" id="ursa-close-btn" title="Close Drawer" aria-label="Close Drawer">
             <iconify-icon icon="icon-park-outline:close"></iconify-icon>
           </button>
         </div>
@@ -924,20 +926,20 @@
             <div class="ursa-msg-content">
               <div class="ursa-bubble">
                 <h4>Hello, Engineer</h4>
-                <p>I am <strong>Grizz</strong>, your official College of Engineering advisor. Click any prompt below to check your subjects, get next semester recommendations, or review council funds.</p>
-                <p style="color:var(--text-secondary);font-size:0.78rem;">Zero typing required — select any topic below to explore.</p>
+                <p>I am <strong>Grizz</strong>, your official College of Engineering advisor. Select any prompt below to check your subjects, next semester recommendations, or council funds.</p>
+                <p class="ursa-bubble-note">Zero typing required — select any topic below to explore.</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Drawer Prompt Picker (Clickable-Only) -->
+      <!-- Drawer Prompt Picker (Segmented Tray) -->
       <div class="ursa-footer">
-        <div class="ursa-prompt-tabs">
-          <button type="button" class="ursa-tab-btn active" data-tab="academic">Academic</button>
-          <button type="button" class="ursa-tab-btn" data-tab="financial">Financials</button>
-          <button type="button" class="ursa-tab-btn" data-tab="guide">Guide</button>
+        <div class="ursa-prompt-tabs" role="tablist">
+          <button type="button" class="ursa-tab-btn active" data-tab="academic" role="tab">Academic</button>
+          <button type="button" class="ursa-tab-btn" data-tab="financial" role="tab">Financials</button>
+          <button type="button" class="ursa-tab-btn" data-tab="guide" role="tab">Guide</button>
         </div>
         <div class="ursa-prompts-grid" id="ursa-prompts-list">
           <!-- Dynamically populated prompt cards -->
