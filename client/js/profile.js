@@ -5,75 +5,56 @@
 const ProfileModal = (() => {
   let _currentProfile = null;
   let _currentSession = null;
+  let _initialized = false;
 
   function init() {
-    bindTriggers();
+    if (_initialized) return;
+    _initialized = true;
+    bindGlobalTriggers();
     bindTabs();
     bindForms();
   }
 
-  function bindTriggers() {
-    // Desktop triggers
-    const userPill = document.getElementById('user-pill');
-    if (userPill) {
-      userPill.addEventListener('click', () => open());
-      userPill.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          open();
-        }
-      });
-    }
-
-    const settingsBtn = document.getElementById('profile-settings-btn');
-    if (settingsBtn) {
-      settingsBtn.addEventListener('click', (e) => {
+  function bindGlobalTriggers() {
+    // Robust document-level event delegation for all profile opening triggers
+    document.addEventListener('click', (e) => {
+      const trigger = e.target.closest('#user-pill, #profile-settings-btn, #bottom-profile-btn, .mobile-profile-btn, [data-action="open-profile"]');
+      if (trigger) {
+        e.preventDefault();
         e.stopPropagation();
         open();
-      });
-    }
+      }
 
-    // Mobile triggers
-    const bottomProfileBtn = document.getElementById('bottom-profile-btn');
-    if (bottomProfileBtn) {
-      bottomProfileBtn.addEventListener('click', (e) => {
+      // Close triggers
+      if (e.target.closest('#profile-modal-close') || e.target.closest('#profile-cancel-btn') || e.target.id === 'profile-modal-overlay') {
         e.preventDefault();
-        open();
-      });
-    }
-
-    document.querySelectorAll('.mobile-profile-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        open();
-      });
+        close();
+      }
     });
 
-    // Close buttons & overlay
-    const overlay = document.getElementById('profile-modal-overlay');
-    const closeBtn = document.getElementById('profile-modal-close');
-    const cancelBtn = document.getElementById('profile-cancel-btn');
-
-    if (overlay) overlay.addEventListener('click', () => close());
-    if (closeBtn) closeBtn.addEventListener('click', () => close());
-    if (cancelBtn) cancelBtn.addEventListener('click', () => close());
-
+    // Keyboard trigger on user-pill
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isOpen()) {
         close();
+      }
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.id === 'user-pill') {
+        e.preventDefault();
+        open();
       }
     });
   }
 
   function bindTabs() {
-    const tabs = document.querySelectorAll('.profile-tab-btn');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const targetTab = tab.dataset.tab;
-        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === targetTab));
-        document.querySelectorAll('.profile-tab-content').forEach(c => {
-          c.classList.toggle('active', c.id === `profile-tab-${targetTab}`);
-        });
+    document.addEventListener('click', (e) => {
+      const tab = e.target.closest('.profile-tab-btn');
+      if (!tab) return;
+      
+      const targetTab = tab.dataset.tab;
+      document.querySelectorAll('.profile-tab-btn').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === targetTab);
+      });
+      document.querySelectorAll('.profile-tab-content').forEach(c => {
+        c.classList.toggle('active', c.id === `profile-tab-${targetTab}`);
       });
     });
   }
@@ -101,9 +82,17 @@ const ProfileModal = (() => {
   async function open(defaultTab = 'general') {
     const modal = document.getElementById('profile-modal');
     const overlay = document.getElementById('profile-modal-overlay');
-    if (!modal || !overlay) return;
+    if (!modal || !overlay) {
+      console.warn('Profile modal elements not found in DOM');
+      return;
+    }
 
-    // Reset tabs
+    // 1. Instantly show modal to user (Zero Lag)
+    overlay.classList.remove('hidden');
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    // 2. Reset tabs
     document.querySelectorAll('.profile-tab-btn').forEach(t => {
       t.classList.toggle('active', t.dataset.tab === defaultTab);
     });
@@ -111,11 +100,20 @@ const ProfileModal = (() => {
       c.classList.toggle('active', c.id === `profile-tab-${defaultTab}`);
     });
 
-    // Clear feedbacks
+    // 3. Clear feedbacks
     setFeedback('profile-general-feedback', '');
     setFeedback('profile-security-feedback', '');
 
-    // Fetch and populate fresh data
+    // 4. Pre-fill from current UI state immediately
+    const curName = document.getElementById('user-name')?.textContent || '';
+    if (curName && curName !== 'Loading...') {
+      const nameInput = document.getElementById('profile-name-input');
+      if (nameInput && !nameInput.value) nameInput.value = curName;
+      const avatarEl = document.getElementById('profile-modal-avatar');
+      if (avatarEl) avatarEl.textContent = curName[0].toUpperCase();
+    }
+
+    // 5. Asynchronously fetch latest profile from Supabase
     try {
       _currentSession = await Auth.getSession();
       _currentProfile = await Auth.getProfile();
@@ -123,10 +121,6 @@ const ProfileModal = (() => {
     } catch (err) {
       console.error('Failed to load profile data:', err);
     }
-
-    overlay.classList.remove('hidden');
-    modal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
   }
 
   function close() {
@@ -186,8 +180,6 @@ const ProfileModal = (() => {
   }
 
   async function saveGeneralProfile() {
-    if (!_currentProfile || !_currentSession) return;
-
     const nameInput = document.getElementById('profile-name-input');
     const courseSelect = document.getElementById('profile-course-select');
     const yearSelect = document.getElementById('profile-year-select');
@@ -211,6 +203,16 @@ const ProfileModal = (() => {
     }
 
     try {
+      if (!_currentSession) {
+        _currentSession = await Auth.getSession();
+      }
+      if (!_currentProfile && _currentSession) {
+        _currentProfile = await Auth.getProfile();
+      }
+
+      const userId = _currentProfile?.id || _currentSession?.user?.id;
+      if (!userId) throw new Error('User session not active');
+
       const updates = {
         full_name: fullName,
         course,
@@ -218,7 +220,7 @@ const ProfileModal = (() => {
         enrollment_year: enrollmentYear,
       };
 
-      const updated = await Auth.updateProfile(_currentProfile.id, updates);
+      const updated = await Auth.updateProfile(userId, updates);
       _currentProfile = updated;
 
       // Update UI elements in DOM
@@ -236,7 +238,7 @@ const ProfileModal = (() => {
         Api.invalidateCache('/units/checklists');
       }
 
-      // Reload Units & Dashboard views if active
+      // Reload Units view if available
       if (typeof Units !== 'undefined' && Units.load) {
         Units.load();
       }
@@ -249,7 +251,7 @@ const ProfileModal = (() => {
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
-        saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:check"></iconify-icon> Save Profile`;
+        saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:check"></iconify-icon> Save Changes`;
       }
     }
   }
@@ -311,3 +313,12 @@ const ProfileModal = (() => {
 
   return { init, open, close, populateFields };
 })();
+
+window.ProfileModal = ProfileModal;
+
+// Auto-initialize
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => ProfileModal.init());
+} else {
+  ProfileModal.init();
+}
