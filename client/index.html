@@ -794,15 +794,15 @@
             </svg>
           </div>
           <div>
-            <h3 class="modal-title">Welcome to COE Portal!</h3>
-            <p class="modal-subtitle">Complete your engineering academic profile to continue.</p>
+            <h3 class="modal-title">Welcome to COE Portal! 🎓</h3>
+            <p class="modal-subtitle">Please complete your student credentials to proceed.</p>
           </div>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="onboarding-name">Full Name</label>
+            <label for="onboarding-name">Full Name <span style="color:var(--col-danger, #ef4444);">*</span></label>
             <div class="input-icon-wrap">
-              <input type="text" id="onboarding-name" readonly disabled />
+              <input type="text" id="onboarding-name" placeholder="e.g. Juan Dela Cruz" required />
             </div>
           </div>
           <div class="form-group">
@@ -817,7 +817,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="onboarding-year">Year Level <span style="color:var(--col-danger, #ef4444);">*</span></label>
+            <label for="onboarding-year">Current Year Level <span style="color:var(--col-danger, #ef4444);">*</span></label>
             <div class="input-icon-wrap">
               <select id="onboarding-year" required>
                 <option value="" disabled selected>Select year level</option>
@@ -841,13 +841,13 @@
                 <option value="2028">2028</option>
               </select>
             </div>
-            <p class="auth-field-hint">Used to calibrate your Prospectus Credit Unit Tracker</p>
+            <p class="auth-field-hint">Used to calibrate your Prospectus & Credit Unit Tracker</p>
           </div>
           <div class="auth-error hidden" id="onboarding-error"></div>
         </div>
         <div class="modal-footer" style="margin-top:1.25rem;">
           <button class="btn btn-primary btn-full" id="onboarding-submit-btn" type="button">
-            <span>Save Profile & Enter Portal</span>
+            <span>Complete Setup & Enter Portal</span>
           </button>
         </div>
       </div>

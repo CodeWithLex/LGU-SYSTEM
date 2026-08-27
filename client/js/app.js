@@ -354,14 +354,15 @@
 
   if (onboardingSubmitBtn) {
     onboardingSubmitBtn.addEventListener('click', async () => {
+      const name = document.getElementById('onboarding-name')?.value.trim();
       const course = document.getElementById('onboarding-course')?.value;
       const year = document.getElementById('onboarding-year')?.value;
       const enrollYear = document.getElementById('onboarding-enrollment-year')?.value;
 
       onboardingError.classList.add('hidden');
 
-      if (!course || !year || !enrollYear) {
-        onboardingError.textContent = 'Please select your Program, Year Level, and Enrollment Year.';
+      if (!name || !course || !year || !enrollYear) {
+        onboardingError.textContent = 'Please fill in your Full Name and select your Program, Year Level, and Enrollment Year.';
         onboardingError.classList.remove('hidden');
         return;
       }
@@ -375,10 +376,16 @@
         if (!session?.user?.id) throw new Error('Session expired. Please sign in again.');
 
         await Auth.updateProfile(session.user.id, {
+          full_name: name,
           course,
           year_level: year,
           enrollment_year: Number(enrollYear)
         });
+
+        // Update user display in sidebar immediately
+        const displayName = name || session.user.email;
+        document.getElementById('user-name').textContent   = displayName;
+        document.getElementById('user-avatar').textContent = displayName[0].toUpperCase();
 
         // Dismiss modal smoothly
         onboardingModal.classList.add('modal-closing');
@@ -386,6 +393,8 @@
           onboardingModal.classList.add('hidden');
           onboardingModal.classList.remove('modal-closing');
         }, 160);
+
+        UI.toast('Profile setup complete! Welcome to COE Portal.', 'success');
 
         // Refresh units tracker if open
         if (window.Units && typeof Units.init === 'function') {
@@ -400,6 +409,7 @@
       }
     });
   }
+
 
   // ---- Logout (sidebar + mobile bottom nav) ----
   document.getElementById('logout-btn').addEventListener('click', async () => {
