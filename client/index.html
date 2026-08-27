@@ -212,7 +212,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="user-pill" id="user-pill">
+        <div class="user-pill" id="user-pill" role="button" tabindex="0" title="Account Profile & Settings">
           <div class="user-avatar" id="user-avatar">?</div>
           <div class="user-info">
             <span class="user-name" id="user-name">Loading...</span>
@@ -220,7 +220,8 @@
           </div>
         </div>
         <div class="sidebar-actions">
-          <button class="btn-icon" id="logout-btn" title="Sign Out"><iconify-icon icon="icon-park-outline:logout"></iconify-icon></button>
+          <button class="btn-icon" id="profile-settings-btn" title="Account Settings" aria-label="Account Settings"><iconify-icon icon="icon-park-outline:setting-two"></iconify-icon></button>
+          <button class="btn-icon" id="logout-btn" title="Sign Out" aria-label="Sign Out"><iconify-icon icon="icon-park-outline:logout"></iconify-icon></button>
         </div>
       </div>
     </aside>
@@ -235,6 +236,9 @@
             <h2>Financial Dashboard</h2>
             <p class="view-sub">Real-time overview of COE LGU funds</p>
           </div>
+          <button type="button" class="mobile-profile-btn" title="Account Profile & Settings" aria-label="Account Profile & Settings">
+            <span class="mobile-avatar-pill" id="mobile-user-avatar">?</span>
+          </button>
         </div>
 
         <!-- URSA AI Mascot Quick-Prompt Bar -->
@@ -314,26 +318,26 @@
 
       <!-- TRANSACTIONS -->
       <section id="view-transactions" class="view ledger-view">
-        <div class="view-header">
-          <div style="display:flex;align-items:center;gap:0.75rem;">
-            <h2 style="margin:0;">Financial Ledger</h2>
-            <div id="tx-overbudget-alert" class="hidden" style="color:var(--col-danger);padding:0.4rem 0.8rem;background:rgba(239, 68, 68, 0.1);border-radius:100px;font-size:0.75rem;font-weight:700;display:flex;align-items:center;gap:0.4rem;border:1px solid rgba(239, 68, 68, 0.2)">
-              <iconify-icon icon="icon-park-outline:attention" style="font-size:14px" ></iconify-icon> Over Budget
+        <div class="view-header ledger-header">
+          <div class="ledger-title-row">
+            <h2>Financial Ledger</h2>
+            <div id="tx-overbudget-alert" class="hidden tx-overbudget-badge">
+              <iconify-icon icon="icon-park-outline:attention"></iconify-icon> Over Budget
             </div>
           </div>
-          <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
-            <div class="search-input-wrapper" style="position:relative;flex:1;min-width:200px;">
-              <input type="text" id="tx-search" placeholder="Search by description or source..." style="padding-left:2.5rem;width:100%;" />
-              <iconify-icon icon="icon-park-outline:search" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); font-size:16px; color:var(--col-text-dim); pointer-events:none" ></iconify-icon>
+          <div class="filter-bar tx-filter-bar">
+            <div class="search-input-wrapper">
+              <input type="text" id="tx-search" placeholder="Search transactions..." />
+              <iconify-icon icon="icon-park-outline:search"></iconify-icon>
             </div>
-            <select id="filter-type" style="min-width:140px;">
+            <select id="filter-type">
               <option value="all">All Types</option>
               <option value="expense">Expenses</option>
               <option value="donation">Donations</option>
               <option value="collection">Collections</option>
               <option value="allocation">Allocations</option>
             </select>
-            <select id="filter-event" style="min-width:160px;">
+            <select id="filter-event">
               <option value="all">All Events</option>
             </select>
           </div>
@@ -968,7 +972,10 @@
     <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
       <span class="nav-icon"><iconify-icon icon="icon-park-outline:shield"></iconify-icon></span><span>Admin</span>
     </a>
-    <button class="bottom-nav-item" id="bottom-logout-btn" style="background:none;border:none;cursor:pointer;">
+    <button class="bottom-nav-item" id="bottom-profile-btn" style="background:none;border:none;cursor:pointer;" title="Account Profile">
+      <span class="nav-icon"><iconify-icon icon="icon-park-outline:user"></iconify-icon></span><span>Profile</span>
+    </button>
+    <button class="bottom-nav-item" id="bottom-logout-btn" style="background:none;border:none;cursor:pointer;" title="Sign Out">
       <span class="nav-icon"><iconify-icon icon="icon-park-outline:logout"></iconify-icon></span><span>Logout</span>
     </button>
   </nav>
@@ -1131,6 +1138,115 @@
     </div>
   </div>
 
+  <!-- PROFILE & ACCOUNT SETTINGS MODAL -->
+  <div class="profile-modal-overlay hidden" id="profile-modal-overlay"></div>
+  <div class="profile-modal hidden" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    <div class="profile-modal-header">
+      <div class="profile-modal-title-lockup">
+        <div class="profile-modal-avatar-lg" id="profile-modal-avatar">?</div>
+        <div>
+          <h3 id="profile-modal-title">Account Profile</h3>
+          <span class="profile-modal-sub" id="profile-modal-email">user@g.cjc.edu.ph</span>
+        </div>
+      </div>
+      <button type="button" class="btn-icon" id="profile-modal-close" aria-label="Close Profile Modal">
+        <iconify-icon icon="icon-park-outline:close"></iconify-icon>
+      </button>
+    </div>
+
+    <div class="profile-modal-tabs">
+      <button type="button" class="profile-tab-btn active" data-tab="general">Personal & Academic</button>
+      <button type="button" class="profile-tab-btn" data-tab="security">Security & Password</button>
+    </div>
+
+    <div class="profile-modal-body">
+      <!-- GENERAL / ACADEMIC TAB -->
+      <div class="profile-tab-content active" id="profile-tab-general">
+        <form id="profile-general-form" onsubmit="return false;">
+          <div class="form-group">
+            <label for="profile-name-input">Full Name</label>
+            <input type="text" id="profile-name-input" class="input-field" placeholder="Firstname Lastname" required />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="profile-course-select">Degree Program</label>
+              <select id="profile-course-select" class="select-field">
+                <option value="BSCoE">BS Computer Engineering</option>
+                <option value="BSCE">BS Civil Engineering</option>
+                <option value="BSEE">BS Electrical Engineering</option>
+                <option value="BSEcE">BS Electronics Engineering</option>
+                <option value="BSME">BS Mechanical Engineering</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="profile-year-select">Year Level</label>
+              <select id="profile-year-select" class="select-field">
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="profile-enrollment-year">Enrollment Year</label>
+              <input type="number" id="profile-enrollment-year" class="input-field" min="2015" max="2035" placeholder="e.g. 2024" />
+            </div>
+            <div class="form-group">
+              <label>Account Role</label>
+              <div class="profile-role-badge-wrap">
+                <span class="role-badge" id="profile-role-display">Student</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="profile-feedback hidden" id="profile-general-feedback"></div>
+
+          <div class="profile-modal-footer">
+            <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="profile-save-general-btn">
+              <iconify-icon icon="icon-park-outline:check"></iconify-icon> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SECURITY TAB -->
+      <div class="profile-tab-content" id="profile-tab-security">
+        <form id="profile-security-form" onsubmit="return false;">
+          <div class="security-info-box">
+            <iconify-icon icon="icon-park-outline:shield" class="security-shield-icon"></iconify-icon>
+            <div>
+              <strong>Account Authentication</strong>
+              <p>Signed in via verified school account (<span id="profile-security-email">user@g.cjc.edu.ph</span>)</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-new-password">New Password</label>
+            <input type="password" id="profile-new-password" class="input-field" placeholder="Minimum 8 characters" minlength="8" />
+          </div>
+
+          <div class="form-group">
+            <label for="profile-confirm-password">Confirm New Password</label>
+            <input type="password" id="profile-confirm-password" class="input-field" placeholder="Re-type new password" />
+          </div>
+
+          <div class="profile-feedback hidden" id="profile-security-feedback"></div>
+
+          <div class="profile-modal-footer">
+            <button type="submit" class="btn btn-primary" id="profile-save-security-btn">
+              <iconify-icon icon="icon-park-outline:lock"></iconify-icon> Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/api.js"></script>
@@ -1143,6 +1259,7 @@
   <script src="js/units.js"></script>
   <script src="js/admin.js"></script>
   <script src="js/ai-assistant.js"></script>
+  <script src="js/profile.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
