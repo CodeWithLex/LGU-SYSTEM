@@ -25,6 +25,7 @@ function extractFn(src, name) {
 const sandbox = {};
 vm.createContext(sandbox);
 vm.runInContext(extractFn(source, 'sanitizeOptionalText'), sandbox);
+vm.runInContext(extractFn(source, 'normalizeGrade'), sandbox);
 
 let failed = 0;
 
@@ -44,6 +45,21 @@ for (const [input, expected] of cases) {
   console.log(`${ok ? 'PASS' : 'FAIL'} sanitizeOptionalText(${JSON.stringify(input ?? null).slice(0, 32)}) -> ${JSON.stringify(got)}`);
 }
 
+const gradeCases = [
+  [null, null],
+  [undefined, null],
+  ['', null],
+  [1.5, 1.5],
+  ['2.25', 2.25],
+  [5, 5],
+];
+for (const [input, expected] of gradeCases) {
+  const got = sandbox.normalizeGrade(input);
+  const ok = got === expected;
+  if (!ok) failed++;
+  console.log(`${ok ? 'PASS' : 'FAIL'} normalizeGrade(${JSON.stringify(input ?? null)}) -> ${JSON.stringify(got)}`);
+}
+
 // Static wiring checks — the SELECT and writes must carry the fields.
 const wiring = [
   ['instructor, schedule, subjects(id, code, title, units', '/my SELECT includes instructor + schedule'],
@@ -51,6 +67,8 @@ const wiring = [
   ['schedule: sanitizeOptionalText(schedule)', '/enroll insert sanitizes schedule'],
   ['updates.instructor = sanitizeOptionalText(instructor)', '/update maps instructor'],
   ['updates.schedule = sanitizeOptionalText(schedule)', '/update maps schedule'],
+  ['grade: normalizeGrade(grade)', '/enroll uses normalizeGrade'],
+  ['updates.grade = normalizeGrade(grade)', '/update uses normalizeGrade'],
 ];
 for (const [needle, label] of wiring) {
   const ok = source.includes(needle);

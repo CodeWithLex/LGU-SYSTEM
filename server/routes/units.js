@@ -38,6 +38,12 @@ function isValidGrade(val) {
   return Number.isFinite(n) && n >= 1 && n <= 5;
 }
 
+function normalizeGrade(val) {
+  if (val === null || val === undefined || val === '') return null;
+  const n = Number(val);
+  return Number.isFinite(n) ? n : null;
+}
+
 // Optional free-text details (instructor / schedule): trim, cap at 120
 // chars, and normalize empty → NULL so "never filled" == "cleared".
 function sanitizeOptionalText(val) {
@@ -430,7 +436,7 @@ router.post('/enroll', async (req, res) => {
         school_year,
         semester: Number(semester),
         status,
-        grade: grade === '' ? null : (grade === null || grade === undefined ? null : Number(grade)),
+        grade: normalizeGrade(grade),
         instructor: sanitizeOptionalText(instructor),
         schedule: sanitizeOptionalText(schedule),
       });
@@ -474,7 +480,7 @@ router.patch('/update/:id', async (req, res) => {
     }
     if (grade !== undefined) {
       if (!isValidGrade(grade)) return res.status(400).json({ error: 'Grade must be between 1.0 and 5.0.' });
-      updates.grade = grade === '' ? null : Number(grade);
+      updates.grade = normalizeGrade(grade);
     }
     if (school_year !== undefined) {
       if (!SCHOOL_YEAR_RE.test(school_year)) return res.status(400).json({ error: 'School year must look like "2026-2027".' });
