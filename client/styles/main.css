@@ -925,48 +925,45 @@ html body .hidden {
 
 /* Onboarding Modal Styling */
 .onboarding-card {
-  max-width: 500px;
+  max-width: 520px;
   background: var(--bg-surface, #0f172a);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-lg, 12px);
-  padding: 1.75rem;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75), 0 0 35px rgba(249, 115, 22, 0.08);
+  border-radius: var(--radius-lg, 14px);
+  padding: 2rem 2.25rem;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 35px rgba(249, 115, 22, 0.06);
 }
 
 .onboarding-card .modal-header {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 1rem;
+  display: block;
+  margin-bottom: 1.35rem;
+  padding-bottom: 1.15rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.onboarding-card .modal-header-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  background: rgba(249, 115, 22, 0.12);
+.onboarding-card .modal-eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--brand-primary, #f97316);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  margin-bottom: 0.35rem;
 }
 
 .onboarding-card .modal-title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.22rem;
+  font-weight: 700;
   color: var(--text-primary, #f8fafc);
-  letter-spacing: -0.01em;
+  line-height: 1.36;
+  letter-spacing: -0.015em;
 }
 
 .onboarding-card .modal-subtitle {
-  margin: 0.2rem 0 0 0;
+  margin: 0.4rem 0 0 0;
   font-size: 0.84rem;
   color: var(--text-muted, #94a3b8);
+  line-height: 1.45;
 }
 
 .onboarding-grid-row {
@@ -974,6 +971,7 @@ html body .hidden {
   grid-template-columns: 1fr 1fr;
   gap: 0.85rem;
 }
+
 
 @media (max-width: 520px) {
   .onboarding-grid-row {
