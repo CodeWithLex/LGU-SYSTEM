@@ -675,108 +675,184 @@
   font-size: 0.8rem;
 }
 
-/* Dashboard Embedded Widget */
+/* =============================================
+   Grizz Dashboard Minimalist Intelligence Bar
+   ============================================= */
+.grizz-dashboard-bar,
 .ursa-dashboard-widget {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.85) 100%);
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  border-radius: var(--radius-md, 8px);
-  padding: 0.85rem 1.15rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem;
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  gap: 0.85rem;
+  min-height: 48px;
+  box-shadow: none;
+  transition: border-color var(--transition);
 }
 
+.grizz-dashboard-bar:hover,
+.ursa-dashboard-widget:hover {
+  border-color: var(--border-hover);
+}
+
+/* Identity Lockup (Avatar + Name) */
+.grizz-bar-identity,
 .ursa-dash-left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0.2rem 0.45rem 0.2rem 0.2rem;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+  user-select: none;
 }
 
+.grizz-bar-identity:hover,
+.ursa-dash-left:hover {
+  background: var(--surface-hover);
+}
+
+.grizz-avatar-wrap,
 .ursa-dash-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   background: #1E293B;
-  border: 1.5px solid rgba(249, 115, 22, 0.5);
+  border: 1px solid rgba(249, 115, 22, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
   flex-shrink: 0;
-  overflow: hidden;
+  box-shadow: none;
+  overflow: visible;
 }
 
+.grizz-avatar-mini,
 .ursa-dash-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
-.ursa-dash-meta h4 {
-  margin: 0;
-  font-family: var(--font-ui);
-  font-size: 0.875rem;
-  font-weight: 650;
-  color: var(--text-primary);
+.grizz-pulse-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  background: #22C55E;
+  border: 1.5px solid #0F172A;
+  border-radius: 50%;
+}
+
+.grizz-identity-text {
   display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.grizz-name {
+  font-family: var(--font-ui);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
-.ursa-dash-meta p {
-  margin: 0.2rem 0 0 0;
+.grizz-role {
   font-family: var(--font-ui);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 400;
   color: var(--text-secondary);
-  line-height: 1.4;
+  white-space: nowrap;
 }
 
+/* Hairline Divider */
+.grizz-bar-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border-default);
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+/* Prompt Chips Track */
+.grizz-chips-track,
 .ursa-dash-chips {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0;
 }
 
-.ursa-dash-chip {
-  padding: 0.4rem 0.75rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  color: var(--text-primary);
-  font-family: var(--font-ui);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: all 0.15s ease;
-  user-select: none;
-}
-
-.ursa-dash-chip:hover {
-  background: rgba(249, 115, 22, 0.12);
-  border-color: var(--primary);
-  color: var(--primary-hover);
-}
-
-.ursa-chip-label {
-  display: inline;
-}
-
-.ursa-chip-label-mobile {
+.grizz-chips-track::-webkit-scrollbar,
+.ursa-dash-chips::-webkit-scrollbar {
   display: none;
 }
 
-/* Mobile Responsiveness */
+/* Minimalist Prompt Pill */
+.grizz-prompt-pill,
+.ursa-dash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.78rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: 100px;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.grizz-prompt-pill .pill-icon,
+.ursa-dash-chip iconify-icon {
+  color: var(--primary);
+  font-size: 13.5px;
+  transition: transform 0.15s ease;
+}
+
+.grizz-prompt-pill:hover,
+.ursa-dash-chip:hover {
+  background: var(--surface-hover);
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
+.grizz-prompt-pill:hover .pill-icon,
+.ursa-dash-chip:hover iconify-icon {
+  transform: scale(1.1);
+}
+
+.grizz-prompt-pill:active,
+.ursa-dash-chip:active {
+  transform: translateY(0);
+}
+
+/* =============================================
+   Mobile Responsiveness
+   ============================================= */
 @media (max-width: 640px) {
   .ursa-drawer {
     width: 100%;
@@ -808,57 +884,40 @@
     border: none;
   }
 
-  /* Compact Clean Dashboard Widget on Mobile */
+  /* Compact Clean 2-Row Stack with Swipeable Chips on Mobile */
+  .grizz-dashboard-bar,
   .ursa-dashboard-widget {
     flex-direction: column;
     align-items: stretch;
-    padding: 0.75rem 0.85rem;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
     margin-bottom: 1.1rem;
-    gap: 0.65rem;
   }
 
+  .grizz-bar-identity,
   .ursa-dash-left {
-    gap: 0.65rem;
-  }
-
-  .ursa-dash-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-  }
-
-  .ursa-dash-meta h4 {
-    font-size: 0.85rem;
-  }
-
-  .ursa-dash-meta p {
-    font-size: 0.7rem;
-  }
-
-  .ursa-chip-label {
-    display: none !important;
-  }
-
-  .ursa-chip-label-mobile {
-    display: inline !important;
-    font-size: 0.72rem;
-    font-weight: 600;
-  }
-
-  .ursa-dash-chips {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.35rem;
+    padding: 0;
     width: 100%;
   }
 
+  .grizz-bar-divider {
+    display: none;
+  }
+
+  .grizz-chips-track,
+  .ursa-dash-chips {
+    width: 100%;
+    display: flex;
+    gap: 0.45rem;
+    padding-bottom: 2px;
+    mask-image: linear-gradient(to right, black 88%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);
+  }
+
+  .grizz-prompt-pill,
   .ursa-dash-chip {
-    padding: 0.45rem 0.25rem;
-    justify-content: center;
-    text-align: center;
-    border-radius: 6px;
+    padding: 0.4rem 0.75rem;
     font-size: 0.72rem;
-    gap: 0.25rem;
-    white-space: nowrap;
+    height: 34px;
   }
 }

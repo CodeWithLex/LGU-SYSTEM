@@ -72,10 +72,16 @@ const GrizzAI = (() => {
         return;
       }
 
-      const dashChip = e.target.closest('.ursa-dash-chip');
+      const dashChip = e.target.closest('.ursa-dash-chip, .grizz-prompt-pill');
       if (dashChip && dashChip.dataset.action) {
         open();
         handleAction(dashChip.dataset.action, dashChip.dataset.title || dashChip.textContent.trim());
+        return;
+      }
+
+      const openTrigger = e.target.closest('#grizz-open-trigger, .grizz-bar-identity, .ursa-dash-left');
+      if (openTrigger) {
+        open();
         return;
       }
 
@@ -239,31 +245,32 @@ const GrizzAI = (() => {
     if (!container) return;
 
     container.innerHTML = `
-      <div class="ursa-dashboard-widget">
-        <div class="ursa-dash-left">
-          <div class="ursa-dash-avatar">
-            <img src="assets/grizz.png" alt="Grizz" />
+      <div class="grizz-dashboard-bar">
+        <div class="grizz-bar-identity" id="grizz-open-trigger" role="button" tabindex="0" title="Open Grizz AI Assistant">
+          <div class="grizz-avatar-wrap">
+            <img src="assets/grizz.png" alt="Grizz" class="grizz-avatar-mini" />
+            <span class="grizz-pulse-dot" title="Online"></span>
           </div>
-          <div class="ursa-dash-meta">
-            <h4>Grizz • Academic Advisor <span class="ursa-tag-badge">Navigator</span></h4>
-            <p>Click any quick prompt to explore your subjects or council funds</p>
+          <div class="grizz-identity-text">
+            <span class="grizz-name">Grizz</span>
+            <span class="grizz-role">· AI Advisor</span>
           </div>
         </div>
-        <div class="ursa-dash-chips">
-          <button type="button" class="ursa-dash-chip" data-action="next-sem" data-title="Next Sem Subject Recommendations">
-            <iconify-icon icon="icon-park-outline:checklist" style="color:var(--primary);font-size:14px;"></iconify-icon>
-            <span class="ursa-chip-label">Next Sem Recommendations</span>
-            <span class="ursa-chip-label-mobile">Next Sem</span>
+
+        <div class="grizz-bar-divider" aria-hidden="true"></div>
+
+        <div class="grizz-chips-track">
+          <button type="button" class="grizz-prompt-pill" data-action="next-sem" data-title="Next Sem Subject Recommendations">
+            <iconify-icon icon="icon-park-outline:checklist" class="pill-icon"></iconify-icon>
+            <span>Next Sem Recommendations</span>
           </button>
-          <button type="button" class="ursa-dash-chip" data-action="current-subjects" data-title="Ask About Current Subjects">
-            <iconify-icon icon="icon-park-outline:book-open" style="color:var(--primary);font-size:14px;"></iconify-icon>
-            <span class="ursa-chip-label">Current Subjects</span>
-            <span class="ursa-chip-label-mobile">Current</span>
+          <button type="button" class="grizz-prompt-pill" data-action="current-subjects" data-title="Ask About Current Subjects">
+            <iconify-icon icon="icon-park-outline:book-open" class="pill-icon"></iconify-icon>
+            <span>Current Subjects</span>
           </button>
-          <button type="button" class="ursa-dash-chip" data-action="financial-summary" data-title="Explain Financial Summary">
-            <iconify-icon icon="icon-park-outline:chart-pie" style="color:var(--primary);font-size:14px;"></iconify-icon>
-            <span class="ursa-chip-label">Explain Financials</span>
-            <span class="ursa-chip-label-mobile">Financials</span>
+          <button type="button" class="grizz-prompt-pill" data-action="financial-summary" data-title="Explain Financial Summary">
+            <iconify-icon icon="icon-park-outline:chart-pie" class="pill-icon"></iconify-icon>
+            <span>Explain Funds</span>
           </button>
         </div>
       </div>
