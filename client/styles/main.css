@@ -58,11 +58,11 @@
   /* ---- Typography Tokens ----
      Inter = institutional/UI
      JetBrains Mono = financial/technical numerical data
-     DM Serif Display = financial metrics, KPI digits & stat cards */
+     Proxima Nova = financial metrics, KPI digits & stat cards */
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-data: 'JetBrains Mono', 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-  --font-serif-display: 'DM Serif Display', Georgia, serif;
-  --font-digits: var(--font-serif-display);
+  --font-proxima: 'Proxima Nova', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-digits: var(--font-proxima);
   --font-family: var(--font-ui);
   --font-body: var(--font-ui);
   --font-fallback: var(--font-ui);
@@ -1555,11 +1555,11 @@ html body .hidden {
 }
 
 .stat-value {
-  font-family: var(--font-serif-display), Georgia, serif;
-  font-size: clamp(1.4rem, 1.85vw, 1.72rem);
-  font-weight: 400;
+  font-family: var(--font-proxima);
+  font-size: var(--font-size-kpi-value);
+  font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   line-height: 1.15;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
@@ -2391,7 +2391,7 @@ iconify-icon {
   html body .stat-card { padding: 0.9rem !important; gap: 0.6rem !important; }
   html body .stat-icon { width: 26px !important; height: 26px !important; font-size: 1.15rem !important; }
   html body .stat-label { font-size: 0.65rem !important; }
-  body .stat-value { font-size: 1.2rem !important; }
+  body .stat-value { font-size: 1.1rem !important; }
 
   /* Activity Feed & Badge Fixes */
   html body .tx-item { 
@@ -3018,11 +3018,11 @@ html body.is-admin th.admin-only {
 }
 .units-stat-value {
   display: block;
-  font-family: var(--font-serif-display), Georgia, serif;
-  font-size: 1.6rem;
-  font-weight: 400;
+  font-family: var(--font-proxima);
+  font-size: 1.45rem;
+  font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 .units-stat-label {
