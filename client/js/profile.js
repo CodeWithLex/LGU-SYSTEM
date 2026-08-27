@@ -4,24 +4,24 @@
 
 const ProfileModal = (() => {
   const AVATAR_PRESETS = [
-    { id: 'grizz-1', category: 'grizz', name: 'Grizz Smiling', src: 'assets/avatars/grizz/grizz-1.jpg' },
-    { id: 'grizz-2', category: 'grizz', name: 'Grizz Waving', src: 'assets/avatars/grizz/grizz-2.jpg' },
-    { id: 'grizz-3', category: 'grizz', name: 'Grizz Chill', src: 'assets/avatars/grizz/grizz-3.jpg' },
-    { id: 'grizz-4', category: 'grizz', name: 'Grizz Happy', src: 'assets/avatars/grizz/grizz-4.jpg' },
-    { id: 'icebear-1', category: 'icebear', name: 'Ice Bear Cool', src: 'assets/avatars/icebear/icebear-1.jpg' },
-    { id: 'icebear-2', category: 'icebear', name: 'Ice Bear Ninja', src: 'assets/avatars/icebear/icebear-2.jpg' },
-    { id: 'icebear-3', category: 'icebear', name: 'Ice Bear Serious', src: 'assets/avatars/icebear/icebear-3.jpg' },
-    { id: 'icebear-4', category: 'icebear', name: 'Ice Bear Chef', src: 'assets/avatars/icebear/icebear-4.jpg' },
-    { id: 'panda-1', category: 'panda', name: 'Panda Cute', src: 'assets/avatars/panda/panda-1.jpg' },
-    { id: 'panda-2', category: 'panda', name: 'Panda Phone', src: 'assets/avatars/panda/panda-2.jpg' },
-    { id: 'panda-3', category: 'panda', name: 'Panda Shy', src: 'assets/avatars/panda/panda-3.jpg' },
-    { id: 'panda-4', category: 'panda', name: 'Panda Wink', src: 'assets/avatars/panda/panda-4.jpg' },
-    { id: 'other-1', category: 'others', name: 'Chloe', src: 'assets/avatars/others/other-1.jpg' },
-    { id: 'other-2', category: 'others', name: 'Nom Nom', src: 'assets/avatars/others/other-2.jpg' },
-    { id: 'other-3', category: 'others', name: 'Charlie', src: 'assets/avatars/others/other-3.jpg' },
-    { id: 'other-4', category: 'others', name: 'Ranger Tabes', src: 'assets/avatars/others/other-4.jpg' },
-    { id: 'other-5', category: 'others', name: 'Captain Craboo', src: 'assets/avatars/others/other-5.jpg' },
-    { id: 'other-6', category: 'others', name: 'Bears Stack', src: 'assets/avatars/others/other-6.jpg' },
+    { id: 'grizz-1', category: 'grizz', name: 'Grizz Smiling', src: 'assets/avatars/grizz/grizz-1.webp' },
+    { id: 'grizz-2', category: 'grizz', name: 'Grizz Waving', src: 'assets/avatars/grizz/grizz-2.webp' },
+    { id: 'grizz-3', category: 'grizz', name: 'Grizz Chill', src: 'assets/avatars/grizz/grizz-3.webp' },
+    { id: 'grizz-4', category: 'grizz', name: 'Grizz Happy', src: 'assets/avatars/grizz/grizz-4.webp' },
+    { id: 'icebear-1', category: 'icebear', name: 'Ice Bear Cool', src: 'assets/avatars/icebear/icebear-1.webp' },
+    { id: 'icebear-2', category: 'icebear', name: 'Ice Bear Ninja', src: 'assets/avatars/icebear/icebear-2.webp' },
+    { id: 'icebear-3', category: 'icebear', name: 'Ice Bear Serious', src: 'assets/avatars/icebear/icebear-3.webp' },
+    { id: 'icebear-4', category: 'icebear', name: 'Ice Bear Chef', src: 'assets/avatars/icebear/icebear-4.webp' },
+    { id: 'panda-1', category: 'panda', name: 'Panda Cute', src: 'assets/avatars/panda/panda-1.webp' },
+    { id: 'panda-2', category: 'panda', name: 'Panda Phone', src: 'assets/avatars/panda/panda-2.webp' },
+    { id: 'panda-3', category: 'panda', name: 'Panda Shy', src: 'assets/avatars/panda/panda-3.webp' },
+    { id: 'panda-4', category: 'panda', name: 'Panda Wink', src: 'assets/avatars/panda/panda-4.webp' },
+    { id: 'other-1', category: 'others', name: 'Chloe', src: 'assets/avatars/others/other-1.webp' },
+    { id: 'other-2', category: 'others', name: 'Nom Nom', src: 'assets/avatars/others/other-2.webp' },
+    { id: 'other-3', category: 'others', name: 'Charlie', src: 'assets/avatars/others/other-3.webp' },
+    { id: 'other-4', category: 'others', name: 'Ranger Tabes', src: 'assets/avatars/others/other-4.webp' },
+    { id: 'other-5', category: 'others', name: 'Captain Craboo', src: 'assets/avatars/others/other-5.webp' },
+    { id: 'other-6', category: 'others', name: 'Bears Stack', src: 'assets/avatars/others/other-6.webp' },
   ];
 
   let _currentProfile = null;
@@ -228,7 +228,7 @@ const ProfileModal = (() => {
     const yearLevel = String(profile?.year_level || '1');
     const enrollmentYear = profile?.enrollment_year || new Date().getFullYear();
     const role = profile?.role === 'admin' ? 'Administrator' : 'Student Member';
-    _selectedAvatarUrl = profile?.avatar_url || null;
+    _selectedAvatarUrl = profile?.avatar_url ? profile.avatar_url.replace(/\.jpg$/, '.webp') : null;
 
     // Headers & Identifiers
     const avatarEl = document.getElementById('profile-modal-avatar');
@@ -267,7 +267,8 @@ const ProfileModal = (() => {
   function renderAvatarElement(element, avatarUrl, fallbackText) {
     if (!element) return;
     if (avatarUrl) {
-      element.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="avatar-img" />`;
+      const cleanUrl = avatarUrl.replace(/\.jpg$/, '.webp');
+      element.innerHTML = `<img src="${cleanUrl}" alt="Avatar" class="avatar-img" />`;
     } else {
       element.innerHTML = '';
       element.textContent = (fallbackText || '?')[0].toUpperCase();

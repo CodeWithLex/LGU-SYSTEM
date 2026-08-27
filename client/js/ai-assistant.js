@@ -223,9 +223,7 @@ const GrizzAI = (() => {
   // ---- Data Loader ----
   async function loadData() {
     try {
-      if (!profile) {
-        profile = await Auth.getProfile().catch(() => null);
-      }
+      profile = await Auth.getProfile().catch(() => null);
       const prog = profile?.course || 'BSCoE';
       const [checklistRes, unitsRes] = await Promise.all([
         Api.units.checklists(prog).catch(() => ({ subjects: [], requirements: [] })),
@@ -365,11 +363,19 @@ const GrizzAI = (() => {
     const stream = document.getElementById('ursa-chat-stream');
     if (!stream) return;
 
+    // Use current profile avatar or fallback to initial
+    const avatarUrl = profile?.avatar_url || null;
+    const initial = (profile?.full_name || 'U')[0].toUpperCase();
+
+    const avatarHtml = avatarUrl
+      ? `<img src="${avatarUrl}" alt="You" />`
+      : `<span style="font-size:0.75rem;font-weight:700;color:var(--primary);">${initial}</span>`;
+
     const msg = document.createElement('div');
     msg.className = 'ursa-msg user';
     msg.innerHTML = `
       <div class="ursa-msg-avatar">
-        <iconify-icon icon="icon-park-outline:user" style="font-size:15px;color:var(--primary);"></iconify-icon>
+        ${avatarHtml}
       </div>
       <div class="ursa-msg-content">
         <div class="ursa-bubble">${esc(text)}</div>
