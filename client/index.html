@@ -38,8 +38,23 @@
         <div id="login-form" class="auth-form active">
           <div class="auth-form-header">
             <h2>Sign in</h2>
-            <p>Use your email and password to access the system.</p>
+            <p>Use your CJC Google account or email & password.</p>
           </div>
+
+          <button class="btn btn-google btn-full" id="google-login-btn" type="button">
+            <svg class="google-icon" viewBox="0 0 24 24" width="18" height="18">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continue with CJC Google Account</span>
+          </button>
+
+          <div class="auth-divider">
+            <span>or sign in with password</span>
+          </div>
+
           <div class="form-group">
             <label for="login-email">Email Address</label>
             <div class="input-icon-wrap">
@@ -62,8 +77,23 @@
         <div id="register-form" class="auth-form">
           <div class="auth-form-header">
             <h2>Create account</h2>
-            <p>Register to access the student portal.</p>
+            <p>Register with your CJC Google account or fill in the form.</p>
           </div>
+
+          <button class="btn btn-google btn-full" id="google-register-btn" type="button">
+            <svg class="google-icon" viewBox="0 0 24 24" width="18" height="18">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Sign up with CJC Google Account</span>
+          </button>
+
+          <div class="auth-divider">
+            <span>or register with email</span>
+          </div>
+
           <div class="form-group">
             <label for="register-name">Full Name</label>
             <div class="input-icon-wrap">
@@ -749,6 +779,76 @@
         <div class="units-current-list" id="units-current-modal-body"></div>
         <div style="display:flex; gap:0.6rem; justify-content:flex-end;">
           <button class="btn btn-ghost" id="units-current-modal-close" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- First-Time Google OAuth Profile Completion Modal -->
+    <div class="modal-overlay hidden" id="onboarding-modal">
+      <div class="modal-card onboarding-card">
+        <div class="modal-header">
+          <div class="modal-header-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Welcome to COE Portal!</h3>
+            <p class="modal-subtitle">Complete your engineering academic profile to continue.</p>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="onboarding-name">Full Name</label>
+            <div class="input-icon-wrap">
+              <input type="text" id="onboarding-name" readonly disabled />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="onboarding-course">Engineering Program <span style="color:var(--col-danger, #ef4444);">*</span></label>
+            <div class="input-icon-wrap">
+              <select id="onboarding-course" required>
+                <option value="" disabled selected>Select program</option>
+                <option value="BSCoE">Computer Engineering (BSCoE)</option>
+                <option value="BSCE">Civil Engineering (BSCE)</option>
+                <option value="BSECE">Electronics Engineering (BSECE)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="onboarding-year">Year Level <span style="color:var(--col-danger, #ef4444);">*</span></label>
+            <div class="input-icon-wrap">
+              <select id="onboarding-year" required>
+                <option value="" disabled selected>Select year level</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="onboarding-enrollment-year">Enrollment Year <span style="color:var(--col-danger, #ef4444);">*</span></label>
+            <div class="input-icon-wrap">
+              <select id="onboarding-enrollment-year" required>
+                <option value="" disabled selected>Select enrollment year</option>
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+              </select>
+            </div>
+            <p class="auth-field-hint">Used to calibrate your Prospectus Credit Unit Tracker</p>
+          </div>
+          <div class="auth-error hidden" id="onboarding-error"></div>
+        </div>
+        <div class="modal-footer" style="margin-top:1.25rem;">
+          <button class="btn btn-primary btn-full" id="onboarding-submit-btn" type="button">
+            <span>Save Profile & Enter Portal</span>
+          </button>
         </div>
       </div>
     </div>

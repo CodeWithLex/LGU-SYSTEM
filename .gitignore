@@ -11,3 +11,4 @@ dist-build*/
 *.yaml
 .playwright-mcp/
 electron-builder/
+logs/

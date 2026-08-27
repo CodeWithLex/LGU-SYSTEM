@@ -30,17 +30,21 @@ app.use(helmet({
       defaultSrc:   ["'self'"],
       scriptSrc:    ["'self'", "'unsafe-inline'",
                      "https://cdn.jsdelivr.net",
-                     "https://fonts.googleapis.com"],
+                     "https://fonts.googleapis.com",
+                     "https://apis.google.com",
+                     "https://accounts.google.com"],
       styleSrc:     ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc:      ["'self'", "https://fonts.gstatic.com"],
-      imgSrc:       ["'self'", "data:", "https://hchkfunaofyoualrdnkk.supabase.co"],
+      imgSrc:       ["'self'", "data:", "https://hchkfunaofyoualrdnkk.supabase.co", "https://lh3.googleusercontent.com"],
       connectSrc:   ["'self'",
                      "https://hchkfunaofyoualrdnkk.supabase.co",
                      "wss://hchkfunaofyoualrdnkk.supabase.co",
                      "https://api.brevo.com",
                      "https://api.sendinblue.com",
-                     "https://api.iconify.design"],
-      frameSrc:     ["'none'"],
+                     "https://api.iconify.design",
+                     "https://accounts.google.com",
+                     "https://identitytoolkit.googleapis.com"],
+      frameSrc:     ["https://accounts.google.com"],
       objectSrc:    ["'none'"],
     }
   },
@@ -87,13 +91,13 @@ app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 // =============================================
 // Rate Limiting
 // =============================================
-// Global cap — 1000 req / 15 min per IP
+// Global cap — 5000 req / 15 min per IP (calibrated for shared campus Wi-Fi NAT gateways with 500+ students)
 const globalLimiter = rateLimit({
   windowMs:         15 * 60 * 1000, // 15 minutes
-  max:              1000,
+  max:              5000,
   standardHeaders:  true,
   legacyHeaders:    false,
-  message:          { error: 'Too many requests. Please wait 15 minutes and try again.' },
+  message:          { error: 'Too many requests from this network. Please wait a few minutes and try again.' },
   skip: (req) => req.originalUrl === '/api/health', // exempt health check
 });
 app.use('/api/', globalLimiter);

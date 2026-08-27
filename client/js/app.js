@@ -52,6 +52,38 @@
     if (e.key === 'Enter') document.getElementById('login-btn').click();
   });
 
+  // ---- Google OAuth Sign-in Handlers ----
+  const googleLoginBtn = document.getElementById('google-login-btn');
+  const googleRegisterBtn = document.getElementById('google-register-btn');
+
+  async function handleGoogleAuth(btn, errorElId) {
+    const errEl = document.getElementById(errorElId);
+    if (errEl) errEl.classList.add('hidden');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span>Connecting to Google…</span>';
+    btn.disabled = true;
+
+    try {
+      await Auth.loginWithGoogle();
+      // Supabase redirects to Google OAuth flow
+    } catch (err) {
+      if (errEl) {
+        errEl.textContent = err.message || 'Google sign-in failed. Please try again.';
+        errEl.classList.remove('hidden');
+      }
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  }
+
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener('click', () => handleGoogleAuth(googleLoginBtn, 'login-error'));
+  }
+  if (googleRegisterBtn) {
+    googleRegisterBtn.addEventListener('click', () => handleGoogleAuth(googleRegisterBtn, 'register-error'));
+  }
+
+
   // ---- Toggle between Sign in / Register ----
   const loginForm = document.getElementById('login-form');
   const registerForm = document.getElementById('register-form');
@@ -287,11 +319,87 @@
     dropdowns.push({ sync });
   }
 
-  // Register form selects (have a left input icon + custom chevron in the wrap)
-  ['register-course', 'register-year'].forEach(id => bindDropdown(document.getElementById(id)));
+  // Auth & Onboarding selects
+  ['register-course', 'register-year', 'register-enrollment-year', 'onboarding-course', 'onboarding-year', 'onboarding-enrollment-year'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) bindDropdown(el);
+  });
 
   // Every other select in the logged-in app
   document.querySelectorAll('#app-screen select').forEach(bindDropdown);
+
+
+  // ---- First-Time Onboarding Modal ----
+  const onboardingModal = document.getElementById('onboarding-modal');
+  const onboardingSubmitBtn = document.getElementById('onboarding-submit-btn');
+  const onboardingError = document.getElementById('onboarding-error');
+
+  function showOnboardingModal(user, profile) {
+    if (!onboardingModal) return;
+    const nameInput = document.getElementById('onboarding-name');
+    if (nameInput) {
+      nameInput.value = profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || user.email;
+    }
+    const courseSel = document.getElementById('onboarding-course');
+    const yearSel = document.getElementById('onboarding-year');
+    const enrollSel = document.getElementById('onboarding-enrollment-year');
+
+    if (courseSel && profile?.course) courseSel.value = profile.course;
+    if (yearSel && profile?.year_level) yearSel.value = profile.year_level;
+    if (enrollSel && profile?.enrollment_year) enrollSel.value = profile.enrollment_year;
+
+    dropdowns.forEach(d => d.sync());
+    onboardingModal.classList.remove('hidden');
+  }
+
+  if (onboardingSubmitBtn) {
+    onboardingSubmitBtn.addEventListener('click', async () => {
+      const course = document.getElementById('onboarding-course')?.value;
+      const year = document.getElementById('onboarding-year')?.value;
+      const enrollYear = document.getElementById('onboarding-enrollment-year')?.value;
+
+      onboardingError.classList.add('hidden');
+
+      if (!course || !year || !enrollYear) {
+        onboardingError.textContent = 'Please select your Program, Year Level, and Enrollment Year.';
+        onboardingError.classList.remove('hidden');
+        return;
+      }
+
+      onboardingSubmitBtn.disabled = true;
+      const originalText = onboardingSubmitBtn.innerHTML;
+      onboardingSubmitBtn.innerHTML = '<span>Saving Profile…</span>';
+
+      try {
+        const session = await Auth.getSession();
+        if (!session?.user?.id) throw new Error('Session expired. Please sign in again.');
+
+        await Auth.updateProfile(session.user.id, {
+          course,
+          year_level: year,
+          enrollment_year: Number(enrollYear)
+        });
+
+        // Dismiss modal smoothly
+        onboardingModal.classList.add('modal-closing');
+        setTimeout(() => {
+          onboardingModal.classList.add('hidden');
+          onboardingModal.classList.remove('modal-closing');
+        }, 160);
+
+        // Refresh units tracker if open
+        if (window.Units && typeof Units.init === 'function') {
+          Units.init();
+        }
+      } catch (err) {
+        onboardingError.textContent = err.message || 'Failed to update profile. Please try again.';
+        onboardingError.classList.remove('hidden');
+      } finally {
+        onboardingSubmitBtn.disabled = false;
+        onboardingSubmitBtn.innerHTML = originalText;
+      }
+    });
+  }
 
   // ---- Logout (sidebar + mobile bottom nav) ----
   document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -395,10 +503,16 @@
 
     const profile = await Auth.getProfile();
 
+    // Check if First-Time Onboarding is required (e.g. new Google OAuth signup)
+    if (profile && profile.role !== 'admin' && (!profile.course || !profile.year_level || !profile.enrollment_year)) {
+      showOnboardingModal(session.user, profile);
+    }
+
     // Sidebar user info
     document.getElementById('user-name').textContent   = profile?.full_name || session.user.email;
     document.getElementById('user-role').textContent   = profile?.role === 'admin' ? 'Admin' : 'Student';
     document.getElementById('user-avatar').textContent = (profile?.full_name || session.user.email)[0].toUpperCase();
+
 
     UI.setAdminVisibility(profile?.role === 'admin');
 

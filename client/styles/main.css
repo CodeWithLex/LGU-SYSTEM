@@ -861,6 +861,108 @@ html body .hidden {
   font-size: 1rem;
 }
 
+/* Google OAuth Button */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--bg-surface-elevated, #161f30);
+  color: var(--text-primary, #f1f5f9);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.12));
+  border-radius: var(--radius-md, 8px);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition, 0.2s ease);
+  margin-bottom: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-google:hover {
+  background: var(--surface-hover, #1e293b);
+  border-color: rgba(66, 133, 244, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(66, 133, 244, 0.25);
+}
+
+.btn-google:active {
+  transform: translateY(0);
+}
+
+.btn-google .google-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+/* Auth Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.1rem 0;
+  color: var(--text-muted, #94a3b8);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-default, rgba(255, 255, 255, 0.08));
+}
+
+.auth-divider span {
+  padding: 0 0.75rem;
+  opacity: 0.75;
+}
+
+/* Onboarding Modal Styling */
+.onboarding-card {
+  max-width: 480px;
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), 0 0 35px rgba(66, 133, 244, 0.12);
+}
+
+.onboarding-card .modal-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.onboarding-card .modal-header-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(66, 133, 244, 0.15);
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.onboarding-card .modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.onboarding-card .modal-subtitle {
+  margin: 0.2rem 0 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+
 .btn-icon {
   background: transparent;
   border: none;

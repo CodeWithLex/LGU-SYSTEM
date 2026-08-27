@@ -42,6 +42,32 @@ const Auth = (() => {
     return data;
   }
 
+  async function loginWithGoogle() {
+    const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+        queryParams: {
+          hd: 'g.cjc.edu.ph', // Enforces Cor Jesu College Google account selection
+          prompt: 'select_account'
+        }
+      }
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async function updateProfile(userId, updates) {
+    const { data, error } = await window.supabaseClient
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
   function onAuthChange(callback) {
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
       // Expose token globally so reports downloads can authenticate
@@ -50,5 +76,6 @@ const Auth = (() => {
     });
   }
 
-  return { login, register, logout, getSession, getProfile, onAuthChange };
+  return { login, loginWithGoogle, register, logout, getSession, getProfile, updateProfile, onAuthChange };
 })();
+
