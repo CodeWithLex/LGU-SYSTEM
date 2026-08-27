@@ -1238,17 +1238,27 @@ html body .hidden {
   margin-bottom: 1.25rem;
 }
 
+.sidebar-header > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
 .sidebar-header h2 {
   font-family: var(--font-ui);
   font-size: 0.77rem;
-  line-height: 1.2;
+  line-height: 1.15;
   letter-spacing: 0.035em;
   font-weight: 700;
   color: var(--text-primary);
   text-transform: uppercase;
   white-space: nowrap;
+  margin: 0;
 }
 .sidebar-tagline {
+  display: block;
   font-family: var(--font-ui);
   font-size: 0.625rem;
   color: var(--primary);
@@ -1256,6 +1266,8 @@ html body .hidden {
   font-weight: 600;
   text-transform: uppercase;
   white-space: nowrap;
+  line-height: 1.1;
+  margin: 0;
 }
 
 .sidebar-nav {
