@@ -561,17 +561,17 @@
     }
 
     // Sidebar user info
-    document.getElementById('user-name').textContent   = profile?.full_name || session.user.email;
+    const displayName = profile?.full_name || session.user.email;
+    document.getElementById('user-name').textContent   = displayName;
     document.getElementById('user-role').textContent   = profile?.role === 'admin' ? 'Admin' : 'Student';
-    document.getElementById('user-avatar').textContent = (profile?.full_name || session.user.email)[0].toUpperCase();
     
-    const mobileAvatar = document.getElementById('mobile-user-avatar');
-    if (mobileAvatar) mobileAvatar.textContent = (profile?.full_name || session.user.email)[0].toUpperCase();
-
-    UI.setAdminVisibility(profile?.role === 'admin');
-
     if (window.ProfileModal) {
       ProfileModal.init();
+      ProfileModal.syncAvatars(profile?.avatar_url, displayName);
+    } else {
+      document.getElementById('user-avatar').textContent = displayName[0].toUpperCase();
+      const mobileAvatar = document.getElementById('mobile-user-avatar');
+      if (mobileAvatar) mobileAvatar.textContent = displayName[0].toUpperCase();
     }
 
     if (window.GrizzAI) {

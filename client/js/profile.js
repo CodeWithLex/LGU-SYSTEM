@@ -3,8 +3,31 @@
 // =============================================
 
 const ProfileModal = (() => {
+  const AVATAR_PRESETS = [
+    { id: 'grizz-1', category: 'grizz', name: 'Grizz Smiling', src: 'assets/avatars/grizz/grizz-1.jpg' },
+    { id: 'grizz-2', category: 'grizz', name: 'Grizz Waving', src: 'assets/avatars/grizz/grizz-2.jpg' },
+    { id: 'grizz-3', category: 'grizz', name: 'Grizz Chill', src: 'assets/avatars/grizz/grizz-3.jpg' },
+    { id: 'grizz-4', category: 'grizz', name: 'Grizz Happy', src: 'assets/avatars/grizz/grizz-4.jpg' },
+    { id: 'icebear-1', category: 'icebear', name: 'Ice Bear Cool', src: 'assets/avatars/icebear/icebear-1.jpg' },
+    { id: 'icebear-2', category: 'icebear', name: 'Ice Bear Ninja', src: 'assets/avatars/icebear/icebear-2.jpg' },
+    { id: 'icebear-3', category: 'icebear', name: 'Ice Bear Serious', src: 'assets/avatars/icebear/icebear-3.jpg' },
+    { id: 'icebear-4', category: 'icebear', name: 'Ice Bear Chef', src: 'assets/avatars/icebear/icebear-4.jpg' },
+    { id: 'panda-1', category: 'panda', name: 'Panda Cute', src: 'assets/avatars/panda/panda-1.jpg' },
+    { id: 'panda-2', category: 'panda', name: 'Panda Phone', src: 'assets/avatars/panda/panda-2.jpg' },
+    { id: 'panda-3', category: 'panda', name: 'Panda Shy', src: 'assets/avatars/panda/panda-3.jpg' },
+    { id: 'panda-4', category: 'panda', name: 'Panda Wink', src: 'assets/avatars/panda/panda-4.jpg' },
+    { id: 'other-1', category: 'others', name: 'Chloe', src: 'assets/avatars/others/other-1.jpg' },
+    { id: 'other-2', category: 'others', name: 'Nom Nom', src: 'assets/avatars/others/other-2.jpg' },
+    { id: 'other-3', category: 'others', name: 'Charlie', src: 'assets/avatars/others/other-3.jpg' },
+    { id: 'other-4', category: 'others', name: 'Ranger Tabes', src: 'assets/avatars/others/other-4.jpg' },
+    { id: 'other-5', category: 'others', name: 'Captain Craboo', src: 'assets/avatars/others/other-5.jpg' },
+    { id: 'other-6', category: 'others', name: 'Bears Stack', src: 'assets/avatars/others/other-6.jpg' },
+  ];
+
   let _currentProfile = null;
   let _currentSession = null;
+  let _selectedAvatarUrl = null;
+  let _currentCategory = 'all';
   let _initialized = false;
 
   function init() {
@@ -13,10 +36,11 @@ const ProfileModal = (() => {
     bindGlobalTriggers();
     bindTabs();
     bindForms();
+    renderAvatarGallery('all');
   }
 
   function bindGlobalTriggers() {
-    // Robust document-level event delegation for all profile opening triggers
+    // Document-level event delegation for all profile opening triggers
     document.addEventListener('click', (e) => {
       const trigger = e.target.closest('#user-pill, #profile-settings-btn, #bottom-profile-btn, .mobile-profile-btn, [data-action="open-profile"]');
       if (trigger) {
@@ -30,6 +54,39 @@ const ProfileModal = (() => {
         e.preventDefault();
         close();
       }
+
+      // Avatar hero wrap click (toggle/scroll into picker)
+      if (e.target.closest('#avatar-hero-wrap')) {
+        const picker = document.getElementById('avatar-picker-section');
+        if (picker) {
+          picker.classList.toggle('highlighted');
+          picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+
+      // Avatar category button click
+      const catBtn = e.target.closest('.avatar-cat-btn');
+      if (catBtn) {
+        e.preventDefault();
+        const cat = catBtn.dataset.cat;
+        _currentCategory = cat;
+        document.querySelectorAll('.avatar-cat-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+        renderAvatarGallery(cat);
+      }
+
+      // Avatar thumbnail selection
+      const avatarCard = e.target.closest('.avatar-thumb-card');
+      if (avatarCard) {
+        e.preventDefault();
+        const src = avatarCard.dataset.src;
+        selectAvatar(src);
+      }
+
+      // Reset to Letter Initial
+      if (e.target.closest('#profile-reset-avatar-btn')) {
+        e.preventDefault();
+        selectAvatar(null);
+      }
     });
 
     // Keyboard trigger on user-pill
@@ -42,6 +99,34 @@ const ProfileModal = (() => {
         open();
       }
     });
+  }
+
+  function renderAvatarGallery(category = 'all') {
+    const track = document.getElementById('avatar-gallery-track');
+    if (!track) return;
+
+    const filtered = category === 'all'
+      ? AVATAR_PRESETS
+      : AVATAR_PRESETS.filter(a => a.category === category);
+
+    track.innerHTML = filtered.map(a => {
+      const isSelected = _selectedAvatarUrl === a.src;
+      return `
+        <button type="button" class="avatar-thumb-card ${isSelected ? 'active' : ''}" data-src="${a.src}" title="${a.name}">
+          <img src="${a.src}" alt="${a.name}" class="avatar-thumb-img" loading="lazy" />
+          ${isSelected ? '<span class="avatar-check-badge"><iconify-icon icon="icon-park-outline:check"></iconify-icon></span>' : ''}
+        </button>
+      `;
+    }).join('');
+  }
+
+  function selectAvatar(src) {
+    _selectedAvatarUrl = src;
+    const heroAvatar = document.getElementById('profile-modal-avatar');
+    const curName = document.getElementById('profile-name-input')?.value || _currentProfile?.full_name || 'COE';
+    
+    renderAvatarElement(heroAvatar, src, curName);
+    renderAvatarGallery(_currentCategory);
   }
 
   function bindTabs() {
@@ -109,8 +194,6 @@ const ProfileModal = (() => {
     if (curName && curName !== 'Loading...') {
       const nameInput = document.getElementById('profile-name-input');
       if (nameInput && !nameInput.value) nameInput.value = curName;
-      const avatarEl = document.getElementById('profile-modal-avatar');
-      if (avatarEl) avatarEl.textContent = curName[0].toUpperCase();
     }
 
     // 5. Asynchronously fetch latest profile from Supabase
@@ -145,7 +228,7 @@ const ProfileModal = (() => {
     const yearLevel = String(profile?.year_level || '1');
     const enrollmentYear = profile?.enrollment_year || new Date().getFullYear();
     const role = profile?.role === 'admin' ? 'Administrator' : 'Student Member';
-    const avatarLetter = (fullName || email || '?')[0].toUpperCase();
+    _selectedAvatarUrl = profile?.avatar_url || null;
 
     // Headers & Identifiers
     const avatarEl = document.getElementById('profile-modal-avatar');
@@ -153,7 +236,7 @@ const ProfileModal = (() => {
     const secEmailEl = document.getElementById('profile-security-email');
     const roleEl = document.getElementById('profile-role-display');
 
-    if (avatarEl) avatarEl.textContent = avatarLetter;
+    renderAvatarElement(avatarEl, _selectedAvatarUrl, fullName || email);
     if (emailEl) emailEl.textContent = email;
     if (secEmailEl) secEmailEl.textContent = email;
     if (roleEl) {
@@ -177,6 +260,18 @@ const ProfileModal = (() => {
     const confPass = document.getElementById('profile-confirm-password');
     if (newPass) newPass.value = '';
     if (confPass) confPass.value = '';
+
+    renderAvatarGallery(_currentCategory);
+  }
+
+  function renderAvatarElement(element, avatarUrl, fallbackText) {
+    if (!element) return;
+    if (avatarUrl) {
+      element.innerHTML = `<img src="${avatarUrl}" alt="Avatar" class="avatar-img" />`;
+    } else {
+      element.innerHTML = '';
+      element.textContent = (fallbackText || '?')[0].toUpperCase();
+    }
   }
 
   async function saveGeneralProfile() {
@@ -218,19 +313,14 @@ const ProfileModal = (() => {
         course,
         year_level: yearLevel,
         enrollment_year: enrollmentYear,
+        avatar_url: _selectedAvatarUrl,
       };
 
       const updated = await Auth.updateProfile(userId, updates);
       _currentProfile = updated;
 
-      // Update UI elements in DOM
-      const userNameEl = document.getElementById('user-name');
-      const userAvatarEl = document.getElementById('user-avatar');
-      const mobileAvatarEl = document.getElementById('mobile-user-avatar');
-
-      if (userNameEl) userNameEl.textContent = updated.full_name;
-      if (userAvatarEl) userAvatarEl.textContent = updated.full_name[0].toUpperCase();
-      if (mobileAvatarEl) mobileAvatarEl.textContent = updated.full_name[0].toUpperCase();
+      // Synchronize all avatars across the UI
+      syncAvatars(updated.avatar_url, updated.full_name);
 
       // Invalidate units cache so the credit tracker reloads for new course/year if changed
       if (typeof Api !== 'undefined' && Api.invalidateCache) {
@@ -238,12 +328,12 @@ const ProfileModal = (() => {
         Api.invalidateCache('/units/checklists');
       }
 
-      // Reload Units view if available
+      // Reload Units view if active
       if (typeof Units !== 'undefined' && Units.load) {
         Units.load();
       }
 
-      UI.toast('Account profile updated successfully!', 'success');
+      UI.toast('Account profile & avatar updated successfully!', 'success');
       close();
     } catch (err) {
       console.error('Profile update failed:', err);
@@ -254,6 +344,16 @@ const ProfileModal = (() => {
         saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:check"></iconify-icon> Save Changes`;
       }
     }
+  }
+
+  function syncAvatars(avatarUrl, fullName) {
+    const userNameEl = document.getElementById('user-name');
+    const userAvatarEl = document.getElementById('user-avatar');
+    const mobileAvatarEl = document.getElementById('mobile-user-avatar');
+
+    if (userNameEl && fullName) userNameEl.textContent = fullName;
+    if (userAvatarEl) renderAvatarElement(userAvatarEl, avatarUrl, fullName);
+    if (mobileAvatarEl) renderAvatarElement(mobileAvatarEl, avatarUrl, fullName);
   }
 
   async function savePassword() {
@@ -311,12 +411,12 @@ const ProfileModal = (() => {
     el.classList.remove('hidden');
   }
 
-  return { init, open, close, populateFields };
+  return { init, open, close, populateFields, renderAvatarElement, syncAvatars };
 })();
 
 window.ProfileModal = ProfileModal;
 
-// Auto-initialize
+// Auto-initialize on load
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => ProfileModal.init());
 } else {

@@ -1141,17 +1141,49 @@
   <!-- PROFILE & ACCOUNT SETTINGS MODAL -->
   <div class="profile-modal-overlay hidden" id="profile-modal-overlay"></div>
   <div class="profile-modal hidden" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    
+    <!-- Modal Header with Interactive Avatar Lockup -->
     <div class="profile-modal-header">
-      <div class="profile-modal-title-lockup">
-        <div class="profile-modal-avatar-lg" id="profile-modal-avatar">?</div>
-        <div>
-          <h3 id="profile-modal-title">Account Profile</h3>
+      <div class="profile-modal-hero">
+        <div class="avatar-hero-wrap" id="avatar-hero-wrap" role="button" tabindex="0" title="Click to choose a profile avatar">
+          <div class="profile-modal-avatar-lg" id="profile-modal-avatar">?</div>
+          <div class="avatar-edit-badge" title="Change Avatar">
+            <iconify-icon icon="icon-park-outline:camera"></iconify-icon>
+          </div>
+        </div>
+        <div class="profile-modal-identity">
+          <div class="profile-modal-title-row">
+            <h3 id="profile-modal-title">Account Profile</h3>
+            <span class="role-badge" id="profile-role-display">Student</span>
+          </div>
           <span class="profile-modal-sub" id="profile-modal-email">user@g.cjc.edu.ph</span>
         </div>
       </div>
-      <button type="button" class="btn-icon" id="profile-modal-close" aria-label="Close Profile Modal">
+      <button type="button" class="btn-icon profile-close-btn" id="profile-modal-close" aria-label="Close Profile Modal">
         <iconify-icon icon="icon-park-outline:close"></iconify-icon>
       </button>
+    </div>
+
+    <!-- Interactive Avatar Photo Picker Section -->
+    <div class="avatar-picker-section" id="avatar-picker-section">
+      <div class="avatar-picker-header">
+        <div class="avatar-picker-title">
+          <iconify-icon icon="icon-park-outline:pic"></iconify-icon>
+          <span>Choose Your Avatar</span>
+        </div>
+        <!-- Category Filter Tabs -->
+        <div class="avatar-cat-tabs" id="avatar-cat-tabs">
+          <button type="button" class="avatar-cat-btn active" data-cat="all">All</button>
+          <button type="button" class="avatar-cat-btn" data-cat="grizz">Grizz 🐻</button>
+          <button type="button" class="avatar-cat-btn" data-cat="icebear">Ice Bear ❄️</button>
+          <button type="button" class="avatar-cat-btn" data-cat="panda">Panda 🐼</button>
+          <button type="button" class="avatar-cat-btn" data-cat="others">Friends ⭐</button>
+        </div>
+      </div>
+      <!-- Avatar Grid / Swipe Track -->
+      <div class="avatar-gallery-track" id="avatar-gallery-track">
+        <!-- Dynamically populated avatar cards -->
+      </div>
     </div>
 
     <div class="profile-modal-tabs">
@@ -1171,22 +1203,26 @@
           <div class="form-row-2">
             <div class="form-group">
               <label for="profile-course-select">Degree Program</label>
-              <select id="profile-course-select" class="select-field">
-                <option value="BSCoE">BS Computer Engineering</option>
-                <option value="BSCE">BS Civil Engineering</option>
-                <option value="BSEE">BS Electrical Engineering</option>
-                <option value="BSEcE">BS Electronics Engineering</option>
-                <option value="BSME">BS Mechanical Engineering</option>
-              </select>
+              <div class="custom-select-wrap">
+                <select id="profile-course-select" class="select-field">
+                  <option value="BSCoE">BS Computer Engineering</option>
+                  <option value="BSCE">BS Civil Engineering</option>
+                  <option value="BSEE">BS Electrical Engineering</option>
+                  <option value="BSEcE">BS Electronics Engineering</option>
+                  <option value="BSME">BS Mechanical Engineering</option>
+                </select>
+              </div>
             </div>
             <div class="form-group">
               <label for="profile-year-select">Year Level</label>
-              <select id="profile-year-select" class="select-field">
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
+              <div class="custom-select-wrap">
+                <select id="profile-year-select" class="select-field">
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                </select>
+              </div>
             </div>
           </div>
 
@@ -1196,10 +1232,10 @@
               <input type="number" id="profile-enrollment-year" class="input-field" min="2015" max="2035" placeholder="e.g. 2024" />
             </div>
             <div class="form-group">
-              <label>Account Role</label>
-              <div class="profile-role-badge-wrap">
-                <span class="role-badge" id="profile-role-display">Student</span>
-              </div>
+              <label>Avatar Options</label>
+              <button type="button" class="btn btn-ghost reset-avatar-btn" id="profile-reset-avatar-btn">
+                <iconify-icon icon="icon-park-outline:refresh"></iconify-icon> Use Letter Initial
+              </button>
             </div>
           </div>
 
@@ -1221,7 +1257,7 @@
             <iconify-icon icon="icon-park-outline:shield" class="security-shield-icon"></iconify-icon>
             <div>
               <strong>Account Authentication</strong>
-              <p>Signed in via verified school account (<span id="profile-security-email">user@g.cjc.edu.ph</span>)</p>
+              <p>Signed in via verified school account (<span id="profile-security-email" class="font-mono">user@g.cjc.edu.ph</span>)</p>
             </div>
           </div>
 
