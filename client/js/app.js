@@ -573,14 +573,6 @@
       ? saved : 'dashboard';
     navigateTo(target);
 
-    // Low-priority background pre-fetch of all sections to enable instantaneous tab switching
-    const prefetchDelay = Math.max(hideDelay + 100, 200);
-    setTimeout(() => {
-      if (typeof Api.prefetchAll === 'function') {
-        Api.prefetchAll(profile?.role, profile?.course);
-      }
-    }, prefetchDelay);
-
     // Ensure splash stays visible for at least 1.2s to show off the animation smoothly
     const elapsed = Date.now() - splashStart;
     const minSplashDuration = 1200; 
@@ -594,6 +586,18 @@
         setTimeout(() => splash.classList.add('hidden'), 500);
       }
     }, hideDelay);
+
+    // Schedule background pre-fetching AFTER the splash is completely hidden
+    // so the initial active view loads at full speed without network competition
+    setTimeout(() => {
+      if (typeof Api.prefetchAll === 'function') {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(() => Api.prefetchAll(profile?.role, profile?.course));
+        } else {
+          Api.prefetchAll(profile?.role, profile?.course);
+        }
+      }
+    }, hideDelay + 600);
   }
 
 })();

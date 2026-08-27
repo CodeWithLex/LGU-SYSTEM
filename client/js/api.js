@@ -174,7 +174,7 @@ const Api = (() => {
     drop:       (id)      => _request('DELETE', `/units/drop/${id}`),
   };
 
-  // ---- Background Pre-fetch Queue ----
+  // ---- Background Pre-fetch Queue (Paced & Idle-friendly) ----
   async function prefetchAll(role = 'student', program = 'BSCoE') {
     try {
       // Step 1: Core data (Events, Transactions, Dashboard summary)
@@ -183,6 +183,9 @@ const Api = (() => {
         transactions.list({ limit: 200 }),
         reports.summary(),
       ]);
+
+      // Small breather for the browser main thread
+      await new Promise(r => setTimeout(r, 120));
 
       // Step 2: Reports trends and student tracker data
       const step2 = [
@@ -195,6 +198,7 @@ const Api = (() => {
 
       // Step 3: Admin tools (only when user role is admin)
       if (role === 'admin') {
+        await new Promise(r => setTimeout(r, 120));
         await Promise.allSettled([
           admin.users(),
           admin.auditLogs({ limit: 100 }),
