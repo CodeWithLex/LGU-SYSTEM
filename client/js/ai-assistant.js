@@ -26,7 +26,12 @@ const GrizzAI = (() => {
       bindEvents();
       isInitialized = true;
     }
+    loadData();
     renderDashboardWidget();
+  }
+
+  function setProfile(p) {
+    if (p) profile = p;
   }
 
   function bindEvents() {
@@ -363,13 +368,25 @@ const GrizzAI = (() => {
     const stream = document.getElementById('ursa-chat-stream');
     if (!stream) return;
 
-    // Use current profile avatar or fallback to initial
-    const avatarUrl = profile?.avatar_url || null;
-    const initial = (profile?.full_name || 'U')[0].toUpperCase();
+    // Resolve avatar URL from profile, DOM sidebar/mobile avatar, or memory
+    let avatarUrl = profile?.avatar_url || null;
+    if (!avatarUrl) {
+      const sidebarImg = document.querySelector('#user-avatar img, #mobile-user-avatar img');
+      if (sidebarImg && sidebarImg.getAttribute('src')) {
+        avatarUrl = sidebarImg.getAttribute('src');
+      }
+    }
+
+    if (avatarUrl) {
+      avatarUrl = avatarUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+    }
+
+    const userName = profile?.full_name || document.getElementById('user-name')?.textContent || 'User';
+    const initial = (userName.trim() || 'U')[0].toUpperCase();
 
     const avatarHtml = avatarUrl
-      ? `<img src="${avatarUrl}" alt="You" />`
-      : `<span style="font-size:0.75rem;font-weight:700;color:var(--primary);">${initial}</span>`;
+      ? `<img src="${avatarUrl}" alt="You" class="avatar-img" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'user-initial-fallback\\'>${initial}</span>';" />`
+      : `<span class="user-initial-fallback">${initial}</span>`;
 
     const msg = document.createElement('div');
     msg.className = 'ursa-msg user';
@@ -942,6 +959,8 @@ const GrizzAI = (() => {
     close,
     handleAction,
     renderDashboardWidget,
+    setProfile,
+    loadData,
   };
 })();
 

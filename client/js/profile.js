@@ -348,13 +348,18 @@ const ProfileModal = (() => {
   }
 
   function syncAvatars(avatarUrl, fullName) {
+    const cleanUrl = avatarUrl ? avatarUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp') : null;
     const userNameEl = document.getElementById('user-name');
     const userAvatarEl = document.getElementById('user-avatar');
     const mobileAvatarEl = document.getElementById('mobile-user-avatar');
 
     if (userNameEl && fullName) userNameEl.textContent = fullName;
-    if (userAvatarEl) renderAvatarElement(userAvatarEl, avatarUrl, fullName);
-    if (mobileAvatarEl) renderAvatarElement(mobileAvatarEl, avatarUrl, fullName);
+    if (userAvatarEl) renderAvatarElement(userAvatarEl, cleanUrl, fullName);
+    if (mobileAvatarEl) renderAvatarElement(mobileAvatarEl, cleanUrl, fullName);
+
+    if (window.GrizzAI && window.GrizzAI.setProfile) {
+      window.GrizzAI.setProfile({ avatar_url: cleanUrl, full_name: fullName });
+    }
   }
 
   async function savePassword() {
