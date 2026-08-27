@@ -256,7 +256,7 @@ const GrizzAI = (() => {
           </div>
           <div class="grizz-identity-text">
             <span class="grizz-name">Grizz</span>
-            <span class="grizz-role">· AI Advisor</span>
+            <span class="grizz-role">· Your system navigator</span>
           </div>
         </div>
 
