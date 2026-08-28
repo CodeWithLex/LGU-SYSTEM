@@ -1559,17 +1559,16 @@ html body .hidden {
 }
 
 .stat-icon {
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   line-height: 1;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--bg-surface-raised);
-  border: 1px solid var(--border-default);
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
   flex-shrink: 0;
 }
 .stat-icon iconify-icon {

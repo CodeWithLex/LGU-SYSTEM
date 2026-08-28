@@ -134,7 +134,7 @@ const Events = (() => {
             </div>
           </div>
           <div class="stat-card stat-income">
-            <div class="stat-icon"><iconify-icon icon="solar:vault-linear"></iconify-icon></div>
+            <div class="stat-icon"><iconify-icon icon="solar:safe-2-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Remaining</p>
               <h3 class="stat-value">${UI.currency(ev.computed_remaining)}</h3>
