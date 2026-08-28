@@ -117,7 +117,7 @@ function buildReportsHTML(summary, monthly, events) {
         <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value">${fmt(summary.totalExpense)}</h3></div>
       </div>
       <div class="stat-card stat-balance">
-        <div class="stat-icon"><iconify-icon icon="solar:safe-2-linear"></iconify-icon></div>
+        <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
         <div class="stat-body"><p class="stat-label">Net Balance</p><h3 class="stat-value">${fmt(summary.remainingBalance)}</h3></div>
       </div>
       <div class="stat-card stat-donations">
