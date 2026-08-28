@@ -564,6 +564,7 @@
     const displayName = profile?.full_name || session.user.email;
     document.getElementById('user-name').textContent   = displayName;
     document.getElementById('user-role').textContent   = profile?.role === 'admin' ? 'Admin' : 'Student';
+    UI.setAdminVisibility(profile?.role === 'admin');
     
     if (window.ProfileModal) {
       ProfileModal.init();
