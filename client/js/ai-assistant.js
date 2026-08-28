@@ -31,7 +31,10 @@ const GrizzAI = (() => {
   }
 
   function setProfile(p) {
-    if (p) profile = p;
+    if (p) {
+      profile = p;
+      updateInitialGreeting();
+    }
   }
 
   function bindEvents() {
@@ -237,6 +240,7 @@ const GrizzAI = (() => {
       subjects = checklistRes.subjects || [];
       requirements = checklistRes.requirements || [];
       myUnits = unitsRes || [];
+      updateInitialGreeting();
     } catch (err) {
       console.warn('Grizz data preload notice:', err);
     }
@@ -447,12 +451,93 @@ const GrizzAI = (() => {
     }
   }
 
-  function resetChat() {
+  function getDynamicGreeting(name) {
+    const hour = new Date().getHours();
+    const displayName = (name && name !== 'Student' && name !== 'Engineer') ? name : 'engineer';
+
+    // Morning: 5:00 AM - 11:59 AM
+    const morningGreetings = [
+      `Good morning, ${displayName}`,
+      `Rise and shine, ${displayName}!`,
+      `Morning, ${displayName}! Ready to debug today's challenges?`,
+      `Good morning, ${displayName}! Let's build something great today.`,
+      `Morning, ${displayName}. Coffee is brewing, and the advisor is online.`,
+      `Good morning! Hope your coffee is strong and your code compiles on the first try, ${displayName}.`,
+      `Rise and shine, engineer ${displayName}. Let's make today count!`
+    ];
+
+    // Afternoon: 12:00 PM - 5:59 PM
+    const afternoonGreetings = [
+      `Good afternoon, ${displayName}`,
+      `Hope your afternoon is going well, ${displayName}.`,
+      `Good afternoon, engineer ${displayName}! The system is fully operational.`,
+      `Afternoon, ${displayName}! Let's optimize your study load.`,
+      `Good afternoon, ${displayName}. Staying hydrated? Don't forget to take short breaks.`,
+      `Hello, ${displayName}. Ready for some afternoon curriculum planning?`
+    ];
+
+    // Evening: 6:00 PM - 9:59 PM
+    const eveningGreetings = [
+      `Good evening, ${displayName}`,
+      `Evening, ${displayName}! Let's wrap up today's calculations.`,
+      `Good evening, engineer ${displayName}. How did the classes go?`,
+      `Hope you're having a relaxing evening, ${displayName}.`,
+      `Good evening, ${displayName}. Let's plan ahead for the next semester.`,
+      `Evening, ${displayName}. What's on your mind tonight?`
+    ];
+
+    // Late Night / Too Late: 10:00 PM - 4:59 AM
+    const lateGreetings = [
+      `It's late already, engineer, you need to rest`,
+      `It's late already, ${displayName}, you need to rest`,
+      `It's late already, ${displayName}. Time to commit your work and get some sleep.`,
+      `Working late, engineer ${displayName}? You need to rest.`,
+      `It's late already, engineer. Those bugs can wait until tomorrow—go rest!`,
+      `Still online, ${displayName}? The system recommends getting some sleep.`,
+      `Late night session, ${displayName}? Don't forget to recharge your own batteries.`
+    ];
+
+    let list;
+    if (hour >= 5 && hour < 12) {
+      list = morningGreetings;
+    } else if (hour >= 12 && hour < 18) {
+      list = afternoonGreetings;
+    } else if (hour >= 18 && hour < 22) {
+      list = eveningGreetings;
+    } else {
+      list = lateGreetings;
+    }
+
+    const randomIndex = Math.floor(Math.random() * list.length);
+    return list[randomIndex];
+  }
+
+  function getMotivationalQuote() {
+    const quotes = [
+      "Every bug you solve makes you a stronger developer. Keep building!",
+      "Engineering is 10% design and 90% perseverance. You've got this!",
+      "Great engineers aren't born; they are compiled through focus and patience.",
+      "Every complex system is just simple parts built with care. Take it step-by-step!",
+      "Keep pushing! Rome wasn't built in a day, and neither is a great engineer's career.",
+      "Don't worry if it doesn't work right away. If it did, engineering wouldn't be this fun!",
+      "Your code might fail, but your spirit shouldn't. Keep experimenting!",
+      "Success is just a function of time, effort, and perseverance. Keep up the amazing work!",
+      "Every line of code you write is a step closer to mastering your craft. Keep coding!",
+      "Stay curious, stay persistent, and remember to smile — you're doing great!"
+    ];
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    return quotes[randomIndex];
+  }
+
+  function renderWelcomeMessage() {
     const stream = document.getElementById('ursa-chat-stream');
     if (!stream) return;
 
-    const studentName = profile?.full_name ? profile.full_name.split(' ')[0] : 'Student';
+    const studentName = profile?.full_name ? profile.full_name.split(' ')[0] : 'Engineer';
     const progName = PROGRAM_NAMES[profile?.course] || profile?.course || 'Engineering';
+
+    const greeting = getDynamicGreeting(studentName);
+    const motivationalQuote = getMotivationalQuote();
 
     stream.innerHTML = `
       <div class="ursa-msg bot">
@@ -461,13 +546,30 @@ const GrizzAI = (() => {
         </div>
         <div class="ursa-msg-content">
           <div class="ursa-bubble">
-            <h4>Hello, ${esc(studentName)}</h4>
+            <h4>${esc(greeting)}</h4>
             <p>I am <strong>Grizz</strong>, your official College of Engineering advisor for <strong>${esc(progName)}</strong>. Select any inquiry below to explore your subjects or council funds.</p>
-            <p style="color:var(--text-secondary);font-size:0.75rem;">Zero typing required — simply click what you need.</p>
+            <p style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:0.5rem;">Zero typing required — simply click what you need.</p>
+            <div class="ursa-motivational-box" style="border-top:1px dashed var(--border);margin-top:0.75rem;padding-top:0.65rem;font-size:0.78rem;color:var(--primary);font-style:italic;line-height:1.4;display:flex;align-items:flex-start;gap:0.35rem;">
+              <iconify-icon icon="solar:lightbulb-bolt-linear" style="font-size:0.95rem;flex-shrink:0;margin-top:1px;"></iconify-icon>
+              <span>Grizz says: "${esc(motivationalQuote)}"</span>
+            </div>
           </div>
         </div>
       </div>
     `;
+  }
+
+  function updateInitialGreeting() {
+    const stream = document.getElementById('ursa-chat-stream');
+    if (!stream) return;
+
+    if (stream.children.length <= 1) {
+      renderWelcomeMessage();
+    }
+  }
+
+  function resetChat() {
+    renderWelcomeMessage();
     scrollToBottom();
   }
 
