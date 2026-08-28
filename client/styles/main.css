@@ -997,11 +997,13 @@ html body .hidden {
   box-shadow: none;
 }
 
+.btn-secondary,
 .btn-ghost {
   background: var(--surface-secondary);
   color: var(--text-primary);
   border: 1px solid var(--border);
 }
+.btn-secondary:hover,
 .btn-ghost:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
@@ -3607,15 +3609,24 @@ html body.is-admin th.admin-only {
   width: 32px;
   height: 32px;
   color: var(--text-tertiary);
-  border-radius: var(--radius-sm);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition);
+}
+
+.profile-close-btn iconify-icon {
+  font-size: 1.35rem;
 }
 
 .profile-close-btn:hover {
   color: var(--text-primary);
-  background: var(--bg-surface-raised);
+  background: var(--surface-hover);
 }
 
 /* =============================================
