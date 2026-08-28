@@ -352,7 +352,7 @@ const Admin = (() => {
 
       if (fromId === 'GENERAL') {
         const newBal = _genFundBalance - amount;
-        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <iconify-icon icon="icon-park-outline:arrow-right" style="font-size:12px" ></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        fromBalEl.innerHTML = `${UI.currency(_genFundBalance)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
           errEl.textContent = "Insufficient funds in General Fund!";
           errEl.classList.remove('hidden');
@@ -363,7 +363,7 @@ const Admin = (() => {
         }
       } else if (fromId && fromEv) {
         const newBal = fromEv.remaining_budget - amount;
-        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <iconify-icon icon="icon-park-outline:arrow-right" style="font-size:12px" ></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
+        fromBalEl.innerHTML = `${UI.currency(fromEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:${newBal < 0 ? '#ef4444' : 'inherit'}">${UI.currency(newBal)}</span>`;
         if (newBal < 0) {
           errEl.textContent = "Source event has insufficient funds!";
           errEl.classList.remove('hidden');
@@ -378,7 +378,7 @@ const Admin = (() => {
 
       if (toEv) {
         const newBal = toEv.remaining_budget + amount;
-        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <iconify-icon icon="icon-park-outline:arrow-right" style="font-size:12px" ></iconify-icon> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
+        toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
       } else {
         toBalEl.textContent = '—';
       }
@@ -434,8 +434,8 @@ const Admin = (() => {
       _allUsers = await Api.admin.users();
       renderUsersTable(document.getElementById('users-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="icon-park-outline:caution"></iconify-icon> ${err.message}</div>`;
-}
+      document.getElementById('users-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> ${err.message}</div>`;
+    }
   }
 
   function renderUsersTable(searchTerm = '') {
@@ -511,8 +511,8 @@ const Admin = (() => {
       _allLogs = await Api.admin.auditLogs({ limit: 100 });
       renderAuditTable(document.getElementById('audit-search').value.toLowerCase());
     } catch (err) {
-      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="icon-park-outline:caution"></iconify-icon> ${err.message}</div>`;
-}
+      document.getElementById('audit-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> ${err.message}</div>`;
+    }
   }
 
   function renderAuditTable(searchTerm = '') {
@@ -535,21 +535,21 @@ const Admin = (() => {
 
     const actionLabel = a => {
       const icons = {
-        CREATE_TRANSACTION: { icon: 'add-one', color: '#22C55E', label: 'Created Transaction' },
-        EDIT_TRANSACTION:   { icon: 'write', color: '#F97316', label: 'Edited Transaction' },
-        DELETE_TRANSACTION: { icon: 'delete', color: '#ef4444', label: 'Deleted Transaction' },
-        CREATE_EVENT:       { icon: 'calendar', color: '#22C55E', label: 'Created Event' },
-        UPDATE_EVENT:       { icon: 'calendar', color: '#F97316', label: 'Updated Event' },
-        ARCHIVE_EVENT:      { icon: 'box', color: '#8b5cf6', label: 'Archived Event' },
-        POST_ANNOUNCEMENT:  { icon: 'volume-notice', color: '#f59e0b', label: 'Posted Announcement' },
-        SET_USER_ROLE:      { icon: 'shield', color: '#6366f1', label: 'Changed User Role' },
-        BUDGET_TRANSFER:    { icon: 'bank-transfer', color: '#14b8a6', label: 'Budget Transfer' },
-        OVER_BUDGET_ALERT:  { icon: 'caution', color: '#F59E0B', label: 'Over Budget Alert' },
+        CREATE_TRANSACTION: { icon: 'solar:add-circle-linear', color: '#22C55E', label: 'Created Transaction' },
+        EDIT_TRANSACTION:   { icon: 'solar:pen-linear', color: '#F97316', label: 'Edited Transaction' },
+        DELETE_TRANSACTION: { icon: 'solar:trash-bin-trash-linear', color: '#ef4444', label: 'Deleted Transaction' },
+        CREATE_EVENT:       { icon: 'solar:calendar-add-linear', color: '#22C55E', label: 'Created Event' },
+        UPDATE_EVENT:       { icon: 'solar:calendar-date-linear', color: '#F97316', label: 'Updated Event' },
+        ARCHIVE_EVENT:      { icon: 'solar:box-minimalistic-linear', color: '#8b5cf6', label: 'Archived Event' },
+        POST_ANNOUNCEMENT:  { icon: 'solar:bell-linear', color: '#f59e0b', label: 'Posted Announcement' },
+        SET_USER_ROLE:      { icon: 'solar:shield-check-linear', color: '#6366f1', label: 'Changed User Role' },
+        BUDGET_TRANSFER:    { icon: 'solar:card-transfer-linear', color: '#14b8a6', label: 'Budget Transfer' },
+        OVER_BUDGET_ALERT:  { icon: 'solar:danger-triangle-linear', color: '#F59E0B', label: 'Over Budget Alert' },
       };
-      const item = icons[a] || { icon: 'info', color: 'var(--text-secondary)', label: a };
+      const item = icons[a] || { icon: 'solar:info-circle-linear', color: 'var(--text-secondary)', label: a };
       return `
         <div style="display:flex;align-items:center;gap:0.5rem;">
-          <iconify-icon icon="icon-park-outline:${item.icon}" style="font-size:14px;color:${item.color}"></iconify-icon>
+          <iconify-icon icon="${item.icon}" style="font-size:14px;color:${item.color}"></iconify-icon>
           <span style="font-size:.82rem">${item.label}</span>
         </div>`;
     };

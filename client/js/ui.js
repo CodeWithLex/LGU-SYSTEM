@@ -61,14 +61,14 @@ const UI = (() => {
     const msgEl    = document.getElementById('toast-message');
 
     const icons = { 
-      success: 'check-one', 
-      error: 'close-one', 
-      info: 'info', 
-      warning: 'caution' 
+      success: 'solar:check-circle-linear', 
+      error: 'solar:close-circle-linear', 
+      info: 'solar:info-circle-linear', 
+      warning: 'solar:danger-triangle-linear' 
     };
     
-    const iconName = icons[type] || 'check-circle';
-    iconEl.innerHTML = `<iconify-icon icon="icon-park-outline:${iconName}" style="font-size:18px;"></iconify-icon>`;
+    const iconName = icons[type] || 'solar:check-circle-linear';
+    iconEl.innerHTML = `<iconify-icon icon="${iconName}" style="font-size:18px;"></iconify-icon>`;
     msgEl.textContent = message;
     
     toastEl.classList.remove('hidden');
@@ -132,12 +132,13 @@ const UI = (() => {
       </div>`;
   }
 
-  function setEmpty(containerId, icon = 'inbox', text = 'No data available.') {
+  function setEmpty(containerId, icon = 'solar:box-minimalistic-linear', text = 'No data available.') {
     const el = document.getElementById(containerId);
     if (el) {
+      const iconAttr = icon.includes(':') ? icon : `solar:${icon}-linear`;
       el.innerHTML = `
         <div class="empty-state">
-          <span class="empty-icon"><iconify-icon icon="icon-park-outline:${icon}"></iconify-icon></span>
+          <span class="empty-icon"><iconify-icon icon="${iconAttr}"></iconify-icon></span>
           <p>${text}</p>
         </div>`;
     }

@@ -84,7 +84,7 @@ async function initReports() {
     const isSessionErr = err.message.includes('session');
     container.innerHTML = `
       <div class="empty-state">
-        <iconify-icon icon="icon-park-outline:caution" style="font-size:48px; color:var(--col-danger); margin-bottom:1rem" ></iconify-icon>
+        <iconify-icon icon="solar:danger-triangle-linear" style="font-size:48px; color:var(--col-danger); margin-bottom:1rem"></iconify-icon>
         <p style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">${isSessionErr ? 'Session Expired' : 'Failed to Load Reports'}</p>
         <p style="color:var(--col-text-muted);margin-bottom:1.5rem;max-width:300px;margin-left:auto;margin-right:auto;">
           ${err.message}
@@ -109,19 +109,19 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Summary Cards -->
     <div class="stats-grid" style="margin-bottom:2rem;">
       <div class="stat-card stat-income">
-        <div class="stat-icon"><iconify-icon icon="icon-park-outline:trend-two"></iconify-icon></div>
+        <div class="stat-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></div>
         <div class="stat-body"><p class="stat-label">Total Income</p><h3 class="stat-value">${fmt(summary.totalIncome)}</h3></div>
       </div>
       <div class="stat-card stat-expense">
-        <div class="stat-icon"><iconify-icon icon="icon-park-outline:trending-down"></iconify-icon></div>
+        <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
         <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value">${fmt(summary.totalExpense)}</h3></div>
       </div>
       <div class="stat-card stat-balance">
-        <div class="stat-icon"><iconify-icon icon="icon-park-outline:wallet-one"></iconify-icon></div>
+        <div class="stat-icon"><iconify-icon icon="solar:vault-linear"></iconify-icon></div>
         <div class="stat-body"><p class="stat-label">Net Balance</p><h3 class="stat-value">${fmt(summary.remainingBalance)}</h3></div>
       </div>
       <div class="stat-card stat-donations">
-        <div class="stat-icon"><iconify-icon icon="icon-park-outline:percentage"></iconify-icon></div>
+        <div class="stat-icon"><iconify-icon icon="solar:pie-chart-2-linear"></iconify-icon></div>
         <div class="stat-body"><p class="stat-label">Budget Utilized</p><h3 class="stat-value">${utilized}%</h3></div>
       </div>
     </div>
@@ -129,13 +129,13 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Charts Row -->
     <div class="dashboard-grid" style="margin-bottom:2rem;">
       <div class="dashboard-card">
-        <h3><iconify-icon icon="icon-park-outline:chart-histogram" style="font-size:1rem; margin-right:.4rem; vertical-align:middle" ></iconify-icon>Monthly Income vs Expenses</h3>
+        <h3><iconify-icon icon="solar:chart-linear" style="font-size:1.1rem; margin-right:.4rem; vertical-align:middle"></iconify-icon>Monthly Income vs Expenses</h3>
         <div style="position:relative;height:260px;">
           <canvas id="monthly-chart"></canvas>
         </div>
       </div>
       <div class="dashboard-card">
-        <h3><iconify-icon icon="icon-park-outline:chart-pie" style="font-size:1rem; margin-right:.4rem; vertical-align:middle" ></iconify-icon>Breakdown by Type</h3>
+        <h3><iconify-icon icon="solar:pie-chart-linear" style="font-size:1.1rem; margin-right:.4rem; vertical-align:middle"></iconify-icon>Breakdown by Type</h3>
         <div style="position:relative;height:260px;">
           <canvas id="breakdown-chart"></canvas>
         </div>
@@ -145,11 +145,11 @@ function buildReportsHTML(summary, monthly, events) {
     <!-- Event Reports Table -->
     <div class="dashboard-card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-        <h3 style="margin:0;"><iconify-icon icon="icon-park-outline:file-text" style="font-size:1rem; margin-right:.4rem; vertical-align:middle" ></iconify-icon>Export Per-Event Reports</h3>
+        <h3 style="margin:0;"><iconify-icon icon="solar:document-text-linear" style="font-size:1.1rem; margin-right:.4rem; vertical-align:middle"></iconify-icon>Export Per-Event Reports</h3>
         <span style="font-size:.8rem;color:var(--text-secondary);">Admin only</span>
       </div>
       ${events.length === 0
-        ? `<div class="empty-state"><iconify-icon icon="icon-park-outline:info"></iconify-icon> No events found.</div>`
+        ? `<div class="empty-state"><iconify-icon icon="solar:info-circle-linear"></iconify-icon> No events found.</div>`
         : `<div class="table-wrapper">
           <table class="data-table">
             <thead>
@@ -172,11 +172,11 @@ function buildReportsHTML(summary, monthly, events) {
                     <div style="display:inline-flex;gap:.5rem;">
                       <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-pdf="${ev.id}" data-name="${ev.event_name}">
-                        <iconify-icon icon="icon-park-outline:file-text" style="font-size:.85rem; margin-right:.3rem" ></iconify-icon>PDF
+                        <iconify-icon icon="solar:document-text-linear" style="font-size:.85rem; margin-right:.3rem"></iconify-icon>PDF
                       </button>
                       <button class="tx-action-btn admin-only" style="font-size:.8rem;padding:.35rem .8rem;"
                         data-excel="${ev.id}" data-name="${ev.event_name}">
-                        <iconify-icon icon="icon-park-outline:table" style="font-size:.85rem; margin-right:.3rem" ></iconify-icon>Excel
+                        <iconify-icon icon="solar:table-linear" style="font-size:.85rem; margin-right:.3rem"></iconify-icon>Excel
                       </button>
                     </div>
                   </td>
@@ -207,10 +207,10 @@ function buildReportsHTML(summary, monthly, events) {
 
               <div class="data-card-actions" style="margin-top:1rem;padding-top:0.5rem;gap:0.4rem;">
                 <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-pdf="${ev.id}" data-name="${ev.event_name}">
-                  <iconify-icon icon="icon-park-outline:file-text"></iconify-icon> PDF
+                  <iconify-icon icon="solar:document-text-linear"></iconify-icon> PDF
                 </button>
                 <button class="tx-action-btn admin-only" style="padding:0.4rem 0.75rem;font-size:0.8rem;" data-excel="${ev.id}" data-name="${ev.event_name}">
-                  <iconify-icon icon="icon-park-outline:table"></iconify-icon> Excel
+                  <iconify-icon icon="solar:table-linear"></iconify-icon> Excel
                 </button>
               </div>
             </div>

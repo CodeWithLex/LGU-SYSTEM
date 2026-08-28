@@ -115,26 +115,26 @@ const Events = (() => {
           ${UI.renderStatusBadge(ev.status)}
           <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
           <p style="color:var(--text-secondary)">${ev.description || ''}</p>
-          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="icon-park-outline:calendar" style="font-size:14px" ></iconify-icon> ${UI.dateStr(ev.event_date)}</p>` : ''}
+          ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:calendar-date-linear" style="font-size:15px"></iconify-icon> ${UI.dateStr(ev.event_date)}</p>` : ''}
         </div>
 
         <div class="stats-grid" style="margin-bottom:1.5rem">
           <div class="stat-card stat-balance">
-            <div class="stat-icon"><iconify-icon icon="icon-park-outline:wallet-one"></iconify-icon></div>
+            <div class="stat-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Allocated</p>
               <h3 class="stat-value">${UI.currency(ev.allocated_budget)}</h3>
             </div>
           </div>
           <div class="stat-card stat-expense">
-            <div class="stat-icon"><iconify-icon icon="icon-park-outline:trending-down"></iconify-icon></div>
+            <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Expenses</p>
               <h3 class="stat-value">${UI.currency(spent)}</h3>
             </div>
           </div>
           <div class="stat-card stat-income">
-            <div class="stat-icon"><iconify-icon icon="icon-park-outline:building-one"></iconify-icon></div>
+            <div class="stat-icon"><iconify-icon icon="solar:vault-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Remaining</p>
               <h3 class="stat-value">${UI.currency(ev.computed_remaining)}</h3>
@@ -160,9 +160,9 @@ const Events = (() => {
                     </div>
                     <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
                   </div>
-                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="icon-park-outline:paperclip" style="font-size:14px" ></iconify-icon> Receipt</a>` : ''}
+                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</a>` : ''}
                 </div>`).join('')
-              : '<div class="empty-state"><span class="empty-icon"><iconify-icon icon="icon-park-outline:bank-card"></iconify-icon></span><p>No transactions recorded yet.</p></div>'
+              : '<div class="empty-state"><span class="empty-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><p>No transactions recorded yet.</p></div>'
             }
           </div>
         </div>`;

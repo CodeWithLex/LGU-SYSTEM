@@ -216,7 +216,7 @@
     label.className = 'dd-label';
 
     const chevron = document.createElement('i');
-    chevron.innerHTML = '<iconify-icon icon="icon-park-outline:down"></iconify-icon>';
+    chevron.innerHTML = '<iconify-icon icon="solar:alt-arrow-down-linear"></iconify-icon>';
     chevron.className = 'dd-chevron';
 
     trigger.append(label, chevron);

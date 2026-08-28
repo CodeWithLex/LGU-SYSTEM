@@ -264,15 +264,15 @@ const GrizzAI = (() => {
 
         <div class="grizz-chips-track">
           <button type="button" class="grizz-prompt-pill" data-action="next-sem" data-title="Next Sem Subject Recommendations">
-            <iconify-icon icon="icon-park-outline:checklist" class="pill-icon"></iconify-icon>
+            <iconify-icon icon="solar:diploma-verified-linear" class="pill-icon"></iconify-icon>
             <span>Next Sem Recommendations</span>
           </button>
           <button type="button" class="grizz-prompt-pill" data-action="current-subjects" data-title="Ask About Current Subjects">
-            <iconify-icon icon="icon-park-outline:book-open" class="pill-icon"></iconify-icon>
+            <iconify-icon icon="solar:book-bookmark-linear" class="pill-icon"></iconify-icon>
             <span>Current Subjects</span>
           </button>
           <button type="button" class="grizz-prompt-pill" data-action="financial-summary" data-title="Explain Financial Summary">
-            <iconify-icon icon="icon-park-outline:chart-pie" class="pill-icon"></iconify-icon>
+            <iconify-icon icon="solar:pie-chart-2-linear" class="pill-icon"></iconify-icon>
             <span>Explain Funds</span>
           </button>
         </div>
@@ -286,25 +286,25 @@ const GrizzAI = (() => {
       {
         action: 'next-sem',
         title: 'Next Sem Recommendations',
-        icon: 'icon-park-outline:checklist',
+        icon: 'solar:diploma-verified-linear',
         text: 'View eligible subjects based on passed prerequisites',
       },
       {
         action: 'current-subjects',
         title: 'Current Subjects Overview',
-        icon: 'icon-park-outline:book-open',
+        icon: 'solar:book-bookmark-linear',
         text: 'Review enrolled subjects and term load',
       },
       {
         action: 'academic-progress',
         title: 'Academic Progress Tally',
-        icon: 'icon-park-outline:degree-hat',
+        icon: 'solar:chart-square-linear',
         text: 'Check completed units toward graduation',
       },
       {
         action: 'check-prereq',
         title: 'Prerequisites Check',
-        icon: 'icon-park-outline:mind-mapping',
+        icon: 'solar:branching-paths-down-linear',
         text: 'Verify subject standing and course chains',
       },
     ],
@@ -312,19 +312,19 @@ const GrizzAI = (() => {
       {
         action: 'financial-summary',
         title: 'Financial Summary',
-        icon: 'icon-park-outline:chart-pie',
+        icon: 'solar:pie-chart-2-linear',
         text: 'Overview of council funds, expenses & balance',
       },
       {
         action: 'upcoming-events',
         title: 'Events & Budgets',
-        icon: 'icon-park-outline:calendar',
+        icon: 'solar:calendar-date-linear',
         text: 'Upcoming student activities and allocations',
       },
       {
         action: 'recent-spending',
         title: 'Recent Expenses',
-        icon: 'icon-park-outline:bill',
+        icon: 'solar:card-transfer-linear',
         text: 'Latest recorded expenditures from the ledger',
       },
     ],
@@ -332,13 +332,13 @@ const GrizzAI = (() => {
       {
         action: 'guide-logging',
         title: 'How to Log Subjects',
-        icon: 'icon-park-outline:help',
+        icon: 'solar:question-circle-linear',
         text: 'Instructions for recording grades & units',
       },
       {
         action: 'guide-transparency',
         title: 'Transparency Policy',
-        icon: 'icon-park-outline:shield',
+        icon: 'solar:shield-check-linear',
         text: 'How student council finances are audited',
       },
     ],
@@ -358,7 +358,7 @@ const GrizzAI = (() => {
             <span class="ursa-prompt-desc">${item.text}</span>
           </div>
         </div>
-        <div class="ursa-prompt-arrow"><iconify-icon icon="icon-park-outline:right"></iconify-icon></div>
+        <div class="ursa-prompt-arrow"><iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon></div>
       </div>
     `).join('');
   }
@@ -594,7 +594,7 @@ const GrizzAI = (() => {
         'Curriculum Recommendations',
         `<p>You have completed or are currently enrolled in all available prerequisite-cleared courses for <strong>${esc(progTitle)}</strong>.</p>`,
         [
-          { action: 'academic-progress', label: 'View Academic Progress', icon: 'icon-park-outline:degree-hat' },
+          { action: 'academic-progress', label: 'View Academic Progress', icon: 'solar:diploma-verified-linear' },
         ]
       );
       return;
@@ -635,8 +635,8 @@ const GrizzAI = (() => {
     `;
 
     appendBotMessage('Recommended Subject Load', html, [
-      { action: 'academic-progress', label: 'Academic Progress Tally', icon: 'icon-park-outline:degree-hat' },
-      { action: 'check-prereq', label: 'Check Prerequisites', icon: 'icon-park-outline:mind-mapping' },
+      { action: 'academic-progress', label: 'Academic Progress Tally', icon: 'solar:diploma-verified-linear' },
+      { action: 'check-prereq', label: 'Check Prerequisites', icon: 'solar:branching-paths-down-linear' },
     ]);
   }
 
@@ -652,8 +652,8 @@ const GrizzAI = (() => {
           <p>Go to the <a href="#" class="ursa-nav-link" data-view="units" style="color:var(--primary);font-weight:600;">Academic Progress tab</a> to log your enrolled courses.</p>
         `,
         [
-          { action: 'next-sem', label: 'View Recommendations', icon: 'icon-park-outline:checklist' },
-          { action: 'guide-logging', label: 'How to Log Subjects', icon: 'icon-park-outline:help' },
+          { action: 'next-sem', label: 'View Recommendations', icon: 'solar:diploma-verified-linear' },
+          { action: 'guide-logging', label: 'How to Log Subjects', icon: 'solar:question-circle-linear' },
         ]
       );
       return;
@@ -694,8 +694,8 @@ const GrizzAI = (() => {
     `;
 
     appendBotMessage('Current Enrolled Subjects', html, [
-      { action: 'next-sem', label: 'Next Sem Recommendations', icon: 'icon-park-outline:checklist' },
-      { action: 'academic-progress', label: 'Degree Progress Tally', icon: 'icon-park-outline:degree-hat' },
+      { action: 'next-sem', label: 'Next Sem Recommendations', icon: 'solar:diploma-verified-linear' },
+      { action: 'academic-progress', label: 'Degree Progress Tally', icon: 'solar:diploma-verified-linear' },
     ]);
   }
 
@@ -741,8 +741,8 @@ const GrizzAI = (() => {
     `;
 
     appendBotMessage('Academic Progress Summary', html, [
-      { action: 'next-sem', label: 'Recommended Load', icon: 'icon-park-outline:checklist' },
-      { action: 'current-subjects', label: 'Enrolled Subjects', icon: 'icon-park-outline:book-open' },
+      { action: 'next-sem', label: 'Recommended Load', icon: 'solar:diploma-verified-linear' },
+      { action: 'current-subjects', label: 'Enrolled Subjects', icon: 'solar:book-bookmark-linear' },
     ]);
   }
 
@@ -779,8 +779,8 @@ const GrizzAI = (() => {
     `;
 
     appendBotMessage('Curriculum Prerequisites', html, [
-      { action: 'next-sem', label: 'Get Recommendations', icon: 'icon-park-outline:checklist' },
-      { action: 'academic-progress', label: 'View Passed Units', icon: 'icon-park-outline:degree-hat' },
+      { action: 'next-sem', label: 'Get Recommendations', icon: 'solar:diploma-verified-linear' },
+      { action: 'academic-progress', label: 'View Passed Units', icon: 'solar:diploma-verified-linear' },
     ]);
   }
 
@@ -823,8 +823,8 @@ const GrizzAI = (() => {
       `;
 
       appendBotMessage('COE Financial Summary', html, [
-        { action: 'upcoming-events', label: 'Event Budgets', icon: 'icon-park-outline:calendar' },
-        { action: 'recent-spending', label: 'Recent Expenses', icon: 'icon-park-outline:bill' },
+        { action: 'upcoming-events', label: 'Event Budgets', icon: 'solar:calendar-date-linear' },
+        { action: 'recent-spending', label: 'Recent Expenses', icon: 'solar:card-transfer-linear' },
       ]);
     } catch (err) {
       appendBotMessage('Financial Overview', `<p>Could not fetch financial records at this time.</p>`);
@@ -862,8 +862,8 @@ const GrizzAI = (() => {
       `;
 
       appendBotMessage('Events & Budgets', html, [
-        { action: 'financial-summary', label: 'Financial Summary', icon: 'icon-park-outline:chart-pie' },
-        { action: 'recent-spending', label: 'Recent Spending', icon: 'icon-park-outline:bill' },
+        { action: 'financial-summary', label: 'Financial Summary', icon: 'solar:pie-chart-2-linear' },
+        { action: 'recent-spending', label: 'Recent Spending', icon: 'solar:card-transfer-linear' },
       ]);
     } catch (err) {
       appendBotMessage('Upcoming Events', `<p>Could not load events list.</p>`);
@@ -903,8 +903,8 @@ const GrizzAI = (() => {
       `;
 
       appendBotMessage('Recent Expenditures', html, [
-        { action: 'financial-summary', label: 'Financial Overview', icon: 'icon-park-outline:chart-pie' },
-        { action: 'upcoming-events', label: 'Upcoming Events', icon: 'icon-park-outline:calendar' },
+        { action: 'financial-summary', label: 'Financial Overview', icon: 'solar:pie-chart-2-linear' },
+        { action: 'upcoming-events', label: 'Upcoming Events', icon: 'solar:calendar-date-linear' },
       ]);
     } catch (err) {
       appendBotMessage('Recent Spending', `<p>Could not load recent transactions.</p>`);
@@ -926,8 +926,8 @@ const GrizzAI = (() => {
     `;
 
     appendBotMessage('Subject Logging Guide', html, [
-      { action: 'next-sem', label: 'View Recommendations', icon: 'icon-park-outline:checklist' },
-      { action: 'academic-progress', label: 'Academic Progress', icon: 'icon-park-outline:degree-hat' },
+      { action: 'next-sem', label: 'View Recommendations', icon: 'solar:diploma-verified-linear' },
+      { action: 'academic-progress', label: 'Academic Progress', icon: 'solar:diploma-verified-linear' },
     ]);
   }
 
@@ -942,8 +942,8 @@ const GrizzAI = (() => {
     `;
 
     appendBotMessage('Financial Transparency', html, [
-      { action: 'financial-summary', label: 'Check Funds', icon: 'icon-park-outline:chart-pie' },
-      { action: 'upcoming-events', label: 'Event Budgets', icon: 'icon-park-outline:calendar' },
+      { action: 'financial-summary', label: 'Check Funds', icon: 'solar:pie-chart-2-linear' },
+      { action: 'upcoming-events', label: 'Event Budgets', icon: 'solar:calendar-date-linear' },
     ]);
   }
 

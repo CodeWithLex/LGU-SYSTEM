@@ -25,8 +25,8 @@ const Transactions = (() => {
 
     if (!txs.length) {
       const colSpan = _isAdmin ? 8 : 7;
-      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><iconify-icon icon="icon-park-outline:bank-card"></iconify-icon></span><p>No transactions found.</p></div></td></tr>`;
-return;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}"><div class="empty-state"><span class="empty-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><p>No transactions found.</p></div></td></tr>`;
+      return;
     }
 
     tbody.innerHTML = txs.map(tx => `
@@ -39,7 +39,7 @@ return;
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="icon-park-outline:paperclip" style="font-size:14px" ></iconify-icon> View</a>`
+          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> View</a>`
           : '<span style="color:var(--text-tertiary)">—</span>'}</td>
         <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
         ${_isAdmin ? `
@@ -50,10 +50,10 @@ return;
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="icon-park-outline:write" style="font-size:14px" ></iconify-icon></button>
+              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="solar:pen-linear" style="font-size:15px"></iconify-icon></button>
             <button class="tx-action-btn tx-del-btn"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="icon-park-outline:delete" style="font-size:14px" ></iconify-icon></button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="solar:trash-bin-trash-linear" style="font-size:15px"></iconify-icon></button>
           </div>
         </td>` : ''}
       </tr>
@@ -74,10 +74,10 @@ return;
                <span class="tx-amount ${tx.type}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
-              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><iconify-icon icon="icon-park-outline:paperclip" style="font-size:14px" ></iconify-icon> Receipt</a>` : ''}
+              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" style="font-size:0.8rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</a>` : ''}
             </div>
             <div style="font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;">
-              <iconify-icon icon="icon-park-outline:user" style="font-size:10px" ></iconify-icon> ${tx.profiles?.full_name || 'System'}
+              <iconify-icon icon="solar:user-linear" style="font-size:12px"></iconify-icon> ${tx.profiles?.full_name || 'System'}
             </div>
           </div>
           ${_isAdmin ? `
@@ -87,15 +87,15 @@ return;
               data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"
               data-amount="${tx.amount}"
               data-date="${tx.transaction_date}"
-              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="icon-park-outline:write"></iconify-icon></button>
+              data-receipt="${tx.receipt_url || ''}"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
             <button class="tx-action-btn tx-del-btn" style="padding:0.4rem 0.8rem;"
               data-txid="${tx.id}"
-              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="icon-park-outline:delete"></iconify-icon></button>
+              data-desc="${(tx.description || '').replace(/"/g, '&quot;')}"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
           </div>` : ''}
         </div>
       `).join('');
     }
-}
+  }
 
   function bindTableEvents() {
     const tbody = document.getElementById('tx-table-body');

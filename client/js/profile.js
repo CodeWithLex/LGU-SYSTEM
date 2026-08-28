@@ -114,7 +114,7 @@ const ProfileModal = (() => {
       return `
         <button type="button" class="avatar-thumb-card ${isSelected ? 'active' : ''}" data-src="${a.src}" title="${a.name}">
           <img src="${a.src}" alt="${a.name}" class="avatar-thumb-img" loading="lazy" />
-          ${isSelected ? '<span class="avatar-check-badge"><iconify-icon icon="icon-park-outline:check"></iconify-icon></span>' : ''}
+          ${isSelected ? '<span class="avatar-check-badge"><iconify-icon icon="solar:check-circle-linear"></iconify-icon></span>' : ''}
         </button>
       `;
     }).join('');
@@ -295,7 +295,7 @@ const ProfileModal = (() => {
     setFeedback('profile-general-feedback', '');
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:loading" class="spin-icon"></iconify-icon> Saving…`;
+      saveBtn.innerHTML = `<iconify-icon icon="solar:refresh-circle-linear" class="spin-icon"></iconify-icon> Saving…`;
     }
 
     try {
@@ -342,7 +342,7 @@ const ProfileModal = (() => {
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
-        saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:check"></iconify-icon> Save Changes`;
+        saveBtn.innerHTML = `<iconify-icon icon="solar:check-circle-linear"></iconify-icon> Save Changes`;
       }
     }
   }
@@ -383,7 +383,7 @@ const ProfileModal = (() => {
     setFeedback('profile-security-feedback', '');
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:loading" class="spin-icon"></iconify-icon> Updating…`;
+      saveBtn.innerHTML = `<iconify-icon icon="solar:refresh-circle-linear" class="spin-icon"></iconify-icon> Updating…`;
     }
 
     try {
@@ -398,7 +398,7 @@ const ProfileModal = (() => {
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
-        saveBtn.innerHTML = `<iconify-icon icon="icon-park-outline:lock"></iconify-icon> Update Password`;
+        saveBtn.innerHTML = `<iconify-icon icon="solar:lock-keyhole-linear"></iconify-icon> Update Password`;
       }
     }
   }

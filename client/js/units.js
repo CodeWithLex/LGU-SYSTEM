@@ -117,7 +117,7 @@ const Units = (() => {
     } catch (err) {
       document.getElementById('units-checklist').innerHTML = `
         <div class="empty-state">
-          <iconify-icon icon="icon-park-outline:caution" class="empty-icon"></iconify-icon>
+          <iconify-icon icon="solar:danger-triangle-linear" class="empty-icon"></iconify-icon>
           <p>${esc(err.message)}</p>
         </div>`;
     }
@@ -202,11 +202,11 @@ const Units = (() => {
     const term = `${SEM_SHORT[currentSemester()]}, AY ${currentSchoolYear()}`;
     return `
       <button type="button" class="units-current-trigger" data-act="view-current" id="units-current-trigger" title="View enrolled subjects this semester">
-        <iconify-icon icon="icon-park-outline:calendar"></iconify-icon>
+        <iconify-icon icon="solar:calendar-date-linear"></iconify-icon>
         <span class="units-current-trigger-label">Enrolled This Semester</span>
         <span class="units-current-trigger-term">${term}</span>
         <span class="units-current-trigger-units">${totalUnits} unit${totalUnits === 1 ? '' : 's'}</span>
-        <iconify-icon icon="icon-park-outline:right" class="units-current-trigger-chevron"></iconify-icon>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="units-current-trigger-chevron"></iconify-icon>
       </button>`;
   }
 
@@ -242,7 +242,7 @@ const Units = (() => {
     if (!subjects.length) {
       container.innerHTML = card + `
         <div class="empty-state">
-          <iconify-icon icon="icon-park-outline:checklist" class="empty-icon"></iconify-icon>
+          <iconify-icon icon="solar:diploma-verified-linear" class="empty-icon"></iconify-icon>
           <p>No subjects are set up for ${esc(program)} — ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
         </div>`;
       return;
@@ -320,9 +320,9 @@ const Units = (() => {
 
     const actions = rec
       ? `
-        <button class="unit-action-btn" data-act="edit" data-id="${rec.id}" data-subject="${s.id}" title="Edit grade / status"><iconify-icon icon="icon-park-outline:edit"></iconify-icon></button>
-        ${rec.status !== 'passed' ? `<button class="unit-action-btn unit-action-btn--pass" data-act="passed" data-id="${rec.id}" title="Mark as passed"><iconify-icon icon="icon-park-outline:check-one"></iconify-icon></button>` : ''}
-        <button class="unit-action-btn unit-action-btn--del" data-act="drop" data-id="${rec.id}" title="Remove record"><iconify-icon icon="icon-park-outline:delete"></iconify-icon></button>`
+        <button class="unit-action-btn" data-act="edit" data-id="${rec.id}" data-subject="${s.id}" title="Edit grade / status"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
+        ${rec.status !== 'passed' ? `<button class="unit-action-btn unit-action-btn--pass" data-act="passed" data-id="${rec.id}" title="Mark as passed"><iconify-icon icon="solar:check-circle-linear"></iconify-icon></button>` : ''}
+        <button class="unit-action-btn unit-action-btn--del" data-act="drop" data-id="${rec.id}" title="Remove record"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>`
       : `<button class="btn btn-ghost unit-log-btn" data-act="log" data-subject="${s.id}">Log</button>`;
 
     const prereq = s.prerequisites
