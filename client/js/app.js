@@ -450,6 +450,66 @@
     await Auth.logout();
   });
 
+  // ---- Theme Manager (Light / Dark Mode Toggle & Sync) ----
+  const ThemeManager = {
+    init() {
+      const toggleBtn = document.getElementById('theme-toggle-btn');
+      const ursaThemeBtn = document.getElementById('ursa-theme-btn');
+      const profileThemeSelect = document.getElementById('profile-theme-select');
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => this.toggleTheme());
+      }
+      if (ursaThemeBtn) {
+        ursaThemeBtn.addEventListener('click', () => this.toggleTheme());
+      }
+      if (profileThemeSelect) {
+        profileThemeSelect.value = localStorage.getItem('theme') || 'dark';
+        profileThemeSelect.addEventListener('change', (e) => {
+          this.setTheme(e.target.value);
+        });
+      }
+
+      this.updateUI();
+    },
+
+    setTheme(theme) {
+      localStorage.setItem('theme', theme);
+      document.documentElement.setAttribute('data-theme', theme);
+      this.updateUI();
+      // Dispatch a custom event to notify other components (e.g. Chart.js redraw in reports.js)
+      window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme } }));
+    },
+
+    toggleTheme() {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      this.setTheme(targetTheme);
+    },
+
+    updateUI() {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      const icon = currentTheme === 'dark' ? 'solar:sun-linear' : 'solar:moon-linear';
+      const title = currentTheme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme';
+
+      const themeIcon = document.getElementById('theme-icon');
+      const themeBtn = document.getElementById('theme-toggle-btn');
+      if (themeIcon) themeIcon.setAttribute('icon', icon);
+      if (themeBtn) themeBtn.setAttribute('title', title);
+
+      const ursaThemeIcon = document.getElementById('ursa-theme-icon');
+      const ursaThemeBtn = document.getElementById('ursa-theme-btn');
+      if (ursaThemeIcon) ursaThemeIcon.setAttribute('icon', icon);
+      if (ursaThemeBtn) ursaThemeBtn.setAttribute('title', title);
+
+      const profileThemeSelect = document.getElementById('profile-theme-select');
+      if (profileThemeSelect) profileThemeSelect.value = currentTheme;
+    }
+  };
+  window.ThemeManager = ThemeManager; // Expose globally for profile.js access
+  ThemeManager.init();
+
+
   let _bootedUserId = null;
 
   // ---- Auth State Observer ----

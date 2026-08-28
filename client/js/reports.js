@@ -4,6 +4,8 @@
 
 let _monthlyChart = null;
 let _breakdownChart = null;
+let _lastMonthlyData = null;
+let _lastSummaryBreakdownData = null;
 
 // Shimmer skeleton that mirrors the reports layout (stat cards, charts,
 // event table) while the API calls are in flight. Reuses the global .sk-*
@@ -65,8 +67,12 @@ async function initReports() {
 
     container.innerHTML = buildReportsHTML(summary, monthly, events);
 
+    // Cache data for dynamic redrawing on theme changes
+    _lastMonthlyData = monthly;
+    _lastSummaryBreakdownData = summary.breakdown;
+
     // CRITICAL: re-create Lucide icons after dynamic HTML injection
-// Render charts after DOM is ready
+    // Render charts after DOM is ready
     requestAnimationFrame(() => {
       renderMonthlyChart(monthly);
       renderBreakdownChart(summary.breakdown);
@@ -221,6 +227,11 @@ function buildReportsHTML(summary, monthly, events) {
   `;
 }
 
+function getThemeColor(varName, fallback) {
+  const color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  return color || fallback;
+}
+
 function renderMonthlyChart(monthly) {
   const canvas = document.getElementById('monthly-chart');
   if (!canvas || !window.Chart) return;
@@ -230,6 +241,9 @@ function renderMonthlyChart(monthly) {
     const [y, mo] = m.month.split('-');
     return new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: '2-digit' });
   });
+
+  const textColor = getThemeColor('--text-secondary', '#94A3B8');
+  const gridColor = getThemeColor('--border', '#28313A');
 
   _monthlyChart = new Chart(canvas, {
     type: 'bar',
@@ -262,7 +276,7 @@ function renderMonthlyChart(monthly) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'top', labels: { color: '#94A3B8', font: { family: 'Inter' } } },
+        legend: { position: 'top', labels: { color: textColor, font: { family: 'Inter' } } },
         tooltip: {
           callbacks: {
             label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
@@ -272,12 +286,12 @@ function renderMonthlyChart(monthly) {
       scales: {
         x: { 
           grid: { display: false },
-          ticks: { color: '#94A3B8' }
+          ticks: { color: textColor }
         },
         y: {
-          grid: { color: '#28313A' },
+          grid: { color: gridColor },
           ticks: {
-            color: '#94A3B8',
+            color: textColor,
             callback: v => `₱${(v / 1000).toFixed(0)}k`
           }
         }
@@ -303,6 +317,9 @@ function renderBreakdownChart(breakdown) {
   const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
   const hasData = active.length > 0;
 
+  const textColor = getThemeColor('--text-secondary', '#94A3B8');
+  const surfaceColor = getThemeColor('--surface', '#111820');
+
   _breakdownChart = new Chart(canvas, {
     type: 'doughnut',
     data: {
@@ -311,7 +328,7 @@ function renderBreakdownChart(breakdown) {
         data: hasData ? active.map(t => breakdown[t.key]) : [1],
         backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
         borderWidth: 2,
-        borderColor: '#111820',
+        borderColor: surfaceColor,
         hoverOffset: 6
       }]
     },
@@ -323,7 +340,7 @@ function renderBreakdownChart(breakdown) {
         legend: {
           position: 'bottom',
           labels: {
-            color: '#94A3B8',
+            color: textColor,
             font: { family: 'Inter', size: 12 },
             padding: 16,
             usePointStyle: true,
@@ -341,6 +358,18 @@ function renderBreakdownChart(breakdown) {
     }
   });
 }
+
+function reloadCharts() {
+  if (_lastMonthlyData && _lastSummaryBreakdownData) {
+    renderMonthlyChart(_lastMonthlyData);
+    renderBreakdownChart(_lastSummaryBreakdownData);
+  }
+}
+
+// Redraw charts dynamically when the user switches themes
+window.addEventListener('themechanged', () => {
+  reloadCharts();
+});
 
 async function downloadReport(type, eventId, eventName) {
   const token = window._authToken;
@@ -376,4 +405,4 @@ async function downloadReport(type, eventId, eventName) {
 }
 
 // Export global namespace for app.js navigation
-window.Reports = { load: initReports };
+window.Reports = { load: initReports, reloadCharts };

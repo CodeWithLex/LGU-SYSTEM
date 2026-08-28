@@ -12,6 +12,13 @@
   <link rel="stylesheet" href="styles/main.css" />
   <link rel="stylesheet" href="styles/ai.css" />
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
+  <script>
+    // Apply theme immediately to prevent flashing
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
 </head>
 <body>
 
@@ -221,6 +228,9 @@
           </div>
         </div>
         <div class="sidebar-actions">
+          <button type="button" class="btn-icon" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <iconify-icon icon="solar:sun-linear" id="theme-icon"></iconify-icon>
+          </button>
           <button class="btn-icon" id="profile-settings-btn" title="Account Settings" aria-label="Account Settings"><iconify-icon icon="solar:settings-minimalistic-linear"></iconify-icon></button>
           <button class="btn-icon" id="logout-btn" title="Sign Out" aria-label="Sign Out"><iconify-icon icon="solar:logout-2-linear"></iconify-icon></button>
         </div>
@@ -912,6 +922,9 @@
           </div>
         </div>
         <div class="ursa-header-actions">
+          <button type="button" class="ursa-btn-icon" id="ursa-theme-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <iconify-icon icon="solar:sun-linear" id="ursa-theme-icon"></iconify-icon>
+          </button>
           <button type="button" class="ursa-btn-icon" id="ursa-clear-btn" title="Reset Conversation" aria-label="Reset Conversation">
             <iconify-icon icon="solar:restart-linear"></iconify-icon>
           </button>
@@ -1237,6 +1250,21 @@
               <button type="button" class="btn btn-ghost reset-avatar-btn" id="profile-reset-avatar-btn">
                 <iconify-icon icon="solar:restart-linear"></iconify-icon> Use Letter Initial
               </button>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="profile-theme-select">Interface Theme</label>
+              <div class="custom-select-wrap">
+                <select id="profile-theme-select" class="select-field">
+                  <option value="dark">Dark Theme (Default)</option>
+                  <option value="light">Light Theme</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="visibility: hidden; pointer-events: none;">
+              <!-- Spacer to balance layout -->
             </div>
           </div>
 

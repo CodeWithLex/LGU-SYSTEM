@@ -107,6 +107,57 @@
   --col-primary: var(--accent);
 }
 
+[data-theme="light"] {
+  /* Render native controls (select dropdowns, scrollbars) in light mode */
+  color-scheme: light;
+
+  --background: #F8FAFC;        /* slate-50 background */
+  --surface: #FFFFFF;           /* white cards, sidebar, modals */
+  --surface-secondary: #F1F5F9; /* slate-100 inputs, sub-containers */
+  --surface-hover: #E2E8F0;     /* slate-200 hover states */
+
+  --border: #E2E8F0;            /* slate-200 borders */
+  --border-hover: #CBD5E1;      /* slate-300 borders */
+
+  --primary: #F97316;           /* keeps engineering orange */
+  --primary-hover: #EA580C;     /* darker orange hover for accessibility contrast */
+
+  --text-primary: #0F172A;      /* slate-900 typography */
+  --text-secondary: #475569;    /* slate-600 typography */
+  --text-tertiary: #64748B;     /* slate-500 typography */
+
+  --success: #16A34A;           /* darker green for contrast */
+  --warning: #D97706;           /* darker warning orange */
+  --error: #DC2626;             /* darker red */
+
+  /* Semantic aliases */
+  --bg-base: var(--background);
+  --bg-surface: var(--surface);
+  --bg-surface-raised: var(--surface-secondary);
+  --border-default: var(--border);
+  --accent: var(--primary);
+  --accent-muted: rgba(249, 115, 22, 0.08);
+  --accent-text-on: #FFFFFF;
+  --border-focus: var(--accent);
+  --status-positive: var(--success);
+  --status-negative: var(--error);
+  --status-warning: var(--warning);
+  --status-neutral: var(--text-secondary);
+  
+  /* Legacy aliases compatibility */
+  --col-bg: var(--bg-base);
+  --col-card: var(--bg-surface);
+  --col-surface: var(--bg-surface);
+  --col-border: var(--border-default);
+  --col-text: var(--text-primary);
+  --col-text-muted: var(--text-secondary);
+  --col-text-dim: var(--text-tertiary);
+  --col-danger: var(--status-negative);
+  --col-success: var(--status-positive);
+  --col-primary: var(--accent);
+}
+
+
 
 /* ---- Reset & Base ---- */
 *,

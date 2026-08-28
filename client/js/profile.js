@@ -255,6 +255,9 @@ const ProfileModal = (() => {
     if (yearSelect) yearSelect.value = yearLevel;
     if (enrollInput) enrollInput.value = enrollmentYear;
 
+    const themeSelect = document.getElementById('profile-theme-select');
+    if (themeSelect) themeSelect.value = localStorage.getItem('theme') || 'dark';
+
     // Reset password inputs
     const newPass = document.getElementById('profile-new-password');
     const confPass = document.getElementById('profile-confirm-password');
@@ -319,6 +322,12 @@ const ProfileModal = (() => {
 
       const updated = await Auth.updateProfile(userId, updates);
       _currentProfile = updated;
+
+      // Save theme settings if changed
+      const themeSelect = document.getElementById('profile-theme-select');
+      if (themeSelect && window.ThemeManager) {
+        window.ThemeManager.setTheme(themeSelect.value);
+      }
 
       // Synchronize all avatars across the UI
       syncAvatars(updated.avatar_url, updated.full_name);
