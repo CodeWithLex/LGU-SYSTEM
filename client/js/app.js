@@ -442,11 +442,18 @@
   }
 
 
-  // ---- Logout (sidebar + mobile bottom nav) ----
-  document.getElementById('logout-btn').addEventListener('click', async () => {
+  // ---- Logout (sidebar + mobile bottom nav + profile modal) ----
+  document.getElementById('logout-btn')?.addEventListener('click', async () => {
     await Auth.logout();
   });
-  document.getElementById('bottom-logout-btn').addEventListener('click', async () => {
+  document.getElementById('bottom-logout-btn')?.addEventListener('click', async () => {
+    await Auth.logout();
+  });
+  document.getElementById('profile-modal-logout-btn')?.addEventListener('click', async () => {
+    const modal = document.getElementById('profile-modal');
+    const overlay = document.getElementById('profile-modal-overlay');
+    if (modal) modal.classList.add('hidden');
+    if (overlay) overlay.classList.add('hidden');
     await Auth.logout();
   });
 
