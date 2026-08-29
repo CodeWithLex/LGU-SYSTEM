@@ -54,6 +54,10 @@
 
   /* Shadows — reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
   --shadow-popover: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-card: none;
+  --shadow-card-hover: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.7);
+  --bg-surface-elevated: #161F2C;
 
   /* ---- Typography Tokens ----
      Inter = Primary UI, Headings, Navigation, Labels & General Typography
@@ -111,8 +115,8 @@
   /* Render native controls (select dropdowns, scrollbars) in light mode */
   color-scheme: light;
 
-  --background: #F8FAFC;        /* slate-50 background */
-  --surface: #FFFFFF;           /* white cards, sidebar, modals */
+  --background: #F8FAFC;        /* slate-50 clean background */
+  --surface: #FFFFFF;           /* pure white cards, sidebar, modals */
   --surface-secondary: #F1F5F9; /* slate-100 inputs, sub-containers */
   --surface-hover: #E2E8F0;     /* slate-200 hover states */
 
@@ -120,15 +124,22 @@
   --border-hover: #CBD5E1;      /* slate-300 borders */
 
   --primary: #F97316;           /* keeps engineering orange */
-  --primary-hover: #EA580C;     /* darker orange hover for accessibility contrast */
+  --primary-hover: #EA580C;     /* accessible darker orange for light surfaces */
 
   --text-primary: #0F172A;      /* slate-900 typography */
   --text-secondary: #475569;    /* slate-600 typography */
   --text-tertiary: #64748B;     /* slate-500 typography */
 
-  --success: #16A34A;           /* darker green for contrast */
-  --warning: #D97706;           /* darker warning orange */
-  --error: #DC2626;             /* darker red */
+  --success: #16A34A;           /* green-600 */
+  --warning: #D97706;           /* amber-600 */
+  --error: #DC2626;             /* red-600 */
+
+  /* Shadows for depth & tactile card feel in light mode */
+  --shadow-popover: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.05), 0 0 1px rgba(15, 23, 42, 0.15);
+  --shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-card-hover: 0 8px 18px -3px rgba(15, 23, 42, 0.09), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+  --shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.18), 0 0 1px rgba(15, 23, 42, 0.12);
+  --bg-surface-elevated: #FFFFFF;
 
   /* Semantic aliases */
   --bg-base: var(--background);
@@ -136,7 +147,7 @@
   --bg-surface-raised: var(--surface-secondary);
   --border-default: var(--border);
   --accent: var(--primary);
-  --accent-muted: rgba(249, 115, 22, 0.08);
+  --accent-muted: rgba(249, 115, 22, 0.09);
   --accent-text-on: #FFFFFF;
   --border-focus: var(--accent);
   --status-positive: var(--success);
@@ -395,9 +406,32 @@ html body .hidden {
 }
 
 /* =============================================
-   AUTHENTICATION SCREEN — Split Layout
+   AUTHENTICATION SCREEN — Split Layout (Always Dark)
    ============================================= */
 #auth-screen {
+  color-scheme: dark;
+  --background: #0B0F14;
+  --surface: #111820;
+  --surface-secondary: #161D25;
+  --surface-hover: #1D2733;
+  --border: #28313A;
+  --border-hover: #3A4550;
+  --primary: #F97316;
+  --primary-hover: #FB923C;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+  --bg-base: #0B0F14;
+  --bg-surface: #111820;
+  --bg-surface-raised: #161D25;
+  --border-default: #28313A;
+  --accent: #F97316;
+  --accent-muted: rgba(249, 115, 22, 0.12);
+  --accent-text-on: #FFFFFF;
+  --border-focus: var(--accent);
+  --bg-surface-elevated: #161F2C;
+  background-color: #0B0F14;
+  color: #F1F5F9;
   flex-direction: row;
   height: 100vh;
   overflow: hidden;
@@ -1595,13 +1629,15 @@ html body .hidden {
   display: flex;
   align-items: center;
   gap: 1.15rem;
-  transition: border-color var(--transition), transform 0.15s ease;
+  box-shadow: var(--shadow-card, none);
+  transition: border-color var(--transition), box-shadow var(--transition), transform 0.15s ease;
   cursor: pointer;
 }
 
 .stat-card.hover-active {
   z-index: 10;
   border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover, none);
 }
 
 .stat-body {
@@ -1712,6 +1748,7 @@ html body .hidden {
 
 .stat-card:hover {
   border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover, none);
 }
 
 /* =============================================
@@ -1730,6 +1767,8 @@ html body .hidden {
   padding: 1.35rem 1.5rem;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-card, none);
+  transition: border-color var(--transition), box-shadow var(--transition);
 }
 
 .dashboard-card h3 {
@@ -1942,13 +1981,15 @@ html body .hidden {
   border-radius: var(--radius-md);
   padding: 1.5rem;
   cursor: pointer;
-  transition: border-color var(--transition);
+  box-shadow: var(--shadow-card, none);
+  transition: border-color var(--transition), box-shadow var(--transition);
   position: relative;
   overflow: hidden;
 }
 
 .event-card:hover {
   border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover, none);
 }
 
 .event-card h3 {
@@ -2210,6 +2251,13 @@ html body .hidden {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   padding: 1.25rem;
+  box-shadow: var(--shadow-card, none);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.month-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover, none);
 }
 
 .month-card h4 {
@@ -3046,6 +3094,7 @@ html body.is-admin th.admin-only {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   padding: 1.5rem;
+  box-shadow: var(--shadow-card, none);
   position: sticky;
   top: 8rem; /* clears the taller pinned view-header */
 }
@@ -3244,6 +3293,7 @@ html body.is-admin th.admin-only {
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card, none);
   overflow: hidden;
 }
 
@@ -4061,4 +4111,211 @@ html body.is-admin th.admin-only {
     grid-template-columns: 1fr;
     gap: 0.5rem;
   }
+}
+
+/* =============================================
+   LIGHT MODE DESIGN ENHANCEMENTS & ELEVATIONS (IN-APP)
+   ============================================= */
+
+/* ---- Modals, Overlays & Dialogs ---- */
+[data-theme="light"] .modal-overlay,
+[data-theme="light"] .profile-modal-overlay {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .modal-card,
+[data-theme="light"] .profile-modal,
+[data-theme="light"] .onboarding-card {
+  background: #FFFFFF;
+  border-color: var(--border);
+  box-shadow: var(--shadow-modal);
+}
+
+[data-theme="light"] .onboarding-card .modal-header {
+  border-bottom-color: var(--border);
+}
+
+/* ---- Profile Modal & Avatar Picker ---- */
+[data-theme="light"] .avatar-picker-section {
+  background: var(--surface-secondary);
+  border-bottom-color: var(--border);
+}
+
+[data-theme="light"] .avatar-picker-section.highlighted {
+  background: #FFF7ED;
+  border-bottom-color: rgba(249, 115, 22, 0.4);
+}
+
+[data-theme="light"] .avatar-cat-tabs {
+  background: var(--surface-hover);
+  border-color: var(--border);
+}
+
+[data-theme="light"] .avatar-cat-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .avatar-cat-btn:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .avatar-cat-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .avatar-thumb-card {
+  background: #FFFFFF;
+  border-color: var(--border);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .avatar-thumb-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .avatar-thumb-card.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.35), 0 4px 14px rgba(15, 23, 42, 0.15);
+}
+
+[data-theme="light"] .security-info-box {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+
+/* ---- Badges & Status Pills ---- */
+[data-theme="light"] .badge-expense {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}
+
+[data-theme="light"] .badge-collection,
+[data-theme="light"] .badge-income {
+  background: #F0FDF4;
+  color: #16A34A;
+  border: 1px solid #BBF7D0;
+}
+
+[data-theme="light"] .badge-allocation,
+[data-theme="light"] .badge-transfer {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+}
+
+[data-theme="light"] .badge-donation {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+
+[data-theme="light"] .role-badge.role-student {
+  background: #FFF7ED;
+  color: #C2410C;
+  border: 1px solid #FFEDD5;
+}
+
+[data-theme="light"] .role-badge.role-admin {
+  background: #F0FDF4;
+  color: #15803D;
+  border: 1px solid #DCFCE7;
+}
+
+[data-theme="light"] .tx-overbudget-badge {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+[data-theme="light"] .profile-feedback--error {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+[data-theme="light"] .profile-feedback--success {
+  background: #F0FDF4;
+  border-color: #BBF7D0;
+  color: #16A34A;
+}
+
+/* ---- Credit Unit Tracker ---- */
+[data-theme="light"] .units-stat {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="light"] .unit-sem-banner {
+  background: transparent;
+  color: var(--text-tertiary);
+}
+
+[data-theme="light"] .units-current-trigger {
+  background: #FFFFFF;
+  border-color: var(--border);
+}
+
+[data-theme="light"] .units-current-trigger:hover {
+  background: var(--surface-hover);
+}
+
+[data-theme="light"] .units-filter-tabs-wrapper {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+
+/* ---- Toast Notification ---- */
+[data-theme="light"] .toast {
+  background: #FFFFFF;
+  border-color: var(--border);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-popover);
+}
+
+/* ---- Skeletons & Shimmer ---- */
+[data-theme="light"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    #F1F5F9 25%,
+    #E2E8F0 37%,
+    #F1F5F9 63%
+  );
+  background-size: 400% 100%;
+}
+
+[data-theme="light"] .sk-bone {
+  background: linear-gradient(
+    90deg,
+    #F8FAFC 25%,
+    #E2E8F0 50%,
+    #F8FAFC 75%
+  );
+  background-size: 600px 100%;
+}
+
+[data-theme="light"] .sk-nav-item--active {
+  background: #F1F5F9 !important;
+}
+
+/* ---- Global Light Scrollbars ---- */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+[data-theme="light"] .table-wrapper::-webkit-scrollbar-thumb,
+[data-theme="light"] .tx-list::-webkit-scrollbar-thumb,
+[data-theme="light"] .announcement-list::-webkit-scrollbar-thumb,
+[data-theme="light"] .mobile-cards-container::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
 }

@@ -1037,3 +1037,159 @@
     height: 34px;
   }
 }
+
+/* =============================================
+   LIGHT MODE DESIGN ENHANCEMENTS FOR GRIZZ / URSA
+   ============================================= */
+
+/* Floating Launcher in Light Mode */
+[data-theme="light"] .ursa-launcher,
+[data-theme="light"] .grizz-launcher {
+  background: #FFFFFF;
+  color: var(--text-primary);
+  border-color: rgba(249, 115, 22, 0.45);
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.12), 0 0 15px -2px rgba(249, 115, 22, 0.2);
+}
+
+[data-theme="light"] .ursa-launcher:hover,
+[data-theme="light"] .grizz-launcher:hover {
+  border-color: var(--primary);
+  box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.16), 0 0 20px -2px rgba(249, 115, 22, 0.35);
+}
+
+[data-theme="light"] .ursa-avatar-badge,
+[data-theme="light"] .grizz-avatar-badge,
+[data-theme="light"] .ursa-header-avatar,
+[data-theme="light"] .ursa-msg.bot .ursa-msg-avatar,
+[data-theme="light"] .grizz-avatar-wrap {
+  background: var(--surface-secondary);
+}
+
+[data-theme="light"] .ursa-avatar-badge::after,
+[data-theme="light"] .grizz-avatar-badge::after,
+[data-theme="light"] .ursa-header-avatar .ursa-dot-online,
+[data-theme="light"] .grizz-pulse-dot {
+  border-color: #FFFFFF;
+}
+
+/* Slide-out Backdrop & Drawer */
+[data-theme="light"] .ursa-overlay {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+[data-theme="light"] .ursa-drawer {
+  background: #FFFFFF;
+  border-left-color: var(--border);
+  box-shadow: -10px 0 35px rgba(15, 23, 42, 0.1);
+}
+
+[data-theme="light"] .ursa-header {
+  background: #FFFFFF;
+  border-bottom-color: var(--border);
+}
+
+/* Chat Messages */
+[data-theme="light"] .ursa-msg.user .ursa-bubble {
+  background: #FFF7ED;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  color: #0F172A;
+}
+
+[data-theme="light"] .ursa-msg.bot .ursa-bubble {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  color: #0F172A;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+
+/* Data summary & cards */
+[data-theme="light"] .ursa-summary-bar,
+[data-theme="light"] .ursa-data-box {
+  background: #F8FAFC;
+  border-color: var(--border);
+}
+
+[data-theme="light"] .ursa-progress-track {
+  background: #E2E8F0;
+}
+
+[data-theme="light"] .ursa-subject-item {
+  background: #FFFFFF;
+  border-color: var(--border);
+}
+
+[data-theme="light"] .ursa-subject-tag {
+  background: #F1F5F9;
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .ursa-data-row.muted {
+  border-top-color: var(--border);
+}
+
+[data-theme="light"] .ursa-alert-box {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+[data-theme="light"] .ursa-response-actions {
+  border-top-color: var(--border);
+}
+
+/* Footer & Prompt Chips */
+[data-theme="light"] .ursa-footer {
+  background: #FFFFFF;
+  border-top-color: var(--border);
+}
+
+[data-theme="light"] .ursa-prompt-tabs {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="light"] .ursa-tab-btn.active {
+  background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme="light"] .ursa-prompt-card {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+}
+
+[data-theme="light"] .ursa-prompt-card:hover {
+  background: #FFFFFF;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+/* Dashboard Minimalist Intelligence Bar */
+[data-theme="light"] .grizz-dashboard-bar,
+[data-theme="light"] .ursa-dashboard-widget {
+  background: #FFFFFF;
+  border-color: var(--border);
+  box-shadow: var(--shadow-card);
+}
+
+[data-theme="light"] .grizz-dashboard-bar:hover,
+[data-theme="light"] .ursa-dashboard-widget:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover);
+}
+
+[data-theme="light"] .grizz-prompt-pill,
+[data-theme="light"] .ursa-dash-chip {
+  background: var(--surface-secondary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .grizz-prompt-pill:hover,
+[data-theme="light"] .ursa-dash-chip:hover {
+  background: #FFFFFF;
+  border-color: var(--primary);
+  color: var(--primary-hover);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
