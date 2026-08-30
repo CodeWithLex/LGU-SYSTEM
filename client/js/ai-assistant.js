@@ -57,25 +57,64 @@ const GrizzAI = (() => {
     }
 
     // Category tabs
-    document.querySelectorAll('.ursa-tab-btn').forEach(btn => {
+    const tabBtns = Array.from(document.querySelectorAll('.ursa-tab-btn'));
+    tabBtns.forEach((btn, idx) => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.ursa-tab-btn').forEach(b => b.classList.remove('active'));
+        tabBtns.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
         btn.classList.add('active');
-        activeTab = btn.dataset.tab;
+        btn.setAttribute('aria-selected', 'true');
+        activeTab = btn.dataset.tab || 'academic';
         renderPromptList();
       });
+
+      btn.addEventListener('keydown', (e) => {
+        let targetIdx = -1;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          targetIdx = (idx + 1) % tabBtns.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          targetIdx = (idx - 1 + tabBtns.length) % tabBtns.length;
+        } else if (e.key === 'Home') {
+          targetIdx = 0;
+        } else if (e.key === 'End') {
+          targetIdx = tabBtns.length - 1;
+        }
+
+        if (targetIdx >= 0) {
+          e.preventDefault();
+          tabBtns[targetIdx].focus();
+          tabBtns[targetIdx].click();
+        }
+      });
+    });
+
+    // Keyboard support for cards (Enter / Space)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const promptCard = document.activeElement?.closest('.ursa-prompt-card');
+        if (promptCard && promptCard.dataset.action) {
+          e.preventDefault();
+          promptCard.click();
+        }
+      }
     });
 
     // Delegate clicks for prompt cards & dynamic follow-up chips
     document.addEventListener('click', (e) => {
       const promptCard = e.target.closest('.ursa-prompt-card');
       if (promptCard && promptCard.dataset.action) {
+        promptCard.classList.add('is-activating');
+        setTimeout(() => promptCard.classList.remove('is-activating'), 350);
         handleAction(promptCard.dataset.action, promptCard.dataset.title || promptCard.textContent.trim());
         return;
       }
 
       const chip = e.target.closest('.ursa-chip-action');
       if (chip && chip.dataset.action) {
+        chip.classList.add('is-activating');
+        setTimeout(() => chip.classList.remove('is-activating'), 350);
         handleAction(chip.dataset.action, chip.dataset.title || chip.textContent.trim());
         return;
       }
@@ -354,15 +393,15 @@ const GrizzAI = (() => {
 
     const items = PROMPT_DATABASE[activeTab] || PROMPT_DATABASE.academic;
     listEl.innerHTML = items.map(item => `
-      <div class="ursa-prompt-card" data-action="${item.action}" data-title="${item.title}" role="button" tabindex="0">
+      <div class="ursa-prompt-card ursa-cat-${activeTab}" data-action="${item.action}" data-title="${esc(item.title)}" role="button" tabindex="0" aria-label="${esc(item.title)}: ${esc(item.text)}">
         <div class="ursa-prompt-left">
-          <div class="ursa-prompt-icon"><iconify-icon icon="${item.icon}"></iconify-icon></div>
+          <div class="ursa-prompt-icon" aria-hidden="true"><iconify-icon icon="${item.icon}"></iconify-icon></div>
           <div class="ursa-prompt-info">
-            <span class="ursa-prompt-text">${item.title}</span>
-            <span class="ursa-prompt-desc">${item.text}</span>
+            <span class="ursa-prompt-text">${esc(item.title)}</span>
+            <span class="ursa-prompt-desc">${esc(item.text)}</span>
           </div>
         </div>
-        <div class="ursa-prompt-arrow"><iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon></div>
+        <div class="ursa-prompt-arrow" aria-hidden="true"><iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon></div>
       </div>
     `).join('');
   }

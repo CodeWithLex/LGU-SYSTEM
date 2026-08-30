@@ -954,12 +954,21 @@
 
       <!-- Drawer Prompt Picker (Segmented Tray) -->
       <div class="ursa-footer">
-        <div class="ursa-prompt-tabs" role="tablist">
-          <button type="button" class="ursa-tab-btn active" data-tab="academic" role="tab">Academic</button>
-          <button type="button" class="ursa-tab-btn" data-tab="financial" role="tab">Financials</button>
-          <button type="button" class="ursa-tab-btn" data-tab="guide" role="tab">Guide</button>
+        <div class="ursa-prompt-tabs" role="tablist" aria-label="Prompt Categories">
+          <button type="button" class="ursa-tab-btn active" data-tab="academic" role="tab" id="ursa-tab-academic" aria-selected="true" aria-controls="ursa-prompts-list">
+            <iconify-icon icon="solar:diploma-verified-linear"></iconify-icon>
+            <span>Academic</span>
+          </button>
+          <button type="button" class="ursa-tab-btn" data-tab="financial" role="tab" id="ursa-tab-financial" aria-selected="false" aria-controls="ursa-prompts-list">
+            <iconify-icon icon="solar:pie-chart-2-linear"></iconify-icon>
+            <span>Financials</span>
+          </button>
+          <button type="button" class="ursa-tab-btn" data-tab="guide" role="tab" id="ursa-tab-guide" aria-selected="false" aria-controls="ursa-prompts-list">
+            <iconify-icon icon="solar:book-bookmark-linear"></iconify-icon>
+            <span>Guide</span>
+          </button>
         </div>
-        <div class="ursa-prompts-grid" id="ursa-prompts-list">
+        <div class="ursa-prompts-grid" id="ursa-prompts-list" role="region" aria-live="polite">
           <!-- Dynamically populated prompt cards -->
         </div>
       </div>
