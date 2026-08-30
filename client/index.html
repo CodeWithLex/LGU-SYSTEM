@@ -308,11 +308,18 @@
             </div>
             <select id="events-sort" style="padding:0.55rem 1rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;">
               <option value="newest">Newest First</option>
+              <option value="date-asc">Date (Soonest)</option>
               <option value="name-asc">Name (A-Z)</option>
               <option value="budget-desc">Budget (High-Low)</option>
               <option value="budget-asc">Budget (Low-High)</option>
             </select>
           </div>
+        </div>
+        <div class="events-filter-tabs" id="events-filter-tabs" role="group" aria-label="Filter events by status">
+          <button type="button" class="events-filter-btn active" data-status="all">All</button>
+          <button type="button" class="events-filter-btn" data-status="upcoming">Upcoming</button>
+          <button type="button" class="events-filter-btn" data-status="ongoing">Ongoing</button>
+          <button type="button" class="events-filter-btn" data-status="completed">Completed</button>
         </div>
         <div id="events-grid" class="events-grid">
           <div class="loading-state">Loading events…</div>
@@ -530,6 +537,7 @@
         <div class="admin-tabs">
           <button class="admin-tab-btn active" data-tab="create" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:pen-new-square-linear" style="font-size:16px" ></iconify-icon> Create Records</button>
           <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:card-transfer-linear" style="font-size:16px" ></iconify-icon> Budget Transfer</button>
+          <button class="admin-tab-btn" data-tab="events" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:document-edit-linear" style="font-size:16px" ></iconify-icon> Manage Events</button>
           <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:users-group-rounded-linear" style="font-size:16px" ></iconify-icon> User Management</button>
           <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:history-linear" style="font-size:16px" ></iconify-icon> Audit Log</button>
         </div>
@@ -716,6 +724,58 @@
               </div>
 
               <button class="btn btn-primary" type="submit" id="submit-transfer-btn">Confirm Transfer</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tab: Manage Events -->
+        <div class="admin-tab-panel" id="admin-tab-events">
+          <div class="dashboard-card" style="max-width:600px;">
+            <h3><iconify-icon icon="solar:document-edit-linear"></iconify-icon> Manage Events</h3>
+            <p style="color:var(--col-text-muted);margin-bottom:1.25rem;font-size:.9rem;">
+              Select an event to edit its details, or archive it to hide it from students. Archived events can be restored here.
+            </p>
+            <form id="edit-event-form" class="admin-form">
+              <div class="form-group">
+                <label>Select Event</label>
+                <select id="me-select" required>
+                  <option value="">Select Event</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Event Name</label>
+                  <input type="text" id="me-name" required placeholder="Event name" />
+                </div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select id="me-status">
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Allocated Budget (₱)</label>
+                  <input type="number" id="me-budget" min="0" step="0.01" required placeholder="0.00" />
+                </div>
+                <div class="form-group">
+                  <label>Event Date</label>
+                  <input type="date" id="me-date" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <textarea id="me-description" rows="2" placeholder="Brief description of the event…"></textarea>
+              </div>
+              <div class="form-error hidden" id="me-error"></div>
+              <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <button class="btn btn-primary" type="submit" id="me-save-btn">Save Changes</button>
+                <button class="btn btn-ghost" type="button" id="me-archive-btn" disabled>Archive Event</button>
+              </div>
             </form>
           </div>
         </div>

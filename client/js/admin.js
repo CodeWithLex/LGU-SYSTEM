@@ -16,6 +16,7 @@ const Admin = (() => {
     if (!_initialized) {
       bindTabSwitching();
       bindEventForm();
+      bindManageEventForm();
       bindTransactionForm();
       bindAnnouncementForm();
       bindBulkImportForm();
@@ -54,9 +55,11 @@ const Admin = (() => {
       ]);
       _allEvents = events;
       _genFundBalance = summary.remainingBalance; // Store available general fund balance
+      const activeEvents = _allEvents.filter(ev => ev.status !== 'archived');
       const opts = '<option value="">Select Event</option>' +
-        _allEvents.map(ev => `<option value="${ev.id}" data-rem="${ev.computed_remaining}">${ev.event_name}</option>`).join('');
+        activeEvents.map(ev => `<option value="${ev.id}" data-rem="${ev.computed_remaining}">${ev.event_name}</option>`).join('');
       document.querySelectorAll('.event-select-dropdown').forEach(el => { el.innerHTML = opts; });
+      populateManageEventSelect();
       
       // Specifically for Budget Transfer: Add "General Fund" as a source option
       const fromSel = document.getElementById('transfer-from');
@@ -101,6 +104,114 @@ const Admin = (() => {
       } finally {
         btn.disabled = false;
         btn.textContent = 'Create Event';
+      }
+    });
+  }
+
+  // ── Manage Events (edit / archive / restore) ───────────────────────────────
+  function populateManageEventSelect() {
+    const sel = document.getElementById('me-select');
+    if (!sel) return;
+    const previous = sel.value;
+    sel.innerHTML = '<option value="">Select Event</option>' +
+      _allEvents.map(ev => `<option value="${ev.id}">${ev.event_name}${ev.status === 'archived' ? ' (Archived)' : ''}</option>`).join('');
+    if (previous && _allEvents.some(ev => ev.id === previous)) {
+      sel.value = previous;
+    } else {
+      resetManageEventForm();
+    }
+  }
+
+  function resetManageEventForm() {
+    document.getElementById('me-name').value       = '';
+    document.getElementById('me-status').value     = 'upcoming';
+    document.getElementById('me-budget').value     = '';
+    document.getElementById('me-date').value       = '';
+    document.getElementById('me-description').value = '';
+    document.getElementById('me-archive-btn').disabled = true;
+    document.getElementById('me-archive-btn').textContent = 'Archive Event';
+  }
+
+  function bindManageEventForm() {
+    const form  = document.getElementById('edit-event-form');
+    const sel   = document.getElementById('me-select');
+    const errEl = document.getElementById('me-error');
+    const saveBtn = document.getElementById('me-save-btn');
+    const archiveBtn = document.getElementById('me-archive-btn');
+
+    if (!form || !sel) return;
+
+    const getSelected = () => _allEvents.find(ev => ev.id === sel.value) || null;
+
+    sel.addEventListener('change', () => {
+      errEl.classList.add('hidden');
+      const ev = getSelected();
+      if (!ev) {
+        resetManageEventForm();
+        return;
+      }
+      document.getElementById('me-name').value        = ev.event_name;
+      document.getElementById('me-status').value      = ev.status === 'archived' ? 'upcoming' : ev.status;
+      document.getElementById('me-budget').value      = ev.allocated_budget;
+      document.getElementById('me-date').value        = ev.event_date || '';
+      document.getElementById('me-description').value = ev.description || '';
+      archiveBtn.disabled = false;
+      archiveBtn.textContent = ev.status === 'archived' ? 'Restore Event' : 'Archive Event';
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const ev = getSelected();
+      if (!ev) return;
+
+      errEl.classList.add('hidden');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+
+      try {
+        await Api.events.update(ev.id, {
+          event_name:       document.getElementById('me-name').value,
+          description:      document.getElementById('me-description').value,
+          allocated_budget: document.getElementById('me-budget').value,
+          event_date:       document.getElementById('me-date').value || null,
+          status:           document.getElementById('me-status').value
+        });
+        UI.toast('Event updated successfully!', 'success');
+        await populateEventDropdown();
+        sel.dispatchEvent(new Event('change'));
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
+      }
+    });
+
+    archiveBtn.addEventListener('click', async () => {
+      const ev = getSelected();
+      if (!ev) return;
+
+      const archiving = ev.status !== 'archived';
+      if (archiving && !confirm(`Archive "${ev.event_name}"? It will be hidden from students. You can restore it later from this tab.`)) return;
+
+      errEl.classList.add('hidden');
+      archiveBtn.disabled = true;
+
+      try {
+        if (archiving) {
+          await Api.events.archive(ev.id);
+          UI.toast('Event archived.', 'success');
+        } else {
+          await Api.events.update(ev.id, { status: 'upcoming' });
+          UI.toast('Event restored.', 'success');
+        }
+        await populateEventDropdown();
+        sel.dispatchEvent(new Event('change'));
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        archiveBtn.disabled = false;
       }
     });
   }

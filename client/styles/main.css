@@ -2004,6 +2004,58 @@ html body .hidden {
   line-clamp: 2;
 }
 
+.event-card-date {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: -0.25rem 0 0.5rem;
+}
+.event-card-date iconify-icon {
+  font-size: 14px;
+}
+
+.event-budget-fill.over {
+  background: var(--error);
+}
+
+.event-over-note {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.events-filter-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.events-filter-btn {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.events-filter-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+.events-filter-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
 .event-budget-bar {
   height: 4px;
   border-radius: var(--radius-sm);

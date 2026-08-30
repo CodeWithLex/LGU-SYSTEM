@@ -5,18 +5,31 @@
 const Events = (() => {
 
   let allEvents = [];
+  let _statusFilter = 'all';
   let _isInitialized = false;
 
   function init() {
     if (_isInitialized) return;
     const searchInput = document.getElementById('events-search');
     const sortSelect  = document.getElementById('events-sort');
+    const filterTabs  = document.getElementById('events-filter-tabs');
 
     if (searchInput) {
       searchInput.addEventListener('input', () => applyFilters());
     }
     if (sortSelect) {
       sortSelect.addEventListener('change', () => applyFilters());
+    }
+    if (filterTabs) {
+      filterTabs.querySelectorAll('.events-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _statusFilter = btn.dataset.status;
+          filterTabs.querySelectorAll('.events-filter-btn').forEach(b =>
+            b.classList.toggle('active', b === btn)
+          );
+          applyFilters();
+        });
+      });
     }
     _isInitialized = true;
   }
@@ -29,7 +42,10 @@ const Events = (() => {
       UI.setLoading('events-grid', 'Loading events…');
     }
     try {
-      allEvents = await Api.events.list();
+      const events = await Api.events.list();
+      // Admins receive archived events from the API (for the Manage tab);
+      // the events grid itself never shows them.
+      allEvents = events.filter(ev => ev.status !== 'archived');
       applyFilters(); // Apply current search/sort to newly loaded data
     } catch (err) {
       if (!allEvents.length) {
@@ -42,16 +58,28 @@ const Events = (() => {
     const searchVal = document.getElementById('events-search')?.value.toLowerCase() || '';
     const sortVal   = document.getElementById('events-sort')?.value || 'newest';
 
-    // 1. Filter
-    let filtered = allEvents.filter(ev => 
+    // 1. Status filter (archived events never reach students - filtered server-side)
+    let filtered = allEvents;
+    if (_statusFilter !== 'all') {
+      filtered = filtered.filter(ev => ev.status === _statusFilter);
+    }
+
+    // 2. Search
+    filtered = filtered.filter(ev =>
       ev.event_name.toLowerCase().includes(searchVal) ||
       (ev.description || '').toLowerCase().includes(searchVal)
     );
 
-    // 2. Sort
+    // 3. Sort
     filtered.sort((a, b) => {
       if (sortVal === 'name-asc') {
         return a.event_name.localeCompare(b.event_name);
+      } else if (sortVal === 'date-asc') {
+        // Soonest event date first; undated events sink to the end
+        if (!a.event_date && !b.event_date) return 0;
+        if (!a.event_date) return 1;
+        if (!b.event_date) return -1;
+        return new Date(a.event_date) - new Date(b.event_date);
       } else if (sortVal === 'budget-desc') {
         return b.allocated_budget - a.allocated_budget;
       } else if (sortVal === 'budget-asc') {
@@ -65,11 +93,22 @@ const Events = (() => {
     renderEventCards(filtered, searchVal.length > 0);
   }
 
+  // Budget bar state shared by the grid cards and the detail view
+  function budgetStats(ev) {
+    const spent   = Number(ev.computed_expenses) || 0;
+    const budget  = Number(ev.allocated_budget) || 0;
+    const over    = budget > 0 && spent > budget;
+    const pct     = over ? 100 : (budget > 0 ? Math.min((spent / budget) * 100, 100) : 0);
+    return { spent, budget, over, pct };
+  }
+
   function renderEventCards(events, isSearching = false) {
     const grid = document.getElementById('events-grid');
     if (!events.length) {
       if (isSearching) {
         UI.setEmpty('events-grid', 'search', 'No events match your search.');
+      } else if (_statusFilter !== 'all') {
+        UI.setEmpty('events-grid', 'target', `No ${_statusFilter} events.`);
       } else {
         UI.setEmpty('events-grid', 'target', 'No events posted yet.');
       }
@@ -77,20 +116,27 @@ const Events = (() => {
     }
 
     grid.innerHTML = events.map(ev => {
-      const spent   = ev.computed_expenses || 0;
-      const pct     = ev.allocated_budget > 0 ? Math.min((spent / ev.allocated_budget) * 100, 100) : 0;
+      const { spent, budget, over, pct } = budgetStats(ev);
+      const dateLine = ev.event_date
+        ? `<div class="event-card-date"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon> ${UI.dateStr(ev.event_date)}</div>`
+        : '';
+      const overNote = over
+        ? `<div class="event-over-note">Over budget by <strong>${UI.currency(spent - budget)}</strong></div>`
+        : '';
       return `
         <div class="event-card" data-id="${ev.id}">
           ${UI.renderStatusBadge(ev.status)}
           <h3>${ev.event_name}</h3>
+          ${dateLine}
           <p>${ev.description || 'No description provided.'}</p>
           <div class="event-budget-bar">
-            <div class="event-budget-fill" style="width:${pct}%"></div>
+            <div class="event-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
           </div>
           <div class="event-budget-labels">
             <span>Spent: <strong>${UI.currency(spent)}</strong></span>
-            <span>Budget: <strong>${UI.currency(ev.allocated_budget)}</strong></span>
+            <span>Budget: <strong>${UI.currency(budget)}</strong></span>
           </div>
+          ${overNote}
         </div>`;
     }).join('');
 
@@ -107,8 +153,10 @@ const Events = (() => {
 
     try {
       const ev = await Api.events.get(id);
-      const spent = ev.computed_expenses || 0;
-      const pct   = ev.allocated_budget > 0 ? Math.min((spent / ev.allocated_budget) * 100, 100) : 0;
+      const { spent, budget, over, pct } = budgetStats(ev);
+      const overNote = over
+        ? `<div class="event-over-note" style="margin:-0.5rem 0 1.5rem;">Over budget by <strong>${UI.currency(spent - budget)}</strong></div>`
+        : '';
 
       container.innerHTML = `
         <div style="margin-bottom:1.5rem">
@@ -123,7 +171,7 @@ const Events = (() => {
             <div class="stat-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></div>
             <div class="stat-body">
               <p class="stat-label">Allocated</p>
-              <h3 class="stat-value">${UI.currency(ev.allocated_budget)}</h3>
+              <h3 class="stat-value">${UI.currency(budget)}</h3>
             </div>
           </div>
           <div class="stat-card stat-expense">
@@ -143,8 +191,9 @@ const Events = (() => {
         </div>
 
         <div class="event-budget-bar" style="margin-bottom:1.5rem;height:8px">
-          <div class="event-budget-fill" style="width:${pct}%"></div>
+          <div class="event-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
         </div>
+        ${overNote}
 
         <div class="dashboard-card">
           <h3>Transaction History</h3>

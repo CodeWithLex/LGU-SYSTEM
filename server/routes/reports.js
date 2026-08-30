@@ -90,7 +90,7 @@ router.get('/monthly', async (req, res) => {
 router.get('/events-summary', async (req, res) => {
   const [{ data: events, error: evtErr }, { data: transactions }] = await Promise.all([
     supabase.from('events').select('id, event_name, allocated_budget, remaining_budget, status').order('created_at', { ascending: false }),
-    supabase.from('transactions').select('event_id, type, amount')
+    supabase.from('transactions').select('event_id, type, amount, use_allocation')
   ]);
 
   if (evtErr) { logError('Events Summary Error', evtErr); return res.status(500).json({ error: 'Failed to fetch events summary.' }); }
@@ -98,21 +98,24 @@ router.get('/events-summary', async (req, res) => {
   const txStats = {};
   if (transactions) {
     transactions.forEach(tx => {
-      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0, alloc_expenses: 0 };
+      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0, alloc_expenses: 0, budget_injections: 0 };
       if (tx.type === 'expense') {
         txStats[tx.event_id].expenses += Number(tx.amount);
         if (tx.use_allocation) txStats[tx.event_id].alloc_expenses += Number(tx.amount);
+      }
+      else if (tx.type === 'allocation' || tx.type === 'transfer') {
+        txStats[tx.event_id].budget_injections += Number(tx.amount);
       }
       else txStats[tx.event_id].income += Number(tx.amount);
     });
   }
 
   res.json(events.map(ev => {
-    const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0 };
+    const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0, budget_injections: 0 };
     return {
       ...ev,
       // Event remaining strictly reflects original allocation minus explicit event costs
-      computed_remaining: Number(ev.allocated_budget) - stats.alloc_expenses
+      computed_remaining: Number(ev.allocated_budget) + stats.budget_injections - stats.alloc_expenses
     };
   }));
 });
