@@ -130,6 +130,7 @@ const Admin = (() => {
     document.getElementById('me-description').value = '';
     document.getElementById('me-archive-btn').disabled = true;
     document.getElementById('me-archive-btn').textContent = 'Archive Event';
+    document.getElementById('me-complete-btn').disabled = true;
   }
 
   function bindManageEventForm() {
@@ -137,6 +138,7 @@ const Admin = (() => {
     const sel   = document.getElementById('me-select');
     const errEl = document.getElementById('me-error');
     const saveBtn = document.getElementById('me-save-btn');
+    const completeBtn = document.getElementById('me-complete-btn');
     const archiveBtn = document.getElementById('me-archive-btn');
 
     if (!form || !sel) return;
@@ -157,6 +159,8 @@ const Admin = (() => {
       document.getElementById('me-description').value = ev.description || '';
       archiveBtn.disabled = false;
       archiveBtn.textContent = ev.status === 'archived' ? 'Restore Event' : 'Archive Event';
+      // Already-done or archived events have nothing to complete
+      completeBtn.disabled = ev.status === 'completed' || ev.status === 'archived';
     });
 
     form.addEventListener('submit', async e => {
@@ -185,6 +189,25 @@ const Admin = (() => {
       } finally {
         saveBtn.disabled = false;
         saveBtn.textContent = 'Save Changes';
+      }
+    });
+
+    completeBtn.addEventListener('click', async () => {
+      const ev = getSelected();
+      if (!ev) return;
+
+      errEl.classList.add('hidden');
+      completeBtn.disabled = true;
+
+      try {
+        await Api.events.update(ev.id, { status: 'completed' });
+        UI.toast(`"${ev.event_name}" marked as completed.`, 'success');
+        await populateEventDropdown();
+        sel.dispatchEvent(new Event('change'));
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        completeBtn.disabled = false;
       }
     });
 
