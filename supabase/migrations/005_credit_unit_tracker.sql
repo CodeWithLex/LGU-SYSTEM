@@ -3,13 +3,13 @@
 -- COE Credit Unit Tracker Schema & Policies
 --
 -- Curriculum data is transcribed from the official PROSPECTUS.docx:
---   BSCoE — BS Computer Engineering      189 units / 67 subjects
---   BSECE — BS Electronics Engineering   204 units / 68 subjects
---   BSCE  — Civil Engineering            213 units / 75 subjects
+--   BSCoE - BS Computer Engineering      189 units / 67 subjects
+--   BSECE - BS Electronics Engineering   204 units / 68 subjects
+--   BSCE  - Civil Engineering            213 units / 75 subjects
 --
 -- Re-runnable: drops and recreates the three tables, so this file can
 -- be re-applied over the original draft migration (which carried a
--- placeholder curriculum) — running it always yields the final state.
+-- placeholder curriculum) - running it always yields the final state.
 -- =============================================
 
 DROP TABLE IF EXISTS public.student_units CASCADE;
@@ -80,7 +80,7 @@ CREATE POLICY "Only admins can manage subjects"
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
--- student_units — students only ever see/affect their own rows
+-- student_units - students only ever see/affect their own rows
 DROP POLICY IF EXISTS "Students can read own units" ON public.student_units;
 CREATE POLICY "Students can read own units"
   ON public.student_units FOR SELECT USING (student_id = auth.uid());
@@ -116,7 +116,7 @@ INSERT INTO public.curriculum_requirements (program, total_units, total_subjects
 VALUES ('BSCE', 213, 75)
 ON CONFLICT (program) DO UPDATE SET total_units = EXCLUDED.total_units, total_subjects = EXCLUDED.total_subjects;
 
--- 7. Seed subjects — BSCoE (67 subjects, 189 units)
+-- 7. Seed subjects - BSCoE (67 subjects, 189 units)
 -- Columns: (code, title, units, program, year_level, semester, prerequisites, is_elective)
 INSERT INTO public.subjects (code, title, units, program, year_level, semester, prerequisites, is_elective) VALUES
   ('RS 1',    'God''s Salvific Act',                            3, 'BSCoE', 1, 1, NULL,                      FALSE),
@@ -188,7 +188,7 @@ INSERT INTO public.subjects (code, title, units, program, year_level, semester, 
   ('GE E3',   'General Education Elective 3',                   3, 'BSCoE', 4, 2, NULL,                      TRUE)
 ON CONFLICT (program, code) DO NOTHING;
 
--- Seed subjects — BSECE (68 subjects, 204 units)
+-- Seed subjects - BSECE (68 subjects, 204 units)
 INSERT INTO public.subjects (code, title, units, program, year_level, semester, prerequisites, is_elective) VALUES
   ('RS 1',    'God''s Salvific Act',                            3, 'BSECE', 1, 1, NULL,                      FALSE),
   ('EMath 100', 'Mathematics for Engineers',                    3, 'BSECE', 1, 1, NULL,                      FALSE),
@@ -260,7 +260,7 @@ INSERT INTO public.subjects (code, title, units, program, year_level, semester, 
   ('ECE 400', 'On-the-Job Training - 320 Hours',                3, 'BSECE', 4, 2, NULL,                      FALSE)
 ON CONFLICT (program, code) DO NOTHING;
 
--- Seed subjects — BSCE (75 subjects, 213 units; 3rd year Summer term = semester 3)
+-- Seed subjects - BSCE (75 subjects, 213 units; 3rd year Summer term = semester 3)
 INSERT INTO public.subjects (code, title, units, program, year_level, semester, prerequisites, is_elective) VALUES
   ('RS 1',    'God''s Salvific Act',                            3, 'BSCE', 1, 1, NULL,                       FALSE),
   ('EMath 100', 'Mathematics of Engineering',                   3, 'BSCE', 1, 1, NULL,                       FALSE),

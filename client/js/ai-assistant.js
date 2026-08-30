@@ -1,5 +1,5 @@
 // =============================================
-// ai-assistant.js — Grizz: COE Mascot AI Assistant
+// ai-assistant.js - Grizz: COE Mascot AI Assistant
 // Clickable-only intelligent academic & financial guide
 // =============================================
 
@@ -492,7 +492,7 @@ const GrizzAI = (() => {
       `It's late already, ${displayName}, you need to rest`,
       `It's late already, ${displayName}. Time to commit your work and get some sleep.`,
       `Working late, engineer ${displayName}? You need to rest.`,
-      `It's late already, engineer. Those bugs can wait until tomorrow—go rest!`,
+      `It's late already, engineer. Those bugs can wait until tomorrow-go rest!`,
       `Still online, ${displayName}? The system recommends getting some sleep.`,
       `Late night session, ${displayName}? Don't forget to recharge your own batteries.`
     ];
@@ -523,7 +523,7 @@ const GrizzAI = (() => {
       "Your code might fail, but your spirit shouldn't. Keep experimenting!",
       "Success is just a function of time, effort, and perseverance. Keep up the amazing work!",
       "Every line of code you write is a step closer to mastering your craft. Keep coding!",
-      "Stay curious, stay persistent, and remember to smile — you're doing great!"
+      "Stay curious, stay persistent, and remember to smile - you're doing great!"
     ];
     const randomIndex = Math.floor(Math.random() * quotes.length);
     return quotes[randomIndex];
@@ -548,7 +548,7 @@ const GrizzAI = (() => {
           <div class="ursa-bubble">
             <h4>${esc(greeting)}</h4>
             <p>I am <strong>Grizz</strong>, your official College of Engineering advisor for <strong>${esc(progName)}</strong>. Select any inquiry below to explore your subjects or council funds.</p>
-            <p style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:0.5rem;">Zero typing required — simply click what you need.</p>
+            <p style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:0.5rem;">Zero typing required - simply click what you need.</p>
             <div class="ursa-motivational-box" style="border-top:1px dashed var(--border);margin-top:0.75rem;padding-top:0.65rem;font-size:0.78rem;color:var(--primary);font-style:italic;line-height:1.4;display:flex;align-items:flex-start;gap:0.35rem;">
               <iconify-icon icon="solar:lightbulb-bolt-linear" style="font-size:0.95rem;flex-shrink:0;margin-top:1px;"></iconify-icon>
               <span>Grizz says: "${esc(motivationalQuote)}"</span>

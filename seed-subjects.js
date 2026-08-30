@@ -1,8 +1,8 @@
 // =============================================
-// seed-subjects.js — Seed the Credit Unit Tracker curriculum
+// seed-subjects.js - Seed the Credit Unit Tracker curriculum
 // Fallback for environments where the SQL migration
 // (supabase/migrations/005_credit_unit_tracker.sql) cannot be
-// applied through the SQL console. Safe to re-run — subjects that
+// applied through the SQL console. Safe to re-run - subjects that
 // are no longer in the prospectus are pruned, everything else is
 // upserted. Note: student records for pruned subjects are removed
 // by the FK (ON DELETE CASCADE).

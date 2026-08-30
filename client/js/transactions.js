@@ -1,5 +1,5 @@
 // =============================================
-// transactions.js — Transactions View Module
+// transactions.js - Transactions View Module
 // =============================================
 
 const Transactions = (() => {
@@ -32,7 +32,7 @@ const Transactions = (() => {
     tbody.innerHTML = txs.map(tx => `
       <tr>
         <td>${UI.dateStr(tx.transaction_date)}</td>
-        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.events?.event_name || '—'}</td>
+        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.events?.event_name || '-'}</td>
         <td>${UI.renderStatusBadge(tx.type)}</td>
         <td>${tx.description}</td>
         <td class="tx-amount ${tx.type}">
@@ -40,8 +40,8 @@ const Transactions = (() => {
         </td>
         <td>${tx.receipt_url
           ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> View</a>`
-          : '<span style="color:var(--text-tertiary)">—</span>'}</td>
-        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '—'}</td>
+          : '<span style="color:var(--text-tertiary)">-</span>'}</td>
+        <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '-'}</td>
         ${_isAdmin ? `
         <td style="text-align:center;">
           <div style="display:inline-flex;gap:.4rem;">
@@ -211,7 +211,7 @@ const Transactions = (() => {
         </div>
         <div class="form-group">
           <label>Reason for Edit <span style="color:#ef4444">*</span></label>
-          <input id="edit-reason" type="text" placeholder="Required — why are you editing this?" />
+          <input id="edit-reason" type="text" placeholder="Required - why are you editing this?" />
         </div>
         <div class="auth-error hidden" id="edit-error"></div>
         <div style="display:flex;gap:.75rem;margin-top:1rem;">
@@ -272,7 +272,7 @@ const Transactions = (() => {
         </p>
         <div class="form-group">
           <label>Reason for Deletion <span style="color:#ef4444">*</span></label>
-          <input id="delete-reason" type="text" placeholder="Required — why are you deleting this?" />
+          <input id="delete-reason" type="text" placeholder="Required - why are you deleting this?" />
         </div>
         <div class="auth-error hidden" id="delete-error"></div>
         <div style="display:flex;gap:.75rem;margin-top:1rem;">

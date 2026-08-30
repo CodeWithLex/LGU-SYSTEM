@@ -1,5 +1,5 @@
 // =============================================
-// admin.js — Admin View Module (Phase 4)
+// admin.js - Admin View Module (Phase 4)
 // =============================================
 
 const Admin = (() => {
@@ -373,14 +373,14 @@ const Admin = (() => {
           btn.disabled = false;
         }
       } else {
-        fromBalEl.textContent = '—';
+        fromBalEl.textContent = '-';
       }
 
       if (toEv) {
         const newBal = toEv.remaining_budget + amount;
         toBalEl.innerHTML = `${UI.currency(toEv.remaining_budget)} <iconify-icon icon="solar:arrow-right-linear" style="font-size:12px"></iconify-icon> <span style="color:#22C55E">${UI.currency(newBal)}</span>`;
       } else {
-        toBalEl.textContent = '—';
+        toBalEl.textContent = '-';
       }
 };
 
@@ -458,10 +458,10 @@ const Admin = (() => {
             <tbody>
               ${filtered.map(u => `
                 <tr>
-                  <td><strong>${u.full_name || '—'}</strong></td>
-                  <td style="font-size:.8rem;color:var(--text-secondary)">${u.email || '—'}</td>
-                  <td style="font-size:.8rem">${u.course || '—'}</td>
-                  <td style="font-size:.8rem">${u.year_level || '—'}</td>
+                  <td><strong>${u.full_name || '-'}</strong></td>
+                  <td style="font-size:.8rem;color:var(--text-secondary)">${u.email || '-'}</td>
+                  <td style="font-size:.8rem">${u.course || '-'}</td>
+                  <td style="font-size:.8rem">${u.year_level || '-'}</td>
                   <td>${UI.renderStatusBadge(u.role)}</td>
                   <td style="text-align:center;">
                     <button class="tx-action-btn" style="font-size:.8rem;padding:.3rem .7rem;"
@@ -592,7 +592,7 @@ const Admin = (() => {
               ${filtered.map(log => `
                 <tr>
                   <td style="font-size:.8rem;white-space:nowrap">${fmtDate(log.created_at)}</td>
-                  <td style="font-size:.8rem">${log.profiles?.full_name || '—'}</td>
+                  <td style="font-size:.8rem">${log.profiles?.full_name || '-'}</td>
                   <td>${actionLabel(log.action)}</td>
                   <td style="font-size:.78rem;color:var(--text-secondary);max-width:300px;line-height:1.4;" title='${JSON.stringify(log.details || {}).replace(/'/g, '&apos;')}'>
                     ${formatDetails(log)}

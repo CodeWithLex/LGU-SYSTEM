@@ -8,7 +8,7 @@
 -- replacement uses CREATE OR REPLACE.
 -- =============================================
 
--- 1. Add enrollment_year to profiles (nullable — existing rows are untouched,
+-- 1. Add enrollment_year to profiles (nullable - existing rows are untouched,
 --    and NULL passes the CHECK constraint)
 DO $$
 BEGIN

@@ -1,5 +1,5 @@
 // =============================================
-// server/lib/validate.js — Input Validation & Sanitization
+// server/lib/validate.js - Input Validation & Sanitization
 // =============================================
 
 /**
@@ -24,7 +24,7 @@ const ALLOWED_RECEIPT_HOSTS = [
 ];
 
 function validateDriveUrl(url) {
-  if (!url) return true; // optional field — null is valid
+  if (!url) return true; // optional field - null is valid
   try {
     const parsed = new URL(url);
     // Only allow https

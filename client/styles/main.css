@@ -10,16 +10,16 @@
   /* ---- Graphite + Steel Blue + Engineering Orange ----
      70% graphite/slate backgrounds · 20% neutral typography ·
      8% steel blue accents · 2% engineering orange (action only).
-     Orange is reserved for ACTION / ACTIVE / IMPORTANT — never a fill. */
+     Orange is reserved for ACTION / ACTIVE / IMPORTANT - never a fill. */
   --background: #0B0F14;        /* app shell, page background */
   --surface: #111820;           /* sidebar, modals, cards */
   --surface-secondary: #161D25; /* input fields, raised surfaces */
   --surface-hover: #1D2733;     /* hover states */
 
-  --border: #28313A;            /* subtle borders — the primary elevation tool */
+  --border: #28313A;            /* subtle borders - the primary elevation tool */
   --border-hover: #3A4550;
 
-  --primary: #F97316;           /* engineering orange — action/active only */
+  --primary: #F97316;           /* engineering orange - action/active only */
   --primary-hover: #FB923C;
 
   --text-primary: #F1F5F9;
@@ -39,20 +39,20 @@
 
   --accent: var(--primary);
   --accent-muted: rgba(249, 115, 22, 0.12);
-  --accent-text-on: #FFFFFF; /* CTA text on #F97316 ≈2.8:1 — carried by bold button text */
+  --accent-text-on: #FFFFFF; /* CTA text on #F97316 ≈2.8:1 - carried by bold button text */
 
   --border-focus: var(--accent); /* focus = orange, matching the action color */
 
   --status-positive: var(--success); /* income / donation / collection */
   --status-negative: var(--error);   /* expense */
   --status-warning: var(--warning);  /* over-budget alerts */
-  --status-neutral: var(--text-secondary); /* allocation — informational */
+  --status-neutral: var(--text-secondary); /* allocation - informational */
 
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 6px;
 
-  /* Shadows — reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
+  /* Shadows - reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
   --shadow-popover: 0 4px 16px rgba(0, 0, 0, 0.4);
   --shadow-card: none;
   --shadow-card-hover: 0 4px 14px rgba(0, 0, 0, 0.35);
@@ -406,7 +406,7 @@ html body .hidden {
 }
 
 /* =============================================
-   AUTHENTICATION SCREEN — Split Layout (Always Dark)
+   AUTHENTICATION SCREEN - Split Layout (Always Dark)
    ============================================= */
 #auth-screen {
   color-scheme: dark;
@@ -441,7 +441,7 @@ html body .hidden {
 .auth-brand-panel {
   position: relative;
   flex: 0 0 50%;
-  background-color: #0D0E10; /* neutral graphite — the pattern overlays it */
+  background-color: #0D0E10; /* neutral graphite - the pattern overlays it */
   border-right: 1px solid var(--border-default);
   overflow: hidden;
   display: flex;
@@ -449,7 +449,7 @@ html body .hidden {
   justify-content: center;
 }
 
-/* Pattern artwork — kept invisible until the PNG finishes loading, then it
+/* Pattern artwork - kept invisible until the PNG finishes loading, then it
    fades in with a subtle zoom so it never pops onto the screen. */
 .auth-brand-panel::before {
   content: '';
@@ -490,7 +490,7 @@ html body .hidden {
   letter-spacing: -0.01em;
   line-height: 1.15;
   color: var(--text-primary);
-  white-space: nowrap; /* force single line — never allow wrapping on desktop */
+  white-space: nowrap; /* force single line - never allow wrapping on desktop */
 }
 
 .auth-subtitle {
@@ -509,7 +509,7 @@ html body .hidden {
   max-width: 400px;
 }
 
-/* Entrance cascade for brand typography — same rhythm as the auth form fields */
+/* Entrance cascade for brand typography - same rhythm as the auth form fields */
 .auth-brand-content .auth-identity h1,
 .auth-brand-content .auth-identity .auth-subtitle,
 .auth-brand-content .auth-brand-desc {
@@ -528,7 +528,7 @@ html body .hidden {
 .auth-form-panel {
   flex: 0 0 50%;
   background-color: var(--bg-base);
-  /* Static engineering-grid hairlines — 1px, ~3% white, no blur/fade */
+  /* Static engineering-grid hairlines - 1px, ~3% white, no blur/fade */
   background-image:
     repeating-linear-gradient(0deg,  rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 28px),
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 28px);
@@ -564,7 +564,7 @@ html body .hidden {
   font-family: var(--font-body);
 }
 
-/* ---- Auth inputs — dark-on-dark, no white boxes ---- */
+/* ---- Auth inputs - dark-on-dark, no white boxes ---- */
 .auth-form-panel .form-group input,
 .auth-form-panel .form-group select {
   background: var(--bg-surface-raised);
@@ -594,7 +594,7 @@ html body .hidden {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Icon-wrapped input — kept as the structural wrapper for the register
+/* Icon-wrapped input - kept as the structural wrapper for the register
    custom dropdowns; the auth fields no longer carry leading icons. */
 .input-icon-wrap {
   position: relative;
@@ -727,7 +727,7 @@ html body .hidden {
   font-size: 1.05rem;
 }
 
-/* Lift the field holding an open menu above its siblings — the form fields'
+/* Lift the field holding an open menu above its siblings - the form fields'
    staggered entrance keeps a retained transform, which stacks them on top of
    the absolutely positioned menu regardless of the menu's own z-index. */
 .form-group:has(.dd.dd-open) {
@@ -826,7 +826,7 @@ html body .hidden {
   animation: authFormIn 0.3s ease-out;
 }
 
-/* Entrance cascade — form children fade in with a subtle stagger */
+/* Entrance cascade - form children fade in with a subtle stagger */
 .auth-form.active > * {
   animation: authFieldIn 0.32s ease-out both;
 }
@@ -850,7 +850,7 @@ html body .hidden {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Auth form toggle — switch between Sign in / Register */
+/* Auth form toggle - switch between Sign in / Register */
 .auth-switch {
   margin-top: 1.5rem;
   text-align: center;
@@ -865,7 +865,7 @@ html body .hidden {
   margin-left: 0.25rem;
   font: inherit;
   font-weight: 600;
-  color: var(--accent); /* primary action — orange, not blue */
+  color: var(--accent); /* primary action - orange, not blue */
   cursor: pointer;
   transition: filter var(--transition);
 }
@@ -957,7 +957,7 @@ html body .hidden {
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
-  font-size: 1.05rem; /* ≥16px — prevents iOS zoom-on-focus */
+  font-size: 1.05rem; /* ≥16px - prevents iOS zoom-on-focus */
   color: var(--text-primary);
   transition: border-color var(--transition);
   outline: none;
@@ -1074,7 +1074,7 @@ html body .hidden {
 .btn-primary:hover {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); /* restrained lift — no orange glow */
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); /* restrained lift - no orange glow */
 }
 .btn-primary:active {
   transform: scale(0.98);
@@ -1099,7 +1099,7 @@ html body .hidden {
   width: 100%;
 }
 
-/* Auth form button — scaled up to match the enlarged form typography */
+/* Auth form button - scaled up to match the enlarged form typography */
 .auth-form .btn-primary {
   padding: 0.9rem 1.4rem;
   font-size: 1rem;
@@ -1421,7 +1421,7 @@ html body .hidden {
 }
 
 .nav-item.active {
-  background: var(--bg-surface-raised); /* dark slate — no orange fill */
+  background: var(--bg-surface-raised); /* dark slate - no orange fill */
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -2015,7 +2015,7 @@ html body .hidden {
 .event-budget-fill {
   height: 100%;
   border-radius: var(--radius-sm);
-  background: var(--accent); /* budget bar fill — orange */
+  background: var(--accent); /* budget bar fill - orange */
   transition: width 0.6s ease;
 }
 
@@ -2192,7 +2192,7 @@ html body .hidden {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 1rem; /* 16px — prevents iOS zoom-on-focus */
+  font-size: 1rem; /* 16px - prevents iOS zoom-on-focus */
   transition: all var(--transition);
 }
 
@@ -2325,7 +2325,7 @@ html body .hidden {
 }
 
 /* =========================================
-   Iconify — icon-park-outline global normalization
+   Iconify - icon-park-outline global normalization
    Ensures all iconify-icon elements render at the
    right size, line-height and display context.
    ========================================= */
@@ -2422,7 +2422,7 @@ iconify-icon {
 }
 
 /* =============================================
-   RESPONSIVE — Tablet (≤1024px)
+   RESPONSIVE - Tablet (≤1024px)
    ============================================= */
 @media (max-width: 1024px) {
   .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
@@ -2430,7 +2430,7 @@ iconify-icon {
 }
 
 /* =============================================
-   RESPONSIVE — Small Tablet / Large Phone (≤768px)
+   RESPONSIVE - Small Tablet / Large Phone (≤768px)
    ============================================= */
 @media (max-width: 768px) {
   :root { --sidebar-w: 60px; }
@@ -2518,7 +2518,7 @@ iconify-icon {
 .bottom-nav { display: none; }
 
 /* =============================================
-   RESPONSIVE — Phone (≤480px)
+   RESPONSIVE - Phone (≤480px)
    ============================================= */
 @media (max-width: 480px) {
   /* Dashboard & Grid Overrides */
@@ -2707,7 +2707,7 @@ iconify-icon {
 }
 
 /* =============================================
-   Phase 4 — Admin Tabs & Modals
+   Phase 4 - Admin Tabs & Modals
    ============================================= */
 
 /* Admin Tabs Navigation */
@@ -2777,7 +2777,7 @@ iconify-icon {
   animation: modalIn .16s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Smooth dismiss — closeModalOverlay() adds .modal-closing, waits for
+/* Smooth dismiss - closeModalOverlay() adds .modal-closing, waits for
    animationend, then applies .hidden. `forwards` holds the end state
    so the modal never flashes back before hiding. */
 .modal-overlay.modal-closing {
@@ -2826,7 +2826,7 @@ html body.is-admin th.admin-only {
   100% { background-position: 600px 0; }
 }
 
-/* The full-screen overlay — mimics the app shell */
+/* The full-screen overlay - mimics the app shell */
 .splash-screen {
   position: fixed;
   inset: 0;
@@ -2838,7 +2838,7 @@ html body.is-admin th.admin-only {
   overflow: hidden;
 }
 
-/* Individual bone — the shimmer tile */
+/* Individual bone - the shimmer tile */
 .sk-bone {
   background: linear-gradient(
     90deg,
@@ -2890,7 +2890,7 @@ html body.is-admin th.admin-only {
 }
 
 .sk-nav-item--active {
-  background: var(--bg-surface-raised) !important; /* dark slate — mirrors the real active nav item */
+  background: var(--bg-surface-raised) !important; /* dark slate - mirrors the real active nav item */
   animation: none; /* active item is a flat tint, not shimmer */
 }
 
@@ -2918,7 +2918,7 @@ html body.is-admin th.admin-only {
   gap: 0;
 }
 
-/* Stat cards — 4 columns matching the real dashboard */
+/* Stat cards - 4 columns matching the real dashboard */
 .sk-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -2935,7 +2935,7 @@ html body.is-admin th.admin-only {
   gap: 1rem;
 }
 
-/* Content cards — 1.6fr / 1fr matching the real dashboard grid */
+/* Content cards - 1.6fr / 1fr matching the real dashboard grid */
 .sk-cards-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -2971,7 +2971,7 @@ html body.is-admin th.admin-only {
 .splash-view-list  .sk-splash-default { display: none; }
 .splash-view-list  .sk-splash-list    { display: flex; flex-direction: column; gap: 1.75rem; }
 
-/* Units shape — progress card beside the subject checklist, like the view */
+/* Units shape - progress card beside the subject checklist, like the view */
 .sk-units {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -2995,7 +2995,7 @@ html body.is-admin th.admin-only {
   gap: 1.75rem;
 }
 
-/* Chart placeholder — matches the 260px real chart canvases */
+/* Chart placeholder - matches the 260px real chart canvases */
 .sk-chart {
   height: 260px;
   border-radius: 8px;
@@ -3033,14 +3033,14 @@ html body.is-admin th.admin-only {
    swap at 480px, 60px rail at 768px).
    ============================================= */
 
-/* ≤1024px — content cards stack 2-up like .dashboard-grid; the units
+/* ≤1024px - content cards stack 2-up like .dashboard-grid; the units
    skeleton stacks its progress card above the checklist like the view */
 @media (max-width: 1024px) {
   .sk-cards-grid { grid-template-columns: repeat(2, 1fr); }
   .sk-units { grid-template-columns: 1fr; }
 }
 
-/* ≤768px — skeleton mirrors the 60px sidebar rail */
+/* ≤768px - skeleton mirrors the 60px sidebar rail */
 @media (max-width: 768px) {
   .sk-sidebar-brand,
   .sk-sidebar-footer { justify-content: center; }
@@ -3051,7 +3051,7 @@ html body.is-admin th.admin-only {
   .sk-main { padding: 1.25rem 1rem; }
 }
 
-/* ≤480px — hide sidebar shell, show bottom nav shell (mirrors real app) */
+/* ≤480px - hide sidebar shell, show bottom nav shell (mirrors real app) */
 @media (max-width: 480px) {
   .sk-sidebar { display: none; }
   .sk-bottom-nav {
@@ -3081,7 +3081,7 @@ html body.is-admin th.admin-only {
   gap: 0.3rem;
 }
 
-/* Header cluster — program picker in the view header (the Download button
+/* Header cluster - program picker in the view header (the Download button
    lives inside the Graduation Progress card). */
 .units-header-controls {
   display: flex;
@@ -3090,7 +3090,7 @@ html body.is-admin th.admin-only {
   flex-wrap: wrap;
 }
 
-/* Download Standing button — full-width action at the bottom of the
+/* Download Standing button - full-width action at the bottom of the
    Graduation Progress card on desktop and mobile alike. */
 #units-download-pdf {
   width: 100%;
@@ -3170,7 +3170,7 @@ html body.is-admin th.admin-only {
   box-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* In-progress extension — translucent, painted under the passed fill
+/* In-progress extension - translucent, painted under the passed fill
    (earlier in the DOM, and .units-progress-fill is position:relative),
    so the bar reads solid-accent → translucent → track. */
 .units-progress-fill-progress {
@@ -3388,7 +3388,7 @@ html body.is-admin th.admin-only {
 .unit-units { font-size: 0.72rem; color: var(--text-tertiary); white-space: nowrap; }
 .unit-prereq { font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.2rem; }
 
-/* Status — 6px dot + text, mirroring the system status-badge language */
+/* Status - 6px dot + text, mirroring the system status-badge language */
 .unit-badge {
   display: inline-flex;
   align-items: center;
@@ -3454,7 +3454,7 @@ html body.is-admin th.admin-only {
   font-size: 0.78rem;
 }
 
-/* Year filter tabs — segmented pill that flows inline at the bottom of the
+/* Year filter tabs - segmented pill that flows inline at the bottom of the
    Graduation Progress card. Static (relative) so it never floats over the
    checklist on mobile; the slider's absolute children still anchor to it. */
 .units-filter-tabs-wrapper {
@@ -3505,7 +3505,7 @@ html body.is-admin th.admin-only {
 .units-tab-btn:hover { color: var(--text-primary); }
 .units-tab-btn.active { color: var(--accent-text-on) !important; } /* crisp on orange */
 
-/* Program picker — locked to the student's enrolled course */
+/* Program picker - locked to the student's enrolled course */
 .dd.dd-disabled { opacity: 0.65; pointer-events: none; }
 .units-program-lock {
   display: inline-flex;

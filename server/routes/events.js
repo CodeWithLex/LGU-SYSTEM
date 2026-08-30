@@ -164,7 +164,7 @@ router.patch('/:id', requireAdmin, async (req, res) => {
     return res.status(400).json({ error: 'Invalid ID format.' });
   }
 
-  // Build a clean updates object — only include provided fields
+  // Build a clean updates object - only include provided fields
   const updates = {};
 
   if (event_name !== undefined) {

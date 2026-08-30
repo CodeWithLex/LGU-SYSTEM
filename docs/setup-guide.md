@@ -1,4 +1,4 @@
-# Setup Guide — COE Budget Transparency System
+# Setup Guide - COE Budget Transparency System
 
 ## Prerequisites
 

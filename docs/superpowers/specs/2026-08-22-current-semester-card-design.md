@@ -1,4 +1,4 @@
-# Current Semester Card — Design
+# Current Semester Card - Design
 
 **Date:** 2026-08-22
 **Status:** Approved (brainstorming complete)
@@ -19,10 +19,10 @@ A compact, read-only **"Current Semester"** card at the top of the checklist col
 | Decision | Choice |
 |---|---|
 | Detail per course row | Code, title, units + optional schedule & instructor (free text) |
-| Data source for schedule/instructor | Optional text columns on `student_units` — student-self-reported, consistent with existing pattern |
+| Data source for schedule/instructor | Optional text columns on `student_units` - student-self-reported, consistent with existing pattern |
 | Placement | Compact card at top of the checklist column, above Year 1–4 tabs |
 | Progress bar | Two-tone: green = passed (unchanged), lighter segment = in-progress; % stays passed-only |
-| Build approach | Reuse existing data flow (client-side filtering of `/api/units/my` payload) — no new endpoints |
+| Build approach | Reuse existing data flow (client-side filtering of `/api/units/my` payload) - no new endpoints |
 
 ## UI Design
 
@@ -33,7 +33,7 @@ Pinned to the top of the right column (above the Year 1–4 tabs). Existing tabs
 ### Card layout
 
 ```
-┌─ Current Semester — 1st Sem, AY 2026–2027 ────────── 21 units ─┐
+┌─ Current Semester - 1st Sem, AY 2026–2027 ────────── 21 units ─┐
 │                                                                  │
 │  CPE 211   Logic Circuits & Switching Theory             3       │
 │            MWF 9:00–10:00 · Engr. Cruz                          │
@@ -42,7 +42,7 @@ Pinned to the top of the right column (above the Year 1–4 tabs). Existing tabs
 │            T 1:00–4:00 · Engr. Reyes                             │
 │                                                                  │
 │  MATH 113  Calculus 3 for Engineers                     3       │
-│            (no schedule/instructor logged — second line hidden) │
+│            (no schedule/instructor logged - second line hidden) │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -53,7 +53,7 @@ Pinned to the top of the right column (above the Year 1–4 tabs). Existing tabs
 
 ### Empty state
 
-The card never disappears. When no courses are logged for the current term it shows a single line: *"No courses logged for this semester yet — log them in the checklist below."* This keeps page structure stable between visits.
+The card never disappears. When no courses are logged for the current term it shows a single line: *"No courses logged for this semester yet - log them in the checklist below."* This keeps page structure stable between visits.
 
 ### Two-tone progress bar (Graduation Progress card, left aside)
 
@@ -65,7 +65,7 @@ The card never disappears. When no courses are logged for the current term it sh
 
 ## Data & API Changes
 
-### Migration 007 — `supabase/migrations/007_enrollment_details.sql`
+### Migration 007 - `supabase/migrations/007_enrollment_details.sql`
 
 ```sql
 ALTER TABLE public.student_units
@@ -75,12 +75,12 @@ ALTER TABLE public.student_units
 
 Both nullable, plain text. No RLS changes (existing row-level policies cover the whole row for the owning student). No backfill; existing rows render without a second line.
 
-### Server — `server/routes/units.js`
+### Server - `server/routes/units.js`
 
-- `GET /api/units/my` — add `instructor, schedule` to the SELECT list.
-- `POST /api/units/enroll` and `PATCH /api/units/update/:id` — accept both fields as optional strings. `trim()`, cap at 120 characters, store `NULL` when empty (so "never filled" and "cleared" are identical).
+- `GET /api/units/my` - add `instructor, schedule` to the SELECT list.
+- `POST /api/units/enroll` and `PATCH /api/units/update/:id` - accept both fields as optional strings. `trim()`, cap at 120 characters, store `NULL` when empty (so "never filled" and "cleared" are identical).
 
-### Client — `client/js/units.js`, `client/index.html`
+### Client - `client/js/units.js`, `client/index.html`
 
 - The existing log/edit modal gains two optional text inputs ("Schedule", "Instructor"), placed **after** the required fields so the core log-a-course flow is unchanged. Placeholder example: `MWF 9:00–10:00 AM`.
 - New `renderCurrentSemester()`: filters the already-loaded `/api/units/my` payload to `status === 'enrolled'` AND `(school_year, semester)` matching the computed current term; renders the card. No extra network request.
@@ -90,11 +90,11 @@ Both nullable, plain text. No RLS changes (existing row-level policies cover the
 
 ## Edge Cases & Error Handling
 
-- **Stale 'enrolled' rows from a past term** — excluded from the card and the in-progress segment (current term only, by design). They remain visible in the year checklist where the student can close them out. No nagging UI.
-- **Term rollover** — when the computed term flips, the card becomes the empty state for the new term; prior-term courses remain in the checklist. No state migration.
-- **Long titles/schedules on mobile** — second line wraps; the card has no fixed height.
-- **`/my` load failure** — the card uses the same fallback state as the checklist; no special-case handling.
-- **XSS** — all free-text (instructor, schedule) HTML-escaped wherever rendered.
+- **Stale 'enrolled' rows from a past term** - excluded from the card and the in-progress segment (current term only, by design). They remain visible in the year checklist where the student can close them out. No nagging UI.
+- **Term rollover** - when the computed term flips, the card becomes the empty state for the new term; prior-term courses remain in the checklist. No state migration.
+- **Long titles/schedules on mobile** - second line wraps; the card has no fixed height.
+- **`/my` load failure** - the card uses the same fallback state as the checklist; no special-case handling.
+- **XSS** - all free-text (instructor, schedule) HTML-escaped wherever rendered.
 
 ## Testing
 
@@ -123,5 +123,5 @@ After seeing the card in the live layout, it occupied too much permanent vertica
 
 - **Slim trigger button** at the top of the checklist column (same slot the card occupied): calendar icon, "Enrolled This Semester", term label, right-aligned unit subtotal, chevron. One line tall; always visible so page structure stays stable and the unit subtotal stays glanceable.
 - **Popup modal** (`#units-current-modal`) using the existing `.modal-overlay` / `.modal-card` pattern: header with term + unit subtotal, the same rows as the card (code · title · plain-number units, optional `schedule · instructor` second line, escaped), list capped at `50vh` with scroll, friendly empty state, Close button + overlay-click to dismiss.
-- The shared `.modal-overlay` gains `backdrop-filter: blur(4px)` so popups blur the background — this also applies to the existing log/edit modal for consistency.
+- The shared `.modal-overlay` gains `backdrop-filter: blur(4px)` so popups blur the background - this also applies to the existing log/edit modal for consistency.
 - Everything else (read-only rows, current-term filtering, stale-row exclusion, two-tone progress bar, endpoints, migration) is unchanged.

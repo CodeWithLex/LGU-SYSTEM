@@ -4,11 +4,11 @@ name: Database Backup
 # Restores rely on the three dumps produced here; see docs/DATABASE.md.
 #
 # REQUIRED repository secrets (Settings → Secrets and variables → Actions):
-#   SUPABASE_DB_URL — full Postgres connection string from
+#   SUPABASE_DB_URL - full Postgres connection string from
 #     Supabase Dashboard → Project Settings → Database → Connection string
 #     (URI, session pooler is fine).
 #
-# SAFETY: this workflow REFUSES to run on public repositories — workflow
+# SAFETY: this workflow REFUSES to run on public repositories - workflow
 # artifacts on public repos are downloadable, and the dump contains
 # student personal data. Make the repo private first.
 
@@ -27,7 +27,7 @@ jobs:
         run: |
           PRIVATE=$(gh api "repos/${{ github.repository }}" --jq '.private')
           if [ "$PRIVATE" != "true" ]; then
-            echo "::error::This repo is PUBLIC — database backup artifacts would expose student personal data. Make the repo private (Settings → General → Danger Zone) before enabling backups."
+            echo "::error::This repo is PUBLIC - database backup artifacts would expose student personal data. Make the repo private (Settings → General → Danger Zone) before enabling backups."
             exit 1
           fi
 

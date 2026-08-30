@@ -1,5 +1,5 @@
 // =============================================
-// dashboard.js — Dashboard View Module
+// dashboard.js - Dashboard View Module
 // =============================================
 
 const Dashboard = (() => {

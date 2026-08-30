@@ -1,12 +1,12 @@
 // =============================================
-// server/lib/audit.js — Audit Logging
+// server/lib/audit.js - Audit Logging
 // =============================================
 const supabase = require('./supabase');
 const { logError } = require('./logger');
 
 /**
  * Inserts an audit log entry for admin actions.
- * Fire-and-forget — never blocks the response.
+ * Fire-and-forget - never blocks the response.
  *
  * @param {string} userId    - Supabase user UUID
  * @param {string} action    - e.g. 'CREATE_EVENT', 'CREATE_TRANSACTION'

@@ -1,5 +1,5 @@
 // =============================================
-// smoke-ui.mjs — post-deploy UI gate
+// smoke-ui.mjs - post-deploy UI gate
 //
 // The unauthenticated block catches the exact failure class that broke
 // login for every user on 2026-08-22: a page-load JS crash (an empty
@@ -40,7 +40,7 @@ else pass('no console errors on load');
 
 // ---- Gate 2: the login form is actually wired ----
 // Dummy credentials must produce SOME feedback (error box or toast).
-// A dead submit button means startup JS crashed — the whole app is down.
+// A dead submit button means startup JS crashed - the whole app is down.
 await page.fill('#login-email', 'smoke@test.invalid');
 await page.fill('#login-password', 'wrong-password');
 await page.click('#login-btn');
@@ -56,7 +56,7 @@ try {
   } catch { /* both selectors missed */ }
 }
 if (feedback) pass('login form is wired (submit produced feedback)');
-else fail('login submit produced NO feedback — app startup JS is likely dead');
+else fail('login submit produced NO feedback - app startup JS is likely dead');
 
 // ---- Gate 3 (optional): authenticated walk-through ----
 if (TEST_EMAIL && TEST_PASSWORD) {
@@ -101,7 +101,7 @@ if (TEST_EMAIL && TEST_PASSWORD) {
 await browser.close();
 
 if (failures) {
-  console.error(`\n${failures} smoke check(s) FAILED — do not trust this deployment.`);
+  console.error(`\n${failures} smoke check(s) FAILED - do not trust this deployment.`);
   process.exit(1);
 }
 console.log('\nAll smoke checks passed.');

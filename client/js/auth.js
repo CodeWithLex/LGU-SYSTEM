@@ -1,5 +1,5 @@
 // =============================================
-// auth.js — Authentication Module
+// auth.js - Authentication Module
 // =============================================
 
 const Auth = (() => {

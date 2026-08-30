@@ -13,7 +13,7 @@ if (!url || !key) {
 
 const supabase = createClient(url, key);
 
-// 005 drops and recreates the tracker tables — running it against a
+// 005 drops and recreates the tracker tables - running it against a
 // database that already has student data WIPES every student record.
 // It is only safe for fresh environments; require an explicit opt-in.
 if (!process.argv.includes('--force')) {

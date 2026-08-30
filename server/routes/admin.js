@@ -1,5 +1,5 @@
 // =============================================
-// server/routes/admin.js — Admin-Only Operations
+// server/routes/admin.js - Admin-Only Operations
 // =============================================
 const express  = require('express');
 const router   = express.Router();

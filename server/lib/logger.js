@@ -1,5 +1,5 @@
 // =============================================
-// server/lib/logger.js — Environment-Aware Logging
+// server/lib/logger.js - Environment-Aware Logging
 // Full error objects are only logged in development;
 // production always sees just the message.
 // =============================================

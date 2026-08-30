@@ -163,7 +163,7 @@ BEFORE (Manual System):
 ────────────────────────────────────────────────────────────────────────────────
 AFTER (With the LGU Transparency System):
 • Officer opens the Public Transparency Dashboard on a tablet during the session.
-• Searches "Relief Program" — immediately displays total breakdown:
+• Searches "Relief Program" - immediately displays total breakdown:
   - 500 Food Packs @ ₱120/pack = ₱60,000 (with supplier receipt attached)
   - Logistics & Fuel = ₱12,000 (with pump receipt attached)
   - Remaining ₱8,000 returned to general fund.

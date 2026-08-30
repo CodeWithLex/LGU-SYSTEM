@@ -1,5 +1,5 @@
 // =============================================
-// server/lib/email.js — Brevo API Helper
+// server/lib/email.js - Brevo API Helper
 // =============================================
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 const supabase = require('./supabase');
@@ -122,7 +122,7 @@ async function sendNewEventEmail(event) {
     sendSmtpEmail.subject = `New Event: ${event.event_name}`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `New Event: ${event.event_name}`,
-preheader: `A new event has been scheduled${event.event_date ? ` for ${new Date(event.event_date).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })}` : ''} — view the full details inside.`,
+preheader: `A new event has been scheduled${event.event_date ? ` for ${new Date(event.event_date).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })}` : ''} - view the full details inside.`,
 content: `
 
   <!-- Badge -->
@@ -434,7 +434,7 @@ function buildEmailTemplate({ subject, preheader, content }) {
           <tr>
             <td align="center" style="padding-top:32px;">
               <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.5;">
-                College of Engineering — Cor Jesu College<br/>
+                College of Engineering - Cor Jesu College<br/>
                 Budget Transparency & Liquidation System
               </p>
               <p style="margin:16px 0 0;font-size:12px;color:#cbd5e1;">

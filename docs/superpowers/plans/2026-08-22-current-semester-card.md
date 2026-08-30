@@ -17,21 +17,21 @@
 - Use only existing CSS custom properties (`--accent`, `--bg-surface`, `--bg-surface-raised`, `--border-default`, `--radius-md`, `--text-primary`, `--text-secondary`, `--text-tertiary`).
 - Per-row unit counts display as a plain number (`3`), never `3u` or `3 units`. The word "units" appears only in the card header subtotal.
 - The large progress percentage stays **passed-only**; enrolled units are never counted as completed.
-- Server-side ownership is always enforced with `.eq('student_id', req.user.id)` — never client-supplied IDs.
+- Server-side ownership is always enforced with `.eq('student_id', req.user.id)` - never client-supplied IDs.
 - Optional fields: `trim()`, cap at 120 characters, empty → `NULL` (both client and server).
-- The repo has **no test framework** — verification is `node --check`, the smoke script in Task 3, and the manual QA checklist in Task 7.
+- The repo has **no test framework** - verification is `node --check`, the smoke script in Task 3, and the manual QA checklist in Task 7.
 - Commit after every task; conventional commit messages matching repo history (`feat:`, `fix(units):`, `docs:`).
 
 ---
 
-### Task 1: Migration 007 — optional detail columns
+### Task 1: Migration 007 - optional detail columns
 
 **Files:**
 - Create: `supabase/migrations/007_enrollment_details.sql`
 
 **Interfaces:**
 - Consumes: table `public.student_units` (from `supabase/migrations/005_credit_unit_tracker.sql:43`).
-- Produces: columns `student_units.instructor TEXT NULL` and `student_units.schedule TEXT NULL` — Tasks 2 and 5 read/write these names verbatim.
+- Produces: columns `student_units.instructor TEXT NULL` and `student_units.schedule TEXT NULL` - Tasks 2 and 5 read/write these names verbatim.
 
 - [ ] **Step 1: Write the migration file**
 
@@ -42,7 +42,7 @@ Create `supabase/migrations/007_enrollment_details.sql` (guards match the re-run
 -- Migration: 007_enrollment_details.sql
 -- Adds optional free-text enrollment details to the
 -- Credit Unit Tracker: instructor and schedule per
--- student_units row. Both nullable — existing rows are
+-- student_units row. Both nullable - existing rows are
 -- untouched and simply render without a detail line.
 --
 -- Re-runnable: both column adds are guarded.
@@ -83,19 +83,19 @@ Expected: `2` (both column adds guarded → re-runnable).
 
 ```bash
 git add supabase/migrations/007_enrollment_details.sql
-git commit -m "feat(units): migration 007 — optional instructor/schedule columns"
+git commit -m "feat(units): migration 007 - optional instructor/schedule columns"
 ```
 
 ---
 
-### Task 2: Server — sanitize helper, `/my` SELECT, enroll/update passthrough
+### Task 2: Server - sanitize helper, `/my` SELECT, enroll/update passthrough
 
 **Files:**
 - Modify: `server/routes/units.js` (helper after `isValidGrade` ~line 39; `/my` SELECT line 85; `/enroll` lines 388 + 417–426; `/update` lines 458–476)
 
 **Interfaces:**
 - Consumes: columns `instructor`, `schedule` from Task 1.
-- Produces: `sanitizeOptionalText(val)` — `null | undefined | '' | whitespace → null`, otherwise trimmed string capped at 120 chars. `/api/units/my` response rows now include `instructor` and `schedule` (strings or `null`) — Task 5 renders them. `POST /api/units/enroll` and `PATCH /api/units/update/:id` accept optional `instructor`/`schedule` body strings — Task 4 sends them.
+- Produces: `sanitizeOptionalText(val)` - `null | undefined | '' | whitespace → null`, otherwise trimmed string capped at 120 chars. `/api/units/my` response rows now include `instructor` and `schedule` (strings or `null`) - Task 5 renders them. `POST /api/units/enroll` and `PATCH /api/units/update/:id` accept optional `instructor`/`schedule` body strings - Task 4 sends them.
 
 - [ ] **Step 1: Add the sanitize helper**
 
@@ -208,14 +208,14 @@ git commit -m "feat(units): optional instructor/schedule through /my, /enroll, /
 
 ---
 
-### Task 3: Smoke test — sanitize behavior + endpoint wiring
+### Task 3: Smoke test - sanitize behavior + endpoint wiring
 
 **Files:**
 - Create: `scripts/smoke-test-units-fields.js`
 
 **Interfaces:**
 - Consumes: `sanitizeOptionalText` and the route source of Task 2 (extracted at runtime with the `vm` pattern established by `scripts/smoke-test-standing.js`).
-- Produces: a runnable gate — `node scripts/smoke-test-units-fields.js` exits 0 only if sanitization behaves per spec and all three endpoints wire the fields.
+- Produces: a runnable gate - `node scripts/smoke-test-units-fields.js` exits 0 only if sanitization behaves per spec and all three endpoints wire the fields.
 
 - [ ] **Step 1: Write the smoke script**
 
@@ -268,7 +268,7 @@ for (const [input, expected] of cases) {
   console.log(`${ok ? 'PASS' : 'FAIL'} sanitizeOptionalText(${JSON.stringify(input).slice(0, 32)}) -> ${JSON.stringify(got)}`);
 }
 
-// Static wiring checks — the SELECT and writes must carry the fields.
+// Static wiring checks - the SELECT and writes must carry the fields.
 const wiring = [
   ['instructor, schedule, subjects(id, code, title, units', '/my SELECT includes instructor + schedule'],
   ['instructor: sanitizeOptionalText(instructor)', '/enroll insert sanitizes instructor'],
@@ -300,10 +300,10 @@ git commit -m "test(units): smoke script for optional field sanitize + wiring"
 
 ---
 
-### Task 4: Client — modal inputs for schedule / instructor
+### Task 4: Client - modal inputs for schedule / instructor
 
 **Files:**
-- Modify: `client/index.html` (units modal, lines 711–714 — after the Grade `form-group`, before the `#units-modal-error` div)
+- Modify: `client/index.html` (units modal, lines 711–714 - after the Grade `form-group`, before the `#units-modal-error` div)
 - Modify: `client/js/units.js` (`openModal` ~line 288, `saveModal` ~lines 303–319)
 
 **Interfaces:**
@@ -378,7 +378,7 @@ git commit -m "feat(units): optional schedule/instructor inputs in log/edit moda
 
 ---
 
-### Task 5: Client — Current Semester card
+### Task 5: Client - Current Semester card
 
 **Files:**
 - Modify: `client/js/units.js` (new functions before `renderChecklist` ~line 164; `renderChecklist` modified at lines 164–199; `SEM_SHORT` constant at line 27)
@@ -386,7 +386,7 @@ git commit -m "feat(units): optional schedule/instructor inputs in log/edit moda
 
 **Interfaces:**
 - Consumes: `/my` payload rows (`u.status`, `u.school_year`, `u.semester`, `u.subjects.{id, code, title, units}`, `u.schedule`, `u.instructor`) from Task 2; `currentSchoolYear()` / `currentSemester()` (`units.js:30-39`); `esc()` (`units.js:51`); `SEM_LABELS` (`units.js:27`).
-- Produces: `currentTermRecords()` → array of current-term enrolled rows (also consumed by Task 6); `currentSemesterCard()` → HTML string; `currentCardRow(u)` → HTML string; `SEM_SHORT = { 1: '1st Sem', 2: '2nd Sem', 3: 'Summer' }`. The card prepends to `#units-checklist` inside `renderChecklist` — it is NOT a `.unit-year` element, so the year filter (`applyYearFilter`, line 202) never hides it.
+- Produces: `currentTermRecords()` → array of current-term enrolled rows (also consumed by Task 6); `currentSemesterCard()` → HTML string; `currentCardRow(u)` → HTML string; `SEM_SHORT = { 1: '1st Sem', 2: '2nd Sem', 3: 'Summer' }`. The card prepends to `#units-checklist` inside `renderChecklist` - it is NOT a `.unit-year` element, so the year filter (`applyYearFilter`, line 202) never hides it.
 
 - [ ] **Step 1: Add `SEM_SHORT`**
 
@@ -437,7 +437,7 @@ In `client/js/units.js`, directly above the `// ---- Checklist ----` comment (li
 
     const body = rows.length
       ? rows.map(currentCardRow).join('')
-      : `<div class="units-current-empty">No courses logged for this semester yet — log them in the checklist below.</div>`;
+      : `<div class="units-current-empty">No courses logged for this semester yet - log them in the checklist below.</div>`;
 
     return `
       <div class="units-current" id="units-current">
@@ -464,7 +464,7 @@ In `client/js/units.js` `renderChecklist` (line 164), change the opening to comp
       container.innerHTML = card + `
         <div class="empty-state">
           <iconify-icon icon="icon-park-outline:checklist" class="empty-icon"></iconify-icon>
-          <p>No subjects are set up for ${esc(program)} — ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
+          <p>No subjects are set up for ${esc(program)} - ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
         </div>`;
       return;
     }
@@ -547,7 +547,7 @@ In `client/styles/main.css`, directly after the `.units-checklist` rule (ends ~l
 }
 ```
 
-(`.unit-code` and `.unit-title` are reused from the checklist rows — same metrics, one visual language. `.unit-title` already has `min-width: 0`, so long titles/meta wrap instead of overflowing on mobile.)
+(`.unit-code` and `.unit-title` are reused from the checklist rows - same metrics, one visual language. `.unit-title` already has `min-width: 0`, so long titles/meta wrap instead of overflowing on mobile.)
 
 - [ ] **Step 5: Verify syntax**
 
@@ -563,7 +563,7 @@ git commit -m "feat(units): current semester card above the year checklist"
 
 ---
 
-### Task 6: Client — two-tone progress bar
+### Task 6: Client - two-tone progress bar
 
 **Files:**
 - Modify: `client/index.html` (progress track, lines 426–428)
@@ -600,7 +600,7 @@ In `client/js/units.js` `renderProgress`, after the `const pct = ...` line (line
 
 ```js
     // In-progress: current-term enrolled units render as a lighter
-    // segment behind the passed fill — pct stays passed-only.
+    // segment behind the passed fill - pct stays passed-only.
     const inProgressUnits = currentTermRecords()
       .reduce((sum, u) => sum + Number(u.subjects.units || 0), 0);
     const inPct = total > 0
@@ -614,7 +614,7 @@ Then change the element updates (lines 141–144) from:
     document.getElementById('units-progress-pct').textContent = `${pct}%`;
     document.getElementById('units-progress-fill').style.width = `${pct}%`;
     document.getElementById('units-completed').textContent = completed;
-    document.getElementById('units-total').textContent = total || '—';
+    document.getElementById('units-total').textContent = total || '-';
 ```
 
 to:
@@ -624,9 +624,9 @@ to:
     document.getElementById('units-progress-fill').style.width = `${pct}%`;
     document.getElementById('units-progress-progress').style.width = `${Math.min(100, pct + inPct)}%`;
     document.getElementById('units-progress-caption').textContent =
-      `${completed} / ${total || '—'} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`;
+      `${completed} / ${total || '-'} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`;
     document.getElementById('units-completed').textContent = completed;
-    document.getElementById('units-total').textContent = total || '—';
+    document.getElementById('units-total').textContent = total || '-';
 ```
 
 - [ ] **Step 3: Layer the bar in CSS**
@@ -660,7 +660,7 @@ Change `.units-progress-fill` (line 2397) to add `position: relative;` (first li
 Immediately after the `.units-progress-fill` rule, add:
 
 ```css
-/* In-progress extension — translucent, painted under the passed fill
+/* In-progress extension - translucent, painted under the passed fill
    (earlier in the DOM, and .units-progress-fill is position:relative),
    so the bar reads solid-accent → translucent → track. */
 .units-progress-fill-progress {
@@ -723,17 +723,17 @@ Expected: no output, no output, `All checks passed.`
 
 Start the app (`npm run dev`, or the Electron wrapper per `docs/desktop-app.md`), sign in as a student whose profile has a valid program (e.g. BSCoE), open **Academic Progress**, and verify each point from the spec:
 
-1. **Existing rows unaffected** — the card renders; previously logged subjects show no second line (instructor/schedule are null).
-2. **Enroll with details** — Log a current-term subject with schedule + instructor: the card row shows the muted second line `schedule · instructor`.
-3. **Enroll without details** — Log another subject with both fields blank: row renders with no second line and no placeholder dashes.
-4. **One field only** — Edit a record to have only an instructor: second line shows just the instructor, no dangling `·`.
-5. **Clear round-trip** — Edit a record to clear both fields: second line disappears (empty → NULL).
-6. **Empty state** — Drop every current-term enrolled course: the card shows "No courses logged for this semester yet — log them in the checklist below." and never disappears.
-7. **Progress math** — With passed 93, enrolled 24, required 189: big number stays `49%`, bar shows solid fill to 49% plus translucent segment to ~62%, caption reads `93 / 189 units · 24 in progress`. With zero enrolled: caption reads `93 / 189 units`, translucent segment at 0%.
-8. **Stale rows excluded** — A row with status `enrolled` but an older school year does not appear in the card and does not add to the in-progress segment (it stays visible in the year checklist).
-9. **Year tabs unaffected** — clicking Year 1–4 filters only the checklist; the card stays visible above it.
-10. **Mobile** — at ≤768px width: card stacks above the checklist, long titles/meta wrap, unit counts stay right-aligned.
-11. **XSS probe** — Log a course with instructor `<img src=x onerror=alert(1)>`: it renders as literal text, never executes.
+1. **Existing rows unaffected** - the card renders; previously logged subjects show no second line (instructor/schedule are null).
+2. **Enroll with details** - Log a current-term subject with schedule + instructor: the card row shows the muted second line `schedule · instructor`.
+3. **Enroll without details** - Log another subject with both fields blank: row renders with no second line and no placeholder dashes.
+4. **One field only** - Edit a record to have only an instructor: second line shows just the instructor, no dangling `·`.
+5. **Clear round-trip** - Edit a record to clear both fields: second line disappears (empty → NULL).
+6. **Empty state** - Drop every current-term enrolled course: the card shows "No courses logged for this semester yet - log them in the checklist below." and never disappears.
+7. **Progress math** - With passed 93, enrolled 24, required 189: big number stays `49%`, bar shows solid fill to 49% plus translucent segment to ~62%, caption reads `93 / 189 units · 24 in progress`. With zero enrolled: caption reads `93 / 189 units`, translucent segment at 0%.
+8. **Stale rows excluded** - A row with status `enrolled` but an older school year does not appear in the card and does not add to the in-progress segment (it stays visible in the year checklist).
+9. **Year tabs unaffected** - clicking Year 1–4 filters only the checklist; the card stays visible above it.
+10. **Mobile** - at ≤768px width: card stacks above the checklist, long titles/meta wrap, unit counts stay right-aligned.
+11. **XSS probe** - Log a course with instructor `<img src=x onerror=alert(1)>`: it renders as literal text, never executes.
 
 - [ ] **Step 4: Commit any fixes**
 
@@ -744,7 +744,7 @@ git add -A
 git commit -m "fix(units): QA fixes for current semester card"
 ```
 
-If no fixes were needed, record completion in the commit trail of Tasks 1–6 — nothing to commit here.
+If no fixes were needed, record completion in the commit trail of Tasks 1–6 - nothing to commit here.
 
 ---
 
@@ -752,4 +752,4 @@ If no fixes were needed, record completion in the commit trail of Tasks 1–6 �
 
 - **Spec coverage:** migration (Task 1), `/my`+`/enroll`+`/update` (Task 2), sanitize + smoke (Task 3), modal (Task 4), card incl. empty state/plain-number units/escaping (Task 5), two-tone bar + caption + passed-only % (Task 6), QA checklist items 1–8 of the spec (Task 7 step 3). Non-goals untouched.
 - **Type consistency:** `currentTermRecords` / `currentSemesterCard` / `currentCardRow` / `SEM_SHORT` / `sanitizeOptionalText` / element IDs (`units-schedule`, `units-instructor`, `units-current`, `units-progress-progress`, `units-progress-caption`) are used identically across tasks.
-- **Ordering:** Task 6 consumes `currentTermRecords()` from Task 5 — execute in numbered order. `renderProgress` runs before `renderChecklist` in `load()` (`units.js:114-115`), which is safe because both only read `myUnits` (set at line 113).
+- **Ordering:** Task 6 consumes `currentTermRecords()` from Task 5 - execute in numbered order. `renderProgress` runs before `renderChecklist` in `load()` (`units.js:114-115`), which is safe because both only read `myUnits` (set at line 113).

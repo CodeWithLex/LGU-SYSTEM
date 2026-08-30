@@ -35,7 +35,7 @@ router.post('/', requireAdmin, async (req, res) => {
   const missing = assertRequired({ title, body });
   if (missing) return res.status(400).json({ error: missing });
 
-  // 2. Sanitize (strips HTML tags — prevents XSS in emails and PDF)
+  // 2. Sanitize (strips HTML tags - prevents XSS in emails and PDF)
   const cleanTitle = sanitizeText(String(title));
   const cleanBody  = sanitizeText(String(body));
 

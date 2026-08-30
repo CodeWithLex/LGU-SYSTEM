@@ -9,7 +9,7 @@
 --
 -- Re-runnable: the constraint is only added if missing AND no invalid
 -- rows exist (adding it with invalid rows would fail loudly, which is
--- the desired behavior — fix the data first).
+-- the desired behavior - fix the data first).
 -- =============================================
 
 DO $$

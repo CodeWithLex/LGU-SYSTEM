@@ -60,7 +60,7 @@ for (const [input, expected] of gradeCases) {
   console.log(`${ok ? 'PASS' : 'FAIL'} normalizeGrade(${JSON.stringify(input ?? null)}) -> ${JSON.stringify(got)}`);
 }
 
-// Static wiring checks — the SELECT and writes must carry the fields.
+// Static wiring checks - the SELECT and writes must carry the fields.
 const wiring = [
   ['instructor, schedule, subjects(id, code, title, units', '/my SELECT includes instructor + schedule'],
   ['instructor: sanitizeOptionalText(instructor)', '/enroll insert sanitizes instructor'],

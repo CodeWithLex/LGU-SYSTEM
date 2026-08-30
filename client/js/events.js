@@ -1,5 +1,5 @@
 // =============================================
-// events.js — Events View Module
+// events.js - Events View Module
 // =============================================
 
 const Events = (() => {

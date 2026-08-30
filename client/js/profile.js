@@ -1,5 +1,5 @@
 // =============================================
-// profile.js — User Account Profile & Settings Controller
+// profile.js - User Account Profile & Settings Controller
 // =============================================
 
 const ProfileModal = (() => {

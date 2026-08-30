@@ -1,5 +1,5 @@
 // =============================================
-// income.js — General Income Tracker Module
+// income.js - General Income Tracker Module
 // =============================================
 
 const Income = (() => {

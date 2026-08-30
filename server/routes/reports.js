@@ -151,7 +151,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
   doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(18)
      .text('COE Financial Transparency System', 50, 22);
   doc.font('Helvetica').fontSize(10).fillColor('#a5b4fc')
-     .text('College of Engineering — Cor Jesu College', 50, 46);
+     .text('College of Engineering - Cor Jesu College', 50, 46);
   doc.font('Helvetica-Bold').fontSize(11).fillColor('#ffffff')
      .text('LIQUIDATION REPORT', 50, 64);
 
@@ -164,7 +164,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
      .text(event.event_name, 66, infoY + 14, { width: pageWidth - 32 });
 
   const fmt = n => `₱${Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '-';
 
   let pdfAllExp = 0, pdfAllocExp = 0, pdfInc = 0;
   (transactions || []).forEach(tx => {
@@ -216,7 +216,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
     doc.fillColor(textMuted).font('Helvetica').fontSize(8.5);
     doc.text(fmtDate(tx.transaction_date), cols.date,   rowY + 6, { width: 75 });
     doc.text(tx.type.toUpperCase(),        cols.type,   rowY + 6, { width: 80 });
-    doc.text(tx.description || '—',        cols.desc,   rowY + 6, { width: 210 });
+    doc.text(tx.description || '-',        cols.desc,   rowY + 6, { width: 210 });
     doc.fillColor(amtColor).font('Helvetica-Bold')
        .text(fmt(tx.amount),              cols.amount, rowY + 6, { width: 65, align: 'right' });
 
@@ -241,7 +241,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
   // Footer line
   doc.moveDown(4);
   doc.fillColor(textMuted).font('Helvetica').fontSize(8)
-     .text('This document is computer-generated from the COE Financial Transparency System. | Cor Jesu College — Digos City', 50, doc.page.height - 35, { align: 'center', width: pageWidth });
+     .text('This document is computer-generated from the COE Financial Transparency System. | Cor Jesu College - Digos City', 50, doc.page.height - 35, { align: 'center', width: pageWidth });
 
   doc.end();
 });
@@ -284,7 +284,7 @@ router.get('/excel/:eventId', requireAdmin, async (req, res) => {
   // ── Title block ──
   sheet.mergeCells('A1:F1');
   const titleCell = sheet.getCell('A1');
-  titleCell.value = 'COE FINANCIAL TRANSPARENCY SYSTEM — LIQUIDATION REPORT';
+  titleCell.value = 'COE FINANCIAL TRANSPARENCY SYSTEM - LIQUIDATION REPORT';
   titleCell.font  = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
   titleCell.fill  = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1a1f35' } };
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -292,13 +292,13 @@ router.get('/excel/:eventId', requireAdmin, async (req, res) => {
 
   sheet.mergeCells('A2:F2');
   const subCell = sheet.getCell('A2');
-  subCell.value = 'College of Engineering — Cor Jesu College, Digos City';
+  subCell.value = 'College of Engineering - Cor Jesu College, Digos City';
   subCell.font  = { italic: true, size: 10, color: { argb: 'FF64748b' } };
   subCell.alignment = { horizontal: 'center' };
 
   // ── Event Info ──
   const fmt = n => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '—';
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '-';
 
   let xlAllExp = 0, xlAllocExp = 0, xlInc = 0;
   (transactions || []).forEach(tx => {

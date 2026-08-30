@@ -1,5 +1,5 @@
 // =============================================
-// server/lib/supabase.js — Shared Supabase Admin Client
+// server/lib/supabase.js - Shared Supabase Admin Client
 // All routes import from here (single instance)
 // =============================================
 const { createClient } = require('@supabase/supabase-js');

@@ -1,5 +1,5 @@
 // =============================================
-// units.js — Credit Unit Tracker View Module
+// units.js - Credit Unit Tracker View Module
 // =============================================
 
 const Units = (() => {
@@ -9,7 +9,7 @@ const Units = (() => {
   let myUnits      = []; // the student's enrollment records
   let program      = null;
   let selectedYear = 'all'; // 'all' | '1' | '2' | '3' | '4'
-  let enrollmentYear = null; // profile.enrollment_year — cohort that anchors prospectus SY prefill
+  let enrollmentYear = null; // profile.enrollment_year - cohort that anchors prospectus SY prefill
 
   const VALID_PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
   const PROGRAM_NAMES = {
@@ -128,7 +128,7 @@ const Units = (() => {
     const req = requirements.find(r => r.program === program);
     const total = req ? Number(req.total_units) : 0;
 
-    // Count units once per subject — a retake that is later passed
+    // Count units once per subject - a retake that is later passed
     // never double-counts the same subject.
     const passedSubjectIds = new Set(
       myUnits.filter(u => u.status === 'passed' && u.subjects?.id).map(u => u.subjects.id)
@@ -140,7 +140,7 @@ const Units = (() => {
     const pct = total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0;
 
     // In-progress: current-term enrolled units render as a lighter
-    // segment behind the passed fill — pct stays passed-only.
+    // segment behind the passed fill - pct stays passed-only.
     const inProgressUnits = currentTermRecords()
       .reduce((sum, u) => sum + Number(u.subjects.units || 0), 0);
     const inPct = total > 0
@@ -151,9 +151,9 @@ const Units = (() => {
     document.getElementById('units-progress-fill').style.width = `${pct}%`;
     document.getElementById('units-progress-progress').style.width = `${Math.min(100, pct + inPct)}%`;
     document.getElementById('units-progress-caption').textContent =
-      `${completed} / ${total || '—'} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`;
+      `${completed} / ${total || '-'} units${inProgressUnits > 0 ? ` · ${inProgressUnits} in progress` : ''}`;
     document.getElementById('units-completed').textContent = completed;
-    document.getElementById('units-total').textContent = total || '—';
+    document.getElementById('units-total').textContent = total || '-';
 
     // Estimated graduation cohort: enrollment year + 4. Prefer the stored
     // enrollment_year (a student who enrolled in 2024 graduates 2028 even if
@@ -194,7 +194,7 @@ const Units = (() => {
       </div>`;
   }
 
-  // Slim trigger above the checklist — the full list lives in the popup
+  // Slim trigger above the checklist - the full list lives in the popup
   // modal so the card doesn't occupy permanent vertical space.
   function currentSemesterButton() {
     const rows = currentTermRecords();
@@ -221,7 +221,7 @@ const Units = (() => {
       `${totalUnits} unit${totalUnits === 1 ? '' : 's'}`;
     document.getElementById('units-current-modal-body').innerHTML = rows.length
       ? rows.map(currentCardRow).join('')
-      : `<div class="units-current-empty">No courses logged for this semester yet — log them in the checklist below.</div>`;
+      : `<div class="units-current-empty">No courses logged for this semester yet - log them in the checklist below.</div>`;
     openModalOverlay('units-current-modal');
   }
 
@@ -231,7 +231,7 @@ const Units = (() => {
 
   // ---- Checklist ----
   function recordFor(subjectId) {
-    // API returns newest first — the first match is the latest record
+    // API returns newest first - the first match is the latest record
     return myUnits.find(u => u.subjects?.id === subjectId) || null;
   }
 
@@ -243,7 +243,7 @@ const Units = (() => {
       container.innerHTML = card + `
         <div class="empty-state">
           <iconify-icon icon="solar:diploma-verified-linear" class="empty-icon"></iconify-icon>
-          <p>No subjects are set up for ${esc(program)} — ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
+          <p>No subjects are set up for ${esc(program)} - ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
         </div>`;
       return;
     }
@@ -293,7 +293,7 @@ const Units = (() => {
     if (!activeTab || !slider || !wrapper) return;
 
     // The slider's absolute `left: 4px` rests at the content start (padding
-    // edge + padding), so translate relative to the content box — measuring
+    // edge + padding), so translate relative to the content box - measuring
     // from the border-box would leave the pill offset by the border width.
     const cs = getComputedStyle(wrapper);
     const contentLeft = wrapper.getBoundingClientRect().left

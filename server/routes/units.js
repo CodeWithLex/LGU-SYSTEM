@@ -1,5 +1,5 @@
 // =============================================
-// server/routes/units.js — Credit Unit Tracker API
+// server/routes/units.js - Credit Unit Tracker API
 // Students manage their own subject enrollment records.
 // All ownership checks run against req.user.id (the verified
 // Supabase JWT), never against client-supplied IDs.
@@ -116,7 +116,7 @@ router.get('/my', async (req, res) => {
 });
 
 // GET /api/units/standing
-// PDF transcript of the student's academic standing — every subject from
+// PDF transcript of the student's academic standing - every subject from
 // Year 1 to 4 with units, status, grade, and school year, laid out on the
 // institutional letterhead (LETTER TEMPLATE.docx).
 router.get('/standing', async (req, res) => {
@@ -125,7 +125,7 @@ router.get('/standing', async (req, res) => {
       p => p.toUpperCase() === String(req.profile?.course || '').trim().toUpperCase()
     );
     if (!studentProgram) {
-      return res.status(400).json({ error: 'No enrolled program on your profile — cannot build a standing report.' });
+      return res.status(400).json({ error: 'No enrolled program on your profile - cannot build a standing report.' });
     }
 
     const [reqRes, subjRes, myRes] = await Promise.all([
@@ -146,7 +146,7 @@ router.get('/standing', async (req, res) => {
     const records  = myRes.data || [];
     const total    = Number(reqRes.data?.total_units) || 0;
 
-    // Summary — a passed subject counts once (mirrors the tracker's progress)
+    // Summary - a passed subject counts once (mirrors the tracker's progress)
     const passedIds = new Set(records.filter(r => r.status === 'passed').map(r => r.subject_id));
     const completed = subjects
       .filter(s => passedIds.has(s.id))
@@ -180,7 +180,7 @@ router.get('/standing', async (req, res) => {
     doc.pipe(res);
 
     const primary   = '#1a1f35';  /* ink */
-    const accent    = '#ed2024';  /* template letterhead red — sole accent */
+    const accent    = '#ed2024';  /* template letterhead red - sole accent */
     const textMuted = '#64748b';
     const faint     = '#e2e8f0';  /* hairlines / track */
     const veryLight = '#f8fafc';  /* alternating row fill */
@@ -197,13 +197,13 @@ router.get('/standing', async (req, res) => {
     const hasLogo    = fs.existsSync(logoPath);
 
     function drawLetterhead() {
-      // Preserve the caller's cursor — doc.text()/doc.image() move doc.x/doc.y,
+      // Preserve the caller's cursor - doc.text()/doc.image() move doc.x/doc.y,
       // and this handler runs inside addPage() where tableHeader() then reads
       // the cursor to position the next table on the fresh page.
       const savedX = doc.x, savedY = doc.y;
       // Full-bleed letterhead banner across the top
       if (hasBanner) doc.image(bannerPath, 0, 0, { width: 612 });
-      // Footer — matches LETTER TEMPLATE.docx: a light rule, then the COE logo
+      // Footer - matches LETTER TEMPLATE.docx: a light rule, then the COE logo
       // with COLLEGE OF ENGINEERING in Times bold (the template's footer type)
       // at the bottom-left. The template anchors this in the footer zone below
       // the 1" bottom margin (936 - 72 = 864), so relax the page's bottom
@@ -229,16 +229,16 @@ router.get('/standing', async (req, res) => {
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(14)
        .text('OFFICIAL ACADEMIC STANDING REPORT', contentLeft, 94);
     doc.font('Helvetica').fontSize(9.5).fillColor(textMuted)
-       .text('Subject Status Report — Year 1 to 4', contentLeft, 115);
+       .text('Subject Status Report - Year 1 to 4', contentLeft, 115);
 
-    // ── Student information — two-column metadata block ──
+    // ── Student information - two-column metadata block ──
     const metaTop = 136;
     const metaH   = 12 + 4 * 16 + 10;
     doc.rect(contentLeft, metaTop, pageWidth, metaH).fillAndStroke(veryLight, faint);
     const leftMeta = [
       ['Name',            fullName],
       ['Email',           req.user.email],
-      ['Enrollment Year', enrolledYear || '—'],
+      ['Enrollment Year', enrolledYear || '-'],
       ['Generated',       generated],
     ];
     const rightMeta = [
@@ -261,7 +261,7 @@ router.get('/standing', async (req, res) => {
     });
     doc.y = metaTop + metaH + 10;
 
-    // ── Progress summary — vector bar (PDFKit has no text glyphs for block
+    // ── Progress summary - vector bar (PDFKit has no text glyphs for block
     //    characters in its built-in fonts, so the bar is drawn with shapes) ──
     doc.fillColor(textMuted).font('Helvetica-Bold').fontSize(8.5)
        .text('PROGRESS', contentLeft, doc.y);
@@ -270,7 +270,7 @@ router.get('/standing', async (req, res) => {
     const fillW = total > 0 ? Math.max(12, (pageWidth * pct) / 100) : 0;
     if (fillW > 0) doc.roundedRect(contentLeft, trackTop, fillW, 12, 6).fill(accent);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(9.5)
-       .text(`${pct}% complete (${completed} / ${total || '—'} units completed)`, contentLeft, trackTop + 18, { width: pageWidth });
+       .text(`${pct}% complete (${completed} / ${total || '-'} units completed)`, contentLeft, trackTop + 18, { width: pageWidth });
     doc.moveDown(5);
 
     // ── Subject table ──
@@ -309,7 +309,7 @@ router.get('/standing', async (req, res) => {
     const years = [1, 2, 3, 4].filter(y => subjects.some(s => s.year_level === y));
 
     years.forEach(year => {
-      // Year banner — light band with a 3px accent left bar, no heavy fill
+      // Year banner - light band with a 3px accent left bar, no heavy fill
       if (rowY > pageBottom - 60) { doc.addPage(); rowY = tableHeader(); }
       doc.rect(contentLeft, rowY, pageWidth, 20).fill(veryLight);
       doc.rect(contentLeft, rowY, 3, 20).fill(accent);
@@ -318,7 +318,7 @@ router.get('/standing', async (req, res) => {
 
       [1, 2, 3].filter(sem => subjects.some(s => s.year_level === year && s.semester === sem))
         .forEach(sem => {
-          // Semester sub-header — italic gray
+          // Semester sub-header - italic gray
           if (rowY > pageBottom - 40) { doc.addPage(); rowY = tableHeader(); }
           doc.fillColor(textMuted).font('Helvetica-Oblique').fontSize(8.5)
              .text(`${SEM_LABELS[sem] || 'Semester ' + sem}`, contentLeft + 10, rowY + 2);
@@ -341,12 +341,12 @@ router.get('/standing', async (req, res) => {
                .text(s.title, cols.title, rowY + 6, { width: colW.title, height: rowH - 8 });
             doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
                .text(String(s.units), cols.units, rowY + 6, { width: colW.units, align: 'right' });
-            doc.text(rec?.school_year || '—', cols.sy, rowY + 6, { width: colW.sy });
-            doc.text(SEM_SHORT[rec?.semester ?? s.semester] || '—', cols.sem, rowY + 6, { width: colW.sem });
+            doc.text(rec?.school_year || '-', cols.sy, rowY + 6, { width: colW.sy });
+            doc.text(SEM_SHORT[rec?.semester ?? s.semester] || '-', cols.sem, rowY + 6, { width: colW.sem });
             doc.fillColor(statusColors[status] || textMuted).font('Helvetica-Bold').fontSize(8)
                .text((STATUS_LABELS[status] || status).toUpperCase(), cols.status, rowY + 6, { width: colW.status });
             doc.fillColor(textMuted).font('Helvetica').fontSize(8.5)
-               .text(rec?.grade != null ? String(rec.grade) : '—', cols.grade, rowY + 6, { width: colW.grade, align: 'right' });
+               .text(rec?.grade != null ? String(rec.grade) : '-', cols.grade, rowY + 6, { width: colW.grade, align: 'right' });
 
             rowY += rowH;
             band++;
@@ -354,7 +354,7 @@ router.get('/standing', async (req, res) => {
         });
     });
 
-    // ── Final page — summary + signature block ──
+    // ── Final page - summary + signature block ──
     doc.addPage();
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(13).text('SUMMARY', contentLeft, 94);
     doc.rect(contentLeft, 106, 60, 2).fill(accent);
@@ -367,7 +367,7 @@ router.get('/standing', async (req, res) => {
     doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
        .text('Units Completed:', contentLeft, sumY + 20);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
-       .text(`${completed} / ${total || '—'}`, contentLeft + 100, sumY + 20);
+       .text(`${completed} / ${total || '-'}`, contentLeft + 100, sumY + 20);
     doc.fillColor(textMuted).font('Helvetica').fontSize(9.5)
        .text('Progress:', 300, sumY);
     doc.fillColor(primary).font('Helvetica-Bold').fontSize(10.5)
@@ -409,7 +409,7 @@ router.post('/enroll', async (req, res) => {
     if (!isValidEnum(status, VALID_STATUSES))    return res.status(400).json({ error: 'Invalid status.' });
     if (!isValidGrade(grade))                    return res.status(400).json({ error: 'Grade must be between 1.0 and 5.0.' });
 
-    // Subject must exist and belong to the student's enrolled program —
+    // Subject must exist and belong to the student's enrolled program -
     // students can only log subjects from their own course.
     const { data: subject, error: subjErr } = await supabase
       .from('subjects')

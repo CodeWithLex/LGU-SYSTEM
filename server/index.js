@@ -18,7 +18,7 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 // Trust the first proxy hop (Render/Vercel) so req.ip reflects the real client
-// IP — required for per-IP rate limiting to work behind a reverse proxy.
+// IP - required for per-IP rate limiting to work behind a reverse proxy.
 app.set('trust proxy', 1);
 
 // =============================================
@@ -62,7 +62,7 @@ app.use(helmet({
 }));
 
 // =============================================
-// CORS — strict allowlist only
+// CORS - strict allowlist only
 // =============================================
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
@@ -83,7 +83,7 @@ app.use(cors({
 }));
 
 // =============================================
-// Body parsing — with size limits (prevents DoS)
+// Body parsing - with size limits (prevents DoS)
 // =============================================
 app.use(express.json({ limit: '50kb' }));
 app.use(express.urlencoded({ extended: true, limit: '50kb' }));
@@ -91,7 +91,7 @@ app.use(express.urlencoded({ extended: true, limit: '50kb' }));
 // =============================================
 // Rate Limiting
 // =============================================
-// Global cap — 5000 req / 15 min per IP (calibrated for shared campus Wi-Fi NAT gateways with 500+ students)
+// Global cap - 5000 req / 15 min per IP (calibrated for shared campus Wi-Fi NAT gateways with 500+ students)
 const globalLimiter = rateLimit({
   windowMs:         15 * 60 * 1000, // 15 minutes
   max:              5000,
@@ -103,7 +103,7 @@ const globalLimiter = rateLimit({
 app.use('/api/', globalLimiter);
 
 // Sensitive operations with high blast radius (email blasts, bulk imports,
-// role changes, budget transfers) — tight per-IP cap, applied before auth.
+// role changes, budget transfers) - tight per-IP cap, applied before auth.
 // Note: req.path here is stripped of the '/api' mount prefix.
 const sensitiveLimiter = rateLimit({
   windowMs:         10 * 60 * 1000, // 10 minutes
@@ -118,7 +118,7 @@ const sensitiveLimiter = rateLimit({
 });
 app.use('/api/', sensitiveLimiter);
 
-// Write cap — 100 mutating requests / 5 min, keyed by authenticated user
+// Write cap - 100 mutating requests / 5 min, keyed by authenticated user
 // (falls back to IP). Only counts POST/PATCH/DELETE; mounted after auth.
 const writeLimiter = rateLimit({
   windowMs:        5 * 60 * 1000, // 5 minutes
@@ -167,7 +167,7 @@ app.get("*", (req, res) => {
 });
 
 // =============================================
-// Global Error Handler — never leak stack traces
+// Global Error Handler - never leak stack traces
 // =============================================
 app.use((err, req, res, next) => {
   // Log full error internally, never expose to client

@@ -4,12 +4,12 @@
 
 /* ---- Design Tokens ---- */
 :root {
-  /* Backgrounds — flat, opaque, no glassmorphism */
+  /* Backgrounds - flat, opaque, no glassmorphism */
   --bg-base: #0A0A0B;           /* app shell, page background */
   --bg-surface: #0D0E10;        /* sidebar, modals, cards */
   --bg-surface-raised: #131417; /* input fields, hover states */
 
-  /* Borders — this replaces backdrop-blur/fill/shadow as the primary elevation tool */
+  /* Borders - this replaces backdrop-blur/fill/shadow as the primary elevation tool */
   --border-default: rgba(255, 255, 255, 0.08);
   --border-hover: rgba(255, 255, 255, 0.14);
   --border-focus: var(--accent); /* defined below */
@@ -19,22 +19,22 @@
   --text-secondary: rgba(255, 255, 255, 0.55);
   --text-tertiary: rgba(255, 255, 255, 0.35);
 
-  /* Accent — exactly ONE, used only for: primary buttons, active nav indicator,
+  /* Accent - exactly ONE, used only for: primary buttons, active nav indicator,
      links, focus rings, and chart fill on progress bars */
   --accent: #BA7517; /* COE crest orange */
   --accent-muted: rgba(186, 117, 23, 0.15);
   --accent-text-on: #0A0A0B; /* text color to use ON TOP of a solid accent fill */
 
-  /* Status — use ONLY as a 6px dot + text color, NEVER as a badge background */
+  /* Status - use ONLY as a 6px dot + text color, NEVER as a badge background */
   --status-positive: #4ADE80; /* income / donation / collection */
   --status-negative: #F87171; /* expense */
-  --status-neutral: var(--text-secondary); /* allocation — no unique hue, treat as informational */
+  --status-neutral: var(--text-secondary); /* allocation - no unique hue, treat as informational */
 
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 6px;
 
-  /* Shadows — reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
+  /* Shadows - reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
   --shadow-popover: 0 4px 16px rgba(0, 0, 0, 0.4);
 
   /* Typography */
@@ -1235,7 +1235,7 @@ html body .hidden {
 }
 
 /* =============================================
-   RESPONSIVE — Tablet (≤1024px)
+   RESPONSIVE - Tablet (≤1024px)
    ============================================= */
 @media (max-width: 1024px) {
   .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1243,7 +1243,7 @@ html body .hidden {
 }
 
 /* =============================================
-   RESPONSIVE — Small Tablet / Large Phone (≤768px)
+   RESPONSIVE - Small Tablet / Large Phone (≤768px)
    ============================================= */
 @media (max-width: 768px) {
   :root { --sidebar-w: 60px; }
@@ -1272,7 +1272,7 @@ html body .hidden {
 .bottom-nav { display: none; }
 
 /* =============================================
-   RESPONSIVE — Phone (≤480px)
+   RESPONSIVE - Phone (≤480px)
    ============================================= */
 @media (max-width: 480px) {
   /* Dashboard & Grid Overrides */
@@ -1411,7 +1411,7 @@ html body .hidden {
 }
 
 /* =============================================
-   Phase 4 — Admin Tabs & Modals
+   Phase 4 - Admin Tabs & Modals
    ============================================= */
 
 /* Admin Tab Navigation */
@@ -1480,7 +1480,7 @@ html body.is-admin th.admin-only {
 }
 
 /* =============================================
-   Phase 5 — Custom Loading Splash Screen
+   Phase 5 - Custom Loading Splash Screen
    ============================================= */
 .splash-screen {
   position: fixed;

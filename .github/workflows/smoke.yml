@@ -1,11 +1,11 @@
 name: UI Smoke
 
 # Post-deploy gate: Vercel/Render auto-deploy every push to main, so this
-# runs right after and verifies the deployed site actually works — the
+# runs right after and verifies the deployed site actually works - the
 # same checks that would have caught the 2026-08 empty-select crash that
 # broke login for every user. Optional authenticated checks run when
 # TEST_EMAIL / TEST_PASSWORD secrets are configured (create a dedicated
-# test account for this — never use a real admin's credentials).
+# test account for this - never use a real admin's credentials).
 
 on:
   push:

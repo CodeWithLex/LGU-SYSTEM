@@ -1,5 +1,5 @@
 // =============================================
-// client/js/reports.js — Phase 3 Reporting
+// client/js/reports.js - Phase 3 Reporting
 // =============================================
 
 let _monthlyChart = null;
@@ -253,7 +253,7 @@ function renderMonthlyChart(monthly) {
         {
           label: 'Income',
           data: monthly.map(m => m.income),
-          backgroundColor: '#F97316', /* engineering orange — income bars */
+          backgroundColor: '#F97316', /* engineering orange - income bars */
           borderRadius: 6,
           borderSkipped: false,
           maxBarThickness: 35,

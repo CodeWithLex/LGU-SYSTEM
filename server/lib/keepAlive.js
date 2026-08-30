@@ -14,7 +14,7 @@ function start(serverUrl) {
     try {
       const res = await fetch(`${serverUrl}/api/health`);
       const data = await res.json();
-      console.log(`[keep-alive] Server pinged — ${data.timestamp}`);
+      console.log(`[keep-alive] Server pinged - ${data.timestamp}`);
     } catch (err) {
       console.warn('[keep-alive] Server ping failed:', err.message);
     }

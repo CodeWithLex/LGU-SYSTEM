@@ -214,7 +214,7 @@ router.post('/bulk', requireAdmin, async (req, res) => {
   res.status(201).json({ message: 'Bulk import successful.', count: transactions.length });
 });
 
-// PATCH /api/transactions/:id — edit with mandatory reason (admin only)
+// PATCH /api/transactions/:id - edit with mandatory reason (admin only)
 router.patch('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { amount, description, transaction_date, reason, receipt_url } = req.body;
@@ -253,7 +253,7 @@ router.patch('/:id', requireAdmin, async (req, res) => {
   res.json(data);
 });
 
-// DELETE /api/transactions/:id — soft-delete with mandatory reason (admin only)
+// DELETE /api/transactions/:id - soft-delete with mandatory reason (admin only)
 router.delete('/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { reason } = req.body;

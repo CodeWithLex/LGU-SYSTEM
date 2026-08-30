@@ -1,5 +1,5 @@
 // =============================================
-// app.js — Main Application Router
+// app.js - Main Application Router
 // =============================================
 
 (async () => {
@@ -146,7 +146,7 @@
       return;
     }
 
-    // School-only registration — personal email accounts are rejected
+    // School-only registration - personal email accounts are rejected
     const schoolDomain = '@g.cjc.edu.ph';
     if (!email.toLowerCase().endsWith(schoolDomain)) {
       errEl.textContent = 'Only @g.cjc.edu.ph school accounts can register.';
@@ -160,10 +160,10 @@
     try {
       const data = await Auth.register(name, email, pass, { course, year_level: year, enrollment_year });
       if (data.session) {
-        // Email confirmation disabled — session already active
+        // Email confirmation disabled - session already active
         await bootApp(data.session);
       } else {
-        // Confirmation email sent — return to login with a success message
+        // Confirmation email sent - return to login with a success message
         showAuthForm('login');
         const loginErr = document.getElementById('login-error');
         loginErr.classList.remove('auth-error');
@@ -234,7 +234,7 @@
         li.dataset.index = i;
         li.setAttribute('role', 'option');
         li.addEventListener('click', () => {
-          // Disabled placeholder option — clicking it just dismisses the menu
+          // Disabled placeholder option - clicking it just dismisses the menu
           if (opt.disabled) { close(); return; }
           select.selectedIndex = i;
           sync();

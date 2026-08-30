@@ -61,7 +61,7 @@ CREATE POLICY "Transactions viewable by all"
 CREATE POLICY "Only admins can add transactions"
   ON public.transactions FOR INSERT WITH CHECK (public.is_admin());
 
--- Transactions are immutable — no updates or deletes (audit trail)
+-- Transactions are immutable - no updates or deletes (audit trail)
 -- Admins may soft-delete via a status column (future enhancement)
 
 -- =============================================

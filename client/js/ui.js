@@ -1,5 +1,5 @@
 // =============================================
-// ui.js — Shared UI Utilities
+// ui.js - Shared UI Utilities
 // =============================================
 
 const UI = (() => {
@@ -86,7 +86,7 @@ const UI = (() => {
   }
 
   function dateStr(dateString) {
-    if (!dateString) return '—';
+    if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('en-PH', {
       year: 'numeric', month: 'short', day: 'numeric'
     });
