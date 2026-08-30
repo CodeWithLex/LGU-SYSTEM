@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Officer Console - COE LGU System</title>
+  <link rel="stylesheet" href="styles/officer.css" />
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+</head>
+<body>
+
+  <!-- Access gate: filled by officer-app.js; students/unauthenticated never see data -->
+  <div id="of-gate" class="of-gate hidden">
+    <iconify-icon icon="solar:shield-warning-linear" style="font-size:3rem"></iconify-icon>
+    <h2>Restricted Access</h2>
+    <p id="of-gate-message">This console is for council officers only.</p>
+    <a href="/" class="of-btn of-btn-ghost">Back to Main System</a>
+  </div>
+
+  <div id="of-shell" class="of-shell hidden">
+
+    <!-- Sidebar (desktop) -->
+    <aside class="of-sidebar">
+      <div class="of-brand">
+        <iconify-icon icon="solar:shield-user-linear" style="font-size:1.5rem"></iconify-icon>
+        <div>
+          <strong>Officer Console</strong>
+          <span id="of-brand-sub">COE LGU System</span>
+        </div>
+      </div>
+
+      <nav class="of-nav">
+        <button class="of-nav-btn active" data-of="overview"><iconify-icon icon="solar:chart-2-linear"></iconify-icon> Fund Overview</button>
+        <button class="of-nav-btn" data-of="record"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon> Record Transaction</button>
+        <button class="of-nav-btn" data-of="events"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon> Events &amp; Budgets</button>
+        <button class="of-nav-btn" data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon> Reports &amp; Paper Trail</button>
+        <button class="of-nav-btn" data-of="people"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> People &amp; Access</button>
+        <button class="of-nav-btn" data-of="announcements"><iconify-icon icon="solar:bell-linear"></iconify-icon> Announcements</button>
+      </nav>
+
+      <div class="of-sidebar-foot">
+        <div class="of-user">
+          <span class="of-avatar" id="of-avatar">?</span>
+          <div>
+            <strong id="of-user-name">…</strong>
+            <span id="of-user-role">…</span>
+          </div>
+        </div>
+        <a href="/" class="of-back-link"><iconify-icon icon="solar:arrow-left-linear"></iconify-icon> Main System</a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="of-main">
+
+      <!-- 1. Fund Overview -->
+      <section class="of-view active" id="of-view-overview">
+        <header class="of-view-head"><h1>Fund Overview</h1><p>Live position of council funds</p></header>
+        <div class="of-stat-grid" id="of-overview-stats"></div>
+        <div class="of-cards">
+          <div class="of-card">
+            <h3><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> Budget Alerts</h3>
+            <div id="of-overview-alerts"></div>
+          </div>
+          <div class="of-card">
+            <h3><iconify-icon icon="solar:card-transfer-linear"></iconify-icon> Recent Activity</h3>
+            <div id="of-overview-recent"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Record Transaction -->
+      <section class="of-view" id="of-view-record">
+        <header class="of-view-head"><h1>Record Transaction</h1><p>Log money in and out, attach receipt photos</p></header>
+        <div class="of-record-layout">
+          <div class="of-card">
+            <h3>New Entry</h3>
+            <form id="of-tx-form" class="of-form">
+              <div class="of-form-row">
+                <div class="of-field"><label>Event</label><select id="of-tx-event" required></select></div>
+                <div class="of-field"><label>Type</label>
+                  <select id="of-tx-type" required>
+                    <option value="expense">Expense</option>
+                    <option value="donation">Donation</option>
+                    <option value="collection">Collection</option>
+                    <option value="allocation">Budget Allocation</option>
+                  </select>
+                </div>
+              </div>
+              <div class="of-form-row">
+                <div class="of-field"><label>Amount (₱)</label><input type="number" id="of-tx-amount" min="1" step="0.01" required placeholder="0.00" /></div>
+                <div class="of-field"><label>Date</label><input type="date" id="of-tx-date" required /></div>
+              </div>
+              <div class="of-field"><label>Description</label><input type="text" id="of-tx-desc" required placeholder="e.g. Sound system rental" /></div>
+              <div class="of-field"><label>Donor Name <small>(optional)</small></label><input type="text" id="of-tx-donor" placeholder="Donor or sponsor name" /></div>
+              <div class="of-field" id="of-tx-alloc-field">
+                <label class="of-check"><input type="checkbox" id="of-tx-alloc" checked /> Deduct from event's allocated budget</label>
+              </div>
+              <div class="of-field">
+                <label>Receipt <small>(optional)</small></label>
+                <div class="receipt-attach-row">
+                  <button type="button" class="of-btn of-btn-ghost" id="of-tx-receipt-btn"><iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt</button>
+                  <span class="receipt-chip hidden" id="of-tx-receipt-chip">
+                    <iconify-icon icon="solar:paperclip-linear"></iconify-icon>
+                    <span id="of-tx-receipt-chip-text"></span>
+                    <button type="button" class="receipt-chip-remove" id="of-tx-receipt-remove">&times;</button>
+                  </span>
+                </div>
+              </div>
+              <div class="of-error hidden" id="of-tx-error"></div>
+              <button class="of-btn of-btn-primary" type="submit" id="of-tx-submit">Record Transaction</button>
+            </form>
+          </div>
+          <div class="of-card">
+            <h3><iconify-icon icon="solar:wallet-money-linear"></iconify-icon> Selected Event Budget</h3>
+            <div id="of-record-event-info" class="of-event-balance">Select an event to see its available budget.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Events & Budgets -->
+      <section class="of-view" id="of-view-events">
+        <header class="of-view-head"><h1>Events &amp; Budgets</h1><p>Manage events, allocations, and transfers</p></header>
+        <div class="of-cards">
+          <div class="of-card">
+            <h3><iconify-icon icon="solar:calendar-add-linear"></iconify-icon> Create Event</h3>
+            <form id="of-event-form" class="of-form">
+              <div class="of-form-row">
+                <div class="of-field"><label>Event Name</label><input type="text" id="of-ev-name" required placeholder="e.g. Engineering Week 2026" /></div>
+                <div class="of-field"><label>Status</label>
+                  <select id="of-ev-status">
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
+              <div class="of-form-row">
+                <div class="of-field"><label>Allocated Budget (₱)</label><input type="number" id="of-ev-budget" min="0" step="0.01" required placeholder="0.00" /></div>
+                <div class="of-field"><label>Event Date</label><input type="date" id="of-ev-date" /></div>
+              </div>
+              <div class="of-field"><label>Description</label><textarea id="of-ev-desc" rows="2" placeholder="Brief description"></textarea></div>
+              <div class="of-error hidden" id="of-ev-error"></div>
+              <button class="of-btn of-btn-primary" type="submit" id="of-ev-submit">Create Event</button>
+            </form>
+          </div>
+          <div class="of-card">
+            <h3><iconify-icon icon="solar:card-transfer-linear"></iconify-icon> Budget Transfer</h3>
+            <form id="of-transfer-form" class="of-form">
+              <div class="of-form-row">
+                <div class="of-field"><label>From</label><select id="of-transfer-from" required class="of-event-select"></select></div>
+                <div class="of-field"><label>To</label><select id="of-transfer-to" required class="of-event-select"></select></div>
+              </div>
+              <div class="of-form-row">
+                <div class="of-field"><label>Amount (₱)</label><input type="number" id="of-transfer-amount" min="1" step="0.01" required placeholder="0.00" /></div>
+                <div class="of-field"><label>Reason *</label><input type="text" id="of-transfer-reason" required placeholder="Why is this transfer being made?" /></div>
+              </div>
+              <div id="of-transfer-preview" class="of-transfer-preview hidden"></div>
+              <div class="of-error hidden" id="of-transfer-error"></div>
+              <button class="of-btn of-btn-primary" type="submit" id="of-transfer-submit">Confirm Transfer</button>
+            </form>
+          </div>
+        </div>
+        <h3 class="of-list-title">All Events</h3>
+        <div class="of-events-grid" id="of-events-grid"></div>
+        <div id="of-event-detail" class="hidden"></div>
+      </section>
+
+      <!-- 4. Reports & Paper Trail -->
+      <section class="of-view" id="of-view-reports">
+        <header class="of-view-head"><h1>Reports &amp; Paper Trail</h1><p>Financial summaries and the immutable audit log</p></header>
+        <div class="of-card">
+          <h3><iconify-icon icon="solar:document-text-linear"></iconify-icon> Events Summary</h3>
+          <div class="of-table-wrap"><table class="of-table" id="of-events-summary-table">
+            <thead><tr><th>Event</th><th>Allocated</th><th>Spent</th><th>Remaining</th><th>Status</th><th>Report</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+        <div class="of-card">
+          <h3><iconify-icon icon="solar:history-linear"></iconify-icon> Audit Trail <small>(read-only)</small></h3>
+          <input type="text" id="of-audit-search" class="of-search" placeholder="Search audit log…" />
+          <div class="of-table-wrap"><table class="of-table" id="of-audit-table">
+            <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Details</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- 5. People & Access -->
+      <section class="of-view" id="of-view-people">
+        <header class="of-view-head"><h1>People &amp; Access</h1><p id="of-people-sub">Council members and their roles</p></header>
+        <div class="of-card">
+          <input type="text" id="of-people-search" class="of-search" placeholder="Search people…" />
+          <div class="of-table-wrap"><table class="of-table" id="of-people-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th id="of-people-action-col">Change</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- 6. Announcements -->
+      <section class="of-view" id="of-view-announcements">
+        <header class="of-view-head"><h1>Announcements</h1><p>Post updates to students</p></header>
+        <div class="of-cards">
+          <div class="of-card">
+            <h3><iconify-icon icon="solar:bell-linear"></iconify-icon> New Announcement</h3>
+            <form id="of-announce-form" class="of-form">
+              <div class="of-field"><label>Title</label><input type="text" id="of-announce-title" required placeholder="Announcement title" /></div>
+              <div class="of-field"><label>Message</label><textarea id="of-announce-body" required rows="4" placeholder="Write the announcement here…"></textarea></div>
+              <div class="of-error hidden" id="of-announce-error"></div>
+              <button class="of-btn of-btn-primary" type="submit" id="of-announce-submit">Post Announcement</button>
+            </form>
+          </div>
+          <div class="of-card">
+            <h3>Recent</h3>
+            <div id="of-announce-list"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Mobile bottom tabs -->
+  <nav class="of-bottom-nav" id="of-bottom-nav">
+    <button data-of="overview"><iconify-icon icon="solar:chart-2-linear"></iconify-icon><span>Overview</span></button>
+    <button data-of="record"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon><span>Record</span></button>
+    <button data-of="events"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon><span>Events</span></button>
+    <button data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon><span>Reports</span></button>
+    <button data-of="people"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon><span>People</span></button>
+  </nav>
+
+  <div id="of-toast-holder"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/receipt-capture.js"></script>
+  <script src="js/officer/officer-app.js"></script>
+</body>
+</html>
