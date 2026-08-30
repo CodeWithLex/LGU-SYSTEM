@@ -370,6 +370,12 @@ const GrizzAI = (() => {
         icon: 'solar:card-transfer-linear',
         text: 'Latest recorded expenditures from the ledger',
       },
+      {
+        action: 'collections-inflow',
+        title: 'Collections & Inflow',
+        icon: 'solar:wallet-money-linear',
+        text: 'Incoming dues, donations & collection breakdown',
+      },
     ],
     guide: [
       {
@@ -383,6 +389,18 @@ const GrizzAI = (() => {
         title: 'Transparency Policy',
         icon: 'solar:shield-check-linear',
         text: 'How student council finances are audited',
+      },
+      {
+        action: 'guide-curriculum',
+        title: 'Curriculum & Standing',
+        icon: 'solar:square-academic-cap-2-linear',
+        text: 'Understanding prerequisite rules & standing',
+      },
+      {
+        action: 'guide-reports',
+        title: 'Reports & Exports',
+        icon: 'solar:document-text-linear',
+        text: 'How monthly statements & PDF exports work',
       },
     ],
   };
@@ -643,11 +661,20 @@ const GrizzAI = (() => {
       case 'recent-spending':
         await handleRecentSpending();
         break;
+      case 'collections-inflow':
+        await handleCollectionsInflow();
+        break;
       case 'guide-logging':
         handleGuideLogging();
         break;
       case 'guide-transparency':
         handleGuideTransparency();
+        break;
+      case 'guide-curriculum':
+        handleGuideCurriculum();
+        break;
+      case 'guide-reports':
+        handleGuideReports();
         break;
       default:
         appendBotMessage('Grizz Navigator', `<p>Information is ready for this topic.</p>`);
@@ -1085,6 +1112,84 @@ const GrizzAI = (() => {
     appendBotMessage('Financial Transparency', html, [
       { action: 'financial-summary', label: 'Check Funds', icon: 'solar:pie-chart-2-linear' },
       { action: 'upcoming-events', label: 'Event Budgets', icon: 'solar:calendar-date-linear' },
+    ]);
+  }
+
+  // 10. Financials - Collections & Inflow Breakdown
+  async function handleCollectionsInflow() {
+    try {
+      const txs = await Api.transactions.list({ limit: 6 });
+      const inflows = (txs || []).filter(t => t.type === 'collection' || t.type === 'donation' || t.type === 'income');
+
+      if (inflows.length === 0) {
+        appendBotMessage('Collections & Inflow', `<p>No recent collection or donation entries recorded in the ledger.</p>`);
+        return;
+      }
+
+      const cardsHtml = inflows.slice(0, 4).map(t => `
+        <div class="ursa-subject-item">
+          <div class="ursa-subject-meta">
+            <span class="ursa-subject-code">${esc(t.description || 'Collection')}</span>
+            <span class="ursa-subject-title">${UI.dateStr(t.transaction_date)} · ${esc(t.type || 'Inflow')}</span>
+          </div>
+          <span class="ursa-subject-tag active" style="color:#4ADE80;">
+            +${UI.currency(t.amount)}
+          </span>
+        </div>
+      `).join('');
+
+      const html = `
+        <p style="margin-bottom:0.65rem;color:var(--text-secondary);font-size:0.8rem;">
+          Latest recorded student dues, donations & incoming funds:
+        </p>
+        <div class="ursa-card-list">
+          ${cardsHtml}
+        </div>
+      `;
+
+      appendBotMessage('Collections & Inflow', html, [
+        { action: 'financial-summary', label: 'Financial Summary', icon: 'solar:pie-chart-2-linear' },
+        { action: 'recent-spending', label: 'Recent Expenses', icon: 'solar:card-transfer-linear' },
+      ]);
+    } catch (err) {
+      appendBotMessage('Collections & Inflow', `<p>Could not load collection records.</p>`);
+    }
+  }
+
+  // 11. Guide - Curriculum & Prerequisites Standing
+  function handleGuideCurriculum() {
+    const html = `
+      <p style="margin-bottom:0.5rem;font-size:0.82rem;">Understanding prerequisite rules & standing:</p>
+      <ul style="padding-left:1.15rem;font-size:0.8rem;line-height:1.6;margin:0 0 0.65rem 0;color:var(--text-secondary);">
+        <li><strong>Prerequisites:</strong> Must be marked as <em>Passed</em> or currently <em>Enrolled</em> before taking advanced subjects.</li>
+        <li><strong>Year Standing:</strong> Requires passing a specific proportion of prior year units (e.g. 3rd Year Standing).</li>
+        <li><strong>Automated Audit:</strong> Grizz checks your passed grades to unlock only valid next-term subjects.</li>
+      </ul>
+      <p class="ursa-note-text">
+        Keep your Academic Progress tracker updated each term for accurate course recommendations.
+      </p>
+    `;
+
+    appendBotMessage('Curriculum & Prerequisites Guide', html, [
+      { action: 'next-sem', label: 'View Recommendations', icon: 'solar:diploma-verified-linear' },
+      { action: 'check-prereq', label: 'Prerequisites Check', icon: 'solar:branching-paths-down-linear' },
+    ]);
+  }
+
+  // 12. Guide - Financial Reports & PDF Exporting
+  function handleGuideReports() {
+    const html = `
+      <p style="margin-bottom:0.5rem;font-size:0.82rem;">Accessing transparency reports & exports:</p>
+      <ul style="padding-left:1.15rem;font-size:0.8rem;line-height:1.6;margin:0 0 0.65rem 0;color:var(--text-secondary);">
+        <li><strong>Monthly Summaries:</strong> View month-by-month inflows, expenses, and remaining balances in the <em>Reports</em> tab.</li>
+        <li><strong>PDF & Excel Exports:</strong> Export certified audit sheets and expense breakdowns anytime.</li>
+        <li><strong>Receipt Verification:</strong> Every transaction is backed by reference codes and official vouchers.</li>
+      </ul>
+    `;
+
+    appendBotMessage('Financial Reports & Exports Guide', html, [
+      { action: 'financial-summary', label: 'View Funds', icon: 'solar:pie-chart-2-linear' },
+      { action: 'guide-transparency', label: 'Transparency Policy', icon: 'solar:shield-check-linear' },
     ]);
   }
 
