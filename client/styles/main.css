@@ -4180,9 +4180,14 @@ html body.is-admin th.admin-only {
   border-top: 1px solid var(--border-default);
 }
 
-@media (max-width: 540px) {
+.profile-modal-footer .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
   .profile-modal {
     width: 95vw;
+    max-width: 440px;
     border-radius: 12px;
   }
 
@@ -4201,6 +4206,61 @@ html body.is-admin th.admin-only {
   .form-row-2 {
     grid-template-columns: 1fr;
     gap: 0.5rem;
+  }
+
+  .profile-modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+  }
+
+  .profile-modal-footer .btn {
+    white-space: nowrap;
+    justify-content: center;
+    font-size: 0.82rem;
+    padding: 0.55rem 0.85rem;
+    min-height: 42px;
+  }
+
+  .profile-modal-footer #profile-modal-logout-btn {
+    width: 100%;
+    margin-right: 0 !important;
+    order: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .profile-modal-footer #profile-cancel-btn {
+    flex: 1;
+    min-width: 0;
+    order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .profile-modal-footer #profile-save-general-btn {
+    flex: 1.4;
+    min-width: 0;
+    order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .profile-modal-footer #profile-save-security-btn {
+    width: 100%;
+    order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
   }
 }
 
@@ -4489,6 +4549,7 @@ html body.is-admin th.admin-only {
   gap: 0.6rem;
   margin-top: 1rem;
 }
+
 .receipt-capture-file-label {
   font-size: 0.78rem;
   color: var(--text-secondary);
