@@ -5,6 +5,7 @@ const supabase = require('../lib/supabase');
 const { sanitizeText, validateDriveUrl, isPositiveNumber, isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { logError } = require('../lib/logger');
+const { requireAdmin, requireOfficer } = require('../middleware/roles');
 
 const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation'];
 const MAX_LIMIT      = 100;
@@ -41,13 +42,6 @@ function parseReceiptWhenMultipart(req, res, next) {
       }
       next();
     });
-  }
-  next();
-}
-
-function requireAdmin(req, res, next) {
-  if (req.profile?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin privileges required.' });
   }
   next();
 }
@@ -93,10 +87,10 @@ router.get('/', async (req, res) => {
   res.json(signed);
 });
 
-// POST /api/transactions (admin only)
+// POST /api/transactions (officers and admins)
 // Accepts multipart/form-data (transaction fields + optional 'receipt' file
 // captured by the in-system camera) or plain JSON for legacy callers.
-router.post('/', requireAdmin, parseReceiptWhenMultipart, async (req, res) => {
+router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => {
   const { event_id, type, amount, description, donor_name, transaction_date, receipt_url } = req.body;
   // use_allocation arrives as the string 'true'/'false' under multipart
   const use_allocation = req.body.use_allocation === undefined

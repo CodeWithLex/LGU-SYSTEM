@@ -7,17 +7,13 @@ const supabase = require('../lib/supabase');
 const { isPositiveNumber, isValidEnum, isValidUUID, sanitizeText } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { logError } = require('../lib/logger');
+const { requireAdmin, requireOfficer } = require('../middleware/roles');
 
-function requireAdmin(req, res, next) {
-  if (req.profile?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin privileges required.' });
-  }
-  next();
-}
-router.use(requireAdmin);
+const ASSIGNABLE_ROLES = ['admin', 'student', 'governor', 'cashier'];
+const OFFICER_ASSIGNABLE_ROLES = ['student', 'governor', 'cashier'];
 
 // ── GET /api/admin/users ──────────────────────────────────────────────────────
-router.get('/users', async (req, res) => {
+router.get('/users', requireOfficer, async (req, res) => {
   const { data, error } = await supabase
     .from('profiles')
     .select('id, full_name, email, role, course, year_level, created_at')
@@ -28,15 +24,30 @@ router.get('/users', async (req, res) => {
 });
 
 // ── PATCH /api/admin/users/:id/role ──────────────────────────────────────────
+// Admins may assign any role; governors may assign officer/student roles but
+// never touch admin accounts; cashiers have no role-assignment power.
 router.patch('/users/:id/role', async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
+  const actorRole = req.profile?.role;
 
   if (!isValidUUID(id)) {
     return res.status(400).json({ error: 'Invalid ID format.' });
   }
-  if (!isValidEnum(role, ['admin', 'student'])) {
-    return res.status(400).json({ error: 'Role must be "admin" or "student".' });
+  if (!isValidEnum(role, ASSIGNABLE_ROLES)) {
+    return res.status(400).json({ error: `Role must be one of: ${ASSIGNABLE_ROLES.join(', ')}.` });
+  }
+  if (actorRole === 'cashier') {
+    return res.status(403).json({ error: 'Cashiers cannot assign roles.' });
+  }
+  if (actorRole === 'governor') {
+    if (!OFFICER_ASSIGNABLE_ROLES.includes(role)) {
+      return res.status(403).json({ error: 'Only admins can assign the admin role.' });
+    }
+    const { data: target } = await supabase.from('profiles').select('role').eq('id', id).single();
+    if (target?.role === 'admin') {
+      return res.status(403).json({ error: 'Governors cannot modify admin accounts.' });
+    }
   }
 
   // Prevent self-demotion
@@ -53,12 +64,17 @@ router.patch('/users/:id/role', async (req, res) => {
 
   if (error) return res.status(400).json({ error: 'Failed to update role.' });
 
-  logAudit(req.user.id, 'SET_USER_ROLE', { target_user_id: id, user_name: data.full_name, new_role: role });
+  logAudit(req.user.id, 'SET_USER_ROLE', {
+    target_user_id: id,
+    user_name: data.full_name,
+    new_role: role,
+    changed_by_role: actorRole
+  });
   res.json(data);
 });
 
-// ── GET /api/admin/audit-logs ─────────────────────────────────────────────────
-router.get('/audit-logs', async (req, res) => {
+// ── GET /api/admin/audit-logs (readable by all officers) ─────────────────────
+router.get('/audit-logs', requireOfficer, async (req, res) => {
   const limit  = Math.min(Number(req.query.limit)  || 50, 100);
   const offset = Math.min(Number(req.query.offset) || 0, 10000);
 
@@ -122,7 +138,7 @@ router.get('/audit-logs', async (req, res) => {
 });
 
 // ── POST /api/admin/budget-transfer ──────────────────────────────────────────
-router.post('/budget-transfer', async (req, res) => {
+router.post('/budget-transfer', requireOfficer, async (req, res) => {
   const { from_event_id, to_event_id, amount, reason } = req.body;
 
   if (!from_event_id || !to_event_id) {
@@ -244,7 +260,7 @@ router.post('/budget-transfer', async (req, res) => {
 });
 
 // ── PATCH /api/admin/events/:id/archive ──────────────────────────────────────
-router.patch('/events/:id/archive', async (req, res) => {
+router.patch('/events/:id/archive', requireOfficer, async (req, res) => {
   const { id } = req.params;
 
   if (!isValidUUID(id)) {

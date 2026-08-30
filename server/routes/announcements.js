@@ -4,16 +4,10 @@ const supabase = require('../lib/supabase');
 const { sendAnnouncementEmail } = require('../lib/email');
 const { sanitizeText, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
+const { requireOfficer } = require('../middleware/roles');
 
 const MAX_TITLE_LENGTH = 100;
 const MAX_BODY_LENGTH  = 5000;
-
-function requireAdmin(req, res, next) {
-  if (req.profile?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin privileges required.' });
-  }
-  next();
-}
 
 // GET /api/announcements
 router.get('/', async (req, res) => {
@@ -27,8 +21,8 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
-// POST /api/announcements (admin only)
-router.post('/', requireAdmin, async (req, res) => {
+// POST /api/announcements (officers and admins)
+router.post('/', requireOfficer, async (req, res) => {
   const { title, body } = req.body;
 
   // 1. Required fields

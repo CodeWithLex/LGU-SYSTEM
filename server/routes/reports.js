@@ -5,14 +5,7 @@ const PDFDocument = require('pdfkit');
 const ExcelJS    = require('exceljs');
 const { isValidUUID } = require('../lib/validate');
 const { logError } = require('../lib/logger');
-
-// Admin guard
-function requireAdmin(req, res, next) {
-  if (req.profile?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin privileges required.' });
-  }
-  next();
-}
+const { requireOfficer } = require('../middleware/roles');
 
 // ── GET /api/reports/summary ──────────────────────────────────────────────────
 router.get('/summary', async (req, res) => {
@@ -121,7 +114,7 @@ router.get('/events-summary', async (req, res) => {
 });
 
 // ── GET /api/reports/pdf/:eventId ─────────────────────────────────────────────
-router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
+router.get('/pdf/:eventId', requireOfficer, async (req, res) => {
   const { eventId } = req.params;
 
   if (!isValidUUID(eventId)) {
@@ -250,7 +243,7 @@ router.get('/pdf/:eventId', requireAdmin, async (req, res) => {
 });
 
 // ── GET /api/reports/excel/:eventId ───────────────────────────────────────────
-router.get('/excel/:eventId', requireAdmin, async (req, res) => {
+router.get('/excel/:eventId', requireOfficer, async (req, res) => {
   const { eventId } = req.params;
 
   if (!isValidUUID(eventId)) {

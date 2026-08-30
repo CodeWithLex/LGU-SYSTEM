@@ -4,15 +4,9 @@ const supabase = require('../lib/supabase');
 const { sanitizeText, isPositiveNumber, isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { sendNewEventEmail } = require('../lib/email');
+const { requireAdmin, requireOfficer } = require('../middleware/roles');
 
 const VALID_STATUSES = ['upcoming', 'ongoing', 'completed', 'cancelled'];
-
-function requireAdmin(req, res, next) {
-  if (req.profile?.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin privileges required.' });
-  }
-  next();
-}
 
 // GET /api/events
 // Students see all events except archived ones; admins also see archived
@@ -120,7 +114,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/events (admin only)
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireOfficer, async (req, res) => {
   const { event_name, description, allocated_budget, event_date, status } = req.body;
 
   // 1. Required fields
@@ -183,7 +177,7 @@ router.post('/', requireAdmin, async (req, res) => {
 });
 
 // PATCH /api/events/:id (admin only)
-router.patch('/:id', requireAdmin, async (req, res) => {
+router.patch('/:id', requireOfficer, async (req, res) => {
   const { id }    = req.params;
   const { event_name, description, allocated_budget, event_date, status } = req.body;
 
