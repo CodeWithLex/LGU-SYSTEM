@@ -248,6 +248,27 @@ const Admin = (() => {
     const typeSel  = document.getElementById('tx-type');
     const fundGrp  = document.getElementById('fund-source-group');
     const useAlloc = document.getElementById('tx-use-allocation');
+    let pendingReceipt = null; // { blob, name, size } from the camera modal
+
+    const receiptBtn  = document.getElementById('tx-add-receipt');
+    const receiptChip = document.getElementById('tx-receipt-chip');
+    const chipText    = document.getElementById('tx-receipt-chip-text');
+    const chipRemove  = document.getElementById('tx-receipt-remove');
+
+    const clearReceipt = () => {
+      pendingReceipt = null;
+      receiptChip.classList.add('hidden');
+    };
+
+    receiptBtn.addEventListener('click', async () => {
+      const captured = await ReceiptCapture.open();
+      if (!captured) return; // user cancelled
+      pendingReceipt = captured;
+      chipText.textContent = `${captured.name} (${Math.round(captured.size / 1024)} KB)`;
+      receiptChip.classList.remove('hidden');
+    });
+
+    chipRemove.addEventListener('click', clearReceipt);
 
     const updateFundToggle = async () => {
       // Only show if it's an expense AND an event is selected
@@ -309,26 +330,44 @@ const Admin = (() => {
       btn.textContent = 'Submitting…';
 
       try {
-        const receiptUrl = document.getElementById('tx-receipt-url').value.trim();
-        const tx = await Api.transactions.create({
-          event_id:         eventSel.value,
-          type:             typeSel.value,
-          amount:           document.getElementById('tx-amount').value,
-          description:      document.getElementById('tx-desc').value,
-          donor_name:       document.getElementById('tx-donor').value,
-          transaction_date: document.getElementById('tx-date').value,
-          receipt_url:      receiptUrl || null,
-          use_allocation:   (typeSel.value === 'expense' && eventSel.value) ? useAlloc.checked : false
-        });
+        // With an attached receipt the request must be multipart so the file
+        // reaches the server; otherwise a plain JSON body is fine.
+        let payload;
+        if (pendingReceipt) {
+          payload = new FormData();
+          payload.append('event_id',        eventSel.value);
+          payload.append('type',            typeSel.value);
+          payload.append('amount',          document.getElementById('tx-amount').value);
+          payload.append('description',     document.getElementById('tx-desc').value);
+          payload.append('donor_name',      document.getElementById('tx-donor').value);
+          payload.append('transaction_date', document.getElementById('tx-date').value);
+          payload.append('use_allocation',  (typeSel.value === 'expense' && eventSel.value) ? String(useAlloc.checked) : 'false');
+          payload.append('receipt',         pendingReceipt.blob, pendingReceipt.name);
+        } else {
+          payload = {
+            event_id:         eventSel.value,
+            type:             typeSel.value,
+            amount:           document.getElementById('tx-amount').value,
+            description:      document.getElementById('tx-desc').value,
+            donor_name:       document.getElementById('tx-donor').value,
+            transaction_date: document.getElementById('tx-date').value,
+            use_allocation:   (typeSel.value === 'expense' && eventSel.value) ? useAlloc.checked : false
+          };
+        }
 
-        if (tx.over_budget_warning) {
+        const tx = await Api.transactions.create(payload);
+
+        if (tx.warning) {
+          UI.toast(tx.warning, 'warning');
+        } else if (tx.over_budget_warning) {
           UI.toast('Transaction recorded, but event is OVER 90% BUDGET CAPACITY!', 'warning');
         } else {
           UI.toast('Transaction recorded successfully!', 'success');
         }
-        
+
         form.reset();
-        useAlloc.checked = true; 
+        clearReceipt();
+        useAlloc.checked = true;
         updateFundToggle();
         setTodayDate();
         await populateEventDropdown();

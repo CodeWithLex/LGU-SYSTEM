@@ -624,8 +624,17 @@
                   <input type="text" id="tx-donor" name="donor_name" placeholder="Donor or sponsor name" />
                 </div>
                 <div class="form-group">
-                  <label>Receipt - Google Drive Link <span style="font-weight:400;color:var(--col-text-muted)">(optional)</span></label>
-                  <input type="url" id="tx-receipt-url" placeholder="https://drive.google.com/file/d/..." />
+                  <label>Receipt <span style="font-weight:400;color:var(--col-text-muted)">(optional - photo or PDF)</span></label>
+                  <div class="receipt-attach-row">
+                    <button type="button" class="btn btn-ghost" id="tx-add-receipt" style="font-size:0.85rem;">
+                      <iconify-icon icon="solar:camera-minimalistic-linear"></iconify-icon> Add Receipt
+                    </button>
+                    <span class="receipt-chip hidden" id="tx-receipt-chip">
+                      <iconify-icon icon="solar:paperclip-linear"></iconify-icon>
+                      <span id="tx-receipt-chip-text"></span>
+                      <button type="button" class="receipt-chip-remove" id="tx-receipt-remove" aria-label="Remove receipt">&times;</button>
+                    </span>
+                  </div>
                 </div>
                 <!-- Fund Source Toggle -->
                 <div class="form-group" id="fund-source-group" style="display:none;margin-top:.5rem;">
@@ -1395,6 +1404,7 @@
   <script src="js/reports.js"></script>
   <script src="js/income.js"></script>
   <script src="js/units.js"></script>
+  <script src="js/receipt-capture.js"></script>
   <script src="js/admin.js"></script>
   <script src="js/ai-assistant.js"></script>
   <script src="js/profile.js"></script>

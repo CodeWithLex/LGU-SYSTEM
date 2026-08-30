@@ -144,7 +144,7 @@ const Api = (() => {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/transactions${q ? '?' + q : ''}`, null, false, 30000);
     },
-    create: (body)        => _request('POST',   '/transactions', body),
+    create: (body)        => _request('POST',   '/transactions', body, body instanceof FormData),
     bulkCreate: (body)    => _request('POST',   '/transactions/bulk', { transactions: body }),
     update: (id, body)    => _request('PATCH',  `/transactions/${id}`, body),
     remove: (id, body)    => _request('DELETE', `/transactions/${id}`, body),

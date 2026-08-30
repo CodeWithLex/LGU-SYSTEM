@@ -96,12 +96,26 @@ router.get('/:id', async (req, res) => {
     });
   }
 
+  // Receipts stored in the private 'receipts' bucket are signed per request
+  // (1-hour expiry). Legacy http(s) links such as Google Drive pass through.
+  const signedTransactions = await Promise.all((transactions || []).map(async tx => {
+    if (tx.receipt_url && tx.receipt_url.startsWith('receipts/')) {
+      const { data, error } = await supabase.storage
+        .from('receipts')
+        .createSignedUrl(tx.receipt_url.replace(/^receipts\//, ''), 3600);
+      if (!error && data?.signedUrl) {
+        return { ...tx, receipt_url: data.signedUrl };
+      }
+    }
+    return tx;
+  }));
+
   res.json({
     ...event,
     computed_expenses: expenses,
     computed_income: income,
     computed_remaining: Number(event.allocated_budget) + budget_injections - alloc_expenses,
-    transactions
+    transactions: signedTransactions
   });
 });
 

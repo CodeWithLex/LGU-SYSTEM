@@ -1,4 +1,5 @@
 const express  = require('express');
+const multer   = require('multer');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
 const { sanitizeText, validateDriveUrl, isPositiveNumber, isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
@@ -8,12 +9,60 @@ const { logError } = require('../lib/logger');
 const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation'];
 const MAX_LIMIT      = 100;
 const MAX_OFFSET     = 10000;
+const MAX_RECEIPT_BYTES = 5 * 1024 * 1024;
+const RECEIPT_MIME_EXT = {
+  'image/jpeg':      'jpg',
+  'image/png':       'png',
+  'image/webp':      'webp',
+  'application/pdf': 'pdf'
+};
+
+// Receipt uploads arrive as multipart; the CSV bulk import posts JSON, so
+// multer is only engaged when the request actually is multipart.
+const receiptUpload = multer({
+  storage: multer.memoryStorage(),
+  limits:  { fileSize: MAX_RECEIPT_BYTES, files: 1 },
+  fileFilter: (req, file, cb) => {
+    if (!RECEIPT_MIME_EXT[file.mimetype]) {
+      return cb(new Error('Receipt must be a JPEG, PNG, WebP image or PDF.'));
+    }
+    cb(null, true);
+  }
+});
+
+function parseReceiptWhenMultipart(req, res, next) {
+  if (req.is('multipart/form-data')) {
+    return receiptUpload.single('receipt')(req, res, (err) => {
+      if (err) {
+        const msg = err.code === 'LIMIT_FILE_SIZE'
+          ? 'Receipt exceeds the 5 MB limit.'
+          : err.message;
+        return res.status(400).json({ error: msg });
+      }
+      next();
+    });
+  }
+  next();
+}
 
 function requireAdmin(req, res, next) {
   if (req.profile?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin privileges required.' });
   }
   next();
+}
+
+// Signs storage-backed receipt paths for display; legacy links pass through.
+async function signReceipt(tx) {
+  if (tx.receipt_url && tx.receipt_url.startsWith('receipts/')) {
+    const { data, error } = await supabase.storage
+      .from('receipts')
+      .createSignedUrl(tx.receipt_url.replace(/^receipts\//, ''), 3600);
+    if (!error && data?.signedUrl) {
+      return { ...tx, receipt_url: data.signedUrl };
+    }
+  }
+  return tx;
 }
 
 // GET /api/transactions
@@ -39,12 +88,20 @@ router.get('/', async (req, res) => {
 
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: 'Failed to fetch transactions.' });
-  res.json(data);
+
+  const signed = await Promise.all((data || []).map(signReceipt));
+  res.json(signed);
 });
 
 // POST /api/transactions (admin only)
-router.post('/', requireAdmin, async (req, res) => {
-  const { event_id, type, amount, description, donor_name, transaction_date, receipt_url, use_allocation } = req.body;
+// Accepts multipart/form-data (transaction fields + optional 'receipt' file
+// captured by the in-system camera) or plain JSON for legacy callers.
+router.post('/', requireAdmin, parseReceiptWhenMultipart, async (req, res) => {
+  const { event_id, type, amount, description, donor_name, transaction_date, receipt_url } = req.body;
+  // use_allocation arrives as the string 'true'/'false' under multipart
+  const use_allocation = req.body.use_allocation === undefined
+    ? undefined
+    : req.body.use_allocation === true || req.body.use_allocation === 'true';
 
   // 1. Required field check (event_id is optional for General Income)
   const missing = assertRequired({ type, amount, description, transaction_date });
@@ -124,17 +181,52 @@ router.post('/', requireAdmin, async (req, res) => {
       receipt_url:      cleanReceipt,
       added_by:         req.user.id,
       transaction_date: transaction_date,
-      use_allocation:   use_allocation !== undefined ? Boolean(use_allocation) : true
+      use_allocation:   use_allocation !== undefined ? use_allocation : true
     })
     .select()
     .single();
 
   if (txError) return res.status(400).json({ error: 'Failed to create transaction.' });
 
-  if (receipt_url) {
+  let receiptWarning = null;
+
+  if (req.file) {
+    // In-system receipt capture: upload to the private 'receipts' bucket,
+    // then point the transaction at the storage path. A storage failure must
+    // not lose the transaction - it is saved with no receipt instead.
+    const ext      = RECEIPT_MIME_EXT[req.file.mimetype];
+    const folder   = event_id || 'general';
+    const objectPath = `${folder}/${tx.id}.${ext}`;
+    const storagePath = `receipts/${objectPath}`;
+
+    const { error: upErr } = await supabase.storage
+      .from('receipts')
+      .upload(objectPath, req.file.buffer, {
+        contentType: req.file.mimetype,
+        cacheControl: '3600'
+      });
+
+    if (upErr) {
+      logError('Receipt Upload Error', upErr);
+      receiptWarning = 'Transaction saved, but the receipt upload failed. You can edit the transaction later to attach it.';
+    } else {
+      await supabase.from('transactions').update({ receipt_url: storagePath }).eq('id', tx.id);
+      tx.receipt_url = storagePath;
+
+      await supabase.from('receipts').insert({
+        transaction_id: tx.id,
+        file_url:       storagePath,
+        file_name:      req.file.originalname || `receipt.${ext}`,
+        file_type:      req.file.mimetype,
+        uploaded_by:    req.user.id,
+      });
+    }
+  }
+
+  if (receipt_url && !req.file) {
     await supabase.from('receipts').insert({
       transaction_id: tx.id,
-      file_url:       receipt_url,
+      file_url:       cleanReceipt,
       file_name:      'Google Drive Link',
       file_type:      'link/gdrive',
       uploaded_by:    req.user.id,
@@ -158,7 +250,7 @@ router.post('/', requireAdmin, async (req, res) => {
     description: cleanDesc
   });
 
-  res.status(201).json(tx);
+  res.status(201).json(receiptWarning ? { ...tx, warning: receiptWarning } : tx);
 });
 
 // POST /api/transactions/bulk (admin only)
@@ -234,7 +326,15 @@ router.patch('/:id', requireAdmin, async (req, res) => {
   }
   if (description !== undefined) updates.description = sanitizeText(String(description)).slice(0, 500);
   if (transaction_date !== undefined) updates.transaction_date = transaction_date;
-  if (receipt_url !== undefined) updates.receipt_url = sanitizeText(String(receipt_url));
+  if (receipt_url !== undefined) {
+    const candidate = sanitizeText(String(receipt_url));
+    // The edit dialog echoes back the signed URL the server issued for a
+    // storage receipt. Saving that would clobber the permanent storage path,
+    // so an echo is treated as "unchanged" and ignored.
+    if (!candidate.includes('/object/sign/')) {
+      updates.receipt_url = candidate;
+    }
+  }
 
   if (Object.keys(updates).length === 0) {
     return res.status(400).json({ error: 'No valid fields provided for update.' });
