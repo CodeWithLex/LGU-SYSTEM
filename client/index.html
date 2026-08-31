@@ -1048,35 +1048,32 @@
     </aside>
   </div>
 
-  <!-- Bottom Navigation (mobile only, shown via CSS media query) -->
-  <nav class="bottom-nav" id="bottom-nav">
-    <a href="#" class="bottom-nav-item active" data-view="dashboard">
-      <span class="nav-icon"><iconify-icon icon="solar:widget-2-linear"></iconify-icon></span><span>Dashboard</span>
+  <!-- Floating Island Glass Pill Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Mobile Navigation">
+    <a href="#" class="bottom-nav-item active" data-view="dashboard" title="Dashboard">
+      <span class="nav-icon"><iconify-icon icon="solar:widget-2-linear"></iconify-icon></span>
+      <span>Dashboard</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="events">
-      <span class="nav-icon"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon></span><span>Events</span>
+    <a href="#" class="bottom-nav-item" data-view="events" title="Events">
+      <span class="nav-icon"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon></span>
+      <span>Events</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="transactions">
-      <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Ledger</span>
+    <a href="#" class="bottom-nav-item" data-view="transactions" title="Financial Ledger">
+      <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span>
+      <span>Ledger</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="reports">
-      <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span><span>Reports</span>
+    <a href="#" class="bottom-nav-item" data-view="units" title="Academic Progress">
+      <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span>
+      <span>Units</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="units">
-      <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Units</span>
+    <a href="/officer.html" class="bottom-nav-item officer-only officer-nav-link hidden" id="bottom-nav-executive-portal" title="Executive Portal">
+      <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span>
+      <span>Executive</span>
     </a>
-    <a href="/officer.html" class="bottom-nav-item officer-only hidden" id="bottom-nav-executive-portal" title="Executive Portal">
-      <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span><span>Executive</span>
+    <a href="#" class="bottom-nav-item student-only" data-view="reports" id="bottom-nav-reports" title="Financial Reports">
+      <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span>
+      <span>Reports</span>
     </a>
-    <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
-      <span class="nav-icon"><iconify-icon icon="solar:shield-check-linear"></iconify-icon></span><span>Admin</span>
-    </a>
-    <button class="bottom-nav-item" id="bottom-profile-btn" style="background:none;border:none;cursor:pointer;" title="Account Profile">
-      <span class="nav-icon"><iconify-icon icon="solar:user-linear"></iconify-icon></span><span>Profile</span>
-    </button>
-    <button class="bottom-nav-item" id="bottom-logout-btn" style="background:none;border:none;cursor:pointer;" title="Sign Out">
-      <span class="nav-icon"><iconify-icon icon="solar:logout-2-linear"></iconify-icon></span><span>Logout</span>
-    </button>
   </nav>
 
   <!-- Toast -->

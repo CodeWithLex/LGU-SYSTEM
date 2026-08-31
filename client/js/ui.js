@@ -124,6 +124,9 @@ const UI = (() => {
     document.querySelectorAll('.officer-only').forEach(el => {
       el.classList.toggle('hidden', !isOfficer);
     });
+    document.querySelectorAll('.student-only').forEach(el => {
+      el.classList.toggle('hidden', isOfficer);
+    });
   }
 
   // ---- Loading / Empty states ----
