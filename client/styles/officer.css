@@ -677,6 +677,19 @@
   box-shadow: none;
 }
 
+.of-btn-secondary {
+  background: var(--bg-surface-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+
+.of-btn-secondary:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
 .of-btn-ghost {
   background: var(--bg-surface-raised);
   color: var(--text-primary);
