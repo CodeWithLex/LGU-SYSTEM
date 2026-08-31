@@ -75,8 +75,13 @@ const OfficerApp = (() => {
     const name = profile.full_name || user.email;
     $('of-user-name').textContent = name;
     $('of-user-role').textContent = ROLE_LABELS[profile.role] || profile.role;
-    $('of-avatar').textContent = (name[0] || '?').toUpperCase();
+    if (profile.avatar_url) {
+      $('of-avatar').innerHTML = `<img src="${profile.avatar_url}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+    } else {
+      $('of-avatar').textContent = (name[0] || '?').toUpperCase();
+    }
 
+    bindTheme();
     bindNav();
     bindRecordForm();
     bindEventForms();
@@ -93,6 +98,30 @@ const OfficerApp = (() => {
     } catch (err) {
       toast('Could not load initial data: ' + err.message, 'error');
     }
+  }
+
+  function bindTheme() {
+    const updateIcon = () => {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      const icon = currentTheme === 'dark' ? 'solar:sun-linear' : 'solar:moon-linear';
+      const title = currentTheme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme';
+      const iconEl = $('theme-icon');
+      const btnEl = $('theme-toggle-btn');
+      if (iconEl) iconEl.setAttribute('icon', icon);
+      if (btnEl) btnEl.setAttribute('title', title);
+    };
+
+    const toggleBtn = $('theme-toggle-btn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const cur = localStorage.getItem('theme') || 'dark';
+        const next = cur === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', next);
+        document.documentElement.setAttribute('data-theme', next);
+        updateIcon();
+      });
+    }
+    updateIcon();
   }
 
   async function refreshCoreData() {

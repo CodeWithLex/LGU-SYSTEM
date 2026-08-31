@@ -4,50 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>Officer Console - COE LGU System</title>
+  <title>Officer Console - College of Engineering</title>
+  <link rel="icon" type="image/png" href="assets/coe-logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
   <link rel="stylesheet" href="styles/officer.css" />
-  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
+  <script>
+    // Apply theme immediately to prevent flashing
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
 </head>
 <body>
 
   <!-- Access gate: filled by officer-app.js; students/unauthenticated never see data -->
   <div id="of-gate" class="of-gate hidden">
-    <iconify-icon icon="solar:shield-warning-linear" style="font-size:3rem"></iconify-icon>
+    <iconify-icon icon="solar:shield-warning-linear" style="font-size:3.5rem"></iconify-icon>
     <h2>Restricted Access</h2>
     <p id="of-gate-message">This console is for council officers only.</p>
-    <a href="/" class="of-btn of-btn-ghost">Back to Main System</a>
+    <a href="/" class="btn btn-primary">Back to Main Portal</a>
   </div>
 
   <div id="of-shell" class="of-shell hidden">
 
-    <!-- Sidebar (desktop) -->
-    <aside class="of-sidebar">
-      <div class="of-brand">
-        <iconify-icon icon="solar:shield-user-linear" style="font-size:1.5rem"></iconify-icon>
+    <!-- Sidebar (matching main system design) -->
+    <aside class="sidebar of-sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">
+          <img src="assets/coe-logo.png" alt="COE" class="coe-logo-img sidebar-logo-img" />
+        </span>
         <div>
-          <strong>Officer Console</strong>
-          <span id="of-brand-sub">COE LGU System</span>
+          <h2>College of Engineering</h2>
+          <span class="sidebar-tagline" id="of-brand-sub">Officer Console</span>
         </div>
       </div>
 
-      <nav class="of-nav">
-        <button class="of-nav-btn active" data-of="overview"><iconify-icon icon="solar:chart-2-linear"></iconify-icon> Fund Overview</button>
-        <button class="of-nav-btn" data-of="record"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon> Record Transaction</button>
-        <button class="of-nav-btn" data-of="events"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon> Events &amp; Budgets</button>
-        <button class="of-nav-btn" data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon> Reports &amp; Paper Trail</button>
-        <button class="of-nav-btn" data-of="people"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> People &amp; Access</button>
-        <button class="of-nav-btn" data-of="announcements"><iconify-icon icon="solar:bell-linear"></iconify-icon> Announcements</button>
+      <nav class="sidebar-nav of-nav">
+        <button type="button" class="nav-item active" data-of="overview">
+          <span class="nav-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></span><span>Fund Overview</span>
+        </button>
+        <button type="button" class="nav-item" data-of="record">
+          <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><span>Record Transaction</span>
+        </button>
+        <button type="button" class="nav-item" data-of="events">
+          <span class="nav-icon"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon></span><span>Events &amp; Budgets</span>
+        </button>
+        <button type="button" class="nav-item" data-of="reports">
+          <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span><span>Reports &amp; Paper Trail</span>
+        </button>
+        <button type="button" class="nav-item" data-of="people">
+          <span class="nav-icon"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon></span><span>People &amp; Access</span>
+        </button>
+        <button type="button" class="nav-item" data-of="announcements">
+          <span class="nav-icon"><iconify-icon icon="solar:bell-linear"></iconify-icon></span><span>Announcements</span>
+        </button>
       </nav>
 
-      <div class="of-sidebar-foot">
-        <div class="of-user">
-          <span class="of-avatar" id="of-avatar">?</span>
-          <div>
-            <strong id="of-user-name">…</strong>
-            <span id="of-user-role">…</span>
+      <div class="sidebar-footer">
+        <div class="user-pill" id="user-pill" title="Officer Account">
+          <div class="user-avatar" id="of-avatar">?</div>
+          <div class="user-info">
+            <span class="user-name" id="of-user-name">Loading...</span>
+            <span class="user-role" id="of-user-role">Officer</span>
           </div>
         </div>
-        <a href="/" class="of-back-link"><iconify-icon icon="solar:arrow-left-linear"></iconify-icon> Main System</a>
+        <div class="sidebar-actions">
+          <button type="button" class="btn-icon" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+            <iconify-icon icon="solar:sun-linear" id="theme-icon"></iconify-icon>
+          </button>
+          <a href="/" class="btn-icon" title="Return to Main Portal" aria-label="Return to Main Portal" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+            <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
+          </a>
+        </div>
       </div>
     </aside>
 
@@ -56,7 +89,12 @@
 
       <!-- 1. Fund Overview -->
       <section class="of-view active" id="of-view-overview">
-        <header class="of-view-head"><h1>Fund Overview</h1><p>Live position of council funds</p></header>
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Fund Overview</h2>
+            <p class="view-sub">Live position of council funds</p>
+          </div>
+        </div>
         <div class="of-stat-grid" id="of-overview-stats"></div>
         <div class="of-cards">
           <div class="of-card">
@@ -72,7 +110,12 @@
 
       <!-- 2. Record Transaction -->
       <section class="of-view" id="of-view-record">
-        <header class="of-view-head"><h1>Record Transaction</h1><p>Log money in and out, attach receipt photos</p></header>
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Record Transaction</h2>
+            <p class="view-sub">Log money in and out, attach receipt photos</p>
+          </div>
+        </div>
         <div class="of-record-layout">
           <div class="of-card">
             <h3>New Entry</h3>
@@ -121,7 +164,12 @@
 
       <!-- 3. Events & Budgets -->
       <section class="of-view" id="of-view-events">
-        <header class="of-view-head"><h1>Events &amp; Budgets</h1><p>Manage events, allocations, and transfers</p></header>
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Events &amp; Budgets</h2>
+            <p class="view-sub">Manage events, allocations, and transfers</p>
+          </div>
+        </div>
         <div class="of-cards">
           <div class="of-card">
             <h3><iconify-icon icon="solar:calendar-add-linear"></iconify-icon> Create Event</h3>
@@ -170,8 +218,13 @@
 
       <!-- 4. Reports & Paper Trail -->
       <section class="of-view" id="of-view-reports">
-        <header class="of-view-head"><h1>Reports &amp; Paper Trail</h1><p>Financial summaries and the immutable audit log</p></header>
-        <div class="of-card">
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Reports &amp; Paper Trail</h2>
+            <p class="view-sub">Financial summaries and the immutable audit log</p>
+          </div>
+        </div>
+        <div class="of-card" style="margin-bottom:1.5rem;">
           <h3><iconify-icon icon="solar:document-text-linear"></iconify-icon> Events Summary</h3>
           <div class="of-table-wrap"><table class="of-table" id="of-events-summary-table">
             <thead><tr><th>Event</th><th>Allocated</th><th>Spent</th><th>Remaining</th><th>Status</th><th>Report</th></tr></thead>
@@ -190,7 +243,12 @@
 
       <!-- 5. People & Access -->
       <section class="of-view" id="of-view-people">
-        <header class="of-view-head"><h1>People &amp; Access</h1><p id="of-people-sub">Council members and their roles</p></header>
+        <div class="view-header of-view-head">
+          <div>
+            <h2>People &amp; Access</h2>
+            <p class="view-sub" id="of-people-sub">Council members and their roles</p>
+          </div>
+        </div>
         <div class="of-card">
           <input type="text" id="of-people-search" class="of-search" placeholder="Search people…" />
           <div class="of-table-wrap"><table class="of-table" id="of-people-table">
@@ -202,7 +260,12 @@
 
       <!-- 6. Announcements -->
       <section class="of-view" id="of-view-announcements">
-        <header class="of-view-head"><h1>Announcements</h1><p>Post updates to students</p></header>
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Announcements</h2>
+            <p class="view-sub">Post updates to students</p>
+          </div>
+        </div>
         <div class="of-cards">
           <div class="of-card">
             <h3><iconify-icon icon="solar:bell-linear"></iconify-icon> New Announcement</h3>
@@ -225,7 +288,7 @@
 
   <!-- Mobile bottom tabs -->
   <nav class="of-bottom-nav" id="of-bottom-nav">
-    <button data-of="overview"><iconify-icon icon="solar:chart-2-linear"></iconify-icon><span>Overview</span></button>
+    <button data-of="overview" class="active"><iconify-icon icon="solar:chart-2-linear"></iconify-icon><span>Overview</span></button>
     <button data-of="record"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon><span>Record</span></button>
     <button data-of="events"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon><span>Events</span></button>
     <button data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon><span>Reports</span></button>
@@ -236,6 +299,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/receipt-capture.js"></script>
   <script src="js/officer/officer-app.js"></script>
