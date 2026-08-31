@@ -289,54 +289,72 @@ const Api = (() => {
 
   const rosterRequests = {
     async getMyRequest() {
+      let sessionUser = null;
+      if (window.supabaseClient) {
+        try {
+          const { data: { session } } = await window.supabaseClient.auth.getSession();
+          sessionUser = session?.user;
+        } catch {}
+      }
+
+      const email = sessionUser?.email?.toLowerCase();
+      const userId = sessionUser?.id;
+
       let cached = null;
       try {
-        const raw = localStorage.getItem('coe_pending_verification');
-        if (raw) cached = JSON.parse(raw);
+        if (email) {
+          const raw = localStorage.getItem(`coe_req_${email}`);
+          if (raw) cached = JSON.parse(raw);
+        }
+        if (!cached && userId) {
+          const raw = localStorage.getItem(`coe_req_${userId}`);
+          if (raw) cached = JSON.parse(raw);
+        }
+        if (!cached) {
+          const raw = localStorage.getItem('coe_pending_verification');
+          if (raw) cached = JSON.parse(raw);
+        }
       } catch {}
 
-      if (!window.supabaseClient) return cached;
+      if (!window.supabaseClient || (!userId && !email)) return cached;
 
       try {
-        const { data: { session } } = await window.supabaseClient.auth.getSession();
-        const user = session?.user;
-        if (!user) return cached;
-
-        // Try user-specific cache if available
-        if (!cached) {
-          try {
-            const rawUser = localStorage.getItem(`coe_verification_req_${user.id}`);
-            if (rawUser) cached = JSON.parse(rawUser);
-          } catch {}
-        }
-
-        const { data, error } = await window.supabaseClient
+        let query = window.supabaseClient
           .from('enrollment_verification_requests')
           .select('*')
-          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1);
 
+        if (userId && email) {
+          query = query.or(`user_id.eq.${userId},email.eq.${email}`);
+        } else if (userId) {
+          query = query.eq('user_id', userId);
+        } else if (email) {
+          query = query.eq('email', email);
+        }
+
+        const { data, error } = await query;
         if (error) {
-          console.warn('[RosterRequests] getMyRequest query warning:', error.message);
+          console.warn('[RosterRequests] getMyRequest warning:', error.message);
           return cached;
         }
 
         const latest = data && data.length > 0 ? data[0] : null;
         if (latest) {
           try {
+            if (email) localStorage.setItem(`coe_req_${email}`, JSON.stringify(latest));
+            if (userId) localStorage.setItem(`coe_req_${userId}`, JSON.stringify(latest));
             localStorage.setItem('coe_pending_verification', JSON.stringify(latest));
-            localStorage.setItem(`coe_verification_req_${user.id}`, JSON.stringify(latest));
           } catch {}
           return latest;
         }
 
-        // If Supabase returned [] but local storage holds a valid pending request for this user, keep it
-        if (cached && (cached.user_id === user.id || cached.email === user.email)) {
+        // If Supabase returned [] (e.g. pending DB sync), fallback to cached record if matching
+        if (cached && (cached.status === 'pending' || cached.email === email || cached.user_id === userId)) {
           return cached;
         }
 
-        return null;
+        return cached;
       } catch (err) {
         console.warn('[RosterRequests] getMyRequest exception:', err);
         return cached;
@@ -352,11 +370,12 @@ const Api = (() => {
         } catch {}
       }
 
+      const email = (reqData.email || user?.email || '').trim().toLowerCase();
       const userId = user?.id || 'usr_' + Date.now();
       const payload = {
-        user_id: userId,
+        user_id: user?.id || null,
         full_name: reqData.full_name.trim().toUpperCase(),
-        email: user?.email || reqData.email || '',
+        email: email,
         course: reqData.course,
         year_level: String(reqData.year_level),
         enrollment_year: reqData.enrollment_year ? Number(reqData.enrollment_year) : null,
@@ -370,24 +389,26 @@ const Api = (() => {
         created_at: new Date().toISOString()
       };
 
-      // Always persist immediately to local storage
+      // Always save locally immediately
       try {
+        if (email) localStorage.setItem(`coe_req_${email}`, JSON.stringify(localRecord));
+        if (userId) localStorage.setItem(`coe_req_${userId}`, JSON.stringify(localRecord));
         localStorage.setItem('coe_pending_verification', JSON.stringify(localRecord));
-        localStorage.setItem(`coe_verification_req_${userId}`, JSON.stringify(localRecord));
       } catch {}
 
-      if (window.supabaseClient && user) {
+      if (window.supabaseClient && user?.id) {
         try {
           const { data, error } = await window.supabaseClient
             .from('enrollment_verification_requests')
-            .insert([payload])
+            .insert([{ ...payload, user_id: user.id }])
             .select()
             .single();
 
           if (!error && data) {
             try {
+              if (email) localStorage.setItem(`coe_req_${email}`, JSON.stringify(data));
+              localStorage.setItem(`coe_req_${user.id}`, JSON.stringify(data));
               localStorage.setItem('coe_pending_verification', JSON.stringify(data));
-              localStorage.setItem(`coe_verification_req_${userId}`, JSON.stringify(data));
             } catch {}
             return data;
           }

@@ -164,6 +164,13 @@
       existingReq = await Api.rosterRequests.getMyRequest();
     }
 
+    if (!existingReq && user?.email) {
+      try {
+        const raw = localStorage.getItem(`coe_req_${user.email.toLowerCase()}`) || localStorage.getItem('coe_pending_verification');
+        if (raw) existingReq = JSON.parse(raw);
+      } catch {}
+    }
+
     if (existingReq && existingReq.status === 'pending') {
       // Show pending review state screen
       if (formSec) formSec.classList.add('hidden');
