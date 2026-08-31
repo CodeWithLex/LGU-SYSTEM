@@ -385,68 +385,93 @@
         <div class="view-header of-view-head">
           <div>
             <h2>Official Enrolled Roster</h2>
-            <p class="view-sub">Manage officially enrolled engineering students database</p>
+            <p class="view-sub">Manage officially enrolled engineering students database for student portal verification</p>
+          </div>
+          <div class="of-header-actions" style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+            <button type="button" class="of-btn of-btn-secondary" id="of-roster-export-btn" title="Export Enrolled Roster as CSV">
+              <iconify-icon icon="solar:file-download-linear"></iconify-icon> Export CSV
+            </button>
+            <button type="button" class="of-btn of-btn-secondary" id="of-roster-import-btn" title="Bulk Import Roster from CSV">
+              <iconify-icon icon="solar:file-upload-linear"></iconify-icon> Bulk Import CSV
+            </button>
+            <button type="button" class="of-btn of-btn-primary" id="of-roster-add-btn" title="Add Single Enrolled Student">
+              <iconify-icon icon="solar:user-plus-linear"></iconify-icon> Add Student
+            </button>
           </div>
         </div>
-        <div class="of-cards">
-          <div class="of-card" style="margin-bottom:1.5rem;">
-            <h3><iconify-icon icon="solar:user-plus-linear"></iconify-icon> Add Enrolled Student to Master Database</h3>
-            <form id="of-roster-form" class="of-form">
-              <div class="form-row">
-                <div class="of-field">
-                  <label>Full Name (LASTNAME FIRSTNAME MIDDLE)</label>
-                  <input type="text" id="of-roster-name" required placeholder="e.g. DELA CRUZ JUAN SANTOS" class="input-field" />
-                </div>
-                <div class="of-field">
-                  <label>Sex / Gender</label>
-                  <select id="of-roster-sex" class="input-field">
-                    <option value="M">Male (M)</option>
-                    <option value="F">Female (F)</option>
-                  </select>
-                </div>
+
+        <!-- 4 Metric KPI Cards -->
+        <div class="of-stat-grid" id="of-roster-stats">
+          <div class="of-stat" id="of-stat-total-roster">
+            <div class="of-stat-label">
+              <span>Total Enrolled</span>
+              <iconify-icon icon="solar:users-group-rounded-bold" style="color:var(--accent); font-size:1.15rem;"></iconify-icon>
+            </div>
+            <div class="of-stat-value" id="of-stat-val-total">0</div>
+            <div class="of-stat-sub" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">Officially Registered</div>
+          </div>
+          <div class="of-stat" id="of-stat-bsce">
+            <div class="of-stat-label">
+              <span>Civil Eng (BSCE)</span>
+              <span class="badge" style="background:rgba(59,130,246,0.15);color:#60a5fa;font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCE</span>
+            </div>
+            <div class="of-stat-value" id="of-stat-val-bsce" style="color:#60a5fa;">0</div>
+            <div class="of-stat-sub" id="of-stat-sub-bsce" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+          </div>
+          <div class="of-stat" id="of-stat-bscoe">
+            <div class="of-stat-label">
+              <span>Comp Eng (BSCoE)</span>
+              <span class="badge" style="background:rgba(16,185,129,0.15);color:#34d399;font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCoE</span>
+            </div>
+            <div class="of-stat-value" id="of-stat-val-bscoe" style="color:#34d399;">0</div>
+            <div class="of-stat-sub" id="of-stat-sub-bscoe" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+          </div>
+          <div class="of-stat" id="of-stat-bsece">
+            <div class="of-stat-label">
+              <span>Electronics Eng (BSECE)</span>
+              <span class="badge" style="background:rgba(168,85,247,0.15);color:#c084fc;font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSECE</span>
+            </div>
+            <div class="of-stat-value" id="of-stat-val-bsece" style="color:#c084fc;">0</div>
+            <div class="of-stat-sub" id="of-stat-sub-bsece" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+          </div>
+        </div>
+
+        <!-- Master Roster Table Card -->
+        <div class="of-card">
+          <!-- Filter Bar with Search, Program Tabs, and Year Select -->
+          <div class="of-filter-bar" style="margin-bottom:1.25rem;">
+            <div class="of-filter-tools">
+              <div style="position:relative; flex:1;">
+                <input type="text" id="of-roster-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search by student name or surname…" />
+                <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
               </div>
-              <div class="form-row">
-                <div class="of-field">
-                  <label>Engineering Program</label>
-                  <select id="of-roster-course" required class="input-field">
-                    <option value="BSCE">BS Civil Engineering (BSCE)</option>
-                    <option value="BSCoE">BS Computer Engineering (BSCoE)</option>
-                    <option value="BSECE">BS Electronics Engineering (BSECE)</option>
-                  </select>
-                </div>
-                <div class="of-field">
-                  <label>Year Level</label>
-                  <select id="of-roster-year" required class="input-field">
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                    <option value="5">5th Year</option>
-                  </select>
-                </div>
+            </div>
+            <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+              <!-- Program Filter Tabs -->
+              <div class="of-filter-tabs" id="of-roster-prog-tabs">
+                <button type="button" class="of-filter-btn active" data-prog="">All Programs</button>
+                <button type="button" class="of-filter-btn" data-prog="BSCE">BSCE</button>
+                <button type="button" class="of-filter-btn" data-prog="BSCoE">BSCoE</button>
+                <button type="button" class="of-filter-btn" data-prog="BSECE">BSECE</button>
               </div>
-              <div class="of-error hidden" id="of-roster-error"></div>
-              <button class="of-btn of-btn-primary" type="submit" id="of-roster-submit" style="margin-top:0.75rem;">Add Student to Roster</button>
-            </form>
+              <!-- Year Level Select -->
+              <select id="of-roster-year-filter" class="input-field" style="width:auto; min-width:130px; padding:0.4rem 0.75rem; font-size:0.82rem; height:34px;">
+                <option value="">All Year Levels</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+                <option value="5">5th Year</option>
+              </select>
+            </div>
           </div>
 
-          <div class="of-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
-              <h3 style="margin:0;"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> Enrolled Roster Database</h3>
-              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="of-roster-search" class="of-search" style="margin-bottom:0; max-width:220px;" placeholder="Search student name…" />
-                <select id="of-roster-filter-program" class="input-field" style="max-width:140px;">
-                  <option value="">All Programs</option>
-                  <option value="BSCE">BSCE</option>
-                  <option value="BSCoE">BSCoE</option>
-                  <option value="BSECE">BSECE</option>
-                </select>
-              </div>
-            </div>
-            <div id="of-roster-table-container">
-              <div class="loading-state">Loading enrolled student roster…</div>
-            </div>
+          <!-- Table Container -->
+          <div id="of-roster-table-container">
+            <div class="loading-state">Loading enrolled student roster…</div>
           </div>
+          <!-- Pagination Bar -->
+          <div class="of-pagination" id="of-roster-pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; flex-wrap:wrap; gap:0.75rem;"></div>
         </div>
       </section>
 
@@ -488,6 +513,100 @@
       <span>Home</span>
     </a>
   </nav>
+
+  <!-- Add / Edit Enrolled Student Modal -->
+  <div id="of-roster-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card of-modal-card" style="max-width:500px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <h3 id="of-roster-modal-title" style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
+          <iconify-icon icon="solar:user-plus-bold" style="color:var(--accent);"></iconify-icon> Add Enrolled Student
+        </h3>
+        <button type="button" class="btn-icon" id="of-roster-modal-close" title="Close Modal">
+          <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
+        </button>
+      </div>
+      <form id="of-roster-modal-form" class="of-form">
+        <input type="hidden" id="of-roster-edit-id" value="" />
+        <div class="of-field">
+          <label>Full Name (LASTNAME FIRSTNAME MIDDLE)</label>
+          <input type="text" id="of-modal-roster-name" required placeholder="e.g. DELA CRUZ JUAN SANTOS" class="input-field" />
+        </div>
+        <div class="form-row">
+          <div class="of-field">
+            <label>Sex / Gender</label>
+            <select id="of-modal-roster-sex" class="input-field">
+              <option value="M">Male (M)</option>
+              <option value="F">Female (F)</option>
+            </select>
+          </div>
+          <div class="of-field">
+            <label>Engineering Program</label>
+            <select id="of-modal-roster-course" required class="input-field">
+              <option value="BSCE">BS Civil Engineering (BSCE)</option>
+              <option value="BSCoE">BS Computer Engineering (BSCoE)</option>
+              <option value="BSECE">BS Electronics Engineering (BSECE)</option>
+            </select>
+          </div>
+        </div>
+        <div class="of-field">
+          <label>Year Level</label>
+          <select id="of-modal-roster-year" required class="input-field">
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+            <option value="5">5th Year</option>
+          </select>
+        </div>
+        <div class="of-error hidden" id="of-modal-roster-error"></div>
+        <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
+          <button type="button" class="of-btn of-btn-ghost" id="of-roster-modal-cancel">Cancel</button>
+          <button type="submit" class="of-btn of-btn-primary" id="of-roster-modal-submit">Save Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk CSV Import Modal -->
+  <div id="of-roster-import-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card of-modal-card" style="max-width:580px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+        <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
+          <iconify-icon icon="solar:file-upload-bold" style="color:var(--accent);"></iconify-icon> Bulk Import Semester Roster
+        </h3>
+        <button type="button" class="btn-icon" id="of-import-modal-close" title="Close Modal">
+          <iconify-icon icon="solar:close-circle-linear" style="font-size:1.3rem;"></iconify-icon>
+        </button>
+      </div>
+      <p style="font-size:0.83rem; color:var(--text-secondary); margin-bottom:1rem;">
+        Upload official semester enrollment CSV list (Columns expected: <code>Name</code>, <code>Sex</code>, <code>Course</code>, <code>Year</code>).
+      </p>
+      
+      <div id="of-import-dropzone" style="border:2px dashed var(--border-hover); border-radius:8px; padding:2rem; text-align:center; background:var(--bg-surface-raised); cursor:pointer; transition:all var(--transition);">
+        <iconify-icon icon="solar:cloud-upload-linear" style="font-size:2.5rem; color:var(--accent); margin-bottom:0.5rem;"></iconify-icon>
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.25rem;">Choose CSV file or drag & drop</div>
+        <div style="font-size:0.75rem; color:var(--text-secondary);">Supports .csv format with student roster</div>
+        <input type="file" id="of-import-file-input" accept=".csv" style="display:none;" />
+      </div>
+
+      <div id="of-import-preview-area" class="hidden" style="margin-top:1rem;">
+        <div style="font-size:0.83rem; font-weight:600; margin-bottom:0.5rem;" id="of-import-summary"></div>
+        <div class="of-table-wrap" style="max-height:160px; overflow-y:auto;">
+          <table class="of-table" id="of-import-preview-table" style="font-size:0.78rem;">
+            <thead><tr><th>Name</th><th>Sex</th><th>Program</th><th>Year</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="of-error hidden" id="of-import-error" style="margin-top:0.75rem;"></div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
+        <button type="button" class="of-btn of-btn-ghost" id="of-import-cancel-btn">Cancel</button>
+        <button type="button" class="of-btn of-btn-primary" id="of-import-confirm-btn" disabled>Import Students</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Event Management Modal Popup -->
   <div id="of-event-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">

@@ -243,6 +243,39 @@ const Api = (() => {
       if (error) throw new Error(error.message);
       return data;
     },
+    async update(id, studentData) {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const { data, error } = await window.supabaseClient
+        .from('enrolled_students')
+        .update({
+          full_name: studentData.full_name.toUpperCase().trim(),
+          sex: studentData.sex || 'M',
+          department: studentData.department || 'CoE',
+          course: studentData.course,
+          year_level: String(studentData.year_level)
+        })
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    async bulkCreate(records) {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const payload = records.map(r => ({
+        full_name: r.full_name.toUpperCase().trim(),
+        sex: r.sex || 'M',
+        department: r.department || 'CoE',
+        course: r.course,
+        year_level: String(r.year_level)
+      }));
+      const { data, error } = await window.supabaseClient
+        .from('enrolled_students')
+        .insert(payload)
+        .select();
+      if (error) throw new Error(error.message);
+      return data;
+    },
     async delete(id) {
       if (!window.supabaseClient) throw new Error('Supabase client not available');
       const { error } = await window.supabaseClient

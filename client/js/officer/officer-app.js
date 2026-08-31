@@ -1508,56 +1508,90 @@ const OfficerApp = (() => {
 
   // ---------- Enrolled Roster Management ----------
   let _allRoster = [];
+  let _rosterPage = 1;
+  const _rosterPerPage = 15;
+  let _selectedRosterProg = '';
+  let _selectedRosterYear = '';
+  let _importedRosterBatch = [];
 
   function bindRosterForm() {
-    const form = $('of-roster-form');
-    if (!form) return;
-    const errEl = $('of-roster-error');
-    const btn = $('of-roster-submit');
+    bindRosterControls();
+    bindRosterModal();
+    bindRosterImportModal();
+  }
 
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      if (errEl) errEl.classList.add('hidden');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Adding Student…';
-      }
-
-      try {
-        const name = $('of-roster-name')?.value.trim();
-        const sex = $('of-roster-sex')?.value;
-        const course = $('of-roster-course')?.value;
-        const year = $('of-roster-year')?.value;
-
-        if (!name || !course || !year) throw new Error('Please fill in all required fields.');
-
-        await Api.roster.create({ full_name: name, sex, course, year_level: year });
-        toast(`Successfully added "${name}" to official enrolled roster!`, 'success');
-        form.reset();
-
-        // Clear local cache so instant search reflects new student
-        if (window.Roster && window.Roster.getRoster) {
-          window.Roster.getRoster().catch(() => {});
-        }
-
-        await loadRoster(true);
-      } catch (err) {
-        if (errEl) {
-          errEl.textContent = err.message || 'Failed to add student to roster.';
-          errEl.classList.remove('hidden');
-        }
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = 'Add Student to Roster';
-        }
-      }
-    });
-
+  function bindRosterControls() {
+    // Search input
     const searchInput = $('of-roster-search');
-    const programFilter = $('of-roster-filter-program');
-    if (searchInput) searchInput.addEventListener('input', renderRosterTable);
-    if (programFilter) programFilter.addEventListener('change', renderRosterTable);
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        _rosterPage = 1;
+        renderRosterTable();
+      });
+    }
+
+    // Program Filter Tabs
+    const progTabs = $('of-roster-prog-tabs');
+    if (progTabs) {
+      progTabs.querySelectorAll('.of-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          progTabs.querySelectorAll('.of-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _selectedRosterProg = btn.dataset.prog || '';
+          _rosterPage = 1;
+          renderRosterTable();
+        });
+      });
+    }
+
+    // Year Filter Dropdown
+    const yearFilter = $('of-roster-year-filter');
+    if (yearFilter) {
+      yearFilter.addEventListener('change', e => {
+        _selectedRosterYear = e.target.value;
+        _rosterPage = 1;
+        renderRosterTable();
+      });
+    }
+
+    // Open Add Student Modal
+    const addBtn = $('of-roster-add-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        openRosterModal();
+      });
+    }
+
+    // Open Bulk Import CSV Modal
+    const importBtn = $('of-roster-import-btn');
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        openRosterImportModal();
+      });
+    }
+
+    // Export CSV
+    const exportBtn = $('of-roster-export-btn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', exportRosterCSV);
+    }
+  }
+
+  function updateRosterStats() {
+    const total = _allRoster.length;
+    const bsce = _allRoster.filter(s => s.course === 'BSCE').length;
+    const bscoe = _allRoster.filter(s => s.course === 'BSCoE').length;
+    const bsece = _allRoster.filter(s => s.course === 'BSECE').length;
+
+    if ($('of-stat-val-total')) $('of-stat-val-total').textContent = total;
+    if ($('of-stat-val-bsce')) $('of-stat-val-bsce').textContent = bsce;
+    if ($('of-stat-sub-bsce')) $('of-stat-sub-bsce').textContent = total ? `${Math.round((bsce / total) * 100)}% of CoE` : '0% of CoE';
+
+    if ($('of-stat-val-bscoe')) $('of-stat-val-bscoe').textContent = bscoe;
+    if ($('of-stat-sub-bscoe')) $('of-stat-sub-bscoe').textContent = total ? `${Math.round((bscoe / total) * 100)}% of CoE` : '0% of CoE';
+
+    if ($('of-stat-val-bsece')) $('of-stat-val-bsece').textContent = bsece;
+    if ($('of-stat-sub-bsece')) $('of-stat-sub-bsece').textContent = total ? `${Math.round((bsece / total) * 100)}% of CoE` : '0% of CoE';
   }
 
   async function loadRoster(isSilent = false) {
@@ -1569,59 +1603,90 @@ const OfficerApp = (() => {
 
     try {
       _allRoster = await Api.roster.list();
+      updateRosterStats();
       renderRosterTable();
     } catch (err) {
       container.innerHTML = `<div class="of-error">Failed to load enrolled roster: ${esc(err.message)}</div>`;
     }
   }
 
+  function getFilteredRoster() {
+    const query = $('of-roster-search')?.value.toLowerCase().trim() || '';
+    return _allRoster.filter(s => {
+      const matchName = !query || s.full_name.toLowerCase().includes(query);
+      const matchProg = !_selectedRosterProg || s.course === _selectedRosterProg;
+      const matchYear = !_selectedRosterYear || String(s.year_level) === String(_selectedRosterYear);
+      return matchName && matchProg && matchYear;
+    });
+  }
+
   function renderRosterTable() {
     const container = $('of-roster-table-container');
+    const paginationEl = $('of-roster-pagination');
     if (!container) return;
 
-    const query = $('of-roster-search')?.value.toLowerCase().trim() || '';
-    const program = $('of-roster-filter-program')?.value || '';
-
-    const filtered = _allRoster.filter(s => {
-      const matchName = !query || s.full_name.toLowerCase().includes(query);
-      const matchProg = !program || s.course === program;
-      return matchName && matchProg;
-    });
+    const filtered = getFilteredRoster();
 
     if (filtered.length === 0) {
-      container.innerHTML = '<p style="font-size:0.82rem;color:var(--text-secondary);padding:1rem;">No enrolled students found matching filter.</p>';
+      container.innerHTML = '<p style="font-size:0.85rem;color:var(--text-secondary);padding:2rem 1rem;text-align:center;">No enrolled students found matching your search or filters.</p>';
+      if (paginationEl) paginationEl.innerHTML = '';
       return;
     }
 
+    // Pagination calculations
+    const totalPages = Math.ceil(filtered.length / _rosterPerPage) || 1;
+    if (_rosterPage > totalPages) _rosterPage = totalPages;
+    if (_rosterPage < 1) _rosterPage = 1;
+
+    const startIndex = (_rosterPage - 1) * _rosterPerPage;
+    const endIndex = Math.min(startIndex + _rosterPerPage, filtered.length);
+    const pageItems = filtered.slice(startIndex, endIndex);
+
     let html = `
-      <div style="margin-bottom:0.75rem; font-weight:600; font-size:0.85rem; color:var(--text-secondary);">
-        Total Enrolled Students: <span class="badge badge-primary">${filtered.length}</span>
-      </div>
       <div class="of-table-wrap">
         <table class="of-table">
           <thead>
             <tr>
-              <th>Full Name</th>
+              <th style="min-width:180px;">Student Full Name</th>
               <th>Gender</th>
               <th>Program</th>
               <th>Year Level</th>
-              <th>Actions</th>
+              <th style="text-align:right;">Actions</th>
             </tr>
           </thead>
           <tbody>
     `;
 
-    filtered.forEach(student => {
+    pageItems.forEach(student => {
+      let progBadgeStyle = '';
+      if (student.course === 'BSCE') {
+        progBadgeStyle = 'background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);';
+      } else if (student.course === 'BSCoE') {
+        progBadgeStyle = 'background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);';
+      } else {
+        progBadgeStyle = 'background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);';
+      }
+
+      const genderBadge = student.sex === 'F'
+        ? '<span style="font-size:0.75rem;padding:2px 6px;border-radius:4px;background:rgba(236,72,153,0.12);color:#f472b6;">Female</span>'
+        : '<span style="font-size:0.75rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,0.12);color:#93c5fd;">Male</span>';
+
       const yrLabel = `${student.year_level}${student.year_level === '1' ? 'st' : student.year_level === '2' ? 'nd' : student.year_level === '3' ? 'rd' : 'th'} Year`;
+
       html += `
         <tr>
-          <td><strong>${esc(student.full_name)}</strong></td>
-          <td>${student.sex === 'F' ? 'Female' : 'Male'}</td>
-          <td><span class="badge badge-info">${esc(student.course)}</span></td>
-          <td>${yrLabel}</td>
           <td>
-            <button class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--col-danger); padding:0.25rem 0.5rem; font-size:0.8rem;">
-              <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon> Delete
+            <div style="font-weight:600; color:var(--text-primary); font-size:0.86rem;">${esc(student.full_name)}</div>
+          </td>
+          <td>${genderBadge}</td>
+          <td><span class="badge" style="${progBadgeStyle}font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">${esc(student.course)}</span></td>
+          <td><span style="font-size:0.8rem;color:var(--text-secondary);font-weight:500;">${yrLabel}</span></td>
+          <td style="text-align:right; white-space:nowrap;">
+            <button type="button" class="of-btn of-btn-ghost edit-roster-btn" data-id="${student.id}" style="padding:0.25rem 0.5rem; font-size:0.8rem; margin-right:0.35rem;" title="Edit Student">
+              <iconify-icon icon="solar:pen-2-linear"></iconify-icon> Edit
+            </button>
+            <button type="button" class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--col-danger); padding:0.25rem 0.5rem; font-size:0.8rem;" title="Delete Student">
+              <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon>
             </button>
           </td>
         </tr>
@@ -1636,21 +1701,375 @@ const OfficerApp = (() => {
 
     container.innerHTML = html;
 
+    // Attach row events
+    container.querySelectorAll('.edit-roster-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const student = _allRoster.find(s => s.id === btn.dataset.id);
+        if (student) openRosterModal(student);
+      });
+    });
+
     container.querySelectorAll('.delete-roster-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.id;
         const name = btn.dataset.name;
-        if (!confirm(`Are you sure you want to remove "${name}" from the enrolled roster?`)) return;
+        if (!confirm(`Are you sure you want to remove "${name}" from the official enrolled roster?`)) return;
 
         try {
           await Api.roster.delete(id);
           toast(`Removed "${name}" from enrolled roster.`, 'info');
+          if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
           await loadRoster(true);
         } catch (err) {
           toast(`Failed to delete student: ${err.message}`, 'error');
         }
       });
     });
+
+    // Render Pagination Bar
+    if (paginationEl) {
+      let pageButtons = '';
+      for (let i = 1; i <= totalPages; i++) {
+        if (totalPages <= 7 || i === 1 || i === totalPages || Math.abs(i - _rosterPage) <= 1) {
+          pageButtons += `
+            <button type="button" class="of-btn ${i === _rosterPage ? 'of-btn-primary' : 'of-btn-ghost'} roster-page-btn" data-page="${i}" style="padding:0.25rem 0.65rem; min-width:30px; font-size:0.8rem;">
+              ${i}
+            </button>
+          `;
+        } else if (i === _rosterPage - 2 || i === _rosterPage + 2) {
+          pageButtons += '<span style="color:var(--text-tertiary);padding:0 2px;">…</span>';
+        }
+      }
+
+      paginationEl.innerHTML = `
+        <div style="font-size:0.8rem; color:var(--text-secondary);">
+          Showing <strong style="color:var(--text-primary);">${startIndex + 1}–${endIndex}</strong> of <strong style="color:var(--text-primary);">${filtered.length}</strong> students
+        </div>
+        <div style="display:flex; gap:0.35rem; align-items:center;">
+          <button type="button" class="of-btn of-btn-ghost" id="of-roster-prev-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage <= 1 ? 'disabled' : ''}>
+            <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon> Prev
+          </button>
+          ${pageButtons}
+          <button type="button" class="of-btn of-btn-ghost" id="of-roster-next-btn" style="padding:0.25rem 0.6rem; font-size:0.8rem;" ${_rosterPage >= totalPages ? 'disabled' : ''}>
+            Next <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
+          </button>
+        </div>
+      `;
+
+      $('of-roster-prev-btn')?.addEventListener('click', () => {
+        if (_rosterPage > 1) {
+          _rosterPage--;
+          renderRosterTable();
+        }
+      });
+      $('of-roster-next-btn')?.addEventListener('click', () => {
+        if (_rosterPage < totalPages) {
+          _rosterPage++;
+          renderRosterTable();
+        }
+      });
+      paginationEl.querySelectorAll('.roster-page-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _rosterPage = Number(btn.dataset.page);
+          renderRosterTable();
+        });
+      });
+    }
+  }
+
+  // ---------- Single Student Modal (Add & Edit) ----------
+
+  function bindRosterModal() {
+    const modal = $('of-roster-modal');
+    const closeBtn = $('of-roster-modal-close');
+    const cancelBtn = $('of-roster-modal-cancel');
+    const form = $('of-roster-modal-form');
+
+    const closeModal = () => modal?.classList.add('hidden');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (modal) {
+      modal.addEventListener('click', e => {
+        if (e.target === modal) closeModal();
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const errEl = $('of-modal-roster-error');
+        const submitBtn = $('of-roster-modal-submit');
+        const id = $('of-roster-edit-id')?.value;
+        const name = $('of-modal-roster-name')?.value.trim();
+        const sex = $('of-modal-roster-sex')?.value;
+        const course = $('of-modal-roster-course')?.value;
+        const year = $('of-modal-roster-year')?.value;
+
+        if (errEl) errEl.classList.add('hidden');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Saving…';
+        }
+
+        try {
+          if (!name || !course || !year) throw new Error('Please fill in all required fields.');
+
+          if (id) {
+            await Api.roster.update(id, { full_name: name, sex, course, year_level: year });
+            toast(`Updated record for "${name}".`, 'success');
+          } else {
+            await Api.roster.create({ full_name: name, sex, course, year_level: year });
+            toast(`Added "${name}" to enrolled roster!`, 'success');
+          }
+
+          if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
+          closeModal();
+          await loadRoster(true);
+        } catch (err) {
+          if (errEl) {
+            errEl.textContent = err.message || 'Failed to save student.';
+            errEl.classList.remove('hidden');
+          }
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save Student';
+          }
+        }
+      });
+    }
+  }
+
+  function openRosterModal(student = null) {
+    const modal = $('of-roster-modal');
+    if (!modal) return;
+    const title = $('of-roster-modal-title');
+    const idInput = $('of-roster-edit-id');
+    const nameInput = $('of-modal-roster-name');
+    const sexSelect = $('of-modal-roster-sex');
+    const courseSelect = $('of-modal-roster-course');
+    const yearSelect = $('of-modal-roster-year');
+    const errEl = $('of-modal-roster-error');
+
+    if (errEl) errEl.classList.add('hidden');
+
+    if (student) {
+      if (title) title.innerHTML = '<iconify-icon icon="solar:pen-2-bold" style="color:var(--accent);"></iconify-icon> Edit Enrolled Student';
+      if (idInput) idInput.value = student.id;
+      if (nameInput) nameInput.value = student.full_name;
+      if (sexSelect) sexSelect.value = student.sex || 'M';
+      if (courseSelect) courseSelect.value = student.course || 'BSCE';
+      if (yearSelect) yearSelect.value = student.year_level || '1';
+    } else {
+      if (title) title.innerHTML = '<iconify-icon icon="solar:user-plus-bold" style="color:var(--accent);"></iconify-icon> Add Enrolled Student';
+      if (idInput) idInput.value = '';
+      if (nameInput) nameInput.value = '';
+      if (sexSelect) sexSelect.value = 'M';
+      if (courseSelect) courseSelect.value = 'BSCE';
+      if (yearSelect) yearSelect.value = '1';
+    }
+
+    modal.classList.remove('hidden');
+    nameInput?.focus();
+  }
+
+  // ---------- Bulk CSV Import Modal ----------
+
+  function bindRosterImportModal() {
+    const modal = $('of-roster-import-modal');
+    const closeBtn = $('of-import-modal-close');
+    const cancelBtn = $('of-import-cancel-btn');
+    const dropzone = $('of-import-dropzone');
+    const fileInput = $('of-import-file-input');
+    const confirmBtn = $('of-import-confirm-btn');
+
+    const closeModal = () => {
+      modal?.classList.add('hidden');
+      _importedRosterBatch = [];
+      if (fileInput) fileInput.value = '';
+      $('of-import-preview-area')?.classList.add('hidden');
+      $('of-import-error')?.classList.add('hidden');
+      if (confirmBtn) confirmBtn.disabled = true;
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (modal) {
+      modal.addEventListener('click', e => {
+        if (e.target === modal) closeModal();
+      });
+    }
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'var(--accent)';
+      });
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.style.borderColor = 'var(--border-hover)';
+      });
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropzone.style.borderColor = 'var(--border-hover)';
+        if (e.dataTransfer.files?.length) {
+          handleRosterCSVFile(e.dataTransfer.files[0]);
+        }
+      });
+      fileInput.addEventListener('change', e => {
+        if (e.target.files?.length) {
+          handleRosterCSVFile(e.target.files[0]);
+        }
+      });
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        if (!_importedRosterBatch.length) return;
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = `Importing ${_importedRosterBatch.length} Students…`;
+
+        try {
+          await Api.roster.bulkCreate(_importedRosterBatch);
+          toast(`Successfully imported ${_importedRosterBatch.length} students into master roster!`, 'success');
+          if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
+          closeModal();
+          await loadRoster(true);
+        } catch (err) {
+          const errEl = $('of-import-error');
+          if (errEl) {
+            errEl.textContent = err.message || 'Failed to bulk import roster.';
+            errEl.classList.remove('hidden');
+          }
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = 'Import Students';
+        }
+      });
+    }
+  }
+
+  function openRosterImportModal() {
+    const modal = $('of-roster-import-modal');
+    if (!modal) return;
+    $('of-import-preview-area')?.classList.add('hidden');
+    $('of-import-error')?.classList.add('hidden');
+    const confirmBtn = $('of-import-confirm-btn');
+    if (confirmBtn) confirmBtn.disabled = true;
+    modal.classList.remove('hidden');
+  }
+
+  function handleRosterCSVFile(file) {
+    const errEl = $('of-import-error');
+    if (errEl) errEl.classList.add('hidden');
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const text = e.target.result;
+        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+        if (lines.length < 2) throw new Error('CSV file appears empty or missing header row.');
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z]/g, ''));
+        const nameIdx = headers.findIndex(h => h.includes('name'));
+        const sexIdx = headers.findIndex(h => h.includes('sex') || h.includes('gender'));
+        const courseIdx = headers.findIndex(h => h.includes('course') || h.includes('program'));
+        const yearIdx = headers.findIndex(h => h.includes('year') || h.includes('level'));
+
+        if (nameIdx === -1 || courseIdx === -1 || yearIdx === -1) {
+          throw new Error('CSV must contain headers for Name, Course (Program), and Year.');
+        }
+
+        const records = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
+          const rawName = cols[nameIdx];
+          if (!rawName) continue;
+
+          let course = (cols[courseIdx] || 'BSCE').toUpperCase();
+          if (!['BSCE', 'BSCOE', 'BSECE'].includes(course)) {
+            if (course.includes('CIVIL')) course = 'BSCE';
+            else if (course.includes('COMP')) course = 'BSCoE';
+            else if (course.includes('ELEC')) course = 'BSECE';
+            else course = 'BSCE';
+          }
+          if (course === 'BSCOE') course = 'BSCoE';
+
+          let year = (cols[yearIdx] || '1').replace(/[^0-9]/g, '');
+          if (!year) year = '1';
+
+          let sex = sexIdx !== -1 ? (cols[sexIdx] || 'M').toUpperCase()[0] : 'M';
+          if (sex !== 'F' && sex !== 'M') sex = 'M';
+
+          records.push({
+            full_name: rawName.toUpperCase(),
+            sex,
+            department: 'CoE',
+            course,
+            year_level: year
+          });
+        }
+
+        if (!records.length) throw new Error('No valid student records found in CSV.');
+
+        _importedRosterBatch = records;
+
+        // Show preview
+        $('of-import-summary').textContent = `✓ Found ${records.length} student records ready to import:`;
+        const tbody = $('of-import-preview-table')?.querySelector('tbody');
+        if (tbody) {
+          tbody.innerHTML = records.slice(0, 5).map(r => `
+            <tr>
+              <td><strong>${esc(r.full_name)}</strong></td>
+              <td>${r.sex}</td>
+              <td><span class="badge badge-info">${esc(r.course)}</span></td>
+              <td>Year ${r.year_level}</td>
+            </tr>
+          `).join('');
+          if (records.length > 5) {
+            tbody.innerHTML += `<tr><td colspan="4" style="text-align:center; color:var(--text-tertiary); font-size:0.75rem;">… and ${records.length - 5} more students</td></tr>`;
+          }
+        }
+
+        $('of-import-preview-area')?.classList.remove('hidden');
+        const confirmBtn = $('of-import-confirm-btn');
+        if (confirmBtn) {
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = `Import ${records.length} Students`;
+        }
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.message || 'Failed to parse CSV file.';
+          errEl.classList.remove('hidden');
+        }
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function exportRosterCSV() {
+    const list = getFilteredRoster();
+    if (!list.length) {
+      toast('No enrolled students to export.', 'info');
+      return;
+    }
+
+    let csvContent = 'Name,Sex,Department,Course,Year\n';
+    list.forEach(s => {
+      const safeName = `"${s.full_name.replace(/"/g, '""')}"`;
+      csvContent += `${safeName},${s.sex || 'M'},CoE,${s.course},${s.year_level}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `coe_enrolled_roster_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast(`Exported ${list.length} student records as CSV!`, 'success');
   }
 
   // ---------- Start ----------
