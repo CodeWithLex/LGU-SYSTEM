@@ -30,6 +30,7 @@ app.use(helmet({
       defaultSrc:   ["'self'"],
       scriptSrc:    ["'self'", "'unsafe-inline'",
                      "https://cdn.jsdelivr.net",
+                     "https://cdnjs.cloudflare.com",
                      "https://fonts.googleapis.com",
                      "https://apis.google.com",
                      "https://accounts.google.com"],

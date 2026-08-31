@@ -122,6 +122,8 @@
 
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
+  }
+
   if (onboardingLogoutBtn) {
     onboardingLogoutBtn.addEventListener('click', async () => {
       await Auth.logout();
