@@ -803,41 +803,41 @@ const OfficerApp = (() => {
     content.innerHTML = `
       <div class="of-modal-head">
         <div>
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;">
             ${UI.renderStatusBadge(ev.status)}
-            <span style="font-size:0.72rem;color:var(--text-tertiary);">Event ID: ${esc(ev.id.slice(0,8))}</span>
+            <span style="font-size:0.72rem;color:var(--text-tertiary);font-family:var(--font-mono, monospace);">ID: ${esc(ev.id.slice(0,8))}</span>
           </div>
           <h3>${esc(ev.event_name)}</h3>
           <p style="font-size:0.85rem;color:var(--text-secondary);margin:0;">${esc(ev.description || 'No description provided.')}</p>
         </div>
-        <button type="button" class="of-modal-close" id="of-detail-close" aria-label="Close dialog">
+        <button type="button" class="of-modal-close" id="of-detail-close" aria-label="Close dialog" title="Close">
           <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
         </button>
       </div>
 
-      <div class="of-stat-grid" style="margin-bottom:1.25rem;">
-        <div class="of-stat">
-          <div class="of-stat-label">Allocated</div>
-          <div class="of-stat-value">₱${fmtNum(ev.allocated_budget)}</div>
+      <div class="of-modal-stats">
+        <div class="of-modal-stat is-allocated">
+          <span class="of-stat-label">Allocated</span>
+          <span class="of-stat-value">₱${fmtNum(ev.allocated_budget)}</span>
         </div>
-        <div class="of-stat is-red">
-          <div class="of-stat-label">Spent</div>
-          <div class="of-stat-value">₱${fmtNum(ev.computed_expenses)}</div>
+        <div class="of-modal-stat is-spent">
+          <span class="of-stat-label">Spent</span>
+          <span class="of-stat-value">₱${fmtNum(ev.computed_expenses)}</span>
         </div>
-        <div class="of-stat is-green">
-          <div class="of-stat-label">Remaining</div>
-          <div class="of-stat-value">₱${fmtNum(ev.computed_remaining)}</div>
+        <div class="of-modal-stat is-remaining">
+          <span class="of-stat-label">Remaining</span>
+          <span class="of-stat-value">₱${fmtNum(ev.computed_remaining)}</span>
         </div>
       </div>
 
       <form id="of-detail-form" class="of-form">
         <div class="of-form-row">
           <div class="of-field">
-            <label>Event Name</label>
-            <input type="text" id="of-me-name" value="${esc(ev.event_name)}" required />
+            <label><iconify-icon icon="solar:tag-linear" style="font-size:12px;margin-right:3px;vertical-align:middle;"></iconify-icon>Event Name</label>
+            <input type="text" id="of-me-name" value="${esc(ev.event_name)}" required placeholder="Event name" />
           </div>
           <div class="of-field">
-            <label>Status</label>
+            <label><iconify-icon icon="solar:shield-check-linear" style="font-size:12px;margin-right:3px;vertical-align:middle;"></iconify-icon>Status</label>
             <select id="of-me-status">
               ${['upcoming','ongoing','completed','cancelled'].map(s => `<option value="${s}" ${ev.status === s ? 'selected' : ''}>${s[0].toUpperCase() + s.slice(1)}</option>`).join('')}
             </select>
@@ -845,22 +845,22 @@ const OfficerApp = (() => {
         </div>
         <div class="of-form-row">
           <div class="of-field">
-            <label>Allocated Budget (₱)</label>
-            <input type="number" id="of-me-budget" min="0" step="0.01" value="${ev.allocated_budget}" required />
+            <label><iconify-icon icon="solar:wallet-money-linear" style="font-size:12px;margin-right:3px;vertical-align:middle;"></iconify-icon>Allocated Budget (₱)</label>
+            <input type="number" id="of-me-budget" min="0" step="0.01" value="${ev.allocated_budget}" required placeholder="0.00" />
           </div>
           <div class="of-field">
-            <label>Event Date</label>
+            <label><iconify-icon icon="solar:calendar-date-linear" style="font-size:12px;margin-right:3px;vertical-align:middle;"></iconify-icon>Event Date</label>
             <input type="date" id="of-me-date" value="${ev.event_date || ''}" />
           </div>
         </div>
         <div class="of-field">
-          <label>Description</label>
-          <textarea id="of-me-desc" rows="2">${esc(ev.description || '')}</textarea>
+          <label><iconify-icon icon="solar:document-text-linear" style="font-size:12px;margin-right:3px;vertical-align:middle;"></iconify-icon>Description</label>
+          <textarea id="of-me-desc" rows="2" placeholder="Brief event description">${esc(ev.description || '')}</textarea>
         </div>
         <div class="of-error hidden" id="of-me-error"></div>
-        <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:center;margin-top:0.5rem;flex-wrap:wrap;">
+        <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:center;margin-top:0.65rem;flex-wrap:wrap;">
           <button class="of-btn of-btn-ghost" type="button" id="of-detail-receipts">
-            <iconify-icon icon="solar:history-linear"></iconify-icon> Transaction History (<span id="of-detail-tx-count">…</span>)
+            <iconify-icon icon="solar:history-linear"></iconify-icon> Transaction History <span style="font-size:0.75rem;background:var(--bg-surface);padding:0.15rem 0.45rem;border-radius:999px;border:1px solid var(--border-default);margin-left:0.3rem;" id="of-detail-tx-count">…</span>
           </button>
           <div style="display:flex;gap:0.6rem;">
             <button class="of-btn of-btn-ghost" type="button" id="of-detail-cancel">Cancel</button>
@@ -871,6 +871,9 @@ const OfficerApp = (() => {
 
       <div id="of-detail-txs" class="of-scrollable-list hidden" style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-default);max-height:220px;"></div>
     `;
+
+    // Bind custom animated dropdown to modal select
+    Dropdowns.bindAll('#of-event-modal');
 
     const closeModal = () => {
       modal.classList.add('hidden');
