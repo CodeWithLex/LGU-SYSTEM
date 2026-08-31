@@ -1658,19 +1658,7 @@ const OfficerApp = (() => {
     `;
 
     pageItems.forEach(student => {
-      let progBadgeStyle = '';
-      if (student.course === 'BSCE') {
-        progBadgeStyle = 'background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);';
-      } else if (student.course === 'BSCoE') {
-        progBadgeStyle = 'background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);';
-      } else {
-        progBadgeStyle = 'background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);';
-      }
-
-      const genderBadge = student.sex === 'F'
-        ? '<span style="font-size:0.75rem;padding:2px 6px;border-radius:4px;background:rgba(236,72,153,0.12);color:#f472b6;">Female</span>'
-        : '<span style="font-size:0.75rem;padding:2px 6px;border-radius:4px;background:rgba(59,130,246,0.12);color:#93c5fd;">Male</span>';
-
+      const genderText = student.sex === 'F' ? 'Female' : 'Male';
       const yrLabel = `${student.year_level}${student.year_level === '1' ? 'st' : student.year_level === '2' ? 'nd' : student.year_level === '3' ? 'rd' : 'th'} Year`;
 
       html += `
@@ -1678,14 +1666,14 @@ const OfficerApp = (() => {
           <td>
             <div style="font-weight:600; color:var(--text-primary); font-size:0.86rem;">${esc(student.full_name)}</div>
           </td>
-          <td>${genderBadge}</td>
-          <td><span class="badge" style="${progBadgeStyle}font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:4px;">${esc(student.course)}</span></td>
-          <td><span style="font-size:0.8rem;color:var(--text-secondary);font-weight:500;">${yrLabel}</span></td>
+          <td style="color:var(--text-secondary); font-size:0.82rem;">${genderText}</td>
+          <td><span class="badge" style="background:var(--bg-surface-raised); color:var(--text-primary); border:1px solid var(--border-default); font-size:0.75rem; font-weight:600; padding:2px 8px; border-radius:4px; letter-spacing:0.02em;">${esc(student.course)}</span></td>
+          <td><span style="font-size:0.82rem; color:var(--text-secondary); font-weight:500;">${yrLabel}</span></td>
           <td style="text-align:right; white-space:nowrap;">
-            <button type="button" class="of-btn of-btn-ghost edit-roster-btn" data-id="${student.id}" style="padding:0.25rem 0.5rem; font-size:0.8rem; margin-right:0.35rem;" title="Edit Student">
+            <button type="button" class="of-btn of-btn-ghost edit-roster-btn" data-id="${student.id}" style="padding:0.25rem 0.55rem; font-size:0.8rem; margin-right:0.25rem;" title="Edit Student">
               <iconify-icon icon="solar:pen-2-linear"></iconify-icon> Edit
             </button>
-            <button type="button" class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--col-danger); padding:0.25rem 0.5rem; font-size:0.8rem;" title="Delete Student">
+            <button type="button" class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--text-tertiary); padding:0.25rem 0.45rem; font-size:0.85rem;" title="Delete Student">
               <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon>
             </button>
           </td>

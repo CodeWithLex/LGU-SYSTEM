@@ -1718,3 +1718,63 @@
     gap: 0.5rem;
   }
 }
+
+/* ---------- Enrolled Roster Mobile Responsiveness & Polish ---------- */
+@media (max-width: 768px) {
+  .of-view-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+  .of-header-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .of-header-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .of-header-actions #of-roster-add-btn {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+  .of-header-actions .of-btn {
+    justify-content: center;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  .of-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+  .of-filter-tabs {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .of-filter-btn {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    padding: 0.35rem 0.4rem;
+    font-size: 0.75rem;
+  }
+  #of-roster-year-filter {
+    width: 100% !important;
+  }
+  .of-pagination {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.6rem;
+  }
+}
