@@ -185,6 +185,26 @@
 
   <!-- MAIN APP -->
   <div id="app-screen" class="screen">
+
+    <!-- Mobile Top Header (Mobile only) -->
+    <header class="app-mobile-header">
+      <div class="app-mobile-brand">
+        <img src="assets/coe-logo.png" alt="COE" class="coe-logo-img app-mobile-logo" />
+        <div>
+          <h2>Student Portal</h2>
+          <span class="role-badge role-student" id="mobile-user-role-badge">Student</span>
+        </div>
+      </div>
+      <div class="app-mobile-actions">
+        <button type="button" class="btn-icon" data-theme-toggle title="Toggle Theme" aria-label="Toggle Theme">
+          <iconify-icon icon="solar:sun-linear" id="app-mobile-theme-icon"></iconify-icon>
+        </button>
+        <button type="button" class="btn-icon" id="app-mobile-logout-btn" title="Sign Out" aria-label="Sign Out">
+          <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
+        </button>
+      </div>
+    </header>
+
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">

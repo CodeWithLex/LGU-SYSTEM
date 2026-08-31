@@ -310,8 +310,11 @@
   }
 
 
-  // ---- Logout (sidebar + mobile bottom nav + profile modal) ----
+  // ---- Logout (sidebar + mobile headers + profile modal) ----
   document.getElementById('logout-btn')?.addEventListener('click', async () => {
+    await Auth.logout();
+  });
+  document.getElementById('app-mobile-logout-btn')?.addEventListener('click', async () => {
     await Auth.logout();
   });
   document.getElementById('bottom-logout-btn')?.addEventListener('click', async () => {
@@ -338,6 +341,9 @@
       if (ursaThemeBtn) {
         ursaThemeBtn.addEventListener('click', () => this.toggleTheme());
       }
+      document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+        btn.addEventListener('click', () => this.toggleTheme());
+      });
       if (profileThemeSelect) {
         profileThemeSelect.value = localStorage.getItem('theme') || 'dark';
         profileThemeSelect.addEventListener('change', (e) => {
@@ -371,6 +377,12 @@
       const themeBtn = document.getElementById('theme-toggle-btn');
       if (themeIcon) themeIcon.setAttribute('icon', icon);
       if (themeBtn) themeBtn.setAttribute('title', title);
+
+      document.querySelectorAll('[data-theme-toggle]').forEach(btn => {
+        const iconEl = btn.querySelector('iconify-icon');
+        if (iconEl) iconEl.setAttribute('icon', icon);
+        btn.setAttribute('title', title);
+      });
 
       const ursaThemeIcon = document.getElementById('ursa-theme-icon');
       const ursaThemeBtn = document.getElementById('ursa-theme-btn');
@@ -509,12 +521,22 @@
       showOnboardingModal(session.user, profile);
     }
 
-    // Sidebar user info
+    // Sidebar & Mobile Header user info
     const displayName = profile?.full_name || session.user.email;
     const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
-    const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(profile?.role);
+    const roleKey     = profile?.role || 'student';
+    const roleLabel   = roleLabels[roleKey] || UI.capitalize(roleKey);
+    const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
+
     document.getElementById('user-name').textContent   = displayName;
-    document.getElementById('user-role').textContent   = roleLabels[profile?.role] || (profile?.role ? UI.capitalize(profile.role) : 'Student');
+    document.getElementById('user-role').textContent   = roleLabel;
+
+    const mobileRoleBadge = document.getElementById('mobile-user-role-badge');
+    if (mobileRoleBadge) {
+      mobileRoleBadge.textContent = roleLabel;
+      mobileRoleBadge.className = `role-badge role-${roleKey}`;
+    }
+
     UI.setAdminVisibility(profile?.role === 'admin');
     UI.setOfficerVisibility(officerRole);
     
