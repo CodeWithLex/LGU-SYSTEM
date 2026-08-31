@@ -59,6 +59,11 @@
   --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.7);
   --bg-surface-elevated: #161F2C;
 
+  /* Sleek Scrollbar Tokens */
+  --scrollbar-thumb: rgba(255, 255, 255, 0.16);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
+  --scrollbar-track: transparent;
+
   /* ---- Typography Tokens ----
      Inter = Primary UI, Headings, Navigation, Labels & General Typography
      Proxima Nova = Numeric Metrics, Currency Figures, KPIs & Tabular Counts
@@ -141,6 +146,11 @@
   --shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.18), 0 0 1px rgba(15, 23, 42, 0.12);
   --bg-surface-elevated: #FFFFFF;
 
+  /* Sleek Scrollbar Tokens (Light Theme) */
+  --scrollbar-thumb: rgba(15, 23, 42, 0.18);
+  --scrollbar-thumb-hover: rgba(15, 23, 42, 0.35);
+  --scrollbar-track: transparent;
+
   /* Semantic aliases */
   --bg-base: var(--background);
   --bg-surface: var(--surface);
@@ -194,6 +204,34 @@
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* Universal Ultra-Sleek Scrollbars (Applies globally across all scrollables) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* 16px minimum prevents iOS Safari zoom-on-focus for any unstyled input */
@@ -2089,32 +2127,8 @@ html body .hidden {
   overflow: auto;
   max-height: 600px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--col-border);
-}
-
-/* Global Custom Scrollbar for all scrollable containers */
-.table-wrapper::-webkit-scrollbar,
-.tx-list::-webkit-scrollbar,
-.announcement-list::-webkit-scrollbar,
-.mobile-cards-container::-webkit-scrollbar,
-#admin-audit-log-content::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-.table-wrapper::-webkit-scrollbar-track,
-.tx-list::-webkit-scrollbar-track,
-.announcement-list::-webkit-scrollbar-track,
-.table-wrapper {
-  background: transparent;
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb,
-.mobile-cards-container::-webkit-scrollbar-thumb {
-  background: var(--border-default);
-  border-radius: 10px;
+  background: var(--bg-surface);
 }
 
 .data-table {

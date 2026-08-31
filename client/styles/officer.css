@@ -533,24 +533,35 @@
 .of-table-wrap::-webkit-scrollbar,
 .of-scrollable-list::-webkit-scrollbar,
 .of-main::-webkit-scrollbar,
-.of-sidebar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.of-sidebar::-webkit-scrollbar,
+.of-modal-card::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
 .of-table-wrap::-webkit-scrollbar-track,
 .of-scrollable-list::-webkit-scrollbar-track,
 .of-main::-webkit-scrollbar-track,
-.of-sidebar::-webkit-scrollbar-track {
-  background: var(--bg-surface);
+.of-sidebar::-webkit-scrollbar-track,
+.of-modal-card::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .of-table-wrap::-webkit-scrollbar-thumb,
 .of-scrollable-list::-webkit-scrollbar-thumb,
 .of-main::-webkit-scrollbar-thumb,
-.of-sidebar::-webkit-scrollbar-thumb {
-  background: var(--border-hover);
+.of-sidebar::-webkit-scrollbar-thumb,
+.of-modal-card::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, rgba(255, 255, 255, 0.16));
   border-radius: 999px;
+}
+
+.of-table-wrap::-webkit-scrollbar-thumb:hover,
+.of-scrollable-list::-webkit-scrollbar-thumb:hover,
+.of-main::-webkit-scrollbar-thumb:hover,
+.of-sidebar::-webkit-scrollbar-thumb:hover,
+.of-modal-card::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, rgba(255, 255, 255, 0.32));
 }
 
 .of-table {
