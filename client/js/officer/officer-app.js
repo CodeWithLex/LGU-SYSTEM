@@ -116,6 +116,7 @@ const OfficerApp = (() => {
     }
 
     bindTheme();
+    bindLogout();
     bindNav();
     // Replace the portal's native selects with the shared animated dropdowns
     Dropdowns.bindAll('#of-shell');
@@ -191,6 +192,27 @@ const OfficerApp = (() => {
       });
     });
     updateIcon();
+  }
+
+  function bindLogout() {
+    const handleLogout = async (e) => {
+      e.preventDefault();
+      if (confirm('Are you sure you want to sign out of the system?')) {
+        try {
+          await window.supabaseClient.auth.signOut();
+        } catch (err) {
+          console.error('Sign out error:', err);
+        } finally {
+          window.location.href = '/';
+        }
+      }
+    };
+
+    const mobileLogoutBtn = document.getElementById('of-mobile-logout-btn');
+    const desktopLogoutBtn = document.getElementById('of-logout-btn');
+
+    if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', handleLogout);
+    if (desktopLogoutBtn) desktopLogoutBtn.addEventListener('click', handleLogout);
   }
 
   async function refreshCoreData() {
