@@ -2734,37 +2734,43 @@ iconify-icon {
   body .bottom-nav.visible {
     display: flex !important;
     position: fixed !important;
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 12px !important;
-    right: 12px !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 8px !important;
+    right: 8px !important;
     width: auto !important;
-    max-width: 440px !important;
+    max-width: 480px !important;
     margin: 0 auto !important;
     z-index: 1000 !important;
     
     /* Frosted Glassmorphism */
-    background: rgba(17, 24, 32, 0.88) !important;
+    background: rgba(17, 24, 32, 0.9) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 30px !important;
     
-    padding: 6px 6px !important;
+    padding: 4px 4px !important;
     justify-content: space-around !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 2px !important;
     
     box-shadow: 
       0 12px 36px -4px rgba(0, 0, 0, 0.5),
       0 4px 14px rgba(0, 0, 0, 0.25),
       inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
     
-    overflow: visible !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease !important;
+  }
+  body .bottom-nav.visible::-webkit-scrollbar {
+    display: none !important;
   }
 
   [data-theme="light"] body .bottom-nav.visible {
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
     border: 1px solid rgba(0, 0, 0, 0.08) !important;
     box-shadow: 
       0 12px 36px -4px rgba(0, 0, 0, 0.12),
@@ -2778,10 +2784,10 @@ iconify-icon {
     align-items: center !important;
     justify-content: center !important;
     flex: 1 1 0% !important;
-    min-width: 0 !important;
+    min-width: 44px !important;
     height: 48px !important;
-    padding: 4px 2px !important;
-    border-radius: 22px !important;
+    padding: 3px 1px !important;
+    border-radius: 18px !important;
     color: var(--text-tertiary) !important;
     text-decoration: none !important;
     position: relative !important;
@@ -2789,10 +2795,11 @@ iconify-icon {
     user-select: none !important;
     -webkit-tap-highlight-color: transparent !important;
     touch-action: manipulation !important;
+    flex-shrink: 0 !important;
   }
 
   body .bottom-nav-item .nav-icon {
-    font-size: 1.25rem !important;
+    font-size: 1.18rem !important;
     line-height: 1 !important;
     display: flex !important;
     align-items: center !important;
@@ -2801,10 +2808,10 @@ iconify-icon {
   }
 
   body .bottom-nav-item span:not(.nav-icon) {
-    font-size: 0.62rem !important;
+    font-size: 0.58rem !important;
     font-weight: 600 !important;
-    letter-spacing: 0.01em !important;
-    line-height: 1.2 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.15 !important;
     margin-top: 2px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
