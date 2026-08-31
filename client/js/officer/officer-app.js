@@ -50,22 +50,46 @@ const OfficerApp = (() => {
 
   function fmtNum(n) { return Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-  // Skeleton placeholders (reuse the main system's shimmer classes from main.css)
+  // Skeleton placeholders matching the main student portal
   function skeletonStack(lines = 3) {
     const rows = Array.from({ length: lines }, (_, i) =>
-      `<div class="skeleton skeleton-line${i === lines - 1 ? ' short' : ''}"></div>`).join('');
-    return `<div class="skeleton-stack" role="status" aria-label="Loading">
-      <div class="skeleton skeleton-title"></div>${rows}</div>`;
+      `<div class="sk-bone sk-list-row" style="height:${i === 0 ? '16px' : '12px'};width:${i === lines - 1 ? '60%' : '100%'};margin-bottom:0.5rem;"></div>`).join('');
+    return `<div class="sk-content-card" style="padding:1rem;gap:0.5rem;" role="status" aria-label="Loading">${rows}</div>`;
   }
+
   function skeletonRows(colspan, rows = 4) {
     return Array.from({ length: rows }, () =>
-      `<tr><td colspan="${colspan}"><div class="skeleton skeleton-line" style="height:14px;margin:0.45rem 0;"></div></td></tr>`).join('');
+      `<tr><td colspan="${colspan}"><div class="sk-bone sk-list-row" style="height:16px;margin:0.45rem 0;"></div></td></tr>`).join('');
   }
+
   function skeletonStatCards(n = 4) {
-    return Array.from({ length: n }, () => '<div class="skeleton skeleton-card" style="height:96px;"></div>').join('');
+    return Array.from({ length: n }, () => `
+      <div class="sk-stat-card">
+        <div class="sk-bone sk-circle" style="width:38px;height:38px;flex-shrink:0;"></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+          <div class="sk-bone" style="height:10px;width:60%;border-radius:4px;"></div>
+          <div class="sk-bone" style="height:22px;width:80%;border-radius:5px;"></div>
+        </div>
+      </div>
+    `).join('');
   }
+
   function skeletonEventCards(n = 6) {
-    return Array.from({ length: n }, () => '<div class="skeleton skeleton-card" style="height:190px;"></div>').join('');
+    return Array.from({ length: n }, () => `
+      <div class="sk-content-card" style="min-height:190px;padding:1.25rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">
+          <div class="sk-bone" style="height:16px;width:50%;border-radius:4px;"></div>
+          <div class="sk-bone" style="height:14px;width:20%;border-radius:100px;"></div>
+        </div>
+        <div class="sk-bone" style="height:12px;width:80%;border-radius:4px;margin-bottom:0.5rem;"></div>
+        <div class="sk-bone" style="height:12px;width:65%;border-radius:4px;margin-bottom:1rem;"></div>
+        <div class="sk-bone" style="height:8px;width:100%;border-radius:999px;margin-bottom:0.75rem;"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:auto;">
+          <div class="sk-bone" style="height:28px;flex:1;border-radius:6px;"></div>
+          <div class="sk-bone" style="height:28px;flex:1;border-radius:6px;"></div>
+        </div>
+      </div>
+    `).join('');
   }
 
   function getThemeColor(varName, fallback) {
@@ -76,18 +100,35 @@ const OfficerApp = (() => {
   // ---------- Boot ----------
 
   async function boot() {
+    const splash = document.getElementById('splash-screen');
+    const splashStart = Date.now();
+    if (splash) {
+      const savedSection = window.location.hash.slice(1) || localStorage.getItem('officer_last_view') || 'overview';
+      const shape = (['record', 'events', 'reports', 'people', 'announcements'].includes(savedSection)) ? 'list' : 'default';
+      splash.classList.remove('splash-view-list', 'splash-view-default');
+      splash.classList.add(`splash-view-${shape}`);
+      splash.style.opacity = '1';
+      splash.style.visibility = 'visible';
+      splash.classList.remove('hidden');
+    }
+
     if (!window.supabaseClient?.auth) {
+      if (splash) splash.classList.add('hidden');
       return showGate('Authentication is unavailable. Check your internet connection and reload.');
     }
 
     const { data: { session } } = await window.supabaseClient.auth.getSession();
     if (!session) {
+      if (splash) splash.classList.add('hidden');
       return showGate('Please log in through the main system first.');
     }
     window._authToken = session.access_token;
 
     const { data: { user } } = await window.supabaseClient.auth.getUser();
-    if (!user) return showGate('Session expired. Log in again through the main system.');
+    if (!user) {
+      if (splash) splash.classList.add('hidden');
+      return showGate('Session expired. Log in again through the main system.');
+    }
 
     const { data: profile } = await window.supabaseClient
       .from('profiles')
@@ -96,6 +137,7 @@ const OfficerApp = (() => {
       .single();
 
     if (!profile || !OFFICER_ROLES.includes(profile.role)) {
+      if (splash) splash.classList.add('hidden');
       return showGate('This portal is for council officers only. Ask an admin or governor to assign you an officer role.');
     }
 
@@ -118,7 +160,6 @@ const OfficerApp = (() => {
     bindTheme();
     bindLogout();
     bindNav();
-    // Replace the portal's native selects with the shared animated dropdowns
     Dropdowns.bindAll('#of-shell');
     bindRecordForm();
     bindEventForms();
@@ -128,7 +169,6 @@ const OfficerApp = (() => {
     bindAuditSearch();
     bindAnnouncementForm();
 
-    // Start background idle prefetching for all officer views
     if (typeof Api !== 'undefined' && Api.prefetchAll) {
       Api.prefetchAll(profile.role);
     }
@@ -144,7 +184,6 @@ const OfficerApp = (() => {
       if (currentActive === 'announcements') await loadAnnouncements(true);
     });
 
-    // Listen for background SWR cache revalidations to silently refresh data in place
     document.addEventListener('api:cache-updated', async (e) => {
       const path = e.detail?.path || '';
       const currentActive = document.querySelector('.of-view.active')?.id?.replace('of-view-', '');
@@ -168,7 +207,20 @@ const OfficerApp = (() => {
       await switchSection(targetSection);
     } catch (err) {
       toast('Could not load initial data: ' + err.message, 'error');
+    } finally {
+      if (splash) {
+        const elapsed = Date.now() - splashStart;
+        const remaining = Math.max(0, 300 - elapsed);
+        setTimeout(() => {
+          splash.style.opacity = '0';
+          setTimeout(() => {
+            splash.style.visibility = 'hidden';
+            splash.classList.add('hidden');
+          }, 300);
+        }, remaining);
+      }
     }
+  }
   }
 
   window.addEventListener('hashchange', () => {
