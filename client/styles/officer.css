@@ -90,11 +90,13 @@
   color: var(--accent);
 }
 
-/* Main Content Area — the sole scroll container (mirrors .main-content) */
+/* Main Content Area — the sole scroll container (mirrors .main-content).
+   margin-inline auto centers the capped width on ultrawide monitors */
 .of-main {
   flex: 1;
   min-width: 0;
   max-width: 1400px;
+  margin-inline: auto;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -204,10 +206,19 @@
   box-shadow: var(--shadow-popover);
   z-index: 60;
   pointer-events: none;
+  /* Neutralize main.css's shared .stat-popover hidden state (opacity 0 /
+     visibility hidden / -8px shift) — this portal toggles with display */
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: none;
 }
 
 .of-stat.hover-active {
   border-color: var(--accent);
+  /* Lift above sibling cards — their own stacking contexts would
+     otherwise paint over the popover */
+  z-index: 55;
 }
 
 .of-stat.hover-active .stat-popover {
@@ -243,6 +254,11 @@
 }
 
 /* ---------- Charts & Dashboard Grids ---------- */
+.of-chart-box {
+  position: relative;
+  height: 260px;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -302,6 +318,27 @@
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1.25rem;
+}
+
+/* Search + sort pair inside the filter bar */
+.of-filter-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+  max-width: 560px;
+}
+
+.of-filter-tools .of-search {
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+  margin-bottom: 0;
+}
+
+.of-filter-tools .of-sort-select {
+  flex-shrink: 0;
 }
 
 .of-filter-tabs {
@@ -842,6 +879,25 @@
   .of-modal-stats {
     grid-template-columns: 1fr;
   }
+  /* Keep the modal off the screen edges and readable on phones */
+  .of-modal-card {
+    width: calc(100% - 1.5rem);
+    max-width: 480px;
+    padding: 1.15rem 1rem;
+    max-height: 88dvh;
+  }
+  .of-modal-head h3 {
+    font-size: 1.2rem;
+  }
+  /* Toasts span the width instead of a 360px column pinned to the corner */
+  #of-toast-holder {
+    top: 0.9rem;
+    left: 1rem;
+    right: 1rem;
+  }
+  .of-toast {
+    max-width: none;
+  }
 }
 
 /* ---------- Event Cards Grid ---------- */
@@ -952,6 +1008,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
   color: var(--text-primary);
   animation: ofFade 0.3s ease;
 }
@@ -1013,6 +1070,18 @@
 
 .of-recent-item:last-child {
   border-bottom: none;
+}
+
+/* Long descriptions shrink and ellipsize instead of pushing the amount out */
+.of-recent-item .of-recent-main {
+  min-width: 0;
+}
+
+.of-recent-item .of-recent-desc {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .of-recent-item .is-neg {
@@ -1170,6 +1239,21 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 
+/* ---------- Responsive ---------- */
+
+/* Small tablets (≤1024px): main.css forces .dashboard-grid to two tracks here,
+   but the portal sidebar is still visible and the charts get cramped — keep
+   single-column dashboards and stacked record layout until the sidebar leaves */
+@media (max-width: 1024px) {
+  .dashboard-grid,
+  .of-cards {
+    grid-template-columns: 1fr;
+  }
+  .of-record-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ---------- Mobile Bottom Nav ---------- */
 .of-bottom-nav {
   display: none;
@@ -1180,7 +1264,7 @@
     display: none;
   }
   .of-view {
-    padding: 0 1rem 5.5rem;
+    padding: 0 1rem calc(5.5rem + env(safe-area-inset-bottom, 0));
   }
   .of-view-head {
     padding-top: 1.5rem;
@@ -1194,45 +1278,104 @@
     background: var(--bg-surface);
     border-top: 1px solid var(--border-default);
     z-index: 100;
-    padding: 0.4rem 0.3rem calc(0.4rem + env(safe-area-inset-bottom, 0));
+    padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom, 0));
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
   }
-  .of-bottom-nav button {
-    flex: 1;
+  .of-bottom-nav > button,
+  .of-bottom-nav > a {
+    flex: 1 1 0%;
+    min-width: 0;
     background: none;
     border: none;
     color: var(--text-secondary);
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.2rem;
-    font-size: 0.65rem;
-    font-weight: 500;
-    padding: 0.4rem 0;
+    font-size: 0.58rem;
+    font-weight: 600;
+    padding: 0.35rem 0.15rem;
+    min-height: 48px;
     cursor: pointer;
+    text-decoration: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: color var(--transition);
   }
-  .of-bottom-nav button iconify-icon {
-    font-size: 1.25rem;
+  .of-bottom-nav > button > span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.1;
   }
-  .of-bottom-nav button.active {
+  .of-bottom-nav iconify-icon {
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+  .of-bottom-nav > button.active {
     color: var(--accent);
     font-weight: 700;
   }
-  .of-bottom-nav button:active {
-    transform: scale(0.98);
+  .of-bottom-nav > button:active {
+    transform: scale(0.96);
+  }
+  /* Icon-only quick actions (theme toggle, back to main portal) */
+  .of-bottom-nav > .of-nav-quick {
+    flex: 0 0 auto;
+    padding: 0.35rem 0.55rem;
+  }
+  .of-bottom-nav > .of-nav-quick:hover {
+    color: var(--accent);
   }
   .of-form-row {
-    grid-template-columns: 1fr;
-  }
-  .of-record-layout {
-    grid-template-columns: 1fr;
-  }
-  .of-cards,
-  .dashboard-grid {
     grid-template-columns: 1fr;
   }
   .of-filter-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+/* ---------- Small Phones (≤480px) ---------- */
+@media (max-width: 480px) {
+  .of-view {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+  .of-view-head h2 {
+    font-size: 1.3rem;
+  }
+  .of-card {
+    padding: 1rem;
+  }
+  .of-chart-box {
+    height: 220px;
+  }
+  /* The 290px event-card track overflows 320px screens — force single column */
+  .of-events-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Search and sort stack so neither is squeezed off-screen */
+  .of-filter-tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .of-filter-tools .of-sort-select {
+    width: 100%;
+  }
+  .of-table th,
+  .of-table td {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.8rem;
+  }
+  /* Full-width action buttons inside event cards = comfortable tap targets */
+  .of-event-actions .of-btn {
+    flex: 1 1 auto;
+  }
+  .of-transfer-preview {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

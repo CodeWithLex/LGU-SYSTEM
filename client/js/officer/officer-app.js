@@ -164,19 +164,20 @@ const OfficerApp = (() => {
   }
 
   function bindTheme() {
+    const toggleBtns = document.querySelectorAll('[data-theme-toggle]');
     const updateIcon = () => {
       const currentTheme = localStorage.getItem('theme') || 'dark';
       const icon = currentTheme === 'dark' ? 'solar:sun-linear' : 'solar:moon-linear';
       const title = currentTheme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme';
-      const iconEl = $('theme-icon');
-      const btnEl = $('theme-toggle-btn');
-      if (iconEl) iconEl.setAttribute('icon', icon);
-      if (btnEl) btnEl.setAttribute('title', title);
+      toggleBtns.forEach(btn => {
+        const iconEl = btn.querySelector('iconify-icon');
+        if (iconEl) iconEl.setAttribute('icon', icon);
+        btn.setAttribute('title', title);
+      });
     };
 
-    const toggleBtn = $('theme-toggle-btn');
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
         const cur = localStorage.getItem('theme') || 'dark';
         const next = cur === 'dark' ? 'light' : 'dark';
         localStorage.setItem('theme', next);
@@ -184,7 +185,7 @@ const OfficerApp = (() => {
         updateIcon();
         reloadCharts();
       });
-    }
+    });
     updateIcon();
   }
 
@@ -470,8 +471,8 @@ const OfficerApp = (() => {
     $('of-overview-recent').innerHTML = recent.length
       ? recent.map(tx => `
           <div class="of-recent-item">
-            <div>
-              <div style="font-weight:600;">${esc(tx.description)}</div>
+            <div class="of-recent-main">
+              <div class="of-recent-desc">${esc(tx.description)}</div>
               <span class="of-when">${UI.dateStr(tx.transaction_date)} · ${esc(tx.type)}</span>
             </div>
             <span class="${tx.type === 'expense' ? 'is-neg' : 'is-pos'}">${tx.type === 'expense' ? '-' : '+'}₱${fmtNum(tx.amount)}</span>
@@ -480,9 +481,15 @@ const OfficerApp = (() => {
   }
 
   function bindStatPopovers() {
+    // On touch devices a tap fires a synthetic mouseenter before click, which
+    // would open the popover and then let the click handler close it again —
+    // so hover listeners are only bound when the device really supports hover.
+    const canHover = window.matchMedia?.('(hover: hover)').matches;
     document.querySelectorAll('.of-stat').forEach(card => {
-      card.addEventListener('mouseenter', () => card.classList.add('hover-active'));
-      card.addEventListener('mouseleave', () => card.classList.remove('hover-active'));
+      if (canHover) {
+        card.addEventListener('mouseenter', () => card.classList.add('hover-active'));
+        card.addEventListener('mouseleave', () => card.classList.remove('hover-active'));
+      }
       card.addEventListener('click', (e) => {
         e.stopPropagation();
         const active = card.classList.contains('hover-active');
@@ -490,9 +497,12 @@ const OfficerApp = (() => {
         if (!active) card.classList.add('hover-active');
       });
     });
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
-    });
+    if (!bindStatPopovers._docBound) {
+      bindStatPopovers._docBound = true;
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
+      });
+    }
   }
 
   // ---------- 2. Record Transaction ----------
@@ -977,8 +987,8 @@ const OfficerApp = (() => {
         box.innerHTML = detail.transactions?.length
           ? detail.transactions.map(tx => `
               <div class="of-recent-item">
-                <div>
-                  <div style="font-weight:600;">${esc(tx.description)}</div>
+                <div class="of-recent-main">
+                  <div class="of-recent-desc">${esc(tx.description)}</div>
                   <span class="of-when">${UI.dateStr(tx.transaction_date)} · ${esc(tx.type)}</span>
                 </div>
                 <div style="text-align:right">

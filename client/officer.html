@@ -75,7 +75,7 @@
           </div>
         </div>
         <div class="sidebar-actions">
-          <button type="button" class="btn-icon" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+          <button type="button" class="btn-icon" id="theme-toggle-btn" data-theme-toggle title="Toggle Theme" aria-label="Toggle Theme">
             <iconify-icon icon="solar:sun-linear" id="theme-icon"></iconify-icon>
           </button>
           <a href="/" class="btn-icon" title="Return to Main Portal" aria-label="Return to Main Portal" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
@@ -102,13 +102,13 @@
         <div class="dashboard-grid">
           <div class="card of-card">
             <h3><iconify-icon icon="solar:chart-linear"></iconify-icon>Monthly Cashflow (Income vs Expenses)</h3>
-            <div style="position:relative;height:260px;">
+            <div class="of-chart-box">
               <canvas id="of-monthly-chart"></canvas>
             </div>
           </div>
           <div class="card of-card">
             <h3><iconify-icon icon="solar:pie-chart-linear"></iconify-icon>Breakdown by Type</h3>
-            <div style="position:relative;height:260px;">
+            <div class="of-chart-box">
               <canvas id="of-breakdown-chart"></canvas>
             </div>
           </div>
@@ -238,8 +238,8 @@
             <button type="button" class="of-filter-btn" data-status="ongoing">Ongoing</button>
             <button type="button" class="of-filter-btn" data-status="completed">Completed</button>
           </div>
-          <div style="display:flex;gap:0.6rem;align-items:center;">
-            <input type="text" id="of-events-search" class="of-search" style="margin-bottom:0;" placeholder="Search events…" />
+          <div class="of-filter-tools">
+            <input type="text" id="of-events-search" class="of-search" placeholder="Search events…" />
             <select id="of-events-sort" class="of-sort-select">
               <option value="newest">Newest First</option>
               <option value="name-asc">Name (A-Z)</option>
@@ -265,13 +265,13 @@
         <div class="dashboard-grid">
           <div class="card of-card">
             <h3><iconify-icon icon="solar:chart-linear"></iconify-icon>Income vs Expenses Overview</h3>
-            <div style="position:relative;height:260px;">
+            <div class="of-chart-box">
               <canvas id="of-reports-monthly-chart"></canvas>
             </div>
           </div>
           <div class="card of-card">
             <h3><iconify-icon icon="solar:pie-chart-linear"></iconify-icon>Fund Allocation Breakdown</h3>
-            <div style="position:relative;height:260px;">
+            <div class="of-chart-box">
               <canvas id="of-reports-breakdown-chart"></canvas>
             </div>
           </div>
@@ -345,13 +345,16 @@
     </main>
   </div>
 
-  <!-- Mobile bottom tabs -->
+  <!-- Mobile bottom tabs: every sidebar section + quick actions -->
   <nav class="of-bottom-nav" id="of-bottom-nav">
     <button data-of="overview" class="active"><iconify-icon icon="solar:chart-2-linear"></iconify-icon><span>Overview</span></button>
     <button data-of="record"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon><span>Record</span></button>
     <button data-of="events"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon><span>Events</span></button>
     <button data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon><span>Reports</span></button>
     <button data-of="people"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon><span>People</span></button>
+    <button data-of="announcements"><iconify-icon icon="solar:bell-linear"></iconify-icon><span>Announce</span></button>
+    <button type="button" class="of-nav-quick" data-theme-toggle title="Toggle Theme" aria-label="Toggle Theme"><iconify-icon icon="solar:sun-linear"></iconify-icon></button>
+    <a href="/" class="of-nav-quick" title="Return to Main Portal" aria-label="Return to Main Portal"><iconify-icon icon="solar:logout-2-linear"></iconify-icon></a>
   </nav>
 
   <!-- Event Management Modal Popup -->
