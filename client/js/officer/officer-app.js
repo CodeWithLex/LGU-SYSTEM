@@ -13,8 +13,14 @@ const OfficerApp = (() => {
 
   let _profile   = null;
   let _events    = [];
+  let _txs       = [];
   let _loaded    = {};   // section -> loaded once
   let _receipt   = null; // pending receipt for the record form
+
+  let _monthlyData = null;
+  let _summaryBreakdownData = null;
+  let _chartInstances = {};
+  let _eventStatusFilter = 'all';
 
   // ---------- Helpers ----------
 
@@ -42,6 +48,11 @@ const OfficerApp = (() => {
   }
 
   function fmtNum(n) { return Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  function getThemeColor(varName, fallback) {
+    const color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    return color || fallback;
+  }
 
   // ---------- Boot ----------
 
@@ -85,6 +96,7 @@ const OfficerApp = (() => {
     bindNav();
     bindRecordForm();
     bindEventForms();
+    bindEventFilters();
     bindTransferForm();
     bindPeopleSearch();
     bindAuditSearch();
@@ -119,6 +131,7 @@ const OfficerApp = (() => {
         localStorage.setItem('theme', next);
         document.documentElement.setAttribute('data-theme', next);
         updateIcon();
+        reloadCharts();
       });
     }
     updateIcon();
@@ -161,11 +174,146 @@ const OfficerApp = (() => {
 
   const activeEvents = () => _events.filter(ev => ev.status !== 'archived');
 
+  // ---------- Interactive Charts ----------
+
+  function renderChartInstance(canvasId, config) {
+    const canvas = $(canvasId);
+    if (!canvas || !window.Chart) return;
+    if (_chartInstances[canvasId]) {
+      _chartInstances[canvasId].destroy();
+    }
+    _chartInstances[canvasId] = new Chart(canvas, config);
+  }
+
+  function drawMonthlyChart(canvasId, monthly) {
+    if (!monthly || !monthly.length) return;
+    const labels = monthly.map(m => {
+      const [y, mo] = m.month.split('-');
+      return new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: '2-digit' });
+    });
+
+    const textColor = getThemeColor('--text-secondary', '#94A3B8');
+    const gridColor = getThemeColor('--border', '#28313A');
+
+    renderChartInstance(canvasId, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Income',
+            data: monthly.map(m => m.income),
+            backgroundColor: '#F97316',
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 35,
+            categoryPercentage: 0.8,
+            barPercentage: 0.9
+          },
+          {
+            label: 'Expenses',
+            data: monthly.map(m => m.expense),
+            backgroundColor: '#475569',
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 35,
+            categoryPercentage: 0.8,
+            barPercentage: 0.9
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top', labels: { color: textColor, font: { family: 'Inter' } } },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: textColor } },
+          y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => `₱${(v / 1000).toFixed(0)}k` } }
+        }
+      }
+    });
+  }
+
+  function drawBreakdownChart(canvasId, breakdown) {
+    if (!breakdown) return;
+    const typeMap = [
+      { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
+      { key: 'allocation', label: 'Allocation', color: '#94A3B8' },
+      { key: 'donation',   label: 'Donations',  color: '#22C55E' },
+      { key: 'collection', label: 'Collection', color: '#F97316' },
+    ];
+
+    const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
+    const hasData = active.length > 0;
+    const textColor = getThemeColor('--text-secondary', '#94A3B8');
+    const surfaceColor = getThemeColor('--surface', '#111820');
+
+    renderChartInstance(canvasId, {
+      type: 'doughnut',
+      data: {
+        labels: hasData ? active.map(t => t.label) : ['No Data'],
+        datasets: [{
+          data: hasData ? active.map(t => breakdown[t.key]) : [1],
+          backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
+          borderWidth: 2,
+          borderColor: surfaceColor,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: textColor,
+              font: { family: 'Inter', size: 12 },
+              padding: 14,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function reloadCharts() {
+    if (_monthlyData) {
+      drawMonthlyChart('of-monthly-chart', _monthlyData);
+      drawMonthlyChart('of-reports-monthly-chart', _monthlyData);
+    }
+    if (_summaryBreakdownData) {
+      drawBreakdownChart('of-breakdown-chart', _summaryBreakdownData);
+      drawBreakdownChart('of-reports-breakdown-chart', _summaryBreakdownData);
+    }
+  }
+
   // ---------- 1. Fund Overview ----------
 
   async function loadOverview() {
     await refreshCoreData();
-    const summary = await Api.reports.summary();
+    const [summary, monthly] = await Promise.all([
+      Api.reports.summary(),
+      Api.reports.monthly()
+    ]);
+
+    _monthlyData = monthly;
+    _summaryBreakdownData = summary.breakdown;
 
     const reserved = Number(summary.breakdown?.reserved_envelopes || 0);
     const total    = Number(summary.remainingBalance || 0) + reserved;
@@ -182,11 +330,57 @@ const OfficerApp = (() => {
     });
 
     $('of-overview-stats').innerHTML = `
-      <div class="of-stat"><div class="of-stat-label">Total Council Funds</div><div class="of-stat-value">₱${fmtNum(total)}</div></div>
-      <div class="of-stat is-green"><div class="of-stat-label">General Fund Available</div><div class="of-stat-value">₱${fmtNum(summary.remainingBalance)}</div><div class="of-stat-sub">Unreserved cash</div></div>
-      <div class="of-stat"><div class="of-stat-label">Reserved in Events</div><div class="of-stat-value">₱${fmtNum(reserved)}</div><div class="of-stat-sub">${_events.filter(e => e.status !== 'archived').length} active events</div></div>
-      <div class="of-stat ${mtdIn - mtdOut >= 0 ? 'is-green' : 'is-red'}"><div class="of-stat-label">This Month, Net</div><div class="of-stat-value">${mtdIn - mtdOut >= 0 ? '+' : '-'}₱${fmtNum(Math.abs(mtdIn - mtdOut))}</div><div class="of-stat-sub">In ₱${fmtNum(mtdIn)} · Out ₱${fmtNum(mtdOut)}</div></div>
+      <div class="of-stat">
+        <div class="of-stat-label"><span>Total Council Funds</span><iconify-icon icon="solar:info-circle-linear"></iconify-icon></div>
+        <div class="of-stat-value">₱${fmtNum(total)}</div>
+        <div class="of-stat-sub">Available + Reserved Envelopes</div>
+        <div class="stat-popover">
+          <div class="stat-pop-row income"><span>Available Cash</span> <span>₱${fmtNum(summary.remainingBalance)}</span></div>
+          <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Reserved (Events)</span> <span>₱${fmtNum(reserved)}</span></div>
+          <div class="stat-pop-row total"><span>Total Council Net</span> <span>₱${fmtNum(total)}</span></div>
+        </div>
+      </div>
+      <div class="of-stat is-green">
+        <div class="of-stat-label"><span>General Fund Available</span><iconify-icon icon="solar:info-circle-linear"></iconify-icon></div>
+        <div class="of-stat-value">₱${fmtNum(summary.remainingBalance)}</div>
+        <div class="of-stat-sub">Unreserved cash</div>
+        <div class="stat-popover">
+          <div class="stat-pop-row income"><span>Total Income</span> <span>₱${fmtNum(summary.totalIncome)}</span></div>
+          <div class="stat-pop-row expense"><span>Misc Expenses</span> <span>-₱${fmtNum(summary.generalExpense || 0)}</span></div>
+          <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Event Allocations</span> <span>-₱${fmtNum(reserved)}</span></div>
+          <div class="stat-pop-row total"><span>Available Fund</span> <span>₱${fmtNum(summary.remainingBalance)}</span></div>
+        </div>
+      </div>
+      <div class="of-stat">
+        <div class="of-stat-label"><span>Reserved in Events</span><iconify-icon icon="solar:info-circle-linear"></iconify-icon></div>
+        <div class="of-stat-value">₱${fmtNum(reserved)}</div>
+        <div class="of-stat-sub">${_events.filter(e => e.status !== 'archived').length} active events</div>
+        <div class="stat-popover">
+          ${_events.filter(e => e.status !== 'archived').slice(0, 5).map(e => `
+            <div class="stat-pop-row"><span>${esc(e.event_name)}</span> <span>₱${fmtNum(e.allocated_budget)}</span></div>
+          `).join('')}
+          <div class="stat-pop-row total"><span>Total Envelopes</span> <span>₱${fmtNum(reserved)}</span></div>
+        </div>
+      </div>
+      <div class="of-stat ${mtdIn - mtdOut >= 0 ? 'is-green' : 'is-red'}">
+        <div class="of-stat-label"><span>This Month, Net</span><iconify-icon icon="solar:info-circle-linear"></iconify-icon></div>
+        <div class="of-stat-value">${mtdIn - mtdOut >= 0 ? '+' : '-'}₱${fmtNum(Math.abs(mtdIn - mtdOut))}</div>
+        <div class="of-stat-sub">In ₱${fmtNum(mtdIn)} · Out ₱${fmtNum(mtdOut)}</div>
+        <div class="stat-popover">
+          <div class="stat-pop-row income"><span>Month Inflow</span> <span>+₱${fmtNum(mtdIn)}</span></div>
+          <div class="stat-pop-row expense"><span>Month Outflow</span> <span>-₱${fmtNum(mtdOut)}</span></div>
+          <div class="stat-pop-row total"><span>Month Net Position</span> <span>${mtdIn - mtdOut >= 0 ? '+' : '-'}₱${fmtNum(Math.abs(mtdIn - mtdOut))}</span></div>
+        </div>
+      </div>
     `;
+
+    bindStatPopovers();
+
+    // Render Overview Charts
+    requestAnimationFrame(() => {
+      drawMonthlyChart('of-monthly-chart', monthly);
+      drawBreakdownChart('of-breakdown-chart', summary.breakdown);
+    });
 
     // Alerts: events at or past 90% of allocation
     const alerts = activeEvents().filter(ev => {
@@ -201,20 +395,39 @@ const OfficerApp = (() => {
           const spent  = Number(ev.computed_expenses);
           const over   = spent > budget;
           return `<div class="of-alert-item ${over ? 'is-over' : ''}">
-            <span>${esc(ev.event_name)}</span>
+            <span><strong>${esc(ev.event_name)}</strong></span>
             <strong>${over ? `OVER by ₱${fmtNum(spent - budget)}` : `${fmtNum(((spent / budget) * 100))}% used`}</strong>
           </div>`;
         }).join('')
-      : '<div class="of-alert-item">No budget alerts. All events are in healthy range.</div>';
+      : '<div class="of-alert-item" style="color:var(--text-secondary);">No budget alerts. All events are in healthy range.</div>';
 
-    const recent = (_txs || []).slice(0, 6);
+    const recent = (_txs || []).slice(0, 8);
     $('of-overview-recent').innerHTML = recent.length
       ? recent.map(tx => `
           <div class="of-recent-item">
-            <div><div>${esc(tx.description)}</div><span class="of-when">${UI.dateStr(tx.transaction_date)} · ${esc(tx.type)}</span></div>
+            <div>
+              <div style="font-weight:600;">${esc(tx.description)}</div>
+              <span class="of-when">${UI.dateStr(tx.transaction_date)} · ${esc(tx.type)}</span>
+            </div>
             <span class="${tx.type === 'expense' ? 'is-neg' : 'is-pos'}">${tx.type === 'expense' ? '-' : '+'}₱${fmtNum(tx.amount)}</span>
           </div>`).join('')
-      : '<div class="of-recent-item">No transactions recorded yet.</div>';
+      : '<div class="of-recent-item" style="color:var(--text-secondary);">No transactions recorded yet.</div>';
+  }
+
+  function bindStatPopovers() {
+    document.querySelectorAll('.of-stat').forEach(card => {
+      card.addEventListener('mouseenter', () => card.classList.add('hover-active'));
+      card.addEventListener('mouseleave', () => card.classList.remove('hover-active'));
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const active = card.classList.contains('hover-active');
+        document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
+        if (!active) card.classList.add('hover-active');
+      });
+    });
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
+    });
   }
 
   // ---------- 2. Record Transaction ----------
@@ -320,8 +533,8 @@ const OfficerApp = (() => {
       <strong>${esc(ev.event_name)}</strong><br/>
       Allocated: <strong>₱${fmtNum(budget)}</strong><br/>
       Spent: <strong>₱${fmtNum(spent)}</strong><br/>
-      Remaining: <strong style="color:${over || rem < 0 ? 'var(--of-red)' : 'var(--of-green)'}">₱${fmtNum(rem)}</strong>
-      ${over ? '<br/><em style="color:var(--of-red)">This event is over budget.</em>' : ''}
+      Remaining: <strong style="color:${over || rem < 0 ? 'var(--status-negative)' : 'var(--status-positive)'}">₱${fmtNum(rem)}</strong>
+      ${over ? '<br/><em style="color:var(--status-negative)">This event is over budget.</em>' : ''}
     `;
   }
 
@@ -337,6 +550,24 @@ const OfficerApp = (() => {
   }
 
   // ---------- 3. Events & Budgets ----------
+
+  function bindEventFilters() {
+    const searchInput = $('of-events-search');
+    const sortSelect  = $('of-events-sort');
+    const filterTabs  = $('of-events-filter-tabs');
+
+    if (searchInput) searchInput.addEventListener('input', () => renderEventsGrid());
+    if (sortSelect)  sortSelect.addEventListener('change', () => renderEventsGrid());
+    if (filterTabs) {
+      filterTabs.querySelectorAll('.of-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _eventStatusFilter = btn.dataset.status;
+          filterTabs.querySelectorAll('.of-filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+          renderEventsGrid();
+        });
+      });
+    }
+  }
 
   function bindEventForms() {
     $('of-event-form').addEventListener('submit', async e => {
@@ -386,8 +617,8 @@ const OfficerApp = (() => {
         return ev ? `₱${fmtNum(ev.computed_remaining)}` : '—';
       };
       box.innerHTML = `
-        <div><div style="font-size:0.68rem;text-transform:uppercase;color:var(--of-ink-3)">From</div><strong>${fromSel.value === 'GENERAL' ? 'General Fund' : esc(_events.find(e => e.id === fromSel.value)?.event_name || '')}</strong> · ${fmt(fromSel.value)}</div>
-        <div style="text-align:right"><div style="font-size:0.68rem;text-transform:uppercase;color:var(--of-ink-3)">To</div><strong>${esc(_events.find(e => e.id === toSel.value)?.event_name || '')}</strong> · ${fmt(toSel.value)}</div>`;
+        <div><div style="font-size:0.68rem;text-transform:uppercase;color:var(--text-tertiary)">From</div><strong>${fromSel.value === 'GENERAL' ? 'General Fund' : esc(_events.find(e => e.id === fromSel.value)?.event_name || '')}</strong> · ${fmt(fromSel.value)}</div>
+        <div style="text-align:right"><div style="font-size:0.68rem;text-transform:uppercase;color:var(--text-tertiary)">To</div><strong>${esc(_events.find(e => e.id === toSel.value)?.event_name || '')}</strong> · ${fmt(toSel.value)}</div>`;
     };
     fromSel.addEventListener('change', updatePreview);
     toSel.addEventListener('change', updatePreview);
@@ -424,20 +655,44 @@ const OfficerApp = (() => {
   }
 
   async function loadEvents() {
-    // Transfer selects include the General Fund as a source
     const opts = '<option value="">Select Event</option>' +
       activeEvents().map(ev => `<option value="${ev.id}">${esc(ev.event_name)}</option>`).join('');
     $('of-transfer-from').innerHTML = '<option value="GENERAL">GENERAL FUND</option>' + opts;
     $('of-transfer-to').innerHTML   = opts;
-    $('of-transfer-from').insertAdjacentHTML('afterbegin', '');
     await renderEventsGrid();
   }
 
   async function renderEventsGrid() {
-    // Data may be stale after other-section actions
     await refreshCoreData();
     const grid = $('of-events-grid');
-    const list = activeEvents();
+    const searchVal = ($('of-events-search')?.value || '').toLowerCase();
+    const sortVal = $('of-events-sort')?.value || 'newest';
+
+    let list = activeEvents();
+
+    if (_eventStatusFilter !== 'all') {
+      list = list.filter(e => e.status === _eventStatusFilter);
+    }
+
+    if (searchVal) {
+      list = list.filter(e =>
+        e.event_name.toLowerCase().includes(searchVal) ||
+        (e.description || '').toLowerCase().includes(searchVal)
+      );
+    }
+
+    list.sort((a, b) => {
+      if (sortVal === 'name-asc') {
+        return a.event_name.localeCompare(b.event_name);
+      } else if (sortVal === 'budget-desc') {
+        return Number(b.allocated_budget) - Number(a.allocated_budget);
+      } else if (sortVal === 'budget-asc') {
+        return Number(a.allocated_budget) - Number(b.allocated_budget);
+      } else {
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+      }
+    });
+
     grid.innerHTML = list.length ? list.map(ev => {
       const budget = Number(ev.allocated_budget) || 0;
       const spent  = Number(ev.computed_expenses) || 0;
@@ -446,23 +701,25 @@ const OfficerApp = (() => {
       return `
         <div class="of-event-card" data-ev="${ev.id}">
           ${UI.renderStatusBadge(ev.status)}
-          <h4 style="margin-top:0.5rem">${esc(ev.event_name)}</h4>
+          <h4>${esc(ev.event_name)}</h4>
           ${ev.event_date ? `<div class="of-event-date"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon> ${UI.dateStr(ev.event_date)}</div>` : ''}
+          <p>${esc(ev.description || 'No description provided.')}</p>
           <div class="of-budget-bar"><div class="of-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div></div>
           <div class="of-budget-labels"><span>Spent ₱${fmtNum(spent)}</span><span>Alloc ₱${fmtNum(budget)}</span></div>
           ${over ? `<div class="of-over-note">Over budget by ₱${fmtNum(spent - budget)}</div>` : ''}
           <div class="of-event-actions">
             <button class="of-btn of-btn-ghost" data-act="detail">Manage</button>
-            ${ev.status !== 'completed' && ev.status !== 'archived' ? '<button class="of-btn of-btn-ghost" data-act="complete">Mark Completed</button>' : ''}
+            ${ev.status !== 'completed' && ev.status !== 'archived' ? '<button class="of-btn of-btn-ghost" data-act="complete">Complete</button>' : ''}
             ${ev.status !== 'archived'
               ? '<button class="of-btn of-btn-ghost" data-act="archive">Archive</button>'
               : '<button class="of-btn of-btn-ghost" data-act="restore">Restore</button>'}
           </div>
         </div>`;
-    }).join('') : '<p style="color:var(--of-ink-2);font-size:0.85rem">No events yet. Create one above.</p>';
+    }).join('') : '<p style="color:var(--text-secondary);font-size:0.85rem">No matching events found.</p>';
 
     grid.querySelectorAll('.of-event-card').forEach(card => {
       const ev = _events.find(e => e.id === card.dataset.ev);
+      if (!ev) return;
       card.querySelector('[data-act="detail"]').addEventListener('click', () => renderEventDetail(ev.id));
       const completeBtn = card.querySelector('[data-act="complete"]');
       if (completeBtn) completeBtn.addEventListener('click', () => completeEvent(ev));
@@ -481,16 +738,16 @@ const OfficerApp = (() => {
     panel.scrollIntoView({ behavior: 'smooth' });
 
     panel.innerHTML = `
-      <div class="of-card" style="margin-top:1.1rem">
+      <div class="of-card" style="margin-top:1.5rem">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
           <div>
             ${UI.renderStatusBadge(ev.status)}
             <h3 style="margin-top:0.5rem">${esc(ev.event_name)}</h3>
-            <p style="font-size:0.8rem;color:var(--of-ink-2)">${esc(ev.description || 'No description.')}</p>
+            <p style="font-size:0.85rem;color:var(--text-secondary)">${esc(ev.description || 'No description.')}</p>
           </div>
           <button class="of-btn of-btn-ghost" id="of-detail-close">Close</button>
         </div>
-        <div class="of-stat-grid" style="margin-top:1rem">
+        <div class="of-stat-grid" style="margin-top:1.25rem">
           <div class="of-stat"><div class="of-stat-label">Allocated</div><div class="of-stat-value">₱${fmtNum(ev.allocated_budget)}</div></div>
           <div class="of-stat is-red"><div class="of-stat-label">Spent</div><div class="of-stat-value">₱${fmtNum(ev.computed_expenses)}</div></div>
           <div class="of-stat is-green"><div class="of-stat-label">Remaining</div><div class="of-stat-value">₱${fmtNum(ev.computed_remaining)}</div></div>
@@ -515,7 +772,7 @@ const OfficerApp = (() => {
             <button class="of-btn of-btn-ghost" type="button" id="of-detail-receipts">Transaction History</button>
           </div>
         </form>
-        <div id="of-detail-txs" style="margin-top:1rem"></div>
+        <div id="of-detail-txs" class="of-scrollable-list" style="margin-top:1rem"></div>
       </div>`;
 
     $('of-detail-close').addEventListener('click', () => panel.classList.add('hidden'));
@@ -544,21 +801,24 @@ const OfficerApp = (() => {
 
     $('of-detail-receipts').addEventListener('click', async () => {
       const box = $('of-detail-txs');
-      box.innerHTML = '<p style="font-size:0.8rem;color:var(--of-ink-2)">Loading history…</p>';
+      box.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary)">Loading history…</p>';
       try {
         const detail = await Api.events.get(ev.id);
         box.innerHTML = detail.transactions?.length
           ? detail.transactions.map(tx => `
               <div class="of-recent-item">
-                <div><div>${esc(tx.description)}</div><span class="of-when">${UI.dateStr(tx.transaction_date)} · ${esc(tx.type)}</span></div>
+                <div>
+                  <div style="font-weight:600;">${esc(tx.description)}</div>
+                  <span class="of-when">${UI.dateStr(tx.transaction_date)} · ${esc(tx.type)}</span>
+                </div>
                 <div style="text-align:right">
                   <span class="${tx.type === 'expense' ? 'is-neg' : 'is-pos'}">${tx.type === 'expense' ? '-' : '+'}₱${fmtNum(tx.amount)}</span>
-                  ${tx.receipt_url ? `<div><a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="font-size:0.72rem;color:var(--of-accent)">Receipt</a></div>` : ''}
+                  ${tx.receipt_url ? `<div><a class="receipt-link" href="${tx.receipt_url}" target="_blank" style="font-size:0.75rem;color:var(--accent);display:inline-flex;align-items:center;gap:2px;"><iconify-icon icon="solar:paperclip-linear"></iconify-icon> Receipt</a></div>` : ''}
                 </div>
               </div>`).join('')
-          : '<p style="font-size:0.8rem;color:var(--of-ink-2)">No transactions for this event yet.</p>';
+          : '<p style="font-size:0.8rem;color:var(--text-secondary)">No transactions for this event yet.</p>';
       } catch (err) {
-        box.innerHTML = `<p style="font-size:0.8rem;color:var(--of-red)">${esc(err.message)}</p>`;
+        box.innerHTML = `<p style="font-size:0.8rem;color:var(--status-negative)">${esc(err.message)}</p>`;
       }
     });
   }
@@ -595,34 +855,59 @@ const OfficerApp = (() => {
   // ---------- 4. Reports & Paper Trail ----------
 
   async function loadReports() {
-    const summary = await Api.reports.eventsSummary();
+    const [summary, monthly, eventsSummary] = await Promise.all([
+      Api.reports.summary(),
+      Api.reports.monthly(),
+      Api.reports.eventsSummary()
+    ]);
+    _monthlyData = monthly;
+    _summaryBreakdownData = summary.breakdown;
+
+    requestAnimationFrame(() => {
+      drawMonthlyChart('of-reports-monthly-chart', monthly);
+      drawBreakdownChart('of-reports-breakdown-chart', summary.breakdown);
+    });
+
     const tbody = $('of-events-summary-table').querySelector('tbody');
-    tbody.innerHTML = summary.length ? summary.map(ev => `
+    tbody.innerHTML = eventsSummary.length ? eventsSummary.map(ev => `
       <tr>
-        <td>${esc(ev.event_name)}</td>
+        <td><strong>${esc(ev.event_name)}</strong></td>
         <td class="num">₱${fmtNum(ev.allocated_budget)}</td>
         <td class="num">₱${fmtNum((Number(ev.allocated_budget) || 0) + (Number(ev.computed_remaining) || 0) === 0 ? 0 : Math.max(0, (Number(ev.allocated_budget) || 0) - (Number(ev.computed_remaining) || 0)))}</td>
         <td class="num">₱${fmtNum(ev.computed_remaining)}</td>
         <td>${UI.renderStatusBadge(ev.status)}</td>
-        <td><button class="of-btn of-btn-ghost" data-pdf="${ev.id}" data-name="${esc(ev.event_name)}" style="padding:0.3rem 0.6rem;font-size:0.72rem"><iconify-icon icon="solar:download-minimalistic-linear"></iconify-icon> PDF</button></td>
+        <td style="text-align:center;">
+          <div style="display:inline-flex;gap:0.4rem;">
+            <button class="of-btn of-btn-ghost" data-pdf="${ev.id}" data-name="${esc(ev.event_name)}" style="padding:0.35rem 0.65rem;font-size:0.76rem">
+              <iconify-icon icon="solar:document-text-linear"></iconify-icon> PDF
+            </button>
+            <button class="of-btn of-btn-ghost" data-excel="${ev.id}" data-name="${esc(ev.event_name)}" style="padding:0.35rem 0.65rem;font-size:0.76rem">
+              <iconify-icon icon="solar:table-linear"></iconify-icon> Excel
+            </button>
+          </div>
+        </td>
       </tr>`).join('')
-      : '<tr><td colspan="6">No events yet.</td></tr>';
+      : '<tr><td colspan="6">No events found.</td></tr>';
 
     tbody.querySelectorAll('[data-pdf]').forEach(btn => {
-      btn.addEventListener('click', () => downloadPdf(btn.dataset.pdf, btn.dataset.name, btn));
+      btn.addEventListener('click', () => downloadExport('pdf', btn.dataset.pdf, btn.dataset.name, btn));
+    });
+    tbody.querySelectorAll('[data-excel]').forEach(btn => {
+      btn.addEventListener('click', () => downloadExport('excel', btn.dataset.excel, btn.dataset.name, btn));
     });
 
     await loadAudit();
   }
 
-  async function downloadPdf(eventId, eventName, btn) {
+  async function downloadExport(type, eventId, eventName, btn) {
     const token = window._authToken;
     if (!token) { toast('Please log in again.', 'error'); return; }
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.textContent = 'Generating…';
+    btn.textContent = 'Exporting…';
     try {
-      const res = await fetch(`${window.API_BASE}/api/reports/pdf/${eventId}`, {
+      const BASE = window.API_BASE || '';
+      const res = await fetch(`${BASE}/api/reports/${type}/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) {
@@ -630,10 +915,10 @@ const OfficerApp = (() => {
         throw new Error(err.error || `HTTP ${res.status}`);
       }
       const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `report-${eventName.replace(/[^a-z0-9]+/gi, '-')}.pdf`;
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `LGU-Report-${eventName.replace(/[^a-z0-9]+/gi, '-')}.${type === 'pdf' ? 'pdf' : 'xlsx'}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -670,7 +955,7 @@ const OfficerApp = (() => {
         <td style="white-space:nowrap">${UI.dateStr(log.created_at)}</td>
         <td>${esc(log.profiles?.full_name || 'Unknown')}</td>
         <td>${esc(log.action)}</td>
-        <td style="font-size:0.76rem;color:var(--of-ink-2)">${esc(summarizeDetails(log.details))}</td>
+        <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(summarizeDetails(log.details))}</td>
       </tr>`).join('')
       : '<tr><td colspan="4">No matching audit entries.</td></tr>';
   }
@@ -732,21 +1017,21 @@ const OfficerApp = (() => {
     const tbody = $('of-people-table').querySelector('tbody');
     tbody.innerHTML = rows.length ? rows.map(u => `
       <tr>
-        <td>${esc(u.full_name)}</td>
-        <td style="font-size:0.78rem;color:var(--of-ink-2)">${esc(u.email)}</td>
+        <td><strong>${esc(u.full_name)}</strong></td>
+        <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(u.email)}</td>
         <td>${UI.renderStatusBadge(u.role)}</td>
         <td style="${canAssign ? '' : 'display:none'}">
           ${canAssign && u.id !== _profile.id
-            ? `<div style="display:flex;gap:0.4rem">
-                 <select data-role-for="${u.id}" style="padding:0.35rem;border:1px solid var(--of-line);border-radius:6px;font-size:0.76rem">
+            ? `<div style="display:flex;gap:0.4rem;align-items:center;">
+                 <select data-role-for="${u.id}" style="padding:0.35rem;border:1px solid var(--border-default);border-radius:6px;font-size:0.78rem;background:var(--bg-surface-raised);color:var(--text-primary);">
                    ${assignableRoles().map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
                  </select>
-                 <button class="of-btn of-btn-ghost" data-apply="${u.id}" style="padding:0.3rem 0.6rem;font-size:0.72rem">Apply</button>
+                 <button class="of-btn of-btn-ghost" data-apply="${u.id}" style="padding:0.3rem 0.65rem;font-size:0.74rem">Apply</button>
                </div>`
-            : (u.id === _profile.id ? '<span style="color:var(--of-ink-3);font-size:0.75rem">You</span>' : '—')}
+            : (u.id === _profile.id ? '<span style="color:var(--text-tertiary);font-size:0.75rem">You</span>' : '—')}
         </td>
       </tr>`).join('')
-      : '<tr><td colspan="4">No matching people.</td></tr>';
+      : '<tr><td colspan="4">No matching people found.</td></tr>';
 
     tbody.querySelectorAll('[data-apply]').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -801,7 +1086,7 @@ const OfficerApp = (() => {
         <p>${esc(a.body)}</p>
         <span class="of-when">${UI.dateStr(a.created_at)}</span>
       </div>`).join('')
-      : '<p style="font-size:0.82rem;color:var(--of-ink-2)">No announcements yet.</p>';
+      : '<p style="font-size:0.82rem;color:var(--text-secondary)">No announcements yet.</p>';
   }
 
   // ---------- Start ----------

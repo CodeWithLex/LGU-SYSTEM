@@ -91,6 +91,7 @@
   min-width: 0;
   max-width: 1400px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .of-view {
@@ -111,7 +112,7 @@
   margin-bottom: 1.5rem;
 }
 
-.of-view-head h1 {
+.of-view-head h2 {
   font-family: var(--font-ui);
   font-size: 1.5rem;
   font-weight: 700;
@@ -125,10 +126,10 @@
   margin-top: 0.2rem;
 }
 
-/* ---------- Stat Cards Grid ---------- */
+/* ---------- Stat Cards Grid & Interactive Popovers ---------- */
 .of-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -138,13 +139,16 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md, 8px);
   padding: 1.15rem 1.25rem;
-  transition: border-color var(--transition), transform var(--transition);
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   position: relative;
+  cursor: pointer;
+  user-select: none;
 }
 
 .of-stat:hover {
   border-color: var(--border-hover);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .of-stat .of-stat-label {
@@ -153,6 +157,9 @@
   letter-spacing: 0.06em;
   color: var(--text-secondary);
   font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .of-stat .of-stat-value {
@@ -174,7 +181,66 @@
 .of-stat.is-green .of-stat-value { color: var(--status-positive); }
 .of-stat.is-red   .of-stat-value { color: var(--status-negative); }
 
-/* ---------- Cards & Layout Grids ---------- */
+/* Popover Tooltip for Stat Cards */
+.of-stat .stat-popover {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--bg-surface-elevated, var(--bg-surface));
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.9rem 1rem;
+  box-shadow: var(--shadow-popover);
+  z-index: 60;
+  pointer-events: none;
+}
+
+.of-stat.hover-active {
+  border-color: var(--accent);
+}
+
+.of-stat.hover-active .stat-popover {
+  display: block;
+  animation: ofPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+@keyframes ofPopIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stat-pop-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  padding: 0.25rem 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-pop-row.income span:last-child { color: var(--status-positive); }
+.stat-pop-row.expense span:last-child { color: var(--status-negative); }
+
+.stat-pop-row.total {
+  border-top: 1px solid var(--border-default);
+  margin-top: 0.45rem;
+  padding-top: 0.45rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ---------- Charts & Dashboard Grids ---------- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
 .of-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -217,6 +283,57 @@
   grid-template-columns: 1.4fr 1fr;
   gap: 1.25rem;
   align-items: start;
+}
+
+/* ---------- Filter Bar ---------- */
+.of-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.of-filter-tabs {
+  display: flex;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm, 6px);
+  padding: 3px;
+  gap: 2px;
+}
+
+.of-filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.of-filter-btn:hover {
+  color: var(--text-primary);
+}
+
+.of-filter-btn.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.of-sort-select {
+  padding: 0.45rem 0.85rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
 }
 
 /* ---------- Forms ---------- */
@@ -358,12 +475,38 @@
   filter: brightness(1.1);
 }
 
-/* ---------- Tables ---------- */
+/* ---------- Scrollables & Tables ---------- */
 .of-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm, 6px);
   background: var(--bg-surface);
+  max-height: 480px;
+  overscroll-behavior: contain;
+}
+
+/* Custom Scrollbars */
+.of-table-wrap::-webkit-scrollbar,
+.of-scrollable-list::-webkit-scrollbar,
+.of-main::-webkit-scrollbar,
+.of-sidebar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.of-table-wrap::-webkit-scrollbar-track,
+.of-scrollable-list::-webkit-scrollbar-track,
+.of-main::-webkit-scrollbar-track,
+.of-sidebar::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+
+.of-table-wrap::-webkit-scrollbar-thumb,
+.of-scrollable-list::-webkit-scrollbar-thumb,
+.of-main::-webkit-scrollbar-thumb,
+.of-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 999px;
 }
 
 .of-table {
@@ -383,6 +526,9 @@
   background: var(--bg-surface-raised);
   border-bottom: 1px solid var(--border-default);
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .of-table td {
@@ -553,7 +699,13 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- List Items (Alerts, Recent, Announcements) ---------- */
+/* ---------- Scrollable List Items (Alerts, Recent, Announcements) ---------- */
+.of-scrollable-list {
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+
 .of-alert-item {
   display: flex;
   justify-content: space-between;
@@ -795,7 +947,12 @@
   .of-record-layout {
     grid-template-columns: 1fr;
   }
-  .of-cards {
+  .of-cards,
+  .dashboard-grid {
     grid-template-columns: 1fr;
+  }
+  .of-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="styles/main.css" />
   <link rel="stylesheet" href="styles/officer.css" />
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.2/dist/iconify-icon.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <script>
     // Apply theme immediately to prevent flashing
     (function() {
@@ -92,18 +93,36 @@
         <div class="view-header of-view-head">
           <div>
             <h2>Fund Overview</h2>
-            <p class="view-sub">Live position of council funds</p>
+            <p class="view-sub">Live position of council funds with interactive breakdowns</p>
           </div>
         </div>
         <div class="of-stat-grid" id="of-overview-stats"></div>
+
+        <!-- Charts Row -->
+        <div class="dashboard-grid">
+          <div class="card of-card">
+            <h3><iconify-icon icon="solar:chart-linear"></iconify-icon>Monthly Cashflow (Income vs Expenses)</h3>
+            <div style="position:relative;height:260px;">
+              <canvas id="of-monthly-chart"></canvas>
+            </div>
+          </div>
+          <div class="card of-card">
+            <h3><iconify-icon icon="solar:pie-chart-linear"></iconify-icon>Breakdown by Type</h3>
+            <div style="position:relative;height:260px;">
+              <canvas id="of-breakdown-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerts & Activity Row -->
         <div class="of-cards">
           <div class="of-card">
             <h3><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> Budget Alerts</h3>
-            <div id="of-overview-alerts"></div>
+            <div id="of-overview-alerts" class="of-scrollable-list"></div>
           </div>
           <div class="of-card">
             <h3><iconify-icon icon="solar:card-transfer-linear"></iconify-icon> Recent Activity</h3>
-            <div id="of-overview-recent"></div>
+            <div id="of-overview-recent" class="of-scrollable-list"></div>
           </div>
         </div>
       </section>
@@ -211,7 +230,25 @@
             </form>
           </div>
         </div>
-        <h3 class="of-list-title">All Events</h3>
+
+        <div class="of-filter-bar">
+          <div class="of-filter-tabs" id="of-events-filter-tabs">
+            <button type="button" class="of-filter-btn active" data-status="all">All</button>
+            <button type="button" class="of-filter-btn" data-status="upcoming">Upcoming</button>
+            <button type="button" class="of-filter-btn" data-status="ongoing">Ongoing</button>
+            <button type="button" class="of-filter-btn" data-status="completed">Completed</button>
+          </div>
+          <div style="display:flex;gap:0.6rem;align-items:center;">
+            <input type="text" id="of-events-search" class="of-search" style="margin-bottom:0;" placeholder="Search events…" />
+            <select id="of-events-sort" class="of-sort-select">
+              <option value="newest">Newest First</option>
+              <option value="name-asc">Name (A-Z)</option>
+              <option value="budget-desc">Budget (High to Low)</option>
+              <option value="budget-asc">Budget (Low to High)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="of-events-grid" id="of-events-grid"></div>
         <div id="of-event-detail" class="hidden"></div>
       </section>
@@ -221,19 +258,41 @@
         <div class="view-header of-view-head">
           <div>
             <h2>Reports &amp; Paper Trail</h2>
-            <p class="view-sub">Financial summaries and the immutable audit log</p>
+            <p class="view-sub">Financial summaries, exportable audit sheets, and the immutable audit log</p>
           </div>
         </div>
+
+        <!-- Reports Charts Row -->
+        <div class="dashboard-grid">
+          <div class="card of-card">
+            <h3><iconify-icon icon="solar:chart-linear"></iconify-icon>Income vs Expenses Overview</h3>
+            <div style="position:relative;height:260px;">
+              <canvas id="of-reports-monthly-chart"></canvas>
+            </div>
+          </div>
+          <div class="card of-card">
+            <h3><iconify-icon icon="solar:pie-chart-linear"></iconify-icon>Fund Allocation Breakdown</h3>
+            <div style="position:relative;height:260px;">
+              <canvas id="of-reports-breakdown-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
         <div class="of-card" style="margin-bottom:1.5rem;">
-          <h3><iconify-icon icon="solar:document-text-linear"></iconify-icon> Events Summary</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+            <h3 style="margin:0;"><iconify-icon icon="solar:document-text-linear"></iconify-icon> Per-Event Financial Export</h3>
+            <span style="font-size:0.8rem;color:var(--text-secondary);">Export certified PDF and Excel spreadsheets</span>
+          </div>
           <div class="of-table-wrap"><table class="of-table" id="of-events-summary-table">
-            <thead><tr><th>Event</th><th>Allocated</th><th>Spent</th><th>Remaining</th><th>Status</th><th>Report</th></tr></thead>
+            <thead><tr><th>Event</th><th>Allocated</th><th>Spent</th><th>Remaining</th><th>Status</th><th style="text-align:center;">Exports</th></tr></thead>
             <tbody></tbody>
           </table></div>
         </div>
         <div class="of-card">
-          <h3><iconify-icon icon="solar:history-linear"></iconify-icon> Audit Trail <small>(read-only)</small></h3>
-          <input type="text" id="of-audit-search" class="of-search" placeholder="Search audit log…" />
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+            <h3 style="margin:0;"><iconify-icon icon="solar:history-linear"></iconify-icon> Immutable Activity Audit Trail</h3>
+            <input type="text" id="of-audit-search" class="of-search" style="margin-bottom:0;" placeholder="Search by action, name, or details…" />
+          </div>
           <div class="of-table-wrap"><table class="of-table" id="of-audit-table">
             <thead><tr><th>When</th><th>Who</th><th>Action</th><th>Details</th></tr></thead>
             <tbody></tbody>
@@ -250,7 +309,7 @@
           </div>
         </div>
         <div class="of-card">
-          <input type="text" id="of-people-search" class="of-search" placeholder="Search people…" />
+          <input type="text" id="of-people-search" class="of-search" placeholder="Search people by name or email…" />
           <div class="of-table-wrap"><table class="of-table" id="of-people-table">
             <thead><tr><th>Name</th><th>Email</th><th>Role</th><th id="of-people-action-col">Change</th></tr></thead>
             <tbody></tbody>
@@ -277,8 +336,8 @@
             </form>
           </div>
           <div class="of-card">
-            <h3>Recent</h3>
-            <div id="of-announce-list"></div>
+            <h3>Recent Announcements</h3>
+            <div id="of-announce-list" class="of-scrollable-list"></div>
           </div>
         </div>
       </section>
