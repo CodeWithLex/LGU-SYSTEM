@@ -1438,15 +1438,25 @@ const OfficerApp = (() => {
     const bsece = _users.filter(u => u.course === 'BSECE').length;
 
     if ($('of-stat-val-users-total')) $('of-stat-val-users-total').textContent = total;
+    if ($('of-stat-sub-users-total')) {
+      if (totalEnrolled > 0) {
+        const pct = Math.round((total / totalEnrolled) * 100);
+        $('of-stat-sub-users-total').textContent = `${total} of ${totalEnrolled} students registered (${pct}%)`;
+      } else {
+        $('of-stat-sub-users-total').textContent = `${total} accounts registered in system`;
+      }
+    }
+
     if ($('of-stat-val-users-students')) $('of-stat-val-users-students').textContent = students;
     if ($('of-stat-sub-users-students')) {
       if (totalEnrolled > 0) {
-        const pct = Math.round((students / totalEnrolled) * 100);
-        $('of-stat-sub-users-students').textContent = `${students} of ${totalEnrolled} students registered (${pct}%)`;
+        const pct = Math.round((total / totalEnrolled) * 100);
+        $('of-stat-sub-users-students').textContent = `${total} of ${totalEnrolled} students registered (${pct}%)`;
       } else {
         $('of-stat-sub-users-students').textContent = `${students} students registered`;
       }
     }
+
     if ($('of-stat-val-users-officers')) $('of-stat-val-users-officers').textContent = officers;
 
     if ($('of-users-bscoe-count')) $('of-users-bscoe-count').textContent = bscoe;
