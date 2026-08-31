@@ -1313,17 +1313,17 @@
     display: inline-block;
     font-size: 0.68rem;
     font-weight: 700;
-    color: #C084FC;
-    background: rgba(168, 85, 247, 0.15);
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: var(--primary-hover);
+    background: rgba(249, 115, 22, 0.15);
+    border: 1px solid rgba(249, 115, 22, 0.35);
     padding: 0.1rem 0.45rem;
     border-radius: 999px;
     letter-spacing: 0.02em;
   }
   [data-theme="light"] .of-mobile-role {
-    color: #7E22CE;
-    background: rgba(168, 85, 247, 0.1);
-    border-color: rgba(168, 85, 247, 0.25);
+    color: #C2410C;
+    background: #FFF7ED;
+    border-color: #FFEDD5;
   }
   .of-mobile-actions {
     display: flex;

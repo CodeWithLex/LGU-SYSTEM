@@ -295,7 +295,6 @@ const GrizzAI = (() => {
         <div class="grizz-bar-identity" id="grizz-open-trigger" role="button" tabindex="0" title="Open Grizz AI Assistant">
           <div class="grizz-avatar-wrap">
             <img src="assets/grizz.png" alt="Grizz" class="grizz-avatar-mini" />
-            <span class="grizz-pulse-dot" title="Online"></span>
           </div>
           <div class="grizz-identity-text">
             <span class="grizz-name">Grizz</span>

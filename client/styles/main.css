@@ -3007,23 +3007,23 @@ iconify-icon {
 
   /* Officer Executive Link Special Highlight */
   body .bottom-nav-item.officer-nav-link {
-    color: #C084FC !important;
+    color: var(--primary) !important;
   }
   body .bottom-nav-item.officer-nav-link .nav-icon {
-    color: #C084FC !important;
+    color: var(--primary) !important;
   }
   body .bottom-nav-item.officer-nav-link.active,
   body .bottom-nav-item.officer-nav-link:active {
-    background: rgba(168, 85, 247, 0.15) !important;
-    color: #D8B4FE !important;
+    background: rgba(249, 115, 22, 0.15) !important;
+    color: #FB923C !important;
   }
 
   [data-theme="light"] body .bottom-nav-item.officer-nav-link {
-    color: #7E22CE !important;
+    color: #EA580C !important;
   }
   [data-theme="light"] body .bottom-nav-item.officer-nav-link.active {
-    background: rgba(168, 85, 247, 0.12) !important;
-    color: #7E22CE !important;
+    background: rgba(249, 115, 22, 0.12) !important;
+    color: #EA580C !important;
   }
 
   /* Tap Interaction */
@@ -4422,9 +4422,9 @@ html body.is-admin th.admin-only {
 }
 
 .role-badge.role-governor {
-  background: rgba(168, 85, 247, 0.14);
-  color: #C084FC;
-  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--primary-hover);
+  border: 1px solid rgba(249, 115, 22, 0.35);
 }
 
 .role-badge.role-cashier {
@@ -4770,9 +4770,9 @@ html body.is-admin th.admin-only {
 }
 
 [data-theme="light"] .role-badge.role-governor {
-  background: #FAF5FF;
-  color: #7E22CE;
-  border: 1px solid #F3E8FF;
+  background: #FFF7ED;
+  color: #C2410C;
+  border: 1px solid #FFEDD5;
 }
 
 [data-theme="light"] .role-badge.role-cashier {

@@ -221,16 +221,10 @@
   letter-spacing: -0.01em;
 }
 
-.ursa-status-badge {
-  font-family: var(--font-ui);
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 0.1rem 0.4rem;
-  background: rgba(34, 197, 94, 0.12);
-  color: #4ADE80;
-  border-radius: 100px;
-  border: 1px solid rgba(34, 197, 94, 0.25);
-  line-height: 1.2;
+.ursa-status-badge,
+.ursa-dot-online,
+.grizz-pulse-dot {
+  display: none !important;
 }
 
 .ursa-header-sub {

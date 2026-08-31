@@ -34,7 +34,6 @@ const ProfileModal = (() => {
     course: 'BSCoE',
     yearLevel: '1',
     enrollmentYear: '',
-    theme: 'dark',
     avatarUrl: null
   };
 
@@ -43,13 +42,11 @@ const ProfileModal = (() => {
     const courseSelect = document.getElementById('profile-course-select');
     const yearSelect = document.getElementById('profile-year-select');
     const enrollInput = document.getElementById('profile-enrollment-year');
-    const themeSelect = document.getElementById('profile-theme-select');
 
     const curName = nameInput ? nameInput.value.trim() : '';
     const curCourse = courseSelect ? courseSelect.value : '';
     const curYear = yearSelect ? yearSelect.value : '';
     const curEnroll = enrollInput && enrollInput.value ? String(enrollInput.value) : '';
-    const curTheme = themeSelect ? themeSelect.value : (localStorage.getItem('theme') || 'dark');
     const curAvatar = _selectedAvatarUrl || null;
 
     return (
@@ -57,7 +54,6 @@ const ProfileModal = (() => {
       curCourse !== _initialState.course ||
       curYear !== _initialState.yearLevel ||
       curEnroll !== String(_initialState.enrollmentYear || '') ||
-      curTheme !== _initialState.theme ||
       curAvatar !== _initialState.avatarUrl
     );
   }
@@ -201,8 +197,7 @@ const ProfileModal = (() => {
       'profile-name-input',
       'profile-course-select',
       'profile-year-select',
-      'profile-enrollment-year',
-      'profile-theme-select'
+      'profile-enrollment-year'
     ];
 
     inputIds.forEach(id => {
@@ -322,9 +317,6 @@ const ProfileModal = (() => {
     if (yearSelect) yearSelect.value = yearLevel;
     if (enrollInput) enrollInput.value = enrollmentYear;
 
-    const themeSelect = document.getElementById('profile-theme-select');
-    if (themeSelect) themeSelect.value = localStorage.getItem('theme') || 'dark';
-
     // Reset password inputs
     const newPass = document.getElementById('profile-new-password');
     const confPass = document.getElementById('profile-confirm-password');
@@ -336,7 +328,6 @@ const ProfileModal = (() => {
       course: course,
       yearLevel: yearLevel,
       enrollmentYear: String(enrollmentYear || ''),
-      theme: localStorage.getItem('theme') || 'dark',
       avatarUrl: _selectedAvatarUrl
     };
 
@@ -405,15 +396,8 @@ const ProfileModal = (() => {
         course,
         yearLevel,
         enrollmentYear: String(enrollmentYear || ''),
-        theme: localStorage.getItem('theme') || 'dark',
         avatarUrl: _selectedAvatarUrl
       };
-
-      // Save theme settings if changed
-      const themeSelect = document.getElementById('profile-theme-select');
-      if (themeSelect && window.ThemeManager) {
-        window.ThemeManager.setTheme(themeSelect.value);
-      }
 
       // Synchronize all avatars across the UI
       syncAvatars(updated.avatar_url, updated.full_name);
