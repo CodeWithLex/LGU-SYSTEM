@@ -1254,7 +1254,12 @@
   }
 }
 
-/* ---------- Mobile Bottom Nav ---------- */
+/* ---------- Mobile Header ---------- */
+.of-mobile-header {
+  display: none;
+}
+
+/* ---------- Mobile Layout & Navigation ---------- */
 .of-bottom-nav {
   display: none;
 }
@@ -1263,78 +1268,225 @@
   .of-sidebar {
     display: none;
   }
-  .of-view {
-    padding: 0 1rem calc(5.5rem + env(safe-area-inset-bottom, 0));
-  }
-  .of-view-head {
-    padding-top: 1.5rem;
-  }
-  .of-bottom-nav {
+  .of-mobile-header {
     display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
     background: var(--bg-surface);
-    border-top: 1px solid var(--border-default);
+    border-bottom: 1px solid var(--border-default);
+    position: sticky;
+    top: 0;
     z-index: 100;
-    padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom, 0));
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.18);
+    gap: 0.75rem;
   }
-  .of-bottom-nav > button,
-  .of-bottom-nav > a {
-    flex: 1 1 0%;
-    min-width: 0;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
+  .of-mobile-brand {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .of-mobile-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+  }
+  .of-mobile-brand h2 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+  .of-mobile-role {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #C084FC;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }
+  [data-theme="light"] .of-mobile-role {
+    color: #7E22CE;
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.25);
+  }
+  .of-mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .of-mobile-actions .btn-icon {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.2rem;
-    font-size: 0.58rem;
-    font-weight: 600;
-    padding: 0.35rem 0.15rem;
-    min-height: 48px;
-    cursor: pointer;
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface-raised);
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    font-size: 1.15rem;
     text-decoration: none;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: color var(--transition);
+    cursor: pointer;
+    transition: all 0.15s ease;
   }
-  .of-bottom-nav > button > span {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 1.1;
+  .of-mobile-actions .btn-icon:hover {
+    color: var(--text-primary);
+    border-color: var(--border-hover);
   }
-  .of-bottom-nav iconify-icon {
-    font-size: 1.2rem;
-    line-height: 1;
+  .of-mobile-actions a.btn-icon:hover {
+    color: var(--status-negative);
   }
+
+  .of-view {
+    padding: 0 0.85rem calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+  .of-view-head {
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Floating Island Glass Pill Navigation */
+  .of-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    z-index: 1000 !important;
+    
+    background: rgba(17, 24, 32, 0.88) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 30px !important;
+    padding: 5px 4px !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    gap: 2px !important;
+    
+    box-shadow: 
+      0 12px 36px -4px rgba(0, 0, 0, 0.5),
+      0 4px 14px rgba(0, 0, 0, 0.25),
+      inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+    overflow: visible !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease !important;
+  }
+
+  [data-theme="light"] .of-bottom-nav {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 
+      0 12px 36px -4px rgba(0, 0, 0, 0.12),
+      0 4px 12px rgba(0, 0, 0, 0.06),
+      inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .of-bottom-nav > button {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    height: 48px !important;
+    padding: 4px 1px !important;
+    border-radius: 22px !important;
+    color: var(--text-tertiary) !important;
+    background: none !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    position: relative !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .of-bottom-nav > button iconify-icon {
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease !important;
+  }
+
+  .of-bottom-nav > button span {
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.2 !important;
+    margin-top: 2px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    transition: color 0.2s ease, font-weight 0.2s ease !important;
+  }
+
   .of-bottom-nav > button.active {
-    color: var(--accent);
-    font-weight: 700;
+    color: var(--accent) !important;
+    background: rgba(249, 115, 22, 0.12) !important;
+    font-weight: 700 !important;
   }
+
+  [data-theme="light"] .of-bottom-nav > button.active {
+    background: rgba(249, 115, 22, 0.1) !important;
+    color: var(--accent) !important;
+  }
+
+  .of-bottom-nav > button.active iconify-icon {
+    transform: translateY(-1px) scale(1.08) !important;
+    color: var(--accent) !important;
+  }
+
   .of-bottom-nav > button:active {
-    transform: scale(0.96);
+    transform: scale(0.92) !important;
   }
-  /* Icon-only quick actions (theme toggle, back to main portal) */
-  .of-bottom-nav > .of-nav-quick {
-    flex: 0 0 auto;
-    padding: 0.35rem 0.55rem;
-  }
-  .of-bottom-nav > .of-nav-quick:hover {
-    color: var(--accent);
-  }
+
   .of-form-row {
     grid-template-columns: 1fr;
   }
   .of-filter-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+/* ---------- 2x2 Grid for Stat Cards on Mobile (≤640px) ---------- */
+@media (max-width: 640px) {
+  .of-stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .of-stat {
+    padding: 0.85rem 0.85rem !important;
+    border-radius: var(--radius-md, 8px) !important;
+  }
+  .of-stat .of-stat-label {
+    font-size: 0.64rem !important;
+    letter-spacing: 0.03em !important;
+  }
+  .of-stat .of-stat-value {
+    font-size: 1.15rem !important;
+    margin-top: 0.25rem !important;
+    line-height: 1.2 !important;
+  }
+  .of-stat .of-stat-sub {
+    font-size: 0.66rem !important;
+    margin-top: 0.2rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 }
 

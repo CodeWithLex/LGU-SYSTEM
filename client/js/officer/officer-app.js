@@ -103,8 +103,12 @@ const OfficerApp = (() => {
 
     // Header identity
     const name = profile.full_name || user.email;
+    const roleLabel = ROLE_LABELS[profile.role] || profile.role;
     $('of-user-name').textContent = name;
-    $('of-user-role').textContent = ROLE_LABELS[profile.role] || profile.role;
+    $('of-user-role').textContent = roleLabel;
+    if ($('of-mobile-user-role')) {
+      $('of-mobile-user-role').textContent = roleLabel;
+    }
     if (profile.avatar_url) {
       $('of-avatar').innerHTML = `<img src="${profile.avatar_url}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
     } else {

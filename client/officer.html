@@ -33,6 +33,25 @@
 
   <div id="of-shell" class="of-shell hidden">
 
+    <!-- Mobile Top Header (Mobile only) -->
+    <header class="of-mobile-header">
+      <div class="of-mobile-brand">
+        <img src="assets/coe-logo.png" alt="COE" class="coe-logo-img of-mobile-logo" />
+        <div>
+          <h2>Executive Portal</h2>
+          <span class="of-mobile-role" id="of-mobile-user-role">Officer</span>
+        </div>
+      </div>
+      <div class="of-mobile-actions">
+        <button type="button" class="btn-icon" data-theme-toggle title="Toggle Theme" aria-label="Toggle Theme">
+          <iconify-icon icon="solar:sun-linear" id="of-mobile-theme-icon"></iconify-icon>
+        </button>
+        <a href="/" class="btn-icon" title="Return to Student Portal" aria-label="Return to Student Portal">
+          <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
+        </a>
+      </div>
+    </header>
+
     <!-- Sidebar (matching main system design) -->
     <aside class="sidebar of-sidebar">
       <div class="sidebar-header">
@@ -345,16 +364,32 @@
     </main>
   </div>
 
-  <!-- Mobile bottom tabs: every sidebar section + quick actions -->
-  <nav class="of-bottom-nav" id="of-bottom-nav">
-    <button data-of="overview" class="active"><iconify-icon icon="solar:chart-2-linear"></iconify-icon><span>Overview</span></button>
-    <button data-of="record"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon><span>Record</span></button>
-    <button data-of="events"><iconify-icon icon="solar:calendar-mark-linear"></iconify-icon><span>Events</span></button>
-    <button data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon><span>Reports</span></button>
-    <button data-of="people"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon><span>People</span></button>
-    <button data-of="announcements"><iconify-icon icon="solar:bell-linear"></iconify-icon><span>Announce</span></button>
-    <button type="button" class="of-nav-quick" data-theme-toggle title="Toggle Theme" aria-label="Toggle Theme"><iconify-icon icon="solar:sun-linear"></iconify-icon></button>
-    <a href="/" class="of-nav-quick" title="Return to Main Portal" aria-label="Return to Main Portal"><iconify-icon icon="solar:logout-2-linear"></iconify-icon></a>
+  <!-- Mobile Floating Island Glass Pill Bottom Navigation -->
+  <nav class="of-bottom-nav" id="of-bottom-nav" aria-label="Executive Navigation">
+    <button data-of="overview" class="active" title="Fund Overview">
+      <iconify-icon icon="solar:chart-2-linear"></iconify-icon>
+      <span>Overview</span>
+    </button>
+    <button data-of="record" title="Record Transaction">
+      <iconify-icon icon="solar:card-transfer-linear"></iconify-icon>
+      <span>Record</span>
+    </button>
+    <button data-of="events" title="Events & Budgets">
+      <iconify-icon icon="solar:calendar-mark-linear"></iconify-icon>
+      <span>Events</span>
+    </button>
+    <button data-of="reports" title="Reports & Paper Trail">
+      <iconify-icon icon="solar:document-text-linear"></iconify-icon>
+      <span>Reports</span>
+    </button>
+    <button data-of="people" title="People & Access">
+      <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
+      <span>People</span>
+    </button>
+    <button data-of="announcements" title="Announcements">
+      <iconify-icon icon="solar:bell-linear"></iconify-icon>
+      <span>Announce</span>
+    </button>
   </nav>
 
   <!-- Event Management Modal Popup -->
