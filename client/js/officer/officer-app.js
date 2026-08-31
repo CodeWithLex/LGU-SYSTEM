@@ -1630,15 +1630,28 @@ const OfficerApp = (() => {
       return `${last.trim()}, ${rest.join(' ').trim()}`;
     }
 
+    // Check if it starts with a compound surname prefix (e.g. "DELA CRUZ JUAN MIGUEL")
     for (const cp of COMPOUND_SURNAME_PREFIXES) {
       if (n.startsWith(cp + ' ')) {
         return `${cp}, ${n.slice(cp.length + 1).trim()}`;
       }
     }
 
+    // Check if it ends with a compound surname (e.g. "JUAN MIGUEL DELA CRUZ")
+    for (const cp of COMPOUND_SURNAME_PREFIXES) {
+      if (n.endsWith(' ' + cp)) {
+        return `${cp}, ${n.slice(0, n.length - cp.length - 1).trim()}`;
+      }
+    }
+
+    // Natural "Firstname Lastname" / "Firstname Middle Lastname"
+    // e.g. "Marco Navarro" -> "NAVARRO, MARCO"
+    // e.g. "Vic Oliver Bungabong" -> "BUNGABONG, VIC OLIVER"
     const parts = n.split(/\s+/);
     if (parts.length > 1) {
-      return `${parts[0]}, ${parts.slice(1).join(' ')}`;
+      const lastName = parts[parts.length - 1];
+      const firstNames = parts.slice(0, parts.length - 1).join(' ');
+      return `${lastName}, ${firstNames}`;
     }
     return n;
   }

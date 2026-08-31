@@ -162,25 +162,41 @@ function formatStudentName(name) {
     }
   }
 
+  for (const cp of COMPOUND_PREFIXES) {
+    if (n.endsWith(' ' + cp)) {
+      return `${cp}, ${n.slice(0, n.length - cp.length - 1).trim()}`;
+    }
+  }
+
   const parts = n.split(/\s+/);
   if (parts.length > 1) {
-    return `${parts[0]}, ${parts.slice(1).join(' ')}`;
+    const lastName = parts[parts.length - 1];
+    const firstNames = parts.slice(0, parts.length - 1).join(' ');
+    return `${lastName}, ${firstNames}`;
   }
   return n;
 }
 
-test('Formats standard Filipino single surname names', () => {
-  assert.strictEqual(formatStudentName('MATONDO LEX EDRICK'), 'MATONDO, LEX EDRICK');
-  assert.strictEqual(formatStudentName('MATONDO, LEX EDRICK'), 'MATONDO, LEX EDRICK');
-  assert.strictEqual(formatStudentName('  GABATO  JOHN  MARK '), 'GABATO, JOHN MARK');
+test('Formats natural English order Google names (Firstname Lastname)', () => {
+  assert.strictEqual(formatStudentName('Marco Navarro'), 'NAVARRO, MARCO');
+  assert.strictEqual(formatStudentName('Vic Oliver Bungabong'), 'BUNGABONG, VIC OLIVER');
+  assert.strictEqual(formatStudentName('Kristine Kaye Camillo'), 'CAMILLO, KRISTINE KAYE');
+  assert.strictEqual(formatStudentName('Anica Enad'), 'ENAD, ANICA');
+  assert.strictEqual(formatStudentName('Princess Angel S Otero'), 'OTERO, PRINCESS ANGEL S');
+  assert.strictEqual(formatStudentName('Francis Castillo'), 'CASTILLO, FRANCIS');
+  assert.strictEqual(formatStudentName('Vanessa Oric'), 'ORIC, VANESSA');
+  assert.strictEqual(formatStudentName('Marlee Mitch M. Gildore'), 'GILDORE, MARLEE MITCH M.');
+  assert.strictEqual(formatStudentName('Alyssa Fuentes'), 'FUENTES, ALYSSA');
 });
 
-test('Formats compound surnames correctly', () => {
+test('Formats compound surnames correctly in both natural and registry order', () => {
+  assert.strictEqual(formatStudentName('Juan Miguel Dela Cruz'), 'DELA CRUZ, JUAN MIGUEL');
+  assert.strictEqual(formatStudentName('DELA CRUZ, JUAN MIGUEL'), 'DELA CRUZ, JUAN MIGUEL');
   assert.strictEqual(formatStudentName('DELA CRUZ JUAN MIGUEL'), 'DELA CRUZ, JUAN MIGUEL');
+  assert.strictEqual(formatStudentName('Maria Clara San Juan'), 'SAN JUAN, MARIA CLARA');
   assert.strictEqual(formatStudentName('DE LOS SANTOS MARIA CLARA'), 'DE LOS SANTOS, MARIA CLARA');
-  assert.strictEqual(formatStudentName('SAN JUAN CARLOS'), 'SAN JUAN, CARLOS');
+  assert.strictEqual(formatStudentName('Carlos De Castro'), 'DE CASTRO, CARLOS');
   assert.strictEqual(formatStudentName('DEL ROSARIO ANTONIO'), 'DEL ROSARIO, ANTONIO');
-  assert.strictEqual(formatStudentName('DE CASTRO MARK ANTHONY'), 'DE CASTRO, MARK ANTHONY');
 });
 
 // -------------------------------------------------------------
