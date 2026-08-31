@@ -100,9 +100,9 @@
   const onboardingLogoutBtn = document.getElementById('onboarding-logout-btn');
   const onboardingError = document.getElementById('onboarding-error');
 
-  function checkRosterVerification(name, email = '') {
+  async function checkRosterVerification(name, email = '') {
     if (!window.Roster) return null;
-    const match = Roster.findStudent(name, email);
+    const match = await Roster.findStudentAsync(name, email);
     const courseSel = document.getElementById('onboarding-course');
     const yearSel = document.getElementById('onboarding-year');
 
@@ -114,7 +114,7 @@
     return match;
   }
 
-  function showOnboardingModal(user, profile) {
+  async function showOnboardingModal(user, profile) {
     if (!onboardingModal) return;
     const nameInput = document.getElementById('onboarding-name');
     let defaultName = user?.user_metadata?.full_name || user?.user_metadata?.name || profile?.full_name || '';
@@ -135,15 +135,15 @@
     if (confirmInput) confirmInput.value = '';
 
     // Auto-verify and pre-fill program/year from official master roster if available
-    checkRosterVerification(defaultName, user?.email || profile?.email);
+    await checkRosterVerification(defaultName, user?.email || profile?.email);
 
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
   }
 
   // Live auto-match when student types their name in onboarding
-  document.getElementById('onboarding-name')?.addEventListener('input', (e) => {
-    checkRosterVerification(e.target.value.trim());
+  document.getElementById('onboarding-name')?.addEventListener('input', async (e) => {
+    await checkRosterVerification(e.target.value.trim());
   });
 
   if (onboardingLogoutBtn) {
