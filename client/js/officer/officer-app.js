@@ -540,7 +540,20 @@ const OfficerApp = (() => {
         e.stopPropagation();
         const active = card.classList.contains('hover-active');
         document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
-        if (!active) card.classList.add('hover-active');
+        if (!active) {
+          card.classList.add('hover-active');
+          const popover = card.querySelector('.stat-popover');
+          if (popover) {
+            const rect = popover.getBoundingClientRect();
+            if (rect.right > window.innerWidth - 10) {
+              popover.style.left = 'auto';
+              popover.style.right = '0px';
+            } else if (rect.left < 10) {
+              popover.style.left = '0px';
+              popover.style.right = 'auto';
+            }
+          }
+        }
       });
     });
     if (!bindStatPopovers._docBound) {

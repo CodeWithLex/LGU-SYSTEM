@@ -273,7 +273,9 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  right: 0;
+  min-width: 220px;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 2rem));
   background: var(--bg-surface-elevated, var(--bg-surface));
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md, 8px);
@@ -281,12 +283,20 @@
   box-shadow: var(--shadow-popover);
   z-index: 60;
   pointer-events: none;
+  box-sizing: border-box;
   /* Neutralize main.css's shared .stat-popover hidden state (opacity 0 /
      visibility hidden / -8px shift) — this portal toggles with display */
   opacity: 1;
   visibility: visible;
   transform: none;
   transition: none;
+}
+
+/* Right-column cards align popover to right so it never overflows screen edge */
+.of-stat:nth-child(even) .stat-popover,
+.of-stat:nth-child(2n) .stat-popover {
+  left: auto !important;
+  right: 0 !important;
 }
 
 .of-stat.hover-active {
