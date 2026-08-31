@@ -1566,6 +1566,48 @@ const OfficerApp = (() => {
     bindRosterControls();
     bindRosterModal();
     bindRosterImportModal();
+    bindRosterViewTabs();
+    bindRequestsStatusTabs();
+  }
+
+  function bindRosterViewTabs() {
+    const masterTab = $('of-tab-roster-master');
+    const reqTab = $('of-tab-roster-requests');
+    const masterPane = $('of-roster-master-pane');
+    const reqPane = $('of-roster-requests-pane');
+
+    if (masterTab && reqTab) {
+      masterTab.addEventListener('click', () => {
+        masterTab.classList.add('active');
+        reqTab.classList.remove('active');
+        _rosterCurrentView = 'masterlist';
+        if (masterPane) masterPane.classList.remove('hidden');
+        if (reqPane) reqPane.classList.add('hidden');
+      });
+
+      reqTab.addEventListener('click', () => {
+        reqTab.classList.add('active');
+        masterTab.classList.remove('active');
+        _rosterCurrentView = 'requests';
+        if (masterPane) masterPane.classList.add('hidden');
+        if (reqPane) reqPane.classList.remove('hidden');
+        loadRosterRequests();
+      });
+    }
+  }
+
+  function bindRequestsStatusTabs() {
+    const tabsContainer = $('of-requests-status-tabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.querySelectorAll('.of-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabsContainer.querySelectorAll('.of-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        _requestsStatusFilter = btn.dataset.status || 'pending';
+        loadRosterRequests();
+      });
+    });
   }
 
   function bindRosterControls() {
@@ -1625,6 +1667,22 @@ const OfficerApp = (() => {
     }
   }
 
+  async function updateRequestsBadge() {
+    const badge = $('of-roster-pending-badge');
+    if (!badge || !Api.rosterRequests) return;
+    try {
+      const count = await Api.rosterRequests.countPending();
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+      } else {
+        badge.style.display = 'none';
+      }
+    } catch {
+      if (badge) badge.style.display = 'none';
+    }
+  }
+
   function updateRosterStats() {
     const total = _allRoster.length;
     const bsce = _allRoster.filter(s => s.course === 'BSCE').length;
@@ -1653,9 +1711,155 @@ const OfficerApp = (() => {
       _allRoster = await Api.roster.list();
       updateRosterStats();
       renderRosterTable();
+      updateRequestsBadge();
     } catch (err) {
       container.innerHTML = `<div class="of-error">Failed to load enrolled roster: ${esc(err.message)}</div>`;
     }
+  }
+
+  async function loadRosterRequests(isSilent = false) {
+    const container = $('of-roster-requests-table-container');
+    if (!container) return;
+    if (!isSilent) {
+      container.innerHTML = skeletonStack(2);
+    }
+
+    try {
+      _allVerificationRequests = await Api.rosterRequests.list(_requestsStatusFilter);
+      renderRosterRequestsTable();
+      updateRequestsBadge();
+    } catch (err) {
+      container.innerHTML = `<div class="of-error">Failed to load verification requests: ${esc(err.message)}</div>`;
+    }
+  }
+
+  function renderRosterRequestsTable() {
+    const container = $('of-roster-requests-table-container');
+    if (!container) return;
+
+    if (_allVerificationRequests.length === 0) {
+      container.innerHTML = `<p style="font-size:0.85rem;color:var(--text-secondary);padding:2rem 1rem;text-align:center;">No ${_requestsStatusFilter === 'all' ? '' : _requestsStatusFilter} verification requests found.</p>`;
+      return;
+    }
+
+    let html = `
+      <div class="of-table-wrap">
+        <table class="of-table">
+          <thead>
+            <tr>
+              <th style="min-width:180px;">Student Name</th>
+              <th>CJC GSuite Email</th>
+              <th>Program &amp; Year</th>
+              <th>Date Requested</th>
+              <th>Status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    _allVerificationRequests.forEach(req => {
+      const displayName = formatStudentName(req.full_name);
+      let statusBadge = '';
+      if (req.status === 'pending') {
+        statusBadge = '<span class="badge" style="background:rgba(245,158,11,0.15);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);font-size:0.72rem;">Pending Review</span>';
+      } else if (req.status === 'approved') {
+        statusBadge = '<span class="badge" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);font-size:0.72rem;">Approved</span>';
+      } else {
+        statusBadge = '<span class="badge" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);font-size:0.72rem;">Rejected</span>';
+      }
+
+      const dateStr = req.created_at ? new Date(req.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const notesHtml = req.notes ? `<div style="font-size:0.75rem;color:var(--text-tertiary);margin-top:2px;">Note: ${esc(req.notes)}</div>` : '';
+
+      let actionsHtml = '';
+      if (req.status === 'pending') {
+        actionsHtml = `
+          <button type="button" class="of-btn of-btn-primary approve-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="padding:0.25rem 0.6rem;font-size:0.8rem;margin-right:0.35rem;">
+            <iconify-icon icon="solar:check-circle-linear"></iconify-icon> Approve
+          </button>
+          <button type="button" class="of-btn of-btn-ghost reject-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="color:var(--col-danger);padding:0.25rem 0.5rem;font-size:0.8rem;">
+            <iconify-icon icon="solar:close-circle-linear"></iconify-icon> Reject
+          </button>
+        `;
+      } else {
+        actionsHtml = `<span style="font-size:0.78rem;color:var(--text-tertiary);">${req.reviewed_at ? 'Reviewed' : 'Completed'}</span>`;
+      }
+
+      html += `
+        <tr>
+          <td>
+            <div style="font-weight:600;color:var(--text-primary);font-size:0.86rem;">${esc(displayName)}</div>
+            ${notesHtml}
+          </td>
+          <td><span style="font-size:0.82rem;color:var(--text-secondary);">${esc(req.email || '—')}</span></td>
+          <td>
+            <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-primary);border:1px solid var(--border-default);font-size:0.74rem;font-weight:600;padding:2px 6px;border-radius:4px;">${esc(req.course)}</span>
+            <span style="font-size:0.8rem;color:var(--text-secondary);margin-left:0.25rem;">Year ${esc(req.year_level)}</span>
+          </td>
+          <td><span style="font-size:0.8rem;color:var(--text-secondary);">${dateStr}</span></td>
+          <td>${statusBadge}</td>
+          <td style="text-align:right;white-space:nowrap;">
+            ${actionsHtml}
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Attach approve / reject click events
+    container.querySelectorAll('.approve-req-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        if (!confirm(`Approve verification request for "${name}" and add to official enrolled roster?`)) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Approving…';
+
+        try {
+          const formatted = formatStudentName(name);
+          await Api.rosterRequests.approve(id, formatted);
+          toast(`Approved "${formatted}" and added to officially enrolled database!`, 'success');
+          if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
+          await loadRosterRequests(true);
+          await loadRoster(true);
+        } catch (err) {
+          toast(`Failed to approve request: ${err.message}`, 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<iconify-icon icon="solar:check-circle-linear"></iconify-icon> Approve';
+        }
+      });
+    });
+
+    container.querySelectorAll('.reject-req-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        const reason = prompt(`Optional reason for rejecting "${name}":`);
+        if (reason === null) return; // User cancelled
+
+        btn.disabled = true;
+        btn.textContent = 'Rejecting…';
+
+        try {
+          await Api.rosterRequests.reject(id, reason);
+          toast(`Rejected verification request for "${name}".`, 'info');
+          await loadRosterRequests(true);
+        } catch (err) {
+          toast(`Failed to reject request: ${err.message}`, 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<iconify-icon icon="solar:close-circle-linear"></iconify-icon> Reject';
+        }
+      });
+    });
   }
 
   function getFilteredRoster() {

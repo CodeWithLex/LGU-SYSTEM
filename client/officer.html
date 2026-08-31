@@ -400,78 +400,116 @@
           </div>
         </div>
 
-        <!-- 4 Metric KPI Cards -->
-        <div class="of-stat-grid" id="of-roster-stats">
-          <div class="of-stat" id="of-stat-total-roster">
-            <div class="of-stat-label">
-              <span>Total Enrolled</span>
-              <iconify-icon icon="solar:users-group-rounded-linear" style="color:var(--accent); font-size:1.15rem;"></iconify-icon>
+        <!-- View Switcher Tabs: Official Masterlist vs Pending Verification Requests -->
+        <div class="of-filter-tabs" id="of-roster-view-tabs" style="margin-bottom:1.25rem; display:inline-flex; width:auto;">
+          <button type="button" class="of-filter-btn active" data-roster-view="masterlist" id="of-tab-roster-master">
+            <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> Enrolled Database
+          </button>
+          <button type="button" class="of-filter-btn" data-roster-view="requests" id="of-tab-roster-requests">
+            <iconify-icon icon="solar:user-hand-up-linear"></iconify-icon> Verification Requests
+            <span id="of-roster-pending-badge" class="badge" style="margin-left:0.35rem; background:rgba(245,158,11,0.2); color:#f59e0b; padding:1px 6px; border-radius:10px; font-size:0.7rem; display:none;">0</span>
+          </button>
+        </div>
+
+        <!-- 1. Masterlist Pane -->
+        <div id="of-roster-master-pane">
+          <!-- 4 Metric KPI Cards -->
+          <div class="of-stat-grid" id="of-roster-stats">
+            <div class="of-stat" id="of-stat-total-roster">
+              <div class="of-stat-label">
+                <span>Total Enrolled</span>
+                <iconify-icon icon="solar:users-group-rounded-linear" style="color:var(--accent); font-size:1.15rem;"></iconify-icon>
+              </div>
+              <div class="of-stat-value" id="of-stat-val-total">0</div>
+              <div class="of-stat-sub" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">Officially Registered</div>
             </div>
-            <div class="of-stat-value" id="of-stat-val-total">0</div>
-            <div class="of-stat-sub" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">Officially Registered</div>
+            <div class="of-stat" id="of-stat-bsce">
+              <div class="of-stat-label">
+                <span>Civil Eng (BSCE)</span>
+                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCE</span>
+              </div>
+              <div class="of-stat-value" id="of-stat-val-bsce">0</div>
+              <div class="of-stat-sub" id="of-stat-sub-bsce" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+            </div>
+            <div class="of-stat" id="of-stat-bscoe">
+              <div class="of-stat-label">
+                <span>Comp Eng (BSCoE)</span>
+                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCoE</span>
+              </div>
+              <div class="of-stat-value" id="of-stat-val-bscoe">0</div>
+              <div class="of-stat-sub" id="of-stat-sub-bscoe" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+            </div>
+            <div class="of-stat" id="of-stat-bsece">
+              <div class="of-stat-label">
+                <span>Electronics Eng (BSECE)</span>
+                <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSECE</span>
+              </div>
+              <div class="of-stat-value" id="of-stat-val-bsece">0</div>
+              <div class="of-stat-sub" id="of-stat-sub-bsece" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+            </div>
           </div>
-          <div class="of-stat" id="of-stat-bsce">
-            <div class="of-stat-label">
-              <span>Civil Eng (BSCE)</span>
-              <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCE</span>
+
+          <!-- Master Roster Table Card -->
+          <div class="of-card">
+            <!-- Filter Bar with Search, Program Tabs, and Year Select -->
+            <div class="of-filter-bar" style="margin-bottom:1.25rem;">
+              <div class="of-filter-tools">
+                <div style="position:relative; flex:1;">
+                  <input type="text" id="of-roster-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search by student name or surname…" />
+                  <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
+                </div>
+              </div>
+              <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+                <!-- Program Filter Tabs -->
+                <div class="of-filter-tabs" id="of-roster-prog-tabs">
+                  <button type="button" class="of-filter-btn active" data-prog="">All Programs</button>
+                  <button type="button" class="of-filter-btn" data-prog="BSCE">BSCE</button>
+                  <button type="button" class="of-filter-btn" data-prog="BSCoE">BSCoE</button>
+                  <button type="button" class="of-filter-btn" data-prog="BSECE">BSECE</button>
+                </div>
+                <!-- Year Level Select -->
+                <select id="of-roster-year-filter" class="input-field" style="width:auto; min-width:130px; padding:0.4rem 0.75rem; font-size:0.82rem; height:34px;">
+                  <option value="">All Year Levels</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                  <option value="5">5th Year</option>
+                </select>
+              </div>
             </div>
-            <div class="of-stat-value" id="of-stat-val-bsce">0</div>
-            <div class="of-stat-sub" id="of-stat-sub-bsce" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
-          </div>
-          <div class="of-stat" id="of-stat-bscoe">
-            <div class="of-stat-label">
-              <span>Comp Eng (BSCoE)</span>
-              <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSCoE</span>
+
+            <!-- Table Container -->
+            <div id="of-roster-table-container">
+              <div class="loading-state">Loading enrolled student roster…</div>
             </div>
-            <div class="of-stat-value" id="of-stat-val-bscoe">0</div>
-            <div class="of-stat-sub" id="of-stat-sub-bscoe" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
-          </div>
-          <div class="of-stat" id="of-stat-bsece">
-            <div class="of-stat-label">
-              <span>Electronics Eng (BSECE)</span>
-              <span class="badge" style="background:var(--bg-surface-raised);color:var(--text-secondary);border:1px solid var(--border-default);font-size:0.7rem;padding:2px 6px;border-radius:4px;">BSECE</span>
-            </div>
-            <div class="of-stat-value" id="of-stat-val-bsece">0</div>
-            <div class="of-stat-sub" id="of-stat-sub-bsece" style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.35rem;">0% of CoE</div>
+            <!-- Pagination Bar -->
+            <div class="of-pagination" id="of-roster-pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; flex-wrap:wrap; gap:0.75rem;"></div>
           </div>
         </div>
 
-        <!-- Master Roster Table Card -->
-        <div class="of-card">
-          <!-- Filter Bar with Search, Program Tabs, and Year Select -->
-          <div class="of-filter-bar" style="margin-bottom:1.25rem;">
-            <div class="of-filter-tools">
-              <div style="position:relative; flex:1;">
-                <input type="text" id="of-roster-search" class="of-search" style="padding-left:2.2rem; width:100%;" placeholder="Search by student name or surname…" />
-                <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:1.1rem; pointer-events:none;"></iconify-icon>
+        <!-- 2. Verification Requests Pane -->
+        <div id="of-roster-requests-pane" class="hidden">
+          <div class="of-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1.25rem;">
+              <div>
+                <h3 style="margin:0; font-size:1.05rem; display:flex; align-items:center; gap:0.45rem;">
+                  <iconify-icon icon="solar:user-hand-up-bold" style="color:var(--accent);"></iconify-icon> Student Enrollment Verification Requests
+                </h3>
+                <p style="font-size:0.8rem; color:var(--text-secondary); margin:0.25rem 0 0;">Students who signed in with Google but were not yet listed in the S.Y. 2026–2027 masterlist</p>
+              </div>
+              <div class="of-filter-tabs" id="of-requests-status-tabs">
+                <button type="button" class="of-filter-btn active" data-status="pending">Pending</button>
+                <button type="button" class="of-filter-btn" data-status="approved">Approved</button>
+                <button type="button" class="of-filter-btn" data-status="rejected">Rejected</button>
+                <button type="button" class="of-filter-btn" data-status="all">All</button>
               </div>
             </div>
-            <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
-              <!-- Program Filter Tabs -->
-              <div class="of-filter-tabs" id="of-roster-prog-tabs">
-                <button type="button" class="of-filter-btn active" data-prog="">All Programs</button>
-                <button type="button" class="of-filter-btn" data-prog="BSCE">BSCE</button>
-                <button type="button" class="of-filter-btn" data-prog="BSCoE">BSCoE</button>
-                <button type="button" class="of-filter-btn" data-prog="BSECE">BSECE</button>
-              </div>
-              <!-- Year Level Select -->
-              <select id="of-roster-year-filter" class="input-field" style="width:auto; min-width:130px; padding:0.4rem 0.75rem; font-size:0.82rem; height:34px;">
-                <option value="">All Year Levels</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-                <option value="5">5th Year</option>
-              </select>
-            </div>
-          </div>
 
-          <!-- Table Container -->
-          <div id="of-roster-table-container">
-            <div class="loading-state">Loading enrolled student roster…</div>
+            <div id="of-roster-requests-table-container">
+              <div class="loading-state">Loading verification requests…</div>
+            </div>
           </div>
-          <!-- Pagination Bar -->
-          <div class="of-pagination" id="of-roster-pagination" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; flex-wrap:wrap; gap:0.75rem;"></div>
         </div>
       </section>
 

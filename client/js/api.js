@@ -287,6 +287,141 @@ const Api = (() => {
     }
   };
 
+  const rosterRequests = {
+    async getMyRequest() {
+      if (!window.supabaseClient) return null;
+      try {
+        const { data: { user } } = await window.supabaseClient.auth.getUser();
+        if (!user) return null;
+
+        const { data, error } = await window.supabaseClient
+          .from('enrollment_verification_requests')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (error) return null;
+        return data && data.length > 0 ? data[0] : null;
+      } catch {
+        return null;
+      }
+    },
+
+    async submitRequest(reqData) {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const { data: { user } } = await window.supabaseClient.auth.getUser();
+      if (!user) throw new Error('You must be signed in to submit a request.');
+
+      const { data, error } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .insert([{
+          user_id: user.id,
+          full_name: reqData.full_name.trim().toUpperCase(),
+          email: user.email || reqData.email || '',
+          course: reqData.course,
+          year_level: String(reqData.year_level),
+          enrollment_year: reqData.enrollment_year ? Number(reqData.enrollment_year) : null,
+          notes: reqData.notes || '',
+          status: 'pending'
+        }])
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+
+    async list(status = 'pending') {
+      if (!window.supabaseClient) return [];
+      let query = window.supabaseClient
+        .from('enrollment_verification_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (status && status !== 'all') {
+        query = query.eq('status', status);
+      }
+
+      const { data, error } = await query;
+      if (error) throw new Error(error.message);
+      return data || [];
+    },
+
+    async countPending() {
+      if (!window.supabaseClient) return 0;
+      const { count, error } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+      if (error) return 0;
+      return count || 0;
+    },
+
+    async approve(requestId, studentName = '') {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+      // 1. Fetch request details
+      const { data: req, error: reqErr } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .select('*')
+        .eq('id', requestId)
+        .single();
+      if (reqErr || !req) throw new Error(reqErr?.message || 'Verification request not found');
+
+      // 2. Insert into enrolled_students (ignore if duplicate)
+      try {
+        await window.supabaseClient
+          .from('enrolled_students')
+          .insert([{
+            full_name: studentName || req.full_name,
+            sex: req.sex || 'M',
+            department: 'CoE',
+            course: req.course,
+            year_level: req.year_level
+          }]);
+      } catch (e) {
+        console.warn('Student insert warning:', e);
+      }
+
+      // 3. Mark request as approved
+      const { data, error } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .update({
+          status: 'approved',
+          reviewed_by: user?.id || null,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', requestId)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    },
+
+    async reject(requestId, reason = '') {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+      const { data, error } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .update({
+          status: 'rejected',
+          rejection_reason: reason || null,
+          reviewed_by: user?.id || null,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', requestId)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return data;
+    }
+  };
+
   return {
     events,
     transactions,
@@ -295,6 +430,7 @@ const Api = (() => {
     units,
     announcements,
     roster,
+    rosterRequests,
     request: _request,
     invalidateCache,
     hasCache,

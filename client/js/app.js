@@ -99,6 +99,12 @@
   const onboardingSubmitBtn = document.getElementById('onboarding-submit-btn');
   const onboardingLogoutBtn = document.getElementById('onboarding-logout-btn');
   const onboardingError = document.getElementById('onboarding-error');
+  const onboardingPendingLogoutBtn = document.getElementById('onboarding-pending-logout-btn');
+  const onboardingRefreshBtn = document.getElementById('onboarding-refresh-btn');
+
+  let _isRosterMatched = false;
+  let _currentUser = null;
+  let _currentProfile = null;
 
   async function checkRosterVerification(name, email = '') {
     if (!window.Roster) return null;
@@ -107,15 +113,73 @@
     const yearSel = document.getElementById('onboarding-year');
 
     if (match) {
+      _isRosterMatched = true;
       if (courseSel && match.course) courseSel.value = match.course;
       if (yearSel && match.year) yearSel.value = match.year;
       Dropdowns.syncAll();
+      applyOnboardingState(true);
+    } else {
+      _isRosterMatched = false;
+      applyOnboardingState(false);
     }
     return match;
   }
 
+  function applyOnboardingState(isMatched) {
+    const banner = document.getElementById('onboarding-unmatched-banner');
+    const notesWrap = document.getElementById('onboarding-notes-wrap');
+    const passSec = document.getElementById('onboarding-password-section');
+    const submitText = document.getElementById('onboarding-submit-text');
+    const modalTitle = document.getElementById('onboarding-modal-title');
+    const eyebrow = document.getElementById('onboarding-modal-eyebrow');
+
+    if (isMatched) {
+      if (banner) banner.classList.add('hidden');
+      if (notesWrap) notesWrap.style.display = 'none';
+      if (passSec) passSec.style.display = 'block';
+      if (submitText) submitText.textContent = 'Complete Registration & Enter Portal';
+      if (modalTitle) modalTitle.textContent = 'Complete Your Student Profile';
+      if (eyebrow) eyebrow.innerHTML = '<iconify-icon icon="solar:shield-check-linear"></iconify-icon> Student Registration';
+    } else {
+      if (banner) banner.classList.remove('hidden');
+      if (notesWrap) notesWrap.style.display = 'block';
+      if (passSec) passSec.style.display = 'none';
+      if (submitText) submitText.textContent = 'Submit Verification Request';
+      if (modalTitle) modalTitle.textContent = 'Enrollment Verification Required';
+      if (eyebrow) eyebrow.innerHTML = '<iconify-icon icon="solar:shield-warning-linear"></iconify-icon> Verification Required';
+    }
+  }
+
   async function showOnboardingModal(user, profile) {
     if (!onboardingModal) return;
+    _currentUser = user;
+    _currentProfile = profile;
+
+    const formSec = document.getElementById('onboarding-form-section');
+    const pendingSec = document.getElementById('onboarding-pending-state');
+
+    // 1. Check if user already submitted a verification request
+    let existingReq = null;
+    if (window.Api && window.Api.rosterRequests) {
+      existingReq = await Api.rosterRequests.getMyRequest();
+    }
+
+    if (existingReq && existingReq.status === 'pending') {
+      // Show pending review state screen
+      if (formSec) formSec.classList.add('hidden');
+      if (pendingSec) {
+        pendingSec.classList.remove('hidden');
+        document.getElementById('onboarding-pending-name').textContent = existingReq.full_name;
+        document.getElementById('onboarding-pending-course').textContent = `${existingReq.course} - Year ${existingReq.year_level}`;
+      }
+      onboardingModal.classList.remove('hidden');
+      return;
+    }
+
+    // Otherwise show form
+    if (formSec) formSec.classList.remove('hidden');
+    if (pendingSec) pendingSec.classList.add('hidden');
+
     const nameInput = document.getElementById('onboarding-name');
     let defaultName = user?.user_metadata?.full_name || user?.user_metadata?.name || profile?.full_name || '';
     if (nameInput) {
@@ -134,8 +198,12 @@
     if (passInput) passInput.value = '';
     if (confirmInput) confirmInput.value = '';
 
-    // Auto-verify and pre-fill program/year from official master roster if available
-    await checkRosterVerification(defaultName, user?.email || profile?.email);
+    // Auto-verify against master roster
+    const match = await checkRosterVerification(defaultName, user?.email || profile?.email);
+    if (!match && existingReq && existingReq.status === 'approved') {
+      _isRosterMatched = true;
+      applyOnboardingState(true);
+    }
 
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
@@ -143,7 +211,7 @@
 
   // Live auto-match when student types their name in onboarding
   document.getElementById('onboarding-name')?.addEventListener('input', async (e) => {
-    await checkRosterVerification(e.target.value.trim());
+    await checkRosterVerification(e.target.value.trim(), _currentUser?.email);
   });
 
   if (onboardingLogoutBtn) {
@@ -153,12 +221,54 @@
     });
   }
 
+  if (onboardingPendingLogoutBtn) {
+    onboardingPendingLogoutBtn.addEventListener('click', async () => {
+      await Auth.logout();
+      window.location.reload();
+    });
+  }
+
+  if (onboardingRefreshBtn) {
+    onboardingRefreshBtn.addEventListener('click', async () => {
+      onboardingRefreshBtn.disabled = true;
+      onboardingRefreshBtn.innerHTML = '<iconify-icon icon="solar:refresh-linear" class="spin"></iconify-icon> Checking Status…';
+
+      try {
+        if (window.Roster && window.Roster.getRoster) {
+          await window.Roster.getRoster();
+        }
+        const req = await Api.rosterRequests.getMyRequest();
+        const match = await checkRosterVerification(req?.full_name || _currentProfile?.full_name, _currentUser?.email);
+
+        if ((req && req.status === 'approved') || match) {
+          UI.toast('Verification approved! Entering student portal…', 'success');
+          setTimeout(() => window.location.reload(), 1000);
+          return;
+        } else if (req && req.status === 'rejected') {
+          UI.toast(`Verification request rejected: ${req.rejection_reason || 'Please contact executive officers.'}`, 'error');
+          // Re-open form so student can correct details
+          document.getElementById('onboarding-pending-state')?.classList.add('hidden');
+          document.getElementById('onboarding-form-section')?.classList.remove('hidden');
+          applyOnboardingState(false);
+        } else {
+          UI.toast('Your request is still pending review by the Executive Board.', 'info');
+        }
+      } catch (err) {
+        UI.toast(`Error checking status: ${err.message}`, 'error');
+      } finally {
+        onboardingRefreshBtn.disabled = false;
+        onboardingRefreshBtn.innerHTML = '<iconify-icon icon="solar:refresh-linear"></iconify-icon> <span>Check Approval Status</span>';
+      }
+    });
+  }
+
   if (onboardingSubmitBtn) {
     onboardingSubmitBtn.addEventListener('click', async () => {
       const name = document.getElementById('onboarding-name')?.value.trim();
       const course = document.getElementById('onboarding-course')?.value;
       const year = document.getElementById('onboarding-year')?.value;
       const enrollYear = document.getElementById('onboarding-enrollment-year')?.value;
+      const notes = document.getElementById('onboarding-notes')?.value.trim();
       const pass = document.getElementById('onboarding-password')?.value;
       const confirm = document.getElementById('onboarding-confirm')?.value;
 
@@ -176,6 +286,42 @@
         return;
       }
 
+      // If student is NOT matched in masterlist, submit verification request
+      if (!_isRosterMatched) {
+        onboardingSubmitBtn.disabled = true;
+        onboardingSubmitBtn.innerHTML = '<span>Submitting Request…</span>';
+
+        try {
+          await Api.rosterRequests.submitRequest({
+            full_name: name,
+            email: _currentUser?.email,
+            course,
+            year_level: year,
+            enrollment_year: Number(enrollYear),
+            notes
+          });
+
+          UI.toast('Verification request submitted successfully! Awaiting Executive confirmation.', 'success');
+
+          // Switch to pending review view
+          document.getElementById('onboarding-form-section')?.classList.add('hidden');
+          const pendingSec = document.getElementById('onboarding-pending-state');
+          if (pendingSec) {
+            pendingSec.classList.remove('hidden');
+            document.getElementById('onboarding-pending-name').textContent = name;
+            document.getElementById('onboarding-pending-course').textContent = `${course} - Year ${year}`;
+          }
+        } catch (err) {
+          onboardingError.textContent = err.message || 'Failed to submit verification request.';
+          onboardingError.classList.remove('hidden');
+        } finally {
+          onboardingSubmitBtn.disabled = false;
+          onboardingSubmitBtn.innerHTML = '<span>Submit Verification Request</span>';
+        }
+        return;
+      }
+
+      // Standard Registration / Onboarding Completion
       if (pass || confirm) {
         if (!pass || pass.length < 8) {
           onboardingError.textContent = 'Password must be at least 8 characters long.';
@@ -190,7 +336,6 @@
       }
 
       onboardingSubmitBtn.disabled = true;
-      const originalText = onboardingSubmitBtn.innerHTML;
       onboardingSubmitBtn.innerHTML = '<span>Saving Profile…</span>';
 
       try {
