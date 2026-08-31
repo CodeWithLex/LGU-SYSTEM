@@ -65,6 +65,10 @@
   color: var(--text-primary);
 }
 
+.of-nav .nav-item:active {
+  transform: scale(0.98);
+}
+
 .of-nav .nav-item.active {
   background: var(--bg-surface-raised);
   color: var(--text-primary);
@@ -98,7 +102,7 @@
 .of-view {
   display: none;
   padding: 0 2rem 2rem;
-  animation: ofFade 0.25s ease-out;
+  animation: ofFade 0.3s ease;
 }
 
 .of-view.active {
@@ -324,6 +328,10 @@
   color: var(--text-primary);
 }
 
+.of-filter-btn:active {
+  transform: scale(0.98);
+}
+
 .of-filter-btn.active {
   background: var(--bg-surface);
   color: var(--text-primary);
@@ -421,6 +429,7 @@
   border-radius: var(--radius-sm, 6px);
   font-size: 0.82rem;
   line-height: 1.4;
+  animation: ofFade 0.3s ease;
 }
 
 /* ---------- Buttons ---------- */
@@ -438,11 +447,17 @@
   text-decoration: none;
   transition: all var(--transition, 0.25s ease);
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .of-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
+}
+
+.of-btn:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .of-btn-primary {
@@ -450,12 +465,19 @@
   color: #FFFFFF;
   border: 1px solid var(--primary);
   font-weight: 700;
+  transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
 }
 
 .of-btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.of-btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+  filter: brightness(0.95);
+  box-shadow: none;
 }
 
 .of-btn-ghost {
@@ -576,6 +598,11 @@
 }
 
 /* ---------- Event Cards Grid ---------- */
+/* Detail panel replays its entrance each time it is revealed */
+#of-event-detail {
+  animation: ofFade 0.3s ease;
+}
+
 .of-events-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
@@ -684,6 +711,7 @@
   justify-content: space-between;
   gap: 1rem;
   color: var(--text-primary);
+  animation: ofFade 0.3s ease;
 }
 
 .of-transfer-preview strong {
@@ -814,6 +842,7 @@
   border-radius: 999px;
   background: var(--bg-surface-raised);
   color: var(--text-primary);
+  animation: ofFade 0.3s ease;
 }
 
 .receipt-chip.hidden {
@@ -946,6 +975,9 @@
   .of-bottom-nav button.active {
     color: var(--accent);
     font-weight: 700;
+  }
+  .of-bottom-nav button:active {
+    transform: scale(0.98);
   }
   .of-form-row {
     grid-template-columns: 1fr;
