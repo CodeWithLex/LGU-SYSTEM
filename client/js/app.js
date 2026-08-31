@@ -335,6 +335,7 @@
         }
       }
 
+      const originalText = '<span>Complete Registration &amp; Enter Portal</span>';
       onboardingSubmitBtn.disabled = true;
       onboardingSubmitBtn.innerHTML = '<span>Saving Profile…</span>';
 
@@ -354,11 +355,6 @@
           await Auth.updatePassword(pass);
         }
 
-        // Update user display in sidebar immediately
-        const displayName = name || session.user.email;
-        document.getElementById('user-name').textContent   = displayName;
-        document.getElementById('user-avatar').textContent = displayName[0].toUpperCase();
-
         // Dismiss modal smoothly
         onboardingModal.classList.add('modal-closing');
         setTimeout(() => {
@@ -368,10 +364,9 @@
 
         UI.toast('Profile & credentials setup complete! Welcome to COE Portal.', 'success');
 
-        // Refresh units tracker if open
-        if (window.Units && typeof Units.init === 'function') {
-          Units.init();
-        }
+        // Now boot the registered student into the app
+        _bootedUserId = null;
+        await bootApp(session);
       } catch (err) {
         onboardingError.textContent = err.message || 'Failed to update profile. Please try again.';
         onboardingError.classList.remove('hidden');
@@ -586,19 +581,51 @@
       splash.classList.remove('hidden');
     }
 
-    UI.showScreen('app');
-
     const profile = await Auth.getProfile();
+    const roleKey = profile?.role || 'student';
+    const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
 
-    // Check if First-Time Onboarding is required (e.g. new Google OAuth signup)
-    if (profile && profile.role !== 'admin' && (!profile.course || !profile.year_level || !profile.enrollment_year)) {
-      showOnboardingModal(session.user, profile);
+    // ---- Strict Student Masterlist & Verification Gate ----
+    if (!officerRole) {
+      // 1. Check if student is found in the official enrolled masterlist
+      let rosterMatch = null;
+      if (window.Roster && window.Roster.findStudentAsync) {
+        rosterMatch = await Roster.findStudentAsync(
+          profile?.full_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name,
+          session.user.email
+        );
+      }
+
+      // 2. Check if student has an existing verification request
+      let existingReq = null;
+      if (window.Api && window.Api.rosterRequests) {
+        try {
+          existingReq = await Api.rosterRequests.getMyRequest();
+        } catch (e) {
+          console.warn('[Gate] Verification request check error:', e);
+        }
+      }
+
+      const isApproved = existingReq && existingReq.status === 'approved';
+      const isVerified = Boolean(rosterMatch || isApproved);
+      const needsProfileSetup = !profile?.course || !profile?.year_level || !profile?.enrollment_year;
+
+      if (!isVerified || needsProfileSetup) {
+        if (splash) {
+          splash.style.opacity = '0';
+          splash.style.visibility = 'hidden';
+          splash.classList.add('hidden');
+        }
+        await showOnboardingModal(session.user, profile);
+        return; // BLOCK unverified or incomplete student accounts from entering the portal
+      }
     }
+
+    UI.showScreen('app');
 
     // Sidebar & Mobile Header user info
     const displayName = profile?.full_name || session.user.email;
     const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
-    const roleKey     = profile?.role || 'student';
     const roleLabel   = roleLabels[roleKey] || UI.capitalize(roleKey);
     const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
 
