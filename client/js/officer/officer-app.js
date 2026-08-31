@@ -1514,6 +1514,54 @@ const OfficerApp = (() => {
   let _selectedRosterYear = '';
   let _importedRosterBatch = [];
 
+  const COMPOUND_SURNAME_PREFIXES = [
+    'DEL ROSARIO',
+    'DELA CALZADA',
+    'DELA CRUZ',
+    'DELA RAMA',
+    'DELA TORRE',
+    'DELA CERNA',
+    'DELA PEÑA',
+    'DELA PENA',
+    'DELA ROSA',
+    'DELA SERNA',
+    'DE CASTRO',
+    'DE TORRES',
+    'DE LOS SANTOS',
+    'DE LOS REYES',
+    'DE GUZMAN',
+    'DE LEON',
+    'DE VERA',
+    'SAN JUAN',
+    'SAN JOSE',
+    'SAN PEDRO',
+    'SANTA MARIA',
+    'STA. MARIA',
+    'STA MARIA'
+  ];
+
+  function formatStudentName(name) {
+    if (!name || typeof name !== 'string') return '';
+    let n = name.trim().toUpperCase();
+    if (n.includes(',')) {
+      // Normalize spacing around comma: "SURNAME, FIRSTNAME MIDDLE"
+      const [last, ...rest] = n.split(',');
+      return `${last.trim()}, ${rest.join(' ').trim()}`;
+    }
+
+    for (const cp of COMPOUND_SURNAME_PREFIXES) {
+      if (n.startsWith(cp + ' ')) {
+        return `${cp}, ${n.slice(cp.length + 1).trim()}`;
+      }
+    }
+
+    const parts = n.split(/\s+/);
+    if (parts.length > 1) {
+      return `${parts[0]}, ${parts.slice(1).join(' ')}`;
+    }
+    return n;
+  }
+
   function bindRosterForm() {
     bindRosterControls();
     bindRosterModal();
@@ -1658,13 +1706,14 @@ const OfficerApp = (() => {
     `;
 
     pageItems.forEach(student => {
+      const displayName = formatStudentName(student.full_name);
       const genderText = student.sex === 'F' ? 'Female' : 'Male';
       const yrLabel = `${student.year_level}${student.year_level === '1' ? 'st' : student.year_level === '2' ? 'nd' : student.year_level === '3' ? 'rd' : 'th'} Year`;
 
       html += `
         <tr>
           <td>
-            <div style="font-weight:600; color:var(--text-primary); font-size:0.86rem;">${esc(student.full_name)}</div>
+            <div style="font-weight:600; color:var(--text-primary); font-size:0.86rem;">${esc(displayName)}</div>
           </td>
           <td style="color:var(--text-secondary); font-size:0.82rem;">${genderText}</td>
           <td><span class="badge" style="background:var(--bg-surface-raised); color:var(--text-primary); border:1px solid var(--border-default); font-size:0.75rem; font-weight:600; padding:2px 8px; border-radius:4px; letter-spacing:0.02em;">${esc(student.course)}</span></td>
@@ -1803,12 +1852,14 @@ const OfficerApp = (() => {
         try {
           if (!name || !course || !year) throw new Error('Please fill in all required fields.');
 
+          const formattedName = formatStudentName(name);
+
           if (id) {
-            await Api.roster.update(id, { full_name: name, sex, course, year_level: year });
-            toast(`Updated record for "${name}".`, 'success');
+            await Api.roster.update(id, { full_name: formattedName, sex, course, year_level: year });
+            toast(`Updated record for "${formattedName}".`, 'success');
           } else {
-            await Api.roster.create({ full_name: name, sex, course, year_level: year });
-            toast(`Added "${name}" to enrolled roster!`, 'success');
+            await Api.roster.create({ full_name: formattedName, sex, course, year_level: year });
+            toast(`Added "${formattedName}" to enrolled roster!`, 'success');
           }
 
           if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
@@ -1845,7 +1896,7 @@ const OfficerApp = (() => {
     if (student) {
       if (title) title.innerHTML = '<iconify-icon icon="solar:pen-2-bold" style="color:var(--accent);"></iconify-icon> Edit Enrolled Student';
       if (idInput) idInput.value = student.id;
-      if (nameInput) nameInput.value = student.full_name;
+      if (nameInput) nameInput.value = formatStudentName(student.full_name);
       if (sexSelect) sexSelect.value = student.sex || 'M';
       if (courseSelect) courseSelect.value = student.course || 'BSCE';
       if (yearSelect) yearSelect.value = student.year_level || '1';
@@ -1990,7 +2041,7 @@ const OfficerApp = (() => {
           if (sex !== 'F' && sex !== 'M') sex = 'M';
 
           records.push({
-            full_name: rawName.toUpperCase(),
+            full_name: formatStudentName(rawName),
             sex,
             department: 'CoE',
             course,
@@ -2010,7 +2061,7 @@ const OfficerApp = (() => {
             <tr>
               <td><strong>${esc(r.full_name)}</strong></td>
               <td>${r.sex}</td>
-              <td><span class="badge badge-info">${esc(r.course)}</span></td>
+              <td><span class="badge" style="background:var(--bg-surface-raised); border:1px solid var(--border-default);">${esc(r.course)}</span></td>
               <td>Year ${r.year_level}</td>
             </tr>
           `).join('');
@@ -2044,7 +2095,8 @@ const OfficerApp = (() => {
 
     let csvContent = 'Name,Sex,Department,Course,Year\n';
     list.forEach(s => {
-      const safeName = `"${s.full_name.replace(/"/g, '""')}"`;
+      const formatted = formatStudentName(s.full_name);
+      const safeName = `"${formatted.replace(/"/g, '""')}"`;
       csvContent += `${safeName},${s.sex || 'M'},CoE,${s.course},${s.year_level}\n`;
     });
 
