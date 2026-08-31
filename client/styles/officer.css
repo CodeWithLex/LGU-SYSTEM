@@ -632,12 +632,56 @@
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
 }
 
-/* ---------- Event Cards Grid ---------- */
-/* Detail panel replays its entrance each time it is revealed */
-#of-event-detail {
-  animation: ofFade 0.3s ease;
+/* ---------- Event Detail Modal Popup ---------- */
+.of-modal-card {
+  max-width: 640px;
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 1.75rem;
+  border-radius: var(--radius-md, 8px);
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
 }
 
+.of-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.of-modal-head h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0.35rem 0 0.2rem;
+}
+
+.of-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition), background var(--transition);
+}
+
+.of-modal-close:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+/* ---------- Event Cards Grid ---------- */
 .of-events-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));

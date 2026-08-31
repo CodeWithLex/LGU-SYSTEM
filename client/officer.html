@@ -250,7 +250,6 @@
         </div>
 
         <div class="of-events-grid" id="of-events-grid"></div>
-        <div id="of-event-detail" class="hidden"></div>
       </section>
 
       <!-- 4. Reports & Paper Trail -->
@@ -353,6 +352,13 @@
     <button data-of="reports"><iconify-icon icon="solar:document-text-linear"></iconify-icon><span>Reports</span></button>
     <button data-of="people"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon><span>People</span></button>
   </nav>
+
+  <!-- Event Management Modal Popup -->
+  <div id="of-event-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card of-modal-card">
+      <div id="of-event-modal-content"></div>
+    </div>
+  </div>
 
   <div id="of-toast-holder"></div>
 

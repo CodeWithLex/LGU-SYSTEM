@@ -794,54 +794,118 @@ const OfficerApp = (() => {
   function renderEventDetail(id) {
     const ev = _events.find(e => e.id === id);
     if (!ev) return;
-    const panel = $('of-event-detail');
-    panel.classList.remove('hidden');
-    panel.scrollIntoView({ behavior: 'smooth' });
+    const modal = $('of-event-modal');
+    const content = $('of-event-modal-content');
+    if (!modal || !content) return;
 
-    panel.innerHTML = `
-      <div class="of-card" style="margin-top:1.5rem">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
-          <div>
+    modal.classList.remove('hidden');
+
+    content.innerHTML = `
+      <div class="of-modal-head">
+        <div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
             ${UI.renderStatusBadge(ev.status)}
-            <h3 style="margin-top:0.5rem">${esc(ev.event_name)}</h3>
-            <p style="font-size:0.85rem;color:var(--text-secondary)">${esc(ev.description || 'No description.')}</p>
+            <span style="font-size:0.72rem;color:var(--text-tertiary);">Event ID: ${esc(ev.id.slice(0,8))}</span>
           </div>
-          <button class="of-btn of-btn-ghost" id="of-detail-close">Close</button>
+          <h3>${esc(ev.event_name)}</h3>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin:0;">${esc(ev.description || 'No description provided.')}</p>
         </div>
-        <div class="of-stat-grid" style="margin-top:1.25rem">
-          <div class="of-stat"><div class="of-stat-label">Allocated</div><div class="of-stat-value">₱${fmtNum(ev.allocated_budget)}</div></div>
-          <div class="of-stat is-red"><div class="of-stat-label">Spent</div><div class="of-stat-value">₱${fmtNum(ev.computed_expenses)}</div></div>
-          <div class="of-stat is-green"><div class="of-stat-label">Remaining</div><div class="of-stat-value">₱${fmtNum(ev.computed_remaining)}</div></div>
-        </div>
-        <form id="of-detail-form" class="of-form">
-          <div class="of-form-row">
-            <div class="of-field"><label>Event Name</label><input type="text" id="of-me-name" value="${esc(ev.event_name)}" required /></div>
-            <div class="of-field"><label>Status</label>
-              <select id="of-me-status">
-                ${['upcoming','ongoing','completed','cancelled'].map(s => `<option value="${s}" ${ev.status === s ? 'selected' : ''}>${s[0].toUpperCase() + s.slice(1)}</option>`).join('')}
-              </select>
-            </div>
-          </div>
-          <div class="of-form-row">
-            <div class="of-field"><label>Allocated Budget (₱)</label><input type="number" id="of-me-budget" min="0" step="0.01" value="${ev.allocated_budget}" required /></div>
-            <div class="of-field"><label>Event Date</label><input type="date" id="of-me-date" value="${ev.event_date || ''}" /></div>
-          </div>
-          <div class="of-field"><label>Description</label><textarea id="of-me-desc" rows="2">${esc(ev.description || '')}</textarea></div>
-          <div class="of-error hidden" id="of-me-error"></div>
-          <div style="display:flex;gap:0.6rem;flex-wrap:wrap">
-            <button class="of-btn of-btn-primary" type="submit">Save Changes</button>
-            <button class="of-btn of-btn-ghost" type="button" id="of-detail-receipts">Transaction History</button>
-          </div>
-        </form>
-        <div id="of-detail-txs" class="of-scrollable-list" style="margin-top:1rem"></div>
-      </div>`;
+        <button type="button" class="of-modal-close" id="of-detail-close" aria-label="Close dialog">
+          <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+        </button>
+      </div>
 
-    $('of-detail-close').addEventListener('click', () => panel.classList.add('hidden'));
+      <div class="of-stat-grid" style="margin-bottom:1.25rem;">
+        <div class="of-stat">
+          <div class="of-stat-label">Allocated</div>
+          <div class="of-stat-value">₱${fmtNum(ev.allocated_budget)}</div>
+        </div>
+        <div class="of-stat is-red">
+          <div class="of-stat-label">Spent</div>
+          <div class="of-stat-value">₱${fmtNum(ev.computed_expenses)}</div>
+        </div>
+        <div class="of-stat is-green">
+          <div class="of-stat-label">Remaining</div>
+          <div class="of-stat-value">₱${fmtNum(ev.computed_remaining)}</div>
+        </div>
+      </div>
+
+      <form id="of-detail-form" class="of-form">
+        <div class="of-form-row">
+          <div class="of-field">
+            <label>Event Name</label>
+            <input type="text" id="of-me-name" value="${esc(ev.event_name)}" required />
+          </div>
+          <div class="of-field">
+            <label>Status</label>
+            <select id="of-me-status">
+              ${['upcoming','ongoing','completed','cancelled'].map(s => `<option value="${s}" ${ev.status === s ? 'selected' : ''}>${s[0].toUpperCase() + s.slice(1)}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="of-form-row">
+          <div class="of-field">
+            <label>Allocated Budget (₱)</label>
+            <input type="number" id="of-me-budget" min="0" step="0.01" value="${ev.allocated_budget}" required />
+          </div>
+          <div class="of-field">
+            <label>Event Date</label>
+            <input type="date" id="of-me-date" value="${ev.event_date || ''}" />
+          </div>
+        </div>
+        <div class="of-field">
+          <label>Description</label>
+          <textarea id="of-me-desc" rows="2">${esc(ev.description || '')}</textarea>
+        </div>
+        <div class="of-error hidden" id="of-me-error"></div>
+        <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:center;margin-top:0.5rem;flex-wrap:wrap;">
+          <button class="of-btn of-btn-ghost" type="button" id="of-detail-receipts">
+            <iconify-icon icon="solar:history-linear"></iconify-icon> Transaction History (<span id="of-detail-tx-count">…</span>)
+          </button>
+          <div style="display:flex;gap:0.6rem;">
+            <button class="of-btn of-btn-ghost" type="button" id="of-detail-cancel">Cancel</button>
+            <button class="of-btn of-btn-primary" type="submit" id="of-detail-save">Save Changes</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="of-detail-txs" class="of-scrollable-list hidden" style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-default);max-height:220px;"></div>
+    `;
+
+    const closeModal = () => {
+      modal.classList.add('hidden');
+    };
+
+    $('of-detail-close').addEventListener('click', closeModal);
+    $('of-detail-cancel').addEventListener('click', closeModal);
+
+    // Dismiss when clicking backdrop
+    modal.onclick = (e) => {
+      if (e.target === modal) closeModal();
+    };
+
+    // ESC key closes modal
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        document.removeEventListener('keydown', onKey);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+
+    // Load tx count preview
+    Api.events.get(ev.id).then(detail => {
+      const countEl = $('of-detail-tx-count');
+      if (countEl) countEl.textContent = detail.transactions?.length || 0;
+    }).catch(() => {});
 
     $('of-detail-form').addEventListener('submit', async e => {
       e.preventDefault();
       const errEl = $('of-me-error');
       errEl.classList.add('hidden');
+      const saveBtn = $('of-detail-save');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
       try {
         await Api.events.update(ev.id, {
           event_name:       $('of-me-name').value,
@@ -853,15 +917,23 @@ const OfficerApp = (() => {
         toast('Event updated.', 'success');
         await refreshCoreData();
         await renderEventsGrid();
-        renderEventDetail(ev.id);
+        closeModal();
       } catch (err) {
         errEl.textContent = err.message;
         errEl.classList.remove('hidden');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
       }
     });
 
     $('of-detail-receipts').addEventListener('click', async () => {
       const box = $('of-detail-txs');
+      if (!box.classList.contains('hidden')) {
+        box.classList.add('hidden');
+        return;
+      }
+      box.classList.remove('hidden');
       box.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary)">Loading history…</p>';
       try {
         const detail = await Api.events.get(ev.id);
