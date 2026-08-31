@@ -1,6 +1,6 @@
 {
-  "name": "COE Budget Transparency System",
-  "short_name": "COE Budget",
+  "name": "COE Student Portal",
+  "short_name": "COE Student Portal",
   "description": "Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures.",
   "id": "./",
   "start_url": "./?source=pwa",

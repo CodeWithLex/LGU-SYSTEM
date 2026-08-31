@@ -30,7 +30,7 @@ A centralized web application designed for the College of Engineering (COE) and 
 
 The system is a Progressive Web App: on a phone it installs to the home screen with its own icon and opens full-screen (no browser UI), just like a native app.
 
-**Android (Chrome):** open the site once → tap **Install app** on the banner Chrome shows (or ⋮ menu → *Add to Home screen*).
+**Android (Chrome):** open the site once → tap **Install app** on the banner Chrome shows (or ⋮ menu → *Add to Home screen*). It installs as **"COE Student Portal"** with the COE logo as its icon.
 
 **iPhone (Safari):** open the site → tap the **Share** button → **Add to Home Screen**.
 
