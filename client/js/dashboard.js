@@ -26,14 +26,14 @@ const Dashboard = (() => {
       card.addEventListener('mouseenter', showHover);
       card.addEventListener('mouseleave', hideHover);
 
-      // Tap toggle for mobile
+      // Tap / Click navigation: opens target view directly
       card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (card.classList.contains('hover-active')) {
-             hideHover();
-        } else {
-             document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('hover-active'));
-             showHover();
+        const actionLink = e.target.closest('.stat-pop-action');
+        const targetView = actionLink ? actionLink.dataset.nav : card.dataset.nav;
+        if (targetView && typeof window.navigateTo === 'function') {
+          e.stopPropagation();
+          hideHover();
+          window.navigateTo(targetView);
         }
       });
     });
@@ -52,12 +52,13 @@ const Dashboard = (() => {
       document.getElementById('stat-balance').textContent   = UI.currency(summary.remainingBalance);
       document.getElementById('stat-donations').textContent = UI.currency(summary.breakdown.donation);
 
-      // Populate popover breakdowns
+      // Populate popover breakdowns with 1-tap action links
       document.getElementById('pop-income').innerHTML = `
         <div class="stat-pop-row"><span>Donations</span> <span>${UI.currency(summary.breakdown.donation)}</span></div>
         <div class="stat-pop-row"><span>Collections</span> <span>${UI.currency(summary.breakdown.collection)}</span></div>
         <div class="stat-pop-row"><span>Allocations In</span> <span>${UI.currency(summary.breakdown.allocation)}</span></div>
         <div class="stat-pop-row total"><span>Total Income</span> <span>${UI.currency(summary.totalIncome)}</span></div>
+        <a class="stat-pop-action" data-nav="income"><span>View Total Income Tracker</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
       const eventExpense = summary.totalExpense - summary.generalExpense;
@@ -65,6 +66,7 @@ const Dashboard = (() => {
         <div class="stat-pop-row"><span>General/Misc</span> <span>${UI.currency(summary.generalExpense)}</span></div>
         <div class="stat-pop-row"><span>Event Spending</span> <span>${UI.currency(eventExpense)}</span></div>
         <div class="stat-pop-row total"><span>Total Spent</span> <span>${UI.currency(summary.totalExpense)}</span></div>
+        <a class="stat-pop-action" data-nav="transactions"><span>View Transactions Ledger</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
       document.getElementById('pop-balance').innerHTML = `
@@ -73,10 +75,12 @@ const Dashboard = (() => {
         <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Reserved (Events)</span> <span>-${UI.currency(summary.breakdown.reserved_envelopes)}</span></div>
         <div class="stat-pop-row total"><span>Available Fund</span> <span>${UI.currency(summary.remainingBalance)}</span></div>
         <p style="font-size:0.65rem;color:var(--text-tertiary);margin-top:0.4rem;line-height:1.2;">Unreserved cash available for new allocations or general operations.</p>
+        <a class="stat-pop-action" data-nav="reports"><span>View Financial Reports & Trends</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
       document.getElementById('pop-donations').innerHTML = `
         <div class="stat-pop-row" style="color:var(--col-text);line-height:1.4;">Total value of sponsorships and community contributions.</div>
+        <a class="stat-pop-action" data-nav="income"><span>View Donations in Income Tracker</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
     } catch (err) {
       console.error('Stats load error:', err);

@@ -437,6 +437,9 @@
     if (view === 'admin')        Admin.init();
   }
 
+  // Expose navigateTo globally for modular triggers (e.g. dashboard cards, quick links)
+  window.navigateTo = navigateTo;
+
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
     item.addEventListener('click', async e => {
       if (item.dataset.view) {
@@ -444,6 +447,17 @@
         navigateTo(item.dataset.view);
       }
     });
+  });
+
+  // Global [data-nav] delegate handler for springboards
+  document.addEventListener('click', e => {
+    const navEl = e.target.closest('[data-nav]');
+    if (navEl && navEl.dataset.nav) {
+      // Don't intercept if clicking an actual anchor with an href to another page
+      if (navEl.tagName === 'A' && navEl.getAttribute('href') && !navEl.getAttribute('href').startsWith('#')) return;
+      e.preventDefault();
+      navigateTo(navEl.dataset.nav);
+    }
   });
 
   Events.bindBackButton();

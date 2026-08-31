@@ -259,24 +259,48 @@
         <div id="dashboard-ursa-container"></div>
 
         <div class="stats-grid">
-          <div class="stat-card stat-income">
+          <div class="stat-card stat-income" data-nav="income" role="button" tabindex="0" title="Open Total Income Tracker">
             <div class="stat-icon"><iconify-icon icon="solar:chart-2-linear"></iconify-icon></div>
-            <div class="stat-body"><p class="stat-label">Total Income</p><h3 class="stat-value" id="stat-income">₱0.00</h3></div>
+            <div class="stat-body">
+              <div class="stat-label-row">
+                <p class="stat-label">Total Income</p>
+                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+              <h3 class="stat-value" id="stat-income">₱0.00</h3>
+            </div>
             <div class="stat-popover" id="pop-income"></div>
           </div>
-          <div class="stat-card stat-expense">
+          <div class="stat-card stat-expense" data-nav="transactions" role="button" tabindex="0" title="Open Transactions Ledger">
             <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
-            <div class="stat-body"><p class="stat-label">Total Expenses</p><h3 class="stat-value" id="stat-expense">₱0.00</h3></div>
+            <div class="stat-body">
+              <div class="stat-label-row">
+                <p class="stat-label">Total Expenses</p>
+                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+              <h3 class="stat-value" id="stat-expense">₱0.00</h3>
+            </div>
             <div class="stat-popover" id="pop-expense"></div>
           </div>
-          <div class="stat-card stat-balance">
+          <div class="stat-card stat-balance" data-nav="reports" role="button" tabindex="0" title="Open Financial Reports">
             <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
-            <div class="stat-body"><p class="stat-label">Remaining Balance</p><h3 class="stat-value" id="stat-balance">₱0.00</h3></div>
+            <div class="stat-body">
+              <div class="stat-label-row">
+                <p class="stat-label">Remaining Balance</p>
+                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+              <h3 class="stat-value" id="stat-balance">₱0.00</h3>
+            </div>
             <div class="stat-popover" id="pop-balance"></div>
           </div>
-          <div class="stat-card stat-donations">
+          <div class="stat-card stat-donations" data-nav="income" role="button" tabindex="0" title="View Donations in Income Tracker">
             <div class="stat-icon"><iconify-icon icon="solar:hand-money-linear"></iconify-icon></div>
-            <div class="stat-body"><p class="stat-label">Total Donations</p><h3 class="stat-value" id="stat-donations">₱0.00</h3></div>
+            <div class="stat-body">
+              <div class="stat-label-row">
+                <p class="stat-label">Total Donations</p>
+                <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
+              </div>
+              <h3 class="stat-value" id="stat-donations">₱0.00</h3>
+            </div>
             <div class="stat-popover" id="pop-donations"></div>
           </div>
         </div>

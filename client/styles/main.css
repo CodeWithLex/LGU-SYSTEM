@@ -1708,6 +1708,14 @@ html body .hidden {
   color: inherit;
 }
 
+.stat-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.4rem;
+}
+
 .stat-label {
   font-family: var(--font-ui);
   font-size: var(--font-size-kpi-label);
@@ -1716,6 +1724,21 @@ html body .hidden {
   letter-spacing: 0.06em;
   font-weight: 600;
   line-height: 1.2;
+}
+
+.stat-card-hint {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  opacity: 0.5;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+
+.stat-card:hover .stat-card-hint {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateX(3px);
 }
 
 .stat-value {
@@ -1790,9 +1813,38 @@ html body .hidden {
   font-size: var(--font-size-body);
 }
 
+.stat-pop-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.85rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-default);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+.stat-pop-action:hover {
+  color: var(--primary-hover);
+}
+.stat-pop-action iconify-icon {
+  font-size: 0.9rem;
+  transition: transform 0.15s ease;
+}
+.stat-pop-action:hover iconify-icon {
+  transform: translateX(3px);
+}
+
 .stat-card:hover {
   border-color: var(--border-hover);
   box-shadow: var(--shadow-card-hover, none);
+  transform: translateY(-2px);
+}
+.stat-card:active {
+  transform: scale(0.98);
 }
 
 /* =============================================
