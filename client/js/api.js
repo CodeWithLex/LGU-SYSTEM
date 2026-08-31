@@ -215,6 +215,45 @@ const Api = (() => {
     }
   }
 
+  const roster = {
+    async list() {
+      if (window.supabaseClient) {
+        const { data, error } = await window.supabaseClient
+          .from('enrolled_students')
+          .select('*')
+          .order('full_name', { ascending: true });
+        if (error) throw new Error(error.message);
+        return data || [];
+      }
+      return [];
+    },
+    async create(studentData) {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const { data, error } = await window.supabaseClient
+        .from('enrolled_students')
+        .insert([{
+          full_name: studentData.full_name.toUpperCase().trim(),
+          sex: studentData.sex || 'M',
+          department: studentData.department || 'CoE',
+          course: studentData.course,
+          year_level: String(studentData.year_level)
+        }])
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+    async delete(id) {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      const { error } = await window.supabaseClient
+        .from('enrolled_students')
+        .delete()
+        .eq('id', id);
+      if (error) throw new Error(error.message);
+      return true;
+    }
+  };
+
   return {
     events,
     transactions,
@@ -222,6 +261,7 @@ const Api = (() => {
     admin,
     units,
     announcements,
+    roster,
     request: _request,
     invalidateCache,
     hasCache,

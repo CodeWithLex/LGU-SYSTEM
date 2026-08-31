@@ -20,6 +20,13 @@ ALTER TABLE public.enrolled_students ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow authenticated users to read enrolled students" ON public.enrolled_students
   FOR SELECT TO authenticated USING (true);
 
+CREATE POLICY "Allow admins to manage enrolled students" ON public.enrolled_students
+  FOR ALL TO authenticated
+  USING (
+    (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
 -- Populate Master Roster
 INSERT INTO public.enrolled_students (full_name, sex, department, course, year_level) VALUES
   ('ADJALAINE GAGE MASOCOL', 'M', 'CoE', 'BSCE', '1'),

@@ -599,6 +599,7 @@
           <button class="admin-tab-btn" data-tab="transfer" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:card-transfer-linear" style="font-size:16px" ></iconify-icon> Budget Transfer</button>
           <button class="admin-tab-btn" data-tab="events" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:document-edit-linear" style="font-size:16px" ></iconify-icon> Manage Events</button>
           <button class="admin-tab-btn" data-tab="users" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:users-group-rounded-linear" style="font-size:16px" ></iconify-icon> User Management</button>
+          <button class="admin-tab-btn" data-tab="roster" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:user-plus-linear" style="font-size:16px" ></iconify-icon> Enrolled Roster</button>
           <button class="admin-tab-btn" data-tab="audit" style="display:flex;align-items:center;gap:0.4rem;"><iconify-icon icon="solar:history-linear" style="font-size:16px" ></iconify-icon> Audit Log</button>
         </div>
 
@@ -858,6 +859,68 @@
         <!-- Tab: Audit Log -->
         <div class="admin-tab-panel" id="admin-tab-audit">
           <div class="loading-state">Loading audit log…</div>
+        </div>
+
+        <!-- Tab: Enrolled Roster Management (Admin Only) -->
+        <div class="admin-tab-panel" id="admin-tab-roster">
+          <div class="dashboard-card" style="margin-bottom:1.5rem;">
+            <h3><iconify-icon icon="solar:user-plus-linear"></iconify-icon> Add Enrolled Student to Master Roster</h3>
+            <form id="add-roster-form" class="admin-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Full Name (LASTNAME FIRSTNAME MIDDLE)</label>
+                  <input type="text" id="roster-name" required placeholder="e.g. DELA CRUZ JUAN SANTOS" />
+                </div>
+                <div class="form-group">
+                  <label>Sex / Gender</label>
+                  <select id="roster-sex">
+                    <option value="M">Male (M)</option>
+                    <option value="F">Female (F)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Engineering Program</label>
+                  <select id="roster-course" required>
+                    <option value="BSCE">BS Civil Engineering (BSCE)</option>
+                    <option value="BSCoE">BS Computer Engineering (BSCoE)</option>
+                    <option value="BSECE">BS Electronics Engineering (BSECE)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Year Level</label>
+                  <select id="roster-year" required>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                    <option value="5">5th Year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-error hidden" id="roster-error"></div>
+              <button class="btn btn-primary" type="submit" id="submit-roster-btn">Add Student to Roster</button>
+            </form>
+          </div>
+
+          <div class="dashboard-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+              <h3><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> Enrolled Roster Database</h3>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="roster-search-input" class="input-field" placeholder="Search student name…" style="max-width:220px;" />
+                <select id="roster-filter-program" class="input-field" style="max-width:140px;">
+                  <option value="">All Programs</option>
+                  <option value="BSCE">BSCE</option>
+                  <option value="BSCoE">BSCoE</option>
+                  <option value="BSECE">BSECE</option>
+                </select>
+              </div>
+            </div>
+            <div id="roster-table-container">
+              <div class="loading-state">Loading enrolled student roster…</div>
+            </div>
+          </div>
         </div>
 
       </section>
