@@ -1421,10 +1421,17 @@ const OfficerApp = (() => {
     }
   }
 
-  function updatePeopleStats() {
+  async function updatePeopleStats() {
+    if (!_allRoster || _allRoster.length === 0) {
+      try {
+        _allRoster = await Api.roster.list();
+      } catch {}
+    }
+
     const total = _users.length;
     const students = _users.filter(u => u.role === 'student').length;
     const officers = _users.filter(u => u.role !== 'student').length;
+    const totalEnrolled = _allRoster ? _allRoster.length : 0;
 
     const bscoe = _users.filter(u => u.course === 'BSCoE').length;
     const bsce = _users.filter(u => u.course === 'BSCE').length;
@@ -1433,7 +1440,12 @@ const OfficerApp = (() => {
     if ($('of-stat-val-users-total')) $('of-stat-val-users-total').textContent = total;
     if ($('of-stat-val-users-students')) $('of-stat-val-users-students').textContent = students;
     if ($('of-stat-sub-users-students')) {
-      $('of-stat-sub-users-students').textContent = total ? `${Math.round((students / total) * 100)}% of total accounts` : '0% of total accounts';
+      if (totalEnrolled > 0) {
+        const pct = Math.round((students / totalEnrolled) * 100);
+        $('of-stat-sub-users-students').textContent = `${students} of ${totalEnrolled} students registered (${pct}%)`;
+      } else {
+        $('of-stat-sub-users-students').textContent = `${students} students registered`;
+      }
     }
     if ($('of-stat-val-users-officers')) $('of-stat-val-users-officers').textContent = officers;
 
@@ -1452,7 +1464,7 @@ const OfficerApp = (() => {
       ? `You can assign: ${assignableRoles().join(', ')}` + (_profile.role === 'governor' ? ' (admin accounts are out of your reach)' : '')
       : 'Read-only: cashiers cannot assign roles.';
     $('of-people-action-col').style.display = canAssign ? '' : 'none';
-    updatePeopleStats();
+    await updatePeopleStats();
     renderPeopleTable();
   }
 
