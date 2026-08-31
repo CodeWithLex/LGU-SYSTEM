@@ -322,6 +322,51 @@ test('SWR cache handles 100 concurrent requests without race conditions', async 
   assert.strictEqual(networkFetches, 1, `Expected 1 network fetch, but got ${networkFetches}`);
 });
 
+// -------------------------------------------------------------
+// 7. SCRIPT INTEGRITY & CDN DEPENDENCY VERIFICATION
+// -------------------------------------------------------------
+console.log('\n--- 7. Script Integrity & Dependency Audit ---');
+
+test('index.html and officer.html include required Supabase and Chart.js CDN scripts', () => {
+  const indexHtml = fs.readFileSync('client/index.html', 'utf8');
+  const officerHtml = fs.readFileSync('client/officer.html', 'utf8');
+
+  assert.ok(indexHtml.includes('@supabase/supabase-js'), 'index.html missing Supabase CDN script');
+  assert.ok(indexHtml.includes('chart.js'), 'index.html missing Chart.js CDN script');
+  assert.ok(officerHtml.includes('@supabase/supabase-js'), 'officer.html missing Supabase CDN script');
+  assert.ok(officerHtml.includes('chart.js'), 'officer.html missing Chart.js CDN script');
+});
+
+test('All frontend JS files have valid syntax without scope redeclarations', () => {
+  import('node:vm').then(vm => {
+    const jsFiles = [
+      'client/js/config.js',
+      'client/js/roster.js',
+      'client/js/auth.js',
+      'client/js/api.js',
+      'client/js/ui.js',
+      'client/js/dashboard.js',
+      'client/js/events.js',
+      'client/js/transactions.js',
+      'client/js/reports.js',
+      'client/js/income.js',
+      'client/js/units.js',
+      'client/js/receipt-capture.js',
+      'client/js/dropdown.js',
+      'client/js/admin.js',
+      'client/js/ai-assistant.js',
+      'client/js/profile.js',
+      'client/js/app.js',
+      'client/js/officer/officer-app.js'
+    ];
+
+    jsFiles.forEach(file => {
+      const code = fs.readFileSync(file, 'utf8');
+      assert.doesNotThrow(() => new vm.Script(code), `Syntax or redeclaration error in ${file}`);
+    });
+  });
+});
+
 console.log(`\n=============================================================`);
 console.log(`🎉 QA Verification Complete: ${passedTests}/${totalTests} tests passed (${Math.round(passedTests/totalTests*100)}%)`);
 console.log(`=============================================================\n`);
