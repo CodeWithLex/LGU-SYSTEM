@@ -43,10 +43,17 @@ const Auth = (() => {
   }
 
   async function loginWithGoogle() {
+    if (!window.supabaseClient) {
+      throw new Error('Database connection not initialized. Please check your internet connection.');
+    }
+    const redirectUrl = window.location.origin && window.location.origin !== 'null'
+      ? (window.location.origin + window.location.pathname)
+      : window.location.href.split('#')[0].split('?')[0];
+
     const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: redirectUrl,
         queryParams: {
           hd: 'g.cjc.edu.ph', // Enforces Cor Jesu College Google account selection
           prompt: 'select_account'
@@ -54,6 +61,9 @@ const Auth = (() => {
       }
     });
     if (error) throw error;
+    if (data?.url) {
+      window.location.href = data.url;
+    }
     return data;
   }
 
