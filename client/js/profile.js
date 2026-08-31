@@ -29,6 +29,46 @@ const ProfileModal = (() => {
   let _selectedAvatarUrl = null;
   let _currentCategory = 'all';
   let _initialized = false;
+  let _initialState = {
+    fullName: '',
+    course: 'BSCoE',
+    yearLevel: '1',
+    enrollmentYear: '',
+    theme: 'dark',
+    avatarUrl: null
+  };
+
+  function isGeneralFormDirty() {
+    const nameInput = document.getElementById('profile-name-input');
+    const courseSelect = document.getElementById('profile-course-select');
+    const yearSelect = document.getElementById('profile-year-select');
+    const enrollInput = document.getElementById('profile-enrollment-year');
+    const themeSelect = document.getElementById('profile-theme-select');
+
+    const curName = nameInput ? nameInput.value.trim() : '';
+    const curCourse = courseSelect ? courseSelect.value : '';
+    const curYear = yearSelect ? yearSelect.value : '';
+    const curEnroll = enrollInput && enrollInput.value ? String(enrollInput.value) : '';
+    const curTheme = themeSelect ? themeSelect.value : (localStorage.getItem('theme') || 'dark');
+    const curAvatar = _selectedAvatarUrl || null;
+
+    return (
+      curName !== _initialState.fullName ||
+      curCourse !== _initialState.course ||
+      curYear !== _initialState.yearLevel ||
+      curEnroll !== String(_initialState.enrollmentYear || '') ||
+      curTheme !== _initialState.theme ||
+      curAvatar !== _initialState.avatarUrl
+    );
+  }
+
+  function updateSaveButtonState() {
+    const saveBtn = document.getElementById('profile-save-general-btn');
+    if (!saveBtn) return;
+    const dirty = isGeneralFormDirty();
+    saveBtn.disabled = !dirty;
+    saveBtn.classList.toggle('is-disabled', !dirty);
+  }
 
   function init() {
     if (_initialized) return;
@@ -37,6 +77,7 @@ const ProfileModal = (() => {
     bindTabs();
     bindForms();
     renderAvatarGallery('all');
+    updateSaveButtonState();
   }
 
   function bindGlobalTriggers() {
@@ -127,6 +168,7 @@ const ProfileModal = (() => {
     
     renderAvatarElement(heroAvatar, src, curName);
     renderAvatarGallery(_currentCategory);
+    updateSaveButtonState();
   }
 
   function bindTabs() {
@@ -153,6 +195,23 @@ const ProfileModal = (() => {
         await saveGeneralProfile();
       });
     }
+
+    // Input listeners to track dirty state
+    const inputIds = [
+      'profile-name-input',
+      'profile-course-select',
+      'profile-year-select',
+      'profile-enrollment-year',
+      'profile-theme-select'
+    ];
+
+    inputIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', updateSaveButtonState);
+        el.addEventListener('change', updateSaveButtonState);
+      }
+    });
 
     // 2. Security / Password Form
     const securityForm = document.getElementById('profile-security-form');
@@ -272,7 +331,17 @@ const ProfileModal = (() => {
     if (newPass) newPass.value = '';
     if (confPass) confPass.value = '';
 
+    _initialState = {
+      fullName: fullName,
+      course: course,
+      yearLevel: yearLevel,
+      enrollmentYear: String(enrollmentYear || ''),
+      theme: localStorage.getItem('theme') || 'dark',
+      avatarUrl: _selectedAvatarUrl
+    };
+
     renderAvatarGallery(_currentCategory);
+    updateSaveButtonState();
   }
 
   function renderAvatarElement(element, avatarUrl, fallbackText) {
@@ -331,6 +400,15 @@ const ProfileModal = (() => {
       const updated = await Auth.updateProfile(userId, updates);
       _currentProfile = updated;
 
+      _initialState = {
+        fullName,
+        course,
+        yearLevel,
+        enrollmentYear: String(enrollmentYear || ''),
+        theme: localStorage.getItem('theme') || 'dark',
+        avatarUrl: _selectedAvatarUrl
+      };
+
       // Save theme settings if changed
       const themeSelect = document.getElementById('profile-theme-select');
       if (themeSelect && window.ThemeManager) {
@@ -358,8 +436,8 @@ const ProfileModal = (() => {
       setFeedback('profile-general-feedback', err.message || 'Failed to update profile.', 'error');
     } finally {
       if (saveBtn) {
-        saveBtn.disabled = false;
         saveBtn.innerHTML = `<iconify-icon icon="solar:check-circle-linear"></iconify-icon> Save Changes`;
+        updateSaveButtonState();
       }
     }
   }

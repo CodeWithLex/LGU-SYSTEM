@@ -4554,6 +4554,26 @@ html body.is-admin th.admin-only {
   white-space: nowrap;
 }
 
+/* Save Changes button disabled state (unclickable, no bright color) */
+#profile-save-general-btn:disabled,
+#profile-save-general-btn.is-disabled {
+  background: var(--bg-surface-raised, #161D25) !important;
+  border-color: var(--border-default, #28313A) !important;
+  color: var(--text-tertiary, #64748B) !important;
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+[data-theme="light"] #profile-save-general-btn:disabled,
+[data-theme="light"] #profile-save-general-btn.is-disabled {
+  background: #F1F5F9 !important;
+  border-color: #CBD5E1 !important;
+  color: #94A3B8 !important;
+}
+
 @media (max-width: 600px) {
   .profile-modal {
     width: 95vw;
