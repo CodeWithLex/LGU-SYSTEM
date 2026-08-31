@@ -1513,6 +1513,9 @@ const OfficerApp = (() => {
   let _selectedRosterProg = '';
   let _selectedRosterYear = '';
   let _importedRosterBatch = [];
+  let _rosterCurrentView = 'masterlist';
+  let _requestsStatusFilter = 'pending';
+  let _allVerificationRequests = [];
 
   const COMPOUND_SURNAME_PREFIXES = [
     'DEL ROSARIO',
