@@ -171,6 +171,7 @@ const OfficerApp = (() => {
     bindPeopleSearch();
     bindAuditSearch();
     bindAnnouncementForm();
+    bindRosterForm();
 
     if (typeof Api !== 'undefined' && Api.prefetchAll) {
       Api.prefetchAll(profile.role);
@@ -205,7 +206,7 @@ const OfficerApp = (() => {
     try {
       await refreshCoreData();
       const savedSection = window.location.hash.slice(1) || localStorage.getItem('officer_last_view') || 'overview';
-      const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements'];
+      const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements', 'roster'];
       const targetSection = validSections.includes(savedSection) ? savedSection : 'overview';
       await switchSection(targetSection);
     } catch (err) {
@@ -227,7 +228,7 @@ const OfficerApp = (() => {
 
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.slice(1);
-    const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements'];
+    const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements', 'roster'];
     if (validSections.includes(hash)) {
       switchSection(hash);
     }
@@ -320,6 +321,7 @@ const OfficerApp = (() => {
       else if (section === 'reports')      { await loadReports(!isFirstLoad); }
       else if (section === 'people')       { await loadPeople(!isFirstLoad); }
       else if (section === 'announcements') { await loadAnnouncements(!isFirstLoad); }
+      else if (section === 'roster')       { await loadRoster(!isFirstLoad); }
     } catch (err) {
       if (isFirstLoad) toast(err.message || 'Failed to load section.', 'error');
     } finally {
@@ -1502,6 +1504,153 @@ const OfficerApp = (() => {
         <span class="of-when">${UI.dateStr(a.created_at)}</span>
       </div>`).join('')
       : '<p style="font-size:0.82rem;color:var(--text-secondary)">No announcements yet.</p>';
+  }
+
+  // ---------- Enrolled Roster Management ----------
+  let _allRoster = [];
+
+  function bindRosterForm() {
+    const form = $('of-roster-form');
+    if (!form) return;
+    const errEl = $('of-roster-error');
+    const btn = $('of-roster-submit');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (errEl) errEl.classList.add('hidden');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Adding Student…';
+      }
+
+      try {
+        const name = $('of-roster-name')?.value.trim();
+        const sex = $('of-roster-sex')?.value;
+        const course = $('of-roster-course')?.value;
+        const year = $('of-roster-year')?.value;
+
+        if (!name || !course || !year) throw new Error('Please fill in all required fields.');
+
+        await Api.roster.create({ full_name: name, sex, course, year_level: year });
+        toast(`Successfully added "${name}" to official enrolled roster!`, 'success');
+        form.reset();
+
+        // Clear local cache so instant search reflects new student
+        if (window.Roster && window.Roster.getRoster) {
+          window.Roster.getRoster().catch(() => {});
+        }
+
+        await loadRoster(true);
+      } catch (err) {
+        if (errEl) {
+          errEl.textContent = err.message || 'Failed to add student to roster.';
+          errEl.classList.remove('hidden');
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Add Student to Roster';
+        }
+      }
+    });
+
+    const searchInput = $('of-roster-search');
+    const programFilter = $('of-roster-filter-program');
+    if (searchInput) searchInput.addEventListener('input', renderRosterTable);
+    if (programFilter) programFilter.addEventListener('change', renderRosterTable);
+  }
+
+  async function loadRoster(isSilent = false) {
+    const container = $('of-roster-table-container');
+    if (!container) return;
+    if (!isSilent && !_loaded.roster) {
+      container.innerHTML = skeletonStack(3);
+    }
+
+    try {
+      _allRoster = await Api.roster.list();
+      renderRosterTable();
+    } catch (err) {
+      container.innerHTML = `<div class="of-error">Failed to load enrolled roster: ${esc(err.message)}</div>`;
+    }
+  }
+
+  function renderRosterTable() {
+    const container = $('of-roster-table-container');
+    if (!container) return;
+
+    const query = $('of-roster-search')?.value.toLowerCase().trim() || '';
+    const program = $('of-roster-filter-program')?.value || '';
+
+    const filtered = _allRoster.filter(s => {
+      const matchName = !query || s.full_name.toLowerCase().includes(query);
+      const matchProg = !program || s.course === program;
+      return matchName && matchProg;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<p style="font-size:0.82rem;color:var(--text-secondary);padding:1rem;">No enrolled students found matching filter.</p>';
+      return;
+    }
+
+    let html = `
+      <div style="margin-bottom:0.75rem; font-weight:600; font-size:0.85rem; color:var(--text-secondary);">
+        Total Enrolled Students: <span class="badge badge-primary">${filtered.length}</span>
+      </div>
+      <div class="of-table-wrap">
+        <table class="of-table">
+          <thead>
+            <tr>
+              <th>Full Name</th>
+              <th>Gender</th>
+              <th>Program</th>
+              <th>Year Level</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    filtered.forEach(student => {
+      const yrLabel = `${student.year_level}${student.year_level === '1' ? 'st' : student.year_level === '2' ? 'nd' : student.year_level === '3' ? 'rd' : 'th'} Year`;
+      html += `
+        <tr>
+          <td><strong>${esc(student.full_name)}</strong></td>
+          <td>${student.sex === 'F' ? 'Female' : 'Male'}</td>
+          <td><span class="badge badge-info">${esc(student.course)}</span></td>
+          <td>${yrLabel}</td>
+          <td>
+            <button class="of-btn of-btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${esc(student.full_name)}" style="color:var(--col-danger); padding:0.25rem 0.5rem; font-size:0.8rem;">
+              <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon> Delete
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.delete-roster-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        if (!confirm(`Are you sure you want to remove "${name}" from the enrolled roster?`)) return;
+
+        try {
+          await Api.roster.delete(id);
+          toast(`Removed "${name}" from enrolled roster.`, 'info');
+          await loadRoster(true);
+        } catch (err) {
+          toast(`Failed to delete student: ${err.message}`, 'error');
+        }
+      });
+    });
   }
 
   // ---------- Start ----------

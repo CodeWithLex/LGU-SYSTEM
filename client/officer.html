@@ -93,6 +93,9 @@
         <button type="button" class="nav-item" data-of="announcements">
           <span class="nav-icon"><iconify-icon icon="solar:bell-linear"></iconify-icon></span><span>Announcements</span>
         </button>
+        <button type="button" class="nav-item" data-of="roster">
+          <span class="nav-icon"><iconify-icon icon="solar:user-plus-linear"></iconify-icon></span><span>Enrolled Roster</span>
+        </button>
         <a href="/" class="nav-item of-nav-back-link" title="Back to Main Dashboard">
           <span class="nav-icon"><iconify-icon icon="solar:home-2-linear"></iconify-icon></span><span>Main Dashboard</span>
         </a>
@@ -377,6 +380,76 @@
         </div>
       </section>
 
+      <!-- 7. Enrolled Roster Management (Executive / Admin Only) -->
+      <section class="of-view" id="of-view-roster">
+        <div class="view-header of-view-head">
+          <div>
+            <h2>Official Enrolled Roster</h2>
+            <p class="view-sub">Manage officially enrolled engineering students database</p>
+          </div>
+        </div>
+        <div class="of-cards">
+          <div class="of-card" style="margin-bottom:1.5rem;">
+            <h3><iconify-icon icon="solar:user-plus-linear"></iconify-icon> Add Enrolled Student to Master Database</h3>
+            <form id="of-roster-form" class="of-form">
+              <div class="form-row">
+                <div class="of-field">
+                  <label>Full Name (LASTNAME FIRSTNAME MIDDLE)</label>
+                  <input type="text" id="of-roster-name" required placeholder="e.g. DELA CRUZ JUAN SANTOS" class="input-field" />
+                </div>
+                <div class="of-field">
+                  <label>Sex / Gender</label>
+                  <select id="of-roster-sex" class="input-field">
+                    <option value="M">Male (M)</option>
+                    <option value="F">Female (F)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="of-field">
+                  <label>Engineering Program</label>
+                  <select id="of-roster-course" required class="input-field">
+                    <option value="BSCE">BS Civil Engineering (BSCE)</option>
+                    <option value="BSCoE">BS Computer Engineering (BSCoE)</option>
+                    <option value="BSECE">BS Electronics Engineering (BSECE)</option>
+                  </select>
+                </div>
+                <div class="of-field">
+                  <label>Year Level</label>
+                  <select id="of-roster-year" required class="input-field">
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                    <option value="5">5th Year</option>
+                  </select>
+                </div>
+              </div>
+              <div class="of-error hidden" id="of-roster-error"></div>
+              <button class="of-btn of-btn-primary" type="submit" id="of-roster-submit" style="margin-top:0.75rem;">Add Student to Roster</button>
+            </form>
+          </div>
+
+          <div class="of-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+              <h3 style="margin:0;"><iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon> Enrolled Roster Database</h3>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="of-roster-search" class="of-search" style="margin-bottom:0; max-width:220px;" placeholder="Search student name…" />
+                <select id="of-roster-filter-program" class="input-field" style="max-width:140px;">
+                  <option value="">All Programs</option>
+                  <option value="BSCE">BSCE</option>
+                  <option value="BSCoE">BSCoE</option>
+                  <option value="BSECE">BSECE</option>
+                </select>
+              </div>
+            </div>
+            <div id="of-roster-table-container">
+              <div class="loading-state">Loading enrolled student roster…</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -405,6 +478,10 @@
     <button data-of="announcements" title="Announcements">
       <iconify-icon icon="solar:bell-linear"></iconify-icon>
       <span>Announce</span>
+    </button>
+    <button data-of="roster" title="Enrolled Roster">
+      <iconify-icon icon="solar:user-plus-linear"></iconify-icon>
+      <span>Roster</span>
     </button>
     <a href="/" class="of-nav-link-main" title="Return to Student Portal">
       <iconify-icon icon="solar:widget-2-linear"></iconify-icon>

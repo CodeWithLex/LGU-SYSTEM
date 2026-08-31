@@ -21,7 +21,6 @@ const Admin = (() => {
       bindAnnouncementForm();
       bindBulkImportForm();
       bindBudgetTransferForm();
-      bindRosterForm();
       _initialized = true;
     }
     setTodayDate();
@@ -44,7 +43,6 @@ const Admin = (() => {
       p.classList.toggle('active', p.id === `admin-tab-${tab}`)
     );
     if (tab === 'users')  loadUsers();
-    if (tab === 'roster') loadEnrolledRoster();
     if (tab === 'audit')  loadAuditLog();
   }
 
@@ -832,151 +830,6 @@ const Admin = (() => {
       btn.addEventListener('click', () => {
         _auditPage = Number(btn.dataset.adminPage);
         renderAuditTable(searchTerm);
-      });
-    });
-  }
-
-  // ── Enrolled Roster Management (Admin Only) ──────────────────────────────
-  let _allRoster = [];
-
-  function bindRosterForm() {
-    const form = document.getElementById('add-roster-form');
-    if (!form) return;
-    const errEl = document.getElementById('roster-error');
-    const btn = document.getElementById('submit-roster-btn');
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      if (errEl) errEl.classList.add('hidden');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Adding Student…';
-      }
-
-      try {
-        const name = document.getElementById('roster-name')?.value.trim();
-        const sex = document.getElementById('roster-sex')?.value;
-        const course = document.getElementById('roster-course')?.value;
-        const year = document.getElementById('roster-year')?.value;
-
-        if (!name || !course || !year) throw new Error('Please fill in all required fields.');
-
-        await Api.roster.create({ full_name: name, sex, course, year_level: year });
-        UI.toast(`Successfully added "${name}" to official enrolled roster!`, 'success');
-        form.reset();
-
-        // Clear client cache so new student is instantly recognized
-        if (window.Roster && window.Roster.getRoster) {
-          window.Roster.getRoster().catch(() => {});
-        }
-
-        await loadEnrolledRoster();
-      } catch (err) {
-        if (errEl) {
-          errEl.textContent = err.message || 'Failed to add student to roster.';
-          errEl.classList.remove('hidden');
-        }
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = 'Add Student to Roster';
-        }
-      }
-    });
-
-    const searchInput = document.getElementById('roster-search-input');
-    const programFilter = document.getElementById('roster-filter-program');
-    if (searchInput) searchInput.addEventListener('input', renderRosterTable);
-    if (programFilter) programFilter.addEventListener('change', renderRosterTable);
-  }
-
-  async function loadEnrolledRoster() {
-    const container = document.getElementById('roster-table-container');
-    if (!container) return;
-    container.innerHTML = '<div class="loading-state">Loading enrolled student roster…</div>';
-
-    try {
-      _allRoster = await Api.roster.list();
-      renderRosterTable();
-    } catch (err) {
-      container.innerHTML = `<div class="auth-error">Failed to load enrolled roster: ${err.message}</div>`;
-    }
-  }
-
-  function renderRosterTable() {
-    const container = document.getElementById('roster-table-container');
-    if (!container) return;
-
-    const query = document.getElementById('roster-search-input')?.value.toLowerCase().trim() || '';
-    const program = document.getElementById('roster-filter-program')?.value || '';
-
-    const filtered = _allRoster.filter(s => {
-      const matchName = !query || s.full_name.toLowerCase().includes(query);
-      const matchProg = !program || s.course === program;
-      return matchName && matchProg;
-    });
-
-    if (filtered.length === 0) {
-      container.innerHTML = '<div class="loading-state">No enrolled students found matching filter.</div>';
-      return;
-    }
-
-    let html = `
-      <div style="margin-bottom:0.75rem; font-weight:600; font-size:0.85rem; color:var(--text-secondary);">
-        Total Enrolled Students: <span class="badge badge-primary">${filtered.length}</span>
-      </div>
-      <div class="table-responsive">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Full Name</th>
-              <th>Gender</th>
-              <th>Program</th>
-              <th>Year Level</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-
-    filtered.forEach(student => {
-      const yrLabel = `${student.year_level}${student.year_level === '1' ? 'st' : student.year_level === '2' ? 'nd' : student.year_level === '3' ? 'rd' : 'th'} Year`;
-      html += `
-        <tr>
-          <td><strong>${student.full_name}</strong></td>
-          <td>${student.sex === 'F' ? 'Female' : 'Male'}</td>
-          <td><span class="badge badge-info">${student.course}</span></td>
-          <td>${yrLabel}</td>
-          <td>
-            <button class="btn btn-ghost delete-roster-btn" data-id="${student.id}" data-name="${student.full_name}" style="color:var(--col-danger); padding:0.25rem 0.5rem; font-size:0.8rem;">
-              <iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon> Delete
-            </button>
-          </td>
-        </tr>
-      `;
-    });
-
-    html += `
-          </tbody>
-        </table>
-      </div>
-    `;
-
-    container.innerHTML = html;
-
-    container.querySelectorAll('.delete-roster-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        if (!confirm(`Are you sure you want to remove "${name}" from the enrolled roster?`)) return;
-
-        try {
-          await Api.roster.delete(id);
-          UI.toast(`Removed "${name}" from enrolled roster.`, 'info');
-          await loadEnrolledRoster();
-        } catch (err) {
-          UI.toast(`Failed to delete student: ${err.message}`, 'error');
-        }
       });
     });
   }
