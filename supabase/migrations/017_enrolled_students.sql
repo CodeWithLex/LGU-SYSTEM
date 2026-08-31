@@ -23,8 +23,10 @@ CREATE POLICY "Allow authenticated users to read enrolled students" ON public.en
 CREATE POLICY "Allow admins to manage enrolled students" ON public.enrolled_students
   FOR ALL TO authenticated
   USING (
-    (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id = auth.uid() AND role IN ('admin', 'governor', 'cashier')
+    )
   );
 
 -- Populate Master Roster
