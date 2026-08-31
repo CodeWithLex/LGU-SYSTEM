@@ -169,8 +169,10 @@
       if (formSec) formSec.classList.add('hidden');
       if (pendingSec) {
         pendingSec.classList.remove('hidden');
-        document.getElementById('onboarding-pending-name').textContent = existingReq.full_name;
-        document.getElementById('onboarding-pending-course').textContent = `${existingReq.course} - Year ${existingReq.year_level}`;
+        const nameEl = document.getElementById('onboarding-pending-name');
+        const courseEl = document.getElementById('onboarding-pending-course');
+        if (nameEl) nameEl.textContent = existingReq.full_name || user?.user_metadata?.full_name || '—';
+        if (courseEl) courseEl.textContent = `${existingReq.course} - Year ${existingReq.year_level}`;
       }
       onboardingModal.classList.remove('hidden');
       return;
