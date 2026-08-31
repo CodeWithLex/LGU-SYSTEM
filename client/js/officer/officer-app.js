@@ -21,6 +21,7 @@ const OfficerApp = (() => {
   let _summaryBreakdownData = null;
   let _chartInstances = {};
   let _eventStatusFilter = 'all';
+  const _eventDetailCache = new Map();
 
   // ---------- Helpers ----------
 
@@ -122,19 +123,41 @@ const OfficerApp = (() => {
     bindAuditSearch();
     bindAnnouncementForm();
 
+    // Start background idle prefetching for all officer views
+    if (typeof Api !== 'undefined' && Api.prefetchAll) {
+      Api.prefetchAll(profile.role);
+    }
+
     document.addEventListener('transaction-updated', async () => {
+      _eventDetailCache.clear();
       await refreshCoreData();
       const currentActive = document.querySelector('.of-view.active')?.id?.replace('of-view-', '');
-      if (currentActive === 'overview') await loadOverview();
-      if (currentActive === 'reports')  await loadReports();
+      if (currentActive === 'overview') await loadOverview(true);
+      if (currentActive === 'reports')  await loadReports(true);
       if (currentActive === 'events')   await renderEventsGrid();
+      if (currentActive === 'people')   await loadPeople(true);
+      if (currentActive === 'announcements') await loadAnnouncements(true);
+    });
+
+    // Listen for background SWR cache revalidations to silently refresh data in place
+    document.addEventListener('api:cache-updated', async (e) => {
+      const path = e.detail?.path || '';
+      const currentActive = document.querySelector('.of-view.active')?.id?.replace('of-view-', '');
+      if (path.startsWith('/reports') && (currentActive === 'overview' || currentActive === 'reports')) {
+        if (currentActive === 'overview') await loadOverview(true);
+        if (currentActive === 'reports')  await loadReports(true);
+      } else if (path.startsWith('/events') && currentActive === 'events') {
+        await renderEventsGrid();
+      } else if (path.startsWith('/admin/users') && currentActive === 'people') {
+        await loadPeople(true);
+      }
     });
 
     $('of-shell').classList.remove('hidden');
 
     try {
       await refreshCoreData();
-      switchSection('overview');
+      await switchSection('overview');
     } catch (err) {
       toast('Could not load initial data: ' + err.message, 'error');
     }
@@ -187,16 +210,18 @@ const OfficerApp = (() => {
     document.querySelectorAll('[data-of]').forEach(b => b.classList.toggle('active', b.dataset.of === section));
     $(`of-view-${section}`).classList.add('active');
 
+    const isFirstLoad = !_loaded[section];
+    _loaded[section] = true;
+
     try {
-      if (section === 'overview')  { await loadOverview(); }
-      if (section === 'record')    { await loadRecord(); }
-      if (section === 'events')    { await loadEvents(); }
-      if (section === 'reports')   { await loadReports(); }
-      if (section === 'people')    { await loadPeople(); }
-      if (section === 'announcements') { await loadAnnouncements(); }
-      _loaded[section] = true;
+      if (section === 'overview')          { await loadOverview(!isFirstLoad); }
+      else if (section === 'record')       { await loadRecord(); }
+      else if (section === 'events')       { await loadEvents(!isFirstLoad); }
+      else if (section === 'reports')      { await loadReports(!isFirstLoad); }
+      else if (section === 'people')       { await loadPeople(!isFirstLoad); }
+      else if (section === 'announcements') { await loadAnnouncements(!isFirstLoad); }
     } catch (err) {
-      toast(err.message || 'Failed to load section.', 'error');
+      if (isFirstLoad) toast(err.message || 'Failed to load section.', 'error');
     }
   }
 
@@ -339,11 +364,12 @@ const OfficerApp = (() => {
 
   // ---------- 1. Fund Overview ----------
 
-  async function loadOverview() {
-    // Skeletons while data loads (same as the main portal)
-    $('of-overview-stats').innerHTML = skeletonStatCards();
-    $('of-overview-alerts').innerHTML = skeletonStack();
-    $('of-overview-recent').innerHTML = skeletonStack();
+  async function loadOverview(isSilent = false) {
+    if (!isSilent && !_loaded.overview) {
+      $('of-overview-stats').innerHTML = skeletonStatCards();
+      $('of-overview-alerts').innerHTML = skeletonStack();
+      $('of-overview-recent').innerHTML = skeletonStack();
+    }
 
     await refreshCoreData();
     const [summary, monthly] = await Promise.all([
@@ -713,8 +739,10 @@ const OfficerApp = (() => {
     });
   }
 
-  async function loadEvents() {
-    $('of-events-grid').innerHTML = skeletonEventCards();
+  async function loadEvents(isSilent = false) {
+    if (!isSilent && !_loaded.events) {
+      $('of-events-grid').innerHTML = skeletonEventCards();
+    }
     const opts = '<option value="">Select Event</option>' +
       activeEvents().map(ev => `<option value="${ev.id}">${esc(ev.event_name)}</option>`).join('');
     $('of-transfer-from').innerHTML = '<option value="GENERAL">GENERAL FUND</option>' + opts;
@@ -896,9 +924,15 @@ const OfficerApp = (() => {
     };
     document.addEventListener('keydown', onKey);
 
-    // Load tx count preview
+    // Load tx count preview with instant cache check
+    const countEl = $('of-detail-tx-count');
+    const cachedDetail = _eventDetailCache.get(ev.id);
+    if (cachedDetail && countEl) {
+      countEl.textContent = cachedDetail.transactions?.length || 0;
+    }
+
     Api.events.get(ev.id).then(detail => {
-      const countEl = $('of-detail-tx-count');
+      _eventDetailCache.set(ev.id, detail);
       if (countEl) countEl.textContent = detail.transactions?.length || 0;
     }).catch(() => {});
 
@@ -917,6 +951,7 @@ const OfficerApp = (() => {
           event_date:       $('of-me-date').value || null,
           status:           $('of-me-status').value
         });
+        _eventDetailCache.delete(ev.id);
         toast('Event updated.', 'success');
         await refreshCoreData();
         await renderEventsGrid();
@@ -937,9 +972,8 @@ const OfficerApp = (() => {
         return;
       }
       box.classList.remove('hidden');
-      box.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary)">Loading history…</p>';
-      try {
-        const detail = await Api.events.get(ev.id);
+
+      const renderList = (detail) => {
         box.innerHTML = detail.transactions?.length
           ? detail.transactions.map(tx => `
               <div class="of-recent-item">
@@ -953,8 +987,23 @@ const OfficerApp = (() => {
                 </div>
               </div>`).join('')
           : '<p style="font-size:0.8rem;color:var(--text-secondary)">No transactions for this event yet.</p>';
+      };
+
+      const cached = _eventDetailCache.get(ev.id);
+      if (cached) {
+        renderList(cached);
+      } else {
+        box.innerHTML = '<p style="font-size:0.8rem;color:var(--text-secondary)">Loading history…</p>';
+      }
+
+      try {
+        const detail = await Api.events.get(ev.id);
+        _eventDetailCache.set(ev.id, detail);
+        renderList(detail);
       } catch (err) {
-        box.innerHTML = `<p style="font-size:0.8rem;color:var(--status-negative)">${esc(err.message)}</p>`;
+        if (!cached) {
+          box.innerHTML = `<p style="font-size:0.8rem;color:var(--status-negative)">${esc(err.message)}</p>`;
+        }
       }
     });
   }
@@ -990,10 +1039,11 @@ const OfficerApp = (() => {
 
   // ---------- 4. Reports & Paper Trail ----------
 
-  async function loadReports() {
-    // Skeleton rows while data loads
-    $('of-events-summary-table').querySelector('tbody').innerHTML = skeletonRows(5);
-    $('of-audit-table').querySelector('tbody').innerHTML = skeletonRows(4);
+  async function loadReports(isSilent = false) {
+    if (!isSilent && !_loaded.reports) {
+      $('of-events-summary-table').querySelector('tbody').innerHTML = skeletonRows(5);
+      $('of-audit-table').querySelector('tbody').innerHTML = skeletonRows(4);
+    }
 
     const [summary, monthly, eventsSummary] = await Promise.all([
       Api.reports.summary(),
@@ -1229,8 +1279,10 @@ const OfficerApp = (() => {
     $('of-people-search').addEventListener('input', renderPeopleTable);
   }
 
-  async function loadPeople() {
-    $('of-people-table').querySelector('tbody').innerHTML = skeletonRows(4);
+  async function loadPeople(isSilent = false) {
+    if (!isSilent && !_loaded.people) {
+      $('of-people-table').querySelector('tbody').innerHTML = skeletonRows(4);
+    }
     _users = await Api.admin.users();
     const canAssign = canAssignRoles();
     $('of-people-sub').textContent = canAssign
@@ -1297,13 +1349,13 @@ const OfficerApp = (() => {
       btn.disabled = true;
       btn.textContent = 'Posting…';
       try {
-        await Api.request('POST', '/announcements', {
+        await Api.announcements.create({
           title: $('of-announce-title').value,
           body:  $('of-announce-body').value
         });
         toast('Announcement posted.', 'success');
         e.target.reset();
-        await loadAnnouncements();
+        await loadAnnouncements(true);
       } catch (err) {
         errEl.textContent = err.message;
         errEl.classList.remove('hidden');
@@ -1314,9 +1366,11 @@ const OfficerApp = (() => {
     });
   }
 
-  async function loadAnnouncements() {
-    $('of-announce-list').innerHTML = skeletonStack(2);
-    const list = await Api.request('GET', '/announcements');
+  async function loadAnnouncements(isSilent = false) {
+    if (!isSilent && !_loaded.announcements) {
+      $('of-announce-list').innerHTML = skeletonStack(2);
+    }
+    const list = await Api.announcements.list();
     $('of-announce-list').innerHTML = list.length ? list.map(a => `
       <div class="of-announce-item">
         <strong>${esc(a.title)}</strong>

@@ -174,6 +174,11 @@ const Api = (() => {
     drop:       (id)      => _request('DELETE', `/units/drop/${id}`),
   };
 
+  const announcements = {
+    list:   ()       => _request('GET',  '/announcements', null, false, 45000),
+    create: (body)   => _request('POST', '/announcements', body),
+  };
+
   // ---- Background Pre-fetch Queue (Paced & Idle-friendly) ----
   async function prefetchAll(role = 'student', program = 'BSCoE') {
     try {
@@ -182,6 +187,7 @@ const Api = (() => {
         events.list(),
         transactions.list({ limit: 200 }),
         reports.summary(),
+        announcements.list(),
       ]);
 
       // Small breather for the browser main thread
@@ -196,8 +202,8 @@ const Api = (() => {
       if (program) step2.push(units.checklists(program));
       await Promise.allSettled(step2);
 
-      // Step 3: Admin tools (only when user role is admin)
-      if (role === 'admin') {
+      // Step 3: Admin & Officer tools (when user is admin/governor/cashier)
+      if (['admin', 'governor', 'cashier'].includes(role)) {
         await new Promise(r => setTimeout(r, 120));
         await Promise.allSettled([
           admin.users(),
@@ -215,6 +221,7 @@ const Api = (() => {
     reports,
     admin,
     units,
+    announcements,
     request: _request,
     invalidateCache,
     hasCache,
