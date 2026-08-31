@@ -1,13 +1,15 @@
 /* =============================================
-   OFFICER CONSOLE - Cohesive Portal Theme
+   EXECUTIVE PORTAL - Cohesive Portal Theme
    Directly inherits and extends main.css tokens
    ============================================= */
 
-/* Shell Layout */
+/* Shell Layout — fixed viewport like the main system:
+   only .of-main scrolls; sidebar and section titles stay put */
 .of-shell {
   display: flex;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   background: var(--bg-base);
   color: var(--text-primary);
   width: 100%;
@@ -84,10 +86,9 @@
   color: var(--accent);
 }
 
-/* Main Content Area */
+/* Main Content Area — the sole scroll container (mirrors .main-content) */
 .of-main {
   flex: 1;
-  padding: 1.75rem 2rem;
   min-width: 0;
   max-width: 1400px;
   overflow-y: auto;
@@ -96,6 +97,7 @@
 
 .of-view {
   display: none;
+  padding: 0 2rem 2rem;
   animation: ofFade 0.25s ease-out;
 }
 
@@ -108,8 +110,10 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Sticky section title comes from main.css `.view-header`
+   (each head carries both classes); spacing matches it */
 .of-view-head {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .of-view-head h2 {
@@ -904,9 +908,11 @@
   .of-sidebar {
     display: none;
   }
-  .of-main {
-    padding: 1.25rem;
-    padding-bottom: 5.5rem;
+  .of-view {
+    padding: 0 1rem 5.5rem;
+  }
+  .of-view-head {
+    padding-top: 1.5rem;
   }
   .of-bottom-nav {
     display: flex;

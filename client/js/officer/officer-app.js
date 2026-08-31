@@ -1,5 +1,5 @@
 // =============================================
-// officer-app.js - Officer Console Application
+// officer-app.js - Executive Portal Application
 //
 // Runs as a separate full-window app (/officer.html) sharing the main
 // system's login, API layer, and receipt camera. Requires role
@@ -77,7 +77,7 @@ const OfficerApp = (() => {
       .single();
 
     if (!profile || !OFFICER_ROLES.includes(profile.role)) {
-      return showGate('This console is for council officers only. Ask an admin or governor to assign you an officer role.');
+      return showGate('This portal is for council officers only. Ask an admin or governor to assign you an officer role.');
     }
 
     _profile = profile;
