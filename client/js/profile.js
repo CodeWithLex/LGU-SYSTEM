@@ -4,6 +4,7 @@
 
 const ProfileModal = (() => {
   const AVATAR_PRESETS = [
+    { id: 'coe-logo', category: 'others', name: 'Official COE Seal', src: 'assets/coe-logo.png' },
     { id: 'grizz-1', category: 'grizz', name: 'Grizz Smiling', src: 'assets/avatars/grizz/grizz-1.webp' },
     { id: 'grizz-2', category: 'grizz', name: 'Grizz Waving', src: 'assets/avatars/grizz/grizz-2.webp' },
     { id: 'grizz-3', category: 'grizz', name: 'Grizz Chill', src: 'assets/avatars/grizz/grizz-3.webp' },
@@ -69,6 +70,9 @@ const ProfileModal = (() => {
   function init() {
     if (_initialized) return;
     _initialized = true;
+    if (typeof Dropdowns !== 'undefined') {
+      Dropdowns.bindAll('#profile-modal');
+    }
     bindGlobalTriggers();
     bindTabs();
     bindForms();
@@ -317,6 +321,11 @@ const ProfileModal = (() => {
     if (yearSelect) yearSelect.value = yearLevel;
     if (enrollInput) enrollInput.value = enrollmentYear;
 
+    if (typeof Dropdowns !== 'undefined') {
+      Dropdowns.bindAll('#profile-modal');
+      Dropdowns.syncAll();
+    }
+
     // Reset password inputs
     const newPass = document.getElementById('profile-new-password');
     const confPass = document.getElementById('profile-confirm-password');
@@ -338,7 +347,9 @@ const ProfileModal = (() => {
   function renderAvatarElement(element, avatarUrl, fallbackText) {
     if (!element) return;
     if (avatarUrl) {
-      const cleanUrl = avatarUrl.replace(/\.jpg$/, '.webp');
+      const cleanUrl = (avatarUrl.endsWith('.jpg') || avatarUrl.endsWith('.jpeg'))
+        ? avatarUrl.replace(/\.(jpg|jpeg)$/i, '.webp')
+        : avatarUrl;
       element.innerHTML = `<img src="${cleanUrl}" alt="Avatar" class="avatar-img" />`;
     } else {
       element.innerHTML = '';
@@ -399,7 +410,7 @@ const ProfileModal = (() => {
         avatarUrl: _selectedAvatarUrl
       };
 
-      // Synchronize all avatars across the UI
+      // Synchronize all avatars across the UI (Main Portal & Executive Portal)
       syncAvatars(updated.avatar_url, updated.full_name);
 
       // Invalidate units cache so the credit tracker reloads for new course/year if changed
@@ -427,14 +438,21 @@ const ProfileModal = (() => {
   }
 
   function syncAvatars(avatarUrl, fullName) {
-    const cleanUrl = avatarUrl ? avatarUrl.replace(/\.(jpg|jpeg|png)$/i, '.webp') : null;
+    const cleanUrl = avatarUrl
+      ? ((avatarUrl.endsWith('.jpg') || avatarUrl.endsWith('.jpeg')) ? avatarUrl.replace(/\.(jpg|jpeg)$/i, '.webp') : avatarUrl)
+      : null;
     const userNameEl = document.getElementById('user-name');
     const userAvatarEl = document.getElementById('user-avatar');
     const mobileAvatarEl = document.getElementById('mobile-user-avatar');
+    const ofNameEl = document.getElementById('of-user-name');
+    const ofAvatarEl = document.getElementById('of-avatar');
 
     if (userNameEl && fullName) userNameEl.textContent = fullName;
     if (userAvatarEl) renderAvatarElement(userAvatarEl, cleanUrl, fullName);
     if (mobileAvatarEl) renderAvatarElement(mobileAvatarEl, cleanUrl, fullName);
+
+    if (ofNameEl && fullName) ofNameEl.textContent = fullName;
+    if (ofAvatarEl) renderAvatarElement(ofAvatarEl, cleanUrl, fullName);
 
     if (window.GrizzAI && window.GrizzAI.setProfile) {
       window.GrizzAI.setProfile({ avatar_url: cleanUrl, full_name: fullName });

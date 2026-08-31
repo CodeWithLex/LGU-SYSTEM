@@ -4444,6 +4444,60 @@ html body.is-admin th.admin-only {
   pointer-events: none;
 }
 
+.custom-select-wrap:has(.dd)::after {
+  display: none !important;
+}
+
+.profile-modal .dd {
+  width: 100%;
+}
+
+.profile-modal .dd-trigger {
+  width: 100%;
+  height: 42px;
+  padding: 0.55rem 0.85rem;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  font-family: var(--font-ui);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all var(--transition);
+}
+
+.profile-modal .dd-trigger:hover {
+  border-color: var(--border-hover);
+}
+
+.profile-modal .dd-trigger:focus-visible,
+.profile-modal .dd.dd-open .dd-trigger {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+}
+
+.profile-modal .dd-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--bg-surface-raised);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-popover);
+  padding: 0.3rem;
+}
+
+.profile-modal .form-group:has(.dd.dd-open) {
+  position: relative;
+  z-index: 50;
+}
+
 .reset-avatar-btn {
   height: 38px;
   width: 100%;

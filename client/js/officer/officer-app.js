@@ -161,6 +161,9 @@ const OfficerApp = (() => {
     bindLogout();
     bindNav();
     Dropdowns.bindAll('#of-shell');
+    if (typeof ProfileModal !== 'undefined') {
+      ProfileModal.init();
+    }
     bindRecordForm();
     bindEventForms();
     bindEventFilters();

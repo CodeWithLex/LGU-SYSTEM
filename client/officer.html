@@ -45,7 +45,7 @@
 
     <!-- Mobile Top Header (Mobile only) -->
     <header class="of-mobile-header">
-      <div class="of-mobile-brand">
+      <div class="of-mobile-brand" role="button" tabindex="0" title="Open Account Profile & Settings" data-action="open-profile">
         <img src="assets/coe-logo.png" alt="COE" class="coe-logo-img of-mobile-logo" />
         <div>
           <h2>Executive Portal</h2>
@@ -99,7 +99,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="user-pill" id="user-pill" title="Officer Account">
+        <div class="user-pill" id="user-pill" role="button" tabindex="0" title="Account Profile & Settings" data-action="open-profile">
           <div class="user-avatar" id="of-avatar">?</div>
           <div class="user-info">
             <span class="user-name" id="of-user-name">Loading...</span>
@@ -110,9 +110,9 @@
           <button type="button" class="btn-icon" id="theme-toggle-btn" data-theme-toggle title="Toggle Theme" aria-label="Toggle Theme">
             <iconify-icon icon="solar:sun-linear" id="theme-icon"></iconify-icon>
           </button>
-          <a href="/" class="btn-icon" title="Back to Main Dashboard" aria-label="Back to Main Dashboard" style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
-            <iconify-icon icon="solar:home-2-linear"></iconify-icon>
-          </a>
+          <button type="button" class="btn-icon" id="profile-settings-btn" title="Account Settings" aria-label="Account Settings" data-action="open-profile">
+            <iconify-icon icon="solar:settings-minimalistic-linear"></iconify-icon>
+          </button>
           <button type="button" class="btn-icon of-logout-action" id="of-logout-btn" title="Sign Out of System" aria-label="Sign Out of System">
             <iconify-icon icon="solar:logout-2-linear"></iconify-icon>
           </button>
@@ -539,12 +539,158 @@
     </div>
   </div>
 
+  <!-- PROFILE & ACCOUNT SETTINGS MODAL -->
+  <div class="profile-modal-overlay hidden" id="profile-modal-overlay"></div>
+  <div class="profile-modal hidden" id="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+    
+    <!-- Modal Header with Interactive Avatar Lockup -->
+    <div class="profile-modal-header">
+      <div class="profile-modal-hero">
+        <div class="avatar-hero-wrap" id="avatar-hero-wrap" role="button" tabindex="0" title="Click to choose a profile avatar">
+          <div class="profile-modal-avatar-lg" id="profile-modal-avatar">?</div>
+          <div class="avatar-edit-badge" title="Change Avatar">
+            <iconify-icon icon="solar:camera-linear"></iconify-icon>
+          </div>
+        </div>
+        <div class="profile-modal-identity">
+          <div class="profile-modal-title-row">
+            <h3 id="profile-modal-title">Account Profile</h3>
+            <span class="role-badge" id="profile-role-display">Officer</span>
+          </div>
+          <span class="profile-modal-sub" id="profile-modal-email">user@g.cjc.edu.ph</span>
+        </div>
+      </div>
+      <button type="button" class="btn-icon profile-close-btn" id="profile-modal-close" aria-label="Close Profile Modal">
+        <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+      </button>
+    </div>
+
+    <!-- Interactive Avatar Photo Picker Section -->
+    <div class="avatar-picker-section" id="avatar-picker-section">
+      <div class="avatar-picker-header">
+        <div class="avatar-picker-title">
+          <iconify-icon icon="solar:gallery-linear"></iconify-icon>
+          <span>Choose Avatar</span>
+        </div>
+        <!-- Category Filter Tabs -->
+        <div class="avatar-cat-tabs" id="avatar-cat-tabs">
+          <button type="button" class="avatar-cat-btn active" data-cat="all">All</button>
+          <button type="button" class="avatar-cat-btn" data-cat="others">COE Seal &amp; Friends</button>
+          <button type="button" class="avatar-cat-btn" data-cat="grizz">Grizz</button>
+          <button type="button" class="avatar-cat-btn" data-cat="icebear">Ice Bear</button>
+          <button type="button" class="avatar-cat-btn" data-cat="panda">Panda</button>
+        </div>
+      </div>
+      <!-- Avatar Grid / Swipe Track -->
+      <div class="avatar-gallery-track" id="avatar-gallery-track">
+        <!-- Dynamically populated avatar cards -->
+      </div>
+    </div>
+
+    <div class="profile-modal-tabs">
+      <button type="button" class="profile-tab-btn active" data-tab="general">Personal &amp; Academic</button>
+      <button type="button" class="profile-tab-btn" data-tab="security">Security &amp; Password</button>
+    </div>
+
+    <div class="profile-modal-body">
+      <!-- GENERAL / ACADEMIC TAB -->
+      <div class="profile-tab-content active" id="profile-tab-general">
+        <form id="profile-general-form" onsubmit="return false;">
+          <div class="form-group">
+            <label for="profile-name-input">Full Name</label>
+            <input type="text" id="profile-name-input" class="input-field" placeholder="Firstname Lastname" required />
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="profile-course-select">Degree Program</label>
+              <div class="custom-select-wrap">
+                <select id="profile-course-select" class="select-field">
+                  <option value="BSCoE">BS Computer Engineering</option>
+                  <option value="BSCE">BS Civil Engineering</option>
+                  <option value="BSEE">BS Electrical Engineering</option>
+                  <option value="BSEcE">BS Electronics Engineering</option>
+                  <option value="BSME">BS Mechanical Engineering</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="profile-year-select">Year Level</label>
+              <div class="custom-select-wrap">
+                <select id="profile-year-select" class="select-field">
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="profile-enrollment-year">Enrollment Year</label>
+              <input type="number" id="profile-enrollment-year" class="input-field" min="2015" max="2035" placeholder="e.g. 2024" />
+            </div>
+            <div class="form-group">
+              <label>Avatar Options</label>
+              <button type="button" class="btn btn-ghost reset-avatar-btn" id="profile-reset-avatar-btn">
+                <iconify-icon icon="solar:restart-linear"></iconify-icon> Use Letter Initial
+              </button>
+            </div>
+          </div>
+
+          <div class="profile-feedback hidden" id="profile-general-feedback"></div>
+
+          <div class="profile-modal-footer">
+            <button type="button" class="btn btn-secondary" id="profile-cancel-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="profile-save-general-btn">
+              <iconify-icon icon="solar:check-circle-linear"></iconify-icon> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SECURITY TAB -->
+      <div class="profile-tab-content" id="profile-tab-security">
+        <form id="profile-security-form" onsubmit="return false;">
+          <div class="security-info-box">
+            <iconify-icon icon="solar:shield-keyhole-linear" class="security-shield-icon"></iconify-icon>
+            <div>
+              <strong>Account Authentication</strong>
+              <p>Signed in via verified school account (<span id="profile-security-email" class="font-mono">user@g.cjc.edu.ph</span>)</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-new-password">New Password</label>
+            <input type="password" id="profile-new-password" class="input-field" placeholder="Minimum 8 characters" minlength="8" />
+          </div>
+
+          <div class="form-group">
+            <label for="profile-confirm-password">Confirm New Password</label>
+            <input type="password" id="profile-confirm-password" class="input-field" placeholder="Re-type your password" minlength="8" />
+          </div>
+
+          <div class="profile-feedback hidden" id="profile-security-feedback"></div>
+
+          <div class="profile-modal-footer">
+            <button type="submit" class="btn btn-primary" id="profile-save-security-btn">
+              <iconify-icon icon="solar:lock-password-linear"></iconify-icon> Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/receipt-capture.js"></script>
   <script src="js/dropdown.js"></script>
+  <script src="js/profile.js"></script>
   <script src="js/officer/officer-app.js"></script>
   <script>
     // PWA: register the app-shell service worker (skipped in Electron's file:// windows)
