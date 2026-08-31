@@ -4137,6 +4137,72 @@ html body.is-admin th.admin-only {
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
+.role-badge.role-governor {
+  background: rgba(168, 85, 247, 0.14);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.role-badge.role-cashier {
+  background: rgba(59, 130, 246, 0.14);
+  color: #60A5FA;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.role-badge.role-officer {
+  background: rgba(20, 184, 166, 0.14);
+  color: #2DD4BF;
+  border: 1px solid rgba(20, 184, 166, 0.35);
+}
+
+/* Officer Portal Launch Banner in Profile Modal */
+.officer-portal-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(168, 85, 247, 0.12));
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  margin-bottom: 1.15rem;
+}
+
+.officer-portal-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.officer-portal-banner-icon {
+  font-size: 1.6rem;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.officer-portal-banner-info strong {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  display: block;
+}
+
+.officer-portal-banner-info p {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0.15rem 0 0;
+}
+
+.officer-portal-launch-btn {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  text-decoration: none;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+}
+
 /* Security Info Box */
 .security-info-box {
   background: var(--bg-surface-raised);
@@ -4397,6 +4463,24 @@ html body.is-admin th.admin-only {
   background: #F0FDF4;
   color: #15803D;
   border: 1px solid #DCFCE7;
+}
+
+[data-theme="light"] .role-badge.role-governor {
+  background: #FAF5FF;
+  color: #7E22CE;
+  border: 1px solid #F3E8FF;
+}
+
+[data-theme="light"] .role-badge.role-cashier {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #DBEAFE;
+}
+
+[data-theme="light"] .role-badge.role-officer {
+  background: #F0FDFA;
+  color: #0F766E;
+  border: 1px solid #CCFBF1;
 }
 
 [data-theme="light"] .tx-overbudget-badge {

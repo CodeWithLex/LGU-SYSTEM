@@ -1065,6 +1065,9 @@
     <a href="#" class="bottom-nav-item" data-view="units">
       <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span><span>Units</span>
     </a>
+    <a href="/officer.html" class="bottom-nav-item officer-only hidden" id="bottom-nav-executive-portal" title="Executive Portal">
+      <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span><span>Executive</span>
+    </a>
     <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin">
       <span class="nav-icon"><iconify-icon icon="solar:shield-check-linear"></iconify-icon></span><span>Admin</span>
     </a>
@@ -1280,6 +1283,20 @@
       <div class="avatar-gallery-track" id="avatar-gallery-track">
         <!-- Dynamically populated avatar cards -->
       </div>
+    </div>
+
+    <!-- Officer Portal Quick-Access Banner (Officers Only) -->
+    <div class="officer-portal-banner officer-only hidden" id="profile-officer-banner">
+      <div class="officer-portal-banner-info">
+        <iconify-icon icon="solar:shield-user-linear" class="officer-portal-banner-icon"></iconify-icon>
+        <div>
+          <strong>Executive Portal</strong>
+          <p>Access the executive dashboard, event budgets, and financial ledger.</p>
+        </div>
+      </div>
+      <a href="/officer.html" class="btn btn-primary officer-portal-launch-btn">
+        Open Portal <iconify-icon icon="solar:arrow-right-linear"></iconify-icon>
+      </a>
     </div>
 
     <div class="profile-modal-tabs">

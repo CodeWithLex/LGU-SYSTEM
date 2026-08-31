@@ -497,17 +497,12 @@
 
     // Sidebar user info
     const displayName = profile?.full_name || session.user.email;
-    const roleLabels  = { admin: 'Admin', governor: 'Governor', cashier: 'Cashier' };
-    const officerRole = ['admin', 'governor', 'cashier'].includes(profile?.role);
+    const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
+    const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(profile?.role);
     document.getElementById('user-name').textContent   = displayName;
-    document.getElementById('user-role').textContent   = roleLabels[profile?.role] || 'Student';
+    document.getElementById('user-role').textContent   = roleLabels[profile?.role] || (profile?.role ? UI.capitalize(profile.role) : 'Student');
     UI.setAdminVisibility(profile?.role === 'admin');
-
-    // Officers get an entry point to the separate console; visibility
-    // follows the same .hidden toggling pattern as admin-only elements.
-    document.querySelectorAll('.officer-only').forEach(el => {
-      el.classList.toggle('hidden', !officerRole);
-    });
+    UI.setOfficerVisibility(officerRole);
     
     if (window.ProfileModal) {
       ProfileModal.init();

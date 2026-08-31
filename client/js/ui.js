@@ -117,7 +117,13 @@ const UI = (() => {
         }
       }
     });
+  }
 
+  function setOfficerVisibility(isOfficer) {
+    document.body.classList.toggle('is-officer', isOfficer);
+    document.querySelectorAll('.officer-only').forEach(el => {
+      el.classList.toggle('hidden', !isOfficer);
+    });
   }
 
   // ---- Loading / Empty states ----
@@ -144,5 +150,5 @@ const UI = (() => {
     }
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setLoading, setEmpty };
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty };
 })();

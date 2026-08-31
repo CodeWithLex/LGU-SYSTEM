@@ -227,7 +227,15 @@ const ProfileModal = (() => {
     const course = profile?.course || 'BSCoE';
     const yearLevel = String(profile?.year_level || '1');
     const enrollmentYear = profile?.enrollment_year || new Date().getFullYear();
-    const role = profile?.role === 'admin' ? 'Administrator' : 'Student Member';
+    const ROLE_LABELS = {
+      admin: 'Administrator',
+      governor: 'Governor',
+      cashier: 'Cashier',
+      officer: 'Officer',
+      student: 'Student Member'
+    };
+    const roleKey = (profile?.role || '').toLowerCase();
+    const role = ROLE_LABELS[roleKey] || (roleKey ? UI.capitalize(roleKey) : 'Student Member');
     _selectedAvatarUrl = profile?.avatar_url ? profile.avatar_url.replace(/\.jpg$/, '.webp') : null;
 
     // Headers & Identifiers
@@ -241,7 +249,7 @@ const ProfileModal = (() => {
     if (secEmailEl) secEmailEl.textContent = email;
     if (roleEl) {
       roleEl.textContent = role;
-      roleEl.className = `role-badge ${profile?.role === 'admin' ? 'role-admin' : 'role-student'}`;
+      roleEl.className = `role-badge role-${roleKey || 'student'}`;
     }
 
     // Input fields
