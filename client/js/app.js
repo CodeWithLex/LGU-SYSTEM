@@ -627,7 +627,6 @@
     const displayName = profile?.full_name || session.user.email;
     const roleLabels  = { admin: 'Administrator', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
     const roleLabel   = roleLabels[roleKey] || UI.capitalize(roleKey);
-    const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
 
     document.getElementById('user-name').textContent   = displayName;
     document.getElementById('user-role').textContent   = roleLabel;
