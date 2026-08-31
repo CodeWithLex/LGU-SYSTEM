@@ -289,10 +289,21 @@ const Api = (() => {
 
   const rosterRequests = {
     async getMyRequest() {
-      if (!window.supabaseClient) return null;
+      if (!window.supabaseClient) {
+        try {
+          const cached = localStorage.getItem('coe_pending_verification');
+          return cached ? JSON.parse(cached) : null;
+        } catch { return null; }
+      }
       try {
-        const { data: { user } } = await window.supabaseClient.auth.getUser();
-        if (!user) return null;
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        const user = session?.user;
+        if (!user) {
+          try {
+            const cached = localStorage.getItem('coe_pending_verification');
+            return cached ? JSON.parse(cached) : null;
+          } catch { return null; }
+        }
 
         const { data, error } = await window.supabaseClient
           .from('enrollment_verification_requests')
@@ -301,16 +312,32 @@ const Api = (() => {
           .order('created_at', { ascending: false })
           .limit(1);
 
-        if (error) return null;
-        return data && data.length > 0 ? data[0] : null;
-      } catch {
-        return null;
+        if (error) {
+          console.warn('[RosterRequests] getMyRequest error:', error.message);
+          const cached = localStorage.getItem('coe_pending_verification');
+          return cached ? JSON.parse(cached) : null;
+        }
+
+        const latest = data && data.length > 0 ? data[0] : null;
+        if (latest) {
+          try { localStorage.setItem('coe_pending_verification', JSON.stringify(latest)); } catch {}
+        } else {
+          try { localStorage.removeItem('coe_pending_verification'); } catch {}
+        }
+        return latest;
+      } catch (err) {
+        console.warn('[RosterRequests] getMyRequest exception:', err);
+        try {
+          const cached = localStorage.getItem('coe_pending_verification');
+          return cached ? JSON.parse(cached) : null;
+        } catch { return null; }
       }
     },
 
     async submitRequest(reqData) {
       if (!window.supabaseClient) throw new Error('Supabase client not available');
-      const { data: { user } } = await window.supabaseClient.auth.getUser();
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      const user = session?.user;
       if (!user) throw new Error('You must be signed in to submit a request.');
 
       const { data, error } = await window.supabaseClient
@@ -329,6 +356,7 @@ const Api = (() => {
         .single();
 
       if (error) throw new Error(error.message);
+      try { localStorage.setItem('coe_pending_verification', JSON.stringify(data)); } catch {}
       return data;
     },
 

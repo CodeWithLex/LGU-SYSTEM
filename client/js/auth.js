@@ -28,6 +28,7 @@ const Auth = (() => {
   }
 
   async function logout() {
+    try { localStorage.removeItem('coe_pending_verification'); } catch {}
     if (window.supabaseClient?.auth) {
       await window.supabaseClient.auth.signOut();
     }
