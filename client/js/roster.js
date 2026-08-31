@@ -423,11 +423,20 @@ const Roster = (() => {
       .filter(t => t.length > 0 && t !== "jr" && t !== "sr" && t !== "iii" && t !== "ii" && t !== "na");
   }
 
-  // Find a student record by matching name tokens
-  function findStudent(fullName) {
-    if (!fullName || typeof fullName !== "string") return null;
-    const searchTokens = tokenize(fullName);
+  // Find a student record by matching name tokens OR email address tokens
+  function findStudent(fullName, email = "") {
+    const searchTokens = [];
+    if (fullName && typeof fullName === "string") {
+      searchTokens.push(...tokenize(fullName));
+    }
+    if (email && typeof email === "string") {
+      const emailPrefix = email.split("@")[0];
+      const emailTokens = tokenize(emailPrefix.replace(/[._\-0-9]/g, " "));
+      searchTokens.push(...emailTokens);
+    }
+
     if (searchTokens.length === 0) return null;
+    const uniqueSearchTokens = [...new Set(searchTokens)];
 
     let bestMatch = null;
     let maxMatchCount = 0;
@@ -435,7 +444,7 @@ const Roster = (() => {
     for (const student of ENROLLED) {
       const studentTokens = tokenize(student.name);
       let matchCount = 0;
-      for (const st of searchTokens) {
+      for (const st of uniqueSearchTokens) {
         if (studentTokens.includes(st)) {
           matchCount++;
         }
@@ -453,8 +462,8 @@ const Roster = (() => {
   return {
     roster: ENROLLED,
     findStudent,
-    validate(name) {
-      const student = findStudent(name);
+    validate(name, email = "") {
+      const student = findStudent(name, email);
       return {
         isEnrolled: !!student,
         student: student || null

@@ -100,9 +100,9 @@
   const onboardingLogoutBtn = document.getElementById('onboarding-logout-btn');
   const onboardingError = document.getElementById('onboarding-error');
 
-  function checkRosterVerification(name) {
-    if (!window.Roster || !name) return null;
-    const match = Roster.findStudent(name);
+  function checkRosterVerification(name, email = '') {
+    if (!window.Roster) return null;
+    const match = Roster.findStudent(name, email);
     const courseSel = document.getElementById('onboarding-course');
     const yearSel = document.getElementById('onboarding-year');
 
@@ -135,7 +135,7 @@
     if (confirmInput) confirmInput.value = '';
 
     // Auto-verify and pre-fill program/year from official master roster if available
-    checkRosterVerification(defaultName);
+    checkRosterVerification(defaultName, user?.email || profile?.email);
 
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
