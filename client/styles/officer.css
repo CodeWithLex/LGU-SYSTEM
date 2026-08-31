@@ -1265,11 +1265,18 @@
 }
 
 @media (max-width: 900px) {
+  .of-shell {
+    flex-direction: column !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    width: 100% !important;
+  }
   .of-sidebar {
-    display: none;
+    display: none !important;
   }
   .of-mobile-header {
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
     padding: 0.75rem 1rem;
@@ -1279,6 +1286,9 @@
     top: 0;
     z-index: 100;
     gap: 0.75rem;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    flex-shrink: 0 !important;
   }
   .of-mobile-brand {
     display: flex;
@@ -1343,8 +1353,19 @@
     color: var(--status-negative);
   }
 
+  .of-main {
+    flex: 1 1 0% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
   .of-view {
-    padding: 0 0.85rem calc(88px + env(safe-area-inset-bottom, 0px));
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0 0.85rem calc(88px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .of-view-head {
     padding-top: 1rem;
@@ -1355,13 +1376,14 @@
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 10px !important;
-    right: 10px !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 8px !important;
+    right: 8px !important;
     width: auto !important;
-    max-width: 480px !important;
+    max-width: 440px !important;
     margin: 0 auto !important;
     z-index: 1000 !important;
+    box-sizing: border-box !important;
     
     background: rgba(17, 24, 32, 0.88) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
