@@ -248,17 +248,36 @@ const ProfileModal = (() => {
     setFeedback('profile-security-feedback', '');
 
     // 4. Pre-fill from current UI state immediately
-    const curName = document.getElementById('user-name')?.textContent || '';
-    if (curName && curName !== 'Loading...') {
+    const curName = document.getElementById('user-name')?.textContent || document.getElementById('of-user-name')?.textContent || '';
+    if (curName && curName !== 'Loading...' && !curName.includes('@')) {
       const nameInput = document.getElementById('profile-name-input');
       if (nameInput && !nameInput.value) nameInput.value = curName;
     }
 
+    if (_currentProfile) {
+      populateFields(_currentProfile, _currentSession);
+    }
+
     // 5. Asynchronously fetch latest profile from Supabase
     try {
-      _currentSession = await Auth.getSession();
-      _currentProfile = await Auth.getProfile();
-      populateFields(_currentProfile, _currentSession);
+      if (typeof Auth !== 'undefined' && Auth.getSession) {
+        _currentSession = await Auth.getSession();
+        _currentProfile = await Auth.getProfile();
+      } else if (window.supabaseClient) {
+        const { data: { session } } = await window.supabaseClient.auth.getSession();
+        _currentSession = session;
+        if (session?.user) {
+          const { data: prof } = await window.supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          _currentProfile = prof;
+        }
+      }
+      if (_currentProfile) {
+        populateFields(_currentProfile, _currentSession);
+      }
     } catch (err) {
       console.error('Failed to load profile data:', err);
     }

@@ -132,7 +132,7 @@ const OfficerApp = (() => {
 
     const { data: profile } = await window.supabaseClient
       .from('profiles')
-      .select('role, full_name, avatar_url')
+      .select('*')
       .eq('id', user.id)
       .single();
 
@@ -151,11 +151,6 @@ const OfficerApp = (() => {
     if ($('of-mobile-user-role')) {
       $('of-mobile-user-role').textContent = roleLabel;
     }
-    if (profile.avatar_url) {
-      $('of-avatar').innerHTML = `<img src="${profile.avatar_url}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
-    } else {
-      $('of-avatar').textContent = (name[0] || '?').toUpperCase();
-    }
 
     bindTheme();
     bindLogout();
@@ -163,6 +158,14 @@ const OfficerApp = (() => {
     Dropdowns.bindAll('#of-shell');
     if (typeof ProfileModal !== 'undefined') {
       ProfileModal.init();
+      ProfileModal.populateFields(profile, { user });
+      ProfileModal.syncAvatars(profile.avatar_url, name);
+    } else {
+      if (profile.avatar_url) {
+        $('of-avatar').innerHTML = `<img src="${profile.avatar_url}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+      } else {
+        $('of-avatar').textContent = (name[0] || '?').toUpperCase();
+      }
     }
     bindRecordForm();
     bindEventForms();
