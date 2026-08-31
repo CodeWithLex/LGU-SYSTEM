@@ -162,11 +162,22 @@ const OfficerApp = (() => {
 
     try {
       await refreshCoreData();
-      await switchSection('overview');
+      const savedSection = window.location.hash.slice(1) || localStorage.getItem('officer_last_view') || 'overview';
+      const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements'];
+      const targetSection = validSections.includes(savedSection) ? savedSection : 'overview';
+      await switchSection(targetSection);
     } catch (err) {
       toast('Could not load initial data: ' + err.message, 'error');
     }
   }
+
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.slice(1);
+    const validSections = ['overview', 'record', 'events', 'reports', 'people', 'announcements'];
+    if (validSections.includes(hash)) {
+      switchSection(hash);
+    }
+  });
 
   function bindTheme() {
     const toggleBtns = document.querySelectorAll('[data-theme-toggle]');
@@ -233,12 +244,19 @@ const OfficerApp = (() => {
   }
 
   async function switchSection(section) {
+    if (!section || !$(`of-view-${section}`)) section = 'overview';
+
     document.querySelectorAll('.of-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('[data-of]').forEach(b => b.classList.toggle('active', b.dataset.of === section));
     $(`of-view-${section}`).classList.add('active');
 
+    // Remember view across page refreshes and keep URL hash in sync
+    localStorage.setItem('officer_last_view', section);
+    if (window.location.hash.slice(1) !== section) {
+      history.replaceState(null, '', `#${section}`);
+    }
+
     const isFirstLoad = !_loaded[section];
-    _loaded[section] = true;
 
     try {
       if (section === 'overview')          { await loadOverview(!isFirstLoad); }
@@ -249,6 +267,8 @@ const OfficerApp = (() => {
       else if (section === 'announcements') { await loadAnnouncements(!isFirstLoad); }
     } catch (err) {
       if (isFirstLoad) toast(err.message || 'Failed to load section.', 'error');
+    } finally {
+      _loaded[section] = true;
     }
   }
 
