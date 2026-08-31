@@ -493,8 +493,7 @@ html body .hidden {
   justify-content: center;
 }
 
-/* Pattern artwork - kept invisible until the PNG finishes loading, then it
-   fades in with a subtle zoom so it never pops onto the screen. */
+/* Pattern artwork */
 .auth-brand-panel::before {
   content: '';
   position: absolute;
@@ -502,7 +501,7 @@ html body .hidden {
   background-image: url('../assets/bg-pattern-front.png');
   background-size: cover;
   background-position: center;
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -525,7 +524,21 @@ html body .hidden {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 2rem;
+  gap: 1.5rem;
+}
+
+.auth-brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-brand-logo-img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.6));
+  animation: brandTextIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .auth-identity h1 {
