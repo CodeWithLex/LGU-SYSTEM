@@ -35,10 +35,15 @@
     try {
       await Auth.login(email, pass);
     } catch (err) {
+      const lowerEmail = email.toLowerCase();
+      const isSchoolEmail = lowerEmail.endsWith('@g.cjc.edu.ph');
+      
       if (err.message.includes('missing email or phone') || err.message.includes('phone')) {
         errEl.textContent = 'Please enter your email and password.';
+      } else if (isSchoolEmail && (err.message.includes('Invalid login credentials') || err.message.includes('Invalid credentials') || err.message.includes('invalid_grant'))) {
+        errEl.innerHTML = '<strong>Notice:</strong> You will not use your official GSuite/Google account password in this area. Please click <strong>Continue with CJC Google Account</strong> above to sign in securely with your school account.';
       } else {
-        errEl.textContent = err.message;
+        errEl.textContent = err.message || 'Invalid email or password.';
       }
       errEl.classList.remove('hidden');
     } finally {
@@ -52,9 +57,8 @@
     if (e.key === 'Enter') document.getElementById('login-btn').click();
   });
 
-  // ---- Google OAuth Sign-in Handlers ----
+  // ---- Google OAuth Sign-in Handler ----
   const googleLoginBtn = document.getElementById('google-login-btn');
-  const googleRegisterBtn = document.getElementById('google-register-btn');
 
   async function handleGoogleAuth(btn, errorElId) {
     const errEl = document.getElementById(errorElId);
@@ -79,135 +83,30 @@
   if (googleLoginBtn) {
     googleLoginBtn.addEventListener('click', () => handleGoogleAuth(googleLoginBtn, 'login-error'));
   }
-  if (googleRegisterBtn) {
-    googleRegisterBtn.addEventListener('click', () => handleGoogleAuth(googleRegisterBtn, 'register-error'));
-  }
-
-
-  // ---- Toggle between Sign in / Register ----
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  const switchBtn = document.getElementById('auth-switch-btn');
-  const switchHint = document.getElementById('auth-switch-hint');
-
-  function showAuthForm(which) {
-    const toLogin = which === 'login';
-    loginForm.classList.toggle('active', toLogin);
-    registerForm.classList.toggle('active', !toLogin);
-    switchHint.textContent = toLogin ? "Don't have an account?" : 'Already have an account?';
-    switchBtn.textContent = toLogin ? 'Register' : 'Sign in';
-    // Clear stale messages and reset register fields when switching
-    const loginErr = document.getElementById('login-error');
-    loginErr.classList.remove('auth-success');
-    loginErr.classList.add('auth-error');
-    loginErr.classList.add('hidden');
-    document.getElementById('register-error').classList.add('hidden');
-    if (!toLogin) {
-      ['register-name', 'register-email', 'register-password', 'register-confirm', 'register-course', 'register-year', 'register-enrollment-year'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el.tagName === 'SELECT') el.selectedIndex = 0;
-        else el.value = '';
-      });
-      Dropdowns.syncAll();
-    }
-  }
-
-  switchBtn.addEventListener('click', () => {
-    showAuthForm(loginForm.classList.contains('active') ? 'register' : 'login');
-  });
-
-  // ---- Register ----
-  document.getElementById('register-btn').addEventListener('click', async () => {
-    const errEl = document.getElementById('register-error');
-    const btn = document.getElementById('register-btn');
-    const name = document.getElementById('register-name').value.trim();
-    const course = document.getElementById('register-course').value;
-    const year = document.getElementById('register-year').value;
-    const enrollment_year = Number(document.getElementById('register-enrollment-year').value);
-    const email = document.getElementById('register-email').value.trim();
-    const pass = document.getElementById('register-password').value;
-    const confirm = document.getElementById('register-confirm').value;
-
-    errEl.classList.add('hidden');
-
-    if (!name || !course || !year || !enrollment_year || !email || !pass || !confirm) {
-      errEl.textContent = 'Please fill in all fields.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-    if (pass.length < 8) {
-      errEl.textContent = 'Password must be at least 8 characters long.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-    if (pass !== confirm) {
-      errEl.textContent = 'Passwords do not match.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-
-    // School-only registration - personal email accounts are rejected
-    const schoolDomain = '@g.cjc.edu.ph';
-    if (!email.toLowerCase().endsWith(schoolDomain)) {
-      errEl.textContent = 'Only @g.cjc.edu.ph school accounts can register.';
-      errEl.classList.remove('hidden');
-      return;
-    }
-
-    btn.textContent = 'Registering…';
-    btn.disabled = true;
-
-    try {
-      const data = await Auth.register(name, email, pass, { course, year_level: year, enrollment_year });
-      if (data.session) {
-        // Email confirmation disabled - session already active
-        await bootApp(data.session);
-      } else {
-        // Confirmation email sent - return to login with a success message
-        showAuthForm('login');
-        const loginErr = document.getElementById('login-error');
-        loginErr.classList.remove('auth-error');
-        loginErr.classList.add('auth-success');
-        loginErr.textContent = 'Account created! Please confirm your email address before signing in.';
-        loginErr.classList.remove('hidden');
-      }
-    } catch (err) {
-      errEl.textContent = err.message;
-      errEl.classList.remove('hidden');
-    } finally {
-      btn.textContent = 'Register';
-      btn.disabled = false;
-    }
-  });
-
-  // Allow Enter key on register form
-  ['register-password', 'register-confirm'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('register-btn').click();
-    });
-  });
 
   // ---- Custom animated dropdowns (shared component, see dropdown.js) ----
-  // Auth & Onboarding selects
-  ['register-course', 'register-year', 'register-enrollment-year', 'onboarding-course', 'onboarding-year', 'onboarding-enrollment-year'].forEach(id => {
-    Dropdowns.bindDropdown(document.getElementById(id));
+  // Onboarding selects
+  ['onboarding-course', 'onboarding-year', 'onboarding-enrollment-year'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) Dropdowns.bindDropdown(el);
   });
 
   // Every other select in the logged-in app
   Dropdowns.bindAll('#app-screen');
 
-
-  // ---- First-Time Onboarding Modal ----
+  // ---- First-Time Onboarding / Registration Gate ----
   const onboardingModal = document.getElementById('onboarding-modal');
   const onboardingSubmitBtn = document.getElementById('onboarding-submit-btn');
+  const onboardingLogoutBtn = document.getElementById('onboarding-logout-btn');
   const onboardingError = document.getElementById('onboarding-error');
 
   function showOnboardingModal(user, profile) {
     if (!onboardingModal) return;
     const nameInput = document.getElementById('onboarding-name');
     if (nameInput) {
-      nameInput.value = ''; // Empty so the placeholder 'COE Numbawan' is displayed
-      nameInput.placeholder = 'COE Numbawan';
+      const defaultName = user?.user_metadata?.full_name || user?.user_metadata?.name || profile?.full_name || '';
+      nameInput.value = defaultName;
+      nameInput.placeholder = 'Firstname Lastname';
     }
     const courseSel = document.getElementById('onboarding-course');
     const yearSel = document.getElementById('onboarding-year');
@@ -223,6 +122,11 @@
 
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
+  if (onboardingLogoutBtn) {
+    onboardingLogoutBtn.addEventListener('click', async () => {
+      await Auth.logout();
+      window.location.reload();
+    });
   }
 
   if (onboardingSubmitBtn) {
