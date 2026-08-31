@@ -171,12 +171,13 @@
 }
 
 .of-stat .of-stat-value {
-  font-family: var(--font-digits, var(--font-proxima, sans-serif));
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-family: var(--font-proxima);
+  font-size: var(--font-size-kpi-value, 1.5625rem);
+  font-weight: 600;
   color: var(--text-primary);
   margin-top: 0.35rem;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
   letter-spacing: -0.02em;
 }
 
@@ -590,9 +591,26 @@
 }
 
 .of-table .num {
-  font-family: var(--font-digits, inherit);
+  font-family: var(--font-proxima);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
   white-space: nowrap;
+}
+
+.of-table .num.is-pos {
+  color: var(--status-positive);
+  font-weight: 700;
+}
+
+.of-table .num.is-neg {
+  color: var(--status-negative);
+  font-weight: 700;
+}
+
+/* Role-change dropdowns inside the People table keep the compact row size */
+.of-table .dd-trigger {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
 }
 
 .of-search {

@@ -49,6 +49,24 @@ const OfficerApp = (() => {
 
   function fmtNum(n) { return Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+  // Skeleton placeholders (reuse the main system's shimmer classes from main.css)
+  function skeletonStack(lines = 3) {
+    const rows = Array.from({ length: lines }, (_, i) =>
+      `<div class="skeleton skeleton-line${i === lines - 1 ? ' short' : ''}"></div>`).join('');
+    return `<div class="skeleton-stack" role="status" aria-label="Loading">
+      <div class="skeleton skeleton-title"></div>${rows}</div>`;
+  }
+  function skeletonRows(colspan, rows = 4) {
+    return Array.from({ length: rows }, () =>
+      `<tr><td colspan="${colspan}"><div class="skeleton skeleton-line" style="height:14px;margin:0.45rem 0;"></div></td></tr>`).join('');
+  }
+  function skeletonStatCards(n = 4) {
+    return Array.from({ length: n }, () => '<div class="skeleton skeleton-card" style="height:96px;"></div>').join('');
+  }
+  function skeletonEventCards(n = 6) {
+    return Array.from({ length: n }, () => '<div class="skeleton skeleton-card" style="height:190px;"></div>').join('');
+  }
+
   function getThemeColor(varName, fallback) {
     const color = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
     return color || fallback;
@@ -308,6 +326,11 @@ const OfficerApp = (() => {
   // ---------- 1. Fund Overview ----------
 
   async function loadOverview() {
+    // Skeletons while data loads (same as the main portal)
+    $('of-overview-stats').innerHTML = skeletonStatCards();
+    $('of-overview-alerts').innerHTML = skeletonStack();
+    $('of-overview-recent').innerHTML = skeletonStack();
+
     await refreshCoreData();
     const [summary, monthly] = await Promise.all([
       Api.reports.summary(),
@@ -673,6 +696,7 @@ const OfficerApp = (() => {
   }
 
   async function loadEvents() {
+    $('of-events-grid').innerHTML = skeletonEventCards();
     const opts = '<option value="">Select Event</option>' +
       activeEvents().map(ev => `<option value="${ev.id}">${esc(ev.event_name)}</option>`).join('');
     $('of-transfer-from').innerHTML = '<option value="GENERAL">GENERAL FUND</option>' + opts;
@@ -874,6 +898,10 @@ const OfficerApp = (() => {
   // ---------- 4. Reports & Paper Trail ----------
 
   async function loadReports() {
+    // Skeleton rows while data loads
+    $('of-events-summary-table').querySelector('tbody').innerHTML = skeletonRows(5);
+    $('of-audit-table').querySelector('tbody').innerHTML = skeletonRows(4);
+
     const [summary, monthly, eventsSummary] = await Promise.all([
       Api.reports.summary(),
       Api.reports.monthly(),
@@ -893,61 +921,12 @@ const OfficerApp = (() => {
         <td><strong>${esc(ev.event_name)}</strong></td>
         <td class="num">₱${fmtNum(ev.allocated_budget)}</td>
         <td class="num">₱${fmtNum((Number(ev.allocated_budget) || 0) + (Number(ev.computed_remaining) || 0) === 0 ? 0 : Math.max(0, (Number(ev.allocated_budget) || 0) - (Number(ev.computed_remaining) || 0)))}</td>
-        <td class="num">₱${fmtNum(ev.computed_remaining)}</td>
+        <td class="num ${Number(ev.computed_remaining) < 0 ? 'is-neg' : 'is-pos'}">₱${fmtNum(ev.computed_remaining)}</td>
         <td>${UI.renderStatusBadge(ev.status)}</td>
-        <td style="text-align:center;">
-          <div style="display:inline-flex;gap:0.4rem;">
-            <button class="of-btn of-btn-ghost" data-pdf="${ev.id}" data-name="${esc(ev.event_name)}" style="padding:0.35rem 0.65rem;font-size:0.76rem">
-              <iconify-icon icon="solar:document-text-linear"></iconify-icon> PDF
-            </button>
-            <button class="of-btn of-btn-ghost" data-excel="${ev.id}" data-name="${esc(ev.event_name)}" style="padding:0.35rem 0.65rem;font-size:0.76rem">
-              <iconify-icon icon="solar:table-linear"></iconify-icon> Excel
-            </button>
-          </div>
-        </td>
       </tr>`).join('')
-      : '<tr><td colspan="6">No events found.</td></tr>';
-
-    tbody.querySelectorAll('[data-pdf]').forEach(btn => {
-      btn.addEventListener('click', () => downloadExport('pdf', btn.dataset.pdf, btn.dataset.name, btn));
-    });
-    tbody.querySelectorAll('[data-excel]').forEach(btn => {
-      btn.addEventListener('click', () => downloadExport('excel', btn.dataset.excel, btn.dataset.name, btn));
-    });
+      : '<tr><td colspan="5">No events found.</td></tr>';
 
     await loadAudit();
-  }
-
-  async function downloadExport(type, eventId, eventName, btn) {
-    const token = window._authToken;
-    if (!token) { toast('Please log in again.', 'error'); return; }
-    const original = btn.innerHTML;
-    btn.disabled = true;
-    btn.textContent = 'Exporting…';
-    try {
-      const BASE = window.API_BASE || '';
-      const res = await fetch(`${BASE}/api/reports/${type}/${eventId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || `HTTP ${res.status}`);
-      }
-      const blob = await res.blob();
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = `LGU-Report-${eventName.replace(/[^a-z0-9]+/gi, '-')}.${type === 'pdf' ? 'pdf' : 'xlsx'}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      toast(err.message, 'error');
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = original;
-    }
   }
 
   let _auditRows = [];
@@ -965,7 +944,7 @@ const OfficerApp = (() => {
     const q = ($('of-audit-search').value || '').toLowerCase();
     const rows = _auditRows.filter(l => {
       if (!q) return true;
-      const hay = `${l.profiles?.full_name || ''} ${l.action} ${JSON.stringify(l.details || {})}`.toLowerCase();
+      const hay = `${l.profiles?.full_name || ''} ${l.action} ${humanizeAction(l.action)} ${JSON.stringify(l.details || {})}`.toLowerCase();
       return hay.includes(q);
     });
     const tbody = $('of-audit-table').querySelector('tbody');
@@ -973,10 +952,74 @@ const OfficerApp = (() => {
       <tr>
         <td style="white-space:nowrap">${UI.dateStr(log.created_at)}</td>
         <td>${esc(log.profiles?.full_name || 'Unknown')}</td>
-        <td>${esc(log.action)}</td>
-        <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(summarizeDetails(log.details))}</td>
+        <td>${auditActionCell(log.action)}</td>
+        <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(auditDetails(log))}</td>
       </tr>`).join('')
       : '<tr><td colspan="4">No matching audit entries.</td></tr>';
+  }
+
+  // Raw audit codes read like syntax - present them as plain sentences with
+  // the same icon/color language the main system's admin panel uses.
+  const AUDIT_ACTIONS = {
+    CREATE_TRANSACTION:       { icon: 'solar:add-circle-linear',       color: '#22C55E', label: 'Created a transaction' },
+    EDIT_TRANSACTION:         { icon: 'solar:pen-linear',              color: '#F97316', label: 'Edited a transaction' },
+    DELETE_TRANSACTION:       { icon: 'solar:trash-bin-trash-linear',  color: '#ef4444', label: 'Deleted a transaction' },
+    BULK_IMPORT_TRANSACTIONS: { icon: 'solar:upload-track-linear',     color: '#3b82f6', label: 'Bulk import' },
+    CREATE_EVENT:             { icon: 'solar:calendar-add-linear',     color: '#22C55E', label: 'Created an event' },
+    UPDATE_EVENT:             { icon: 'solar:calendar-date-linear',    color: '#F97316', label: 'Updated an event' },
+    ARCHIVE_EVENT:            { icon: 'solar:box-minimalistic-linear', color: '#8b5cf6', label: 'Archived an event' },
+    POST_ANNOUNCEMENT:        { icon: 'solar:bell-linear',             color: '#f59e0b', label: 'Posted an announcement' },
+    SET_USER_ROLE:            { icon: 'solar:shield-check-linear',     color: '#6366f1', label: 'Changed a user role' },
+    BUDGET_TRANSFER:          { icon: 'solar:card-transfer-linear',    color: '#14b8a6', label: 'Transferred budget' },
+    OVER_BUDGET_ALERT:        { icon: 'solar:danger-triangle-linear',  color: '#F59E0B', label: 'Over-budget alert' },
+  };
+
+  function humanizeAction(action) {
+    const meta = AUDIT_ACTIONS[action];
+    if (meta) return meta.label;
+    return String(action || '').toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function auditActionCell(action) {
+    const meta = AUDIT_ACTIONS[action] || { icon: 'solar:info-circle-linear', color: 'var(--text-secondary)' };
+    return `<div style="display:flex;align-items:center;gap:0.5rem;">
+      <iconify-icon icon="${meta.icon}" style="font-size:14px;color:${meta.color}"></iconify-icon>
+      <span>${esc(humanizeAction(action))}</span>
+    </div>`;
+  }
+
+  function auditDetails(log) {
+    const d = log.details || {};
+    switch (log.action) {
+      case 'BUDGET_TRANSFER':
+        return `₱${fmtNum(d.amount)} from "${d.from_event_name || 'an event'}" to "${d.to_event_name || 'an event'}"${d.reason ? ` — reason: ${d.reason}` : ''}`;
+      case 'SET_USER_ROLE':
+        return `Set ${d.user_name || 'a user'}'s role to ${d.new_role || '—'}`;
+      case 'CREATE_TRANSACTION':
+        return `${d.type ? UI.capitalize(String(d.type)) + ' of ' : ''}₱${fmtNum(d.amount)}${d.description ? ` — "${d.description}"` : ''}`;
+      case 'EDIT_TRANSACTION':
+        return `Reason: ${d.reason || '—'}`;
+      case 'DELETE_TRANSACTION':
+        return `Deleted "${d.description || 'a transaction'}"${d.reason ? ` — reason: ${d.reason}` : ''}`;
+      case 'BULK_IMPORT_TRANSACTIONS':
+        return `Imported ${d.count || 0} transactions`;
+      case 'CREATE_EVENT':
+        return `Created "${d.event_name || 'an event'}" with a budget of ₱${fmtNum(d.allocated_budget)}`;
+      case 'UPDATE_EVENT': {
+        const changed = Array.isArray(d.changes)
+          ? d.changes.filter(c => c !== 'updated_at').map(c => String(c).replace(/_/g, ' ')).join(', ')
+          : (d.changes ? String(d.changes) : '');
+        return `Updated "${d.event_name || 'an event'}"${changed ? ` — modified ${changed}` : ''}`;
+      }
+      case 'ARCHIVE_EVENT':
+        return `Archived "${d.event_name || 'an event'}"`;
+      case 'POST_ANNOUNCEMENT':
+        return `Posted "${d.title || 'an announcement'}"`;
+      case 'OVER_BUDGET_ALERT':
+        return `Only ₱${fmtNum(d.remaining_budget)} remains on an event's allocation`;
+      default:
+        return summarizeDetails(d);
+    }
   }
 
   function summarizeDetails(d = {}) {
@@ -1018,6 +1061,7 @@ const OfficerApp = (() => {
   }
 
   async function loadPeople() {
+    $('of-people-table').querySelector('tbody').innerHTML = skeletonRows(4);
     _users = await Api.admin.users();
     const canAssign = canAssignRoles();
     $('of-people-sub').textContent = canAssign
@@ -1051,6 +1095,10 @@ const OfficerApp = (() => {
         </td>
       </tr>`).join('')
       : '<tr><td colspan="4">No matching people found.</td></tr>';
+
+    // Rows are re-created on every render - bind the animated dropdowns to
+    // the freshly injected role selects (bindDropdown skips already-bound ones)
+    tbody.querySelectorAll('[data-role-for]').forEach(sel => Dropdowns.bindDropdown(sel));
 
     tbody.querySelectorAll('[data-apply]').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -1098,6 +1146,7 @@ const OfficerApp = (() => {
   }
 
   async function loadAnnouncements() {
+    $('of-announce-list').innerHTML = skeletonStack(2);
     const list = await Api.request('GET', '/announcements');
     $('of-announce-list').innerHTML = list.length ? list.map(a => `
       <div class="of-announce-item">
