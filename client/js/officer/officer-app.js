@@ -198,6 +198,7 @@ const OfficerApp = (() => {
         const next = cur === 'dark' ? 'light' : 'dark';
         localStorage.setItem('theme', next);
         document.documentElement.setAttribute('data-theme', next);
+        if (typeof UI !== 'undefined' && UI.syncThemeColor) UI.syncThemeColor(next);
         updateIcon();
         reloadCharts();
       });

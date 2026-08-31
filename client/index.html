@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>College of Engineering · Official Student Portal</title>
+  <!-- PWA: installable app with home-screen icon and offline shell -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0B0F14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="COE Budget" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
   <link rel="icon" type="image/png" href="assets/coe-logo.png" />
   <meta name="description" content="Real-time financial transparency dashboard for College of Engineering LGU funds, events, and expenditures." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,6 +25,8 @@
     (function() {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', savedTheme === 'dark' ? '#0B0F14' : '#F8FAFC');
     })();
   </script>
 </head>
@@ -1442,5 +1452,14 @@
   <script src="js/ai-assistant.js"></script>
   <script src="js/profile.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    // PWA: register the app-shell service worker (skipped in Electron's file:// windows)
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) =>
+          console.debug('[PWA] Service worker not registered:', err && err.message));
+      });
+    }
+  </script>
 </body>
 </html>

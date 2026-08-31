@@ -357,6 +357,7 @@
     setTheme(theme) {
       localStorage.setItem('theme', theme);
       document.documentElement.setAttribute('data-theme', theme);
+      if (typeof UI !== 'undefined' && UI.syncThemeColor) UI.syncThemeColor(theme);
       this.updateUI();
       // Dispatch a custom event to notify other components (e.g. Chart.js redraw in reports.js)
       window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme } }));

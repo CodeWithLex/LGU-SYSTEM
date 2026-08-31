@@ -153,5 +153,11 @@ const UI = (() => {
     }
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty };
+  // Keeps the browser/OS chrome color (PWA theme-color meta) in step with the theme
+  function syncThemeColor(theme) {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0F14' : '#F8FAFC');
+  }
+
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor };
 })();

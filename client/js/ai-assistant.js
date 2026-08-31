@@ -188,8 +188,19 @@ const GrizzAI = (() => {
 
         const pad = 8;
         const maxLeft = window.innerWidth - launcher.offsetWidth - pad;
-        const maxTop = window.innerHeight - launcher.offsetHeight - pad;
+        const bottomNav = document.querySelector('.bottom-nav') || document.querySelector('.of-bottom-nav');
+        let bottomBarrier = pad;
+        if (bottomNav) {
+          const navStyle = window.getComputedStyle(bottomNav);
+          if (navStyle.display !== 'none' && navStyle.visibility !== 'hidden' && navStyle.opacity !== '0') {
+            const navRect = bottomNav.getBoundingClientRect();
+            if (navRect.height > 0 && navRect.top < window.innerHeight) {
+              bottomBarrier = Math.max(pad, window.innerHeight - navRect.top + 8);
+            }
+          }
+        }
 
+        const maxTop = window.innerHeight - launcher.offsetHeight - bottomBarrier;
         const clampedLeft = Math.max(pad, Math.min(maxLeft, newLeft));
         const clampedTop = Math.max(pad, Math.min(maxTop, newTop));
 
@@ -229,14 +240,25 @@ const GrizzAI = (() => {
       open();
     });
 
-    // Re-clamp position on window resize
+    // Re-clamp position on window resize with navigation bar barrier check
     window.addEventListener('resize', () => {
       if (launcher.style.left && launcher.style.left !== 'auto') {
         const rect = launcher.getBoundingClientRect();
         const pad = 8;
         const maxLeft = window.innerWidth - launcher.offsetWidth - pad;
-        const maxTop = window.innerHeight - launcher.offsetHeight - pad;
+        const bottomNav = document.querySelector('.bottom-nav') || document.querySelector('.of-bottom-nav');
+        let bottomBarrier = pad;
+        if (bottomNav) {
+          const navStyle = window.getComputedStyle(bottomNav);
+          if (navStyle.display !== 'none' && navStyle.visibility !== 'hidden' && navStyle.opacity !== '0') {
+            const navRect = bottomNav.getBoundingClientRect();
+            if (navRect.height > 0 && navRect.top < window.innerHeight) {
+              bottomBarrier = Math.max(pad, window.innerHeight - navRect.top + 8);
+            }
+          }
+        }
 
+        const maxTop = window.innerHeight - launcher.offsetHeight - bottomBarrier;
         const clampedLeft = Math.max(pad, Math.min(maxLeft, rect.left));
         const clampedTop = Math.max(pad, Math.min(maxTop, rect.top));
 

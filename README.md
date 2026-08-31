@@ -26,6 +26,20 @@ A centralized web application designed for the College of Engineering (COE) and 
 3. **Receipt Management**: Digital storage and verification of all transaction proofs.
 4. **Monitoring Systems**: Dedicated modules for donations and collections.
 
+## Mobile App (PWA — no app store needed)
+
+The system is a Progressive Web App: on a phone it installs to the home screen with its own icon and opens full-screen (no browser UI), just like a native app.
+
+**Android (Chrome):** open the site once → tap **Install app** on the banner Chrome shows (or ⋮ menu → *Add to Home screen*).
+
+**iPhone (Safari):** open the site → tap the **Share** button → **Add to Home Screen**.
+
+**Notes**:
+- `client/manifest.json` — app name, icon, and standalone display mode.
+- `client/sw.js` — app-shell service worker: caches the UI so the app opens instantly and works offline (data still needs internet; `/api` and Supabase traffic are never cached for security).
+- Icons are generated from `client/assets/coe-logo.png` by `node scripts/generate-pwa-icons.js`.
+- Requires HTTPS in production (already true on Vercel). Skipped automatically inside the Electron desktop app.
+
 ## Desktop Application
 
 A native desktop application is available for administrators built with Electron. See `docs/desktop-app.md` for details.
