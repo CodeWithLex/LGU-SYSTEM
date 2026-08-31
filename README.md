@@ -36,7 +36,7 @@ The system is a Progressive Web App: on a phone it installs to the home screen w
 
 **Notes**:
 - `client/manifest.json` — app name, icon, and standalone display mode.
-- `client/sw.js` — app-shell service worker: caches the UI so the app opens instantly and works offline (data still needs internet; `/api` and Supabase traffic are never cached for security).
+- `client/sw.js` — app-shell service worker: always fetches the latest files from the network, and keeps a cached copy only so the app still opens when the phone is offline (data still needs internet; `/api` and Supabase traffic are never cached for security).
 - Icons are generated from `client/assets/coe-logo.png` by `node scripts/generate-pwa-icons.js`.
 - Requires HTTPS in production (already true on Vercel). Skipped automatically inside the Electron desktop app.
 
