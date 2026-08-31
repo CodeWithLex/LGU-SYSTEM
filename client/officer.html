@@ -601,19 +601,20 @@
             <input type="text" id="profile-name-input" class="input-field" placeholder="Firstname Lastname" required />
           </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label for="profile-course-select">Degree Program</label>
-              <div class="custom-select-wrap">
-                <select id="profile-course-select" class="select-field">
-                  <option value="BSCoE">BS Computer Engineering</option>
-                  <option value="BSCE">BS Civil Engineering</option>
-                  <option value="BSEE">BS Electrical Engineering</option>
-                  <option value="BSEcE">BS Electronics Engineering</option>
-                  <option value="BSME">BS Mechanical Engineering</option>
-                </select>
-              </div>
+          <div class="form-group">
+            <label for="profile-course-select">Degree Program</label>
+            <div class="custom-select-wrap">
+              <select id="profile-course-select" class="select-field">
+                <option value="BSCoE">BS Computer Engineering</option>
+                <option value="BSCE">BS Civil Engineering</option>
+                <option value="BSEE">BS Electrical Engineering</option>
+                <option value="BSEcE">BS Electronics Engineering</option>
+                <option value="BSME">BS Mechanical Engineering</option>
+              </select>
             </div>
+          </div>
+
+          <div class="form-row-2">
             <div class="form-group">
               <label for="profile-year-select">Year Level</label>
               <div class="custom-select-wrap">
@@ -625,19 +626,20 @@
                 </select>
               </div>
             </div>
-          </div>
-
-          <div class="form-row-2">
             <div class="form-group">
               <label for="profile-enrollment-year">Enrollment Year</label>
               <input type="number" id="profile-enrollment-year" class="input-field" min="2015" max="2035" placeholder="e.g. 2024" />
             </div>
-            <div class="form-group">
-              <label>Avatar Options</label>
-              <button type="button" class="btn btn-ghost reset-avatar-btn" id="profile-reset-avatar-btn">
-                <iconify-icon icon="solar:restart-linear"></iconify-icon> Use Letter Initial
-              </button>
+          </div>
+
+          <div class="profile-avatar-actions-bar" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div>
+              <label style="margin-bottom: 0.15rem; display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-tertiary);">Avatar Customization</label>
+              <span style="font-size: 0.8rem; color: var(--text-tertiary);">Reset avatar to display your name's letter initial</span>
             </div>
+            <button type="button" class="btn btn-ghost reset-avatar-btn" id="profile-reset-avatar-btn" style="flex-shrink: 0;">
+              <iconify-icon icon="solar:restart-linear"></iconify-icon> Use Letter Initial
+            </button>
           </div>
 
           <div class="profile-feedback hidden" id="profile-general-feedback"></div>
