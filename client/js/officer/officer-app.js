@@ -1509,34 +1509,58 @@ const OfficerApp = (() => {
         <td>${UI.renderStatusBadge(u.role)}</td>
         <td style="font-size:0.78rem;color:var(--text-secondary);white-space:nowrap;">${dateStr}</td>
         <td style="${canAssign ? '' : 'display:none'};white-space:nowrap;">
-          ${canAssign && u.id !== _profile.id
+          ${canAssign && u.id !== _profile.id && !(_profile.role === 'governor' && u.role === 'admin')
             ? `<div style="display:flex;gap:0.4rem;align-items:center;">
-                 <select data-role-for="${u.id}" style="padding:0.35rem;border:1px solid var(--border-default);border-radius:6px;font-size:0.78rem;background:var(--bg-surface-raised);color:var(--text-primary);">
+                 <select data-role-for="${u.id}" data-original-role="${u.role}" style="padding:0.35rem;border:1px solid var(--border-default);border-radius:6px;font-size:0.78rem;background:var(--bg-surface-raised);color:var(--text-primary);min-width:96px;">
                    ${assignableRoles().map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${ROLE_LABELS[r]}</option>`).join('')}
                  </select>
-                 <button class="of-btn of-btn-ghost" data-apply="${u.id}" style="padding:0.3rem 0.65rem;font-size:0.74rem">Apply</button>
+                 <button type="button" class="of-btn of-btn-primary" data-apply="${u.id}" disabled style="padding:0.32rem 0.75rem;font-size:0.76rem;">Save</button>
                </div>`
-            : (u.id === _profile.id ? '<span style="color:var(--text-tertiary);font-size:0.75rem">You</span>' : '—')}
+            : (u.id === _profile.id ? '<span style="color:var(--text-tertiary);font-size:0.75rem">You</span>' : '<span style="color:var(--text-tertiary);font-size:0.75rem">Protected</span>')}
         </td>
       </tr>`;
     }).join('')
       : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary);">No matching accounts found.</td></tr>';
 
-    tbody.querySelectorAll('[data-role-for]').forEach(sel => Dropdowns.bindDropdown(sel));
+    tbody.querySelectorAll('[data-role-for]').forEach(sel => {
+      Dropdowns.bindDropdown(sel);
+
+      sel.addEventListener('change', () => {
+        const id = sel.dataset.roleFor;
+        const orig = sel.dataset.originalRole;
+        const current = sel.value;
+        const btn = tbody.querySelector(`[data-apply="${id}"]`);
+        if (!btn) return;
+        btn.disabled = (current === orig);
+      });
+    });
 
     tbody.querySelectorAll('[data-apply]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.dataset.apply;
-        const role = tbody.querySelector(`[data-role-for="${id}"]`).value;
-        if (!confirm(`Set this person's role to ${ROLE_LABELS[role]}?`)) return;
+        const select = tbody.querySelector(`[data-role-for="${id}"]`);
+        if (!select) return;
+        const role = select.value;
+        const orig = select.dataset.originalRole;
+        if (role === orig) return;
+
+        const targetUser = _users.find(u => u.id === id);
+        const nameStr = targetUser?.full_name ? formatStudentName(targetUser.full_name) : 'this user';
+        if (!confirm(`Set role for "${nameStr}" to ${ROLE_LABELS[role]}?`)) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
         try {
           await Api.admin.setRole(id, role);
-          toast('Role updated successfully.', 'success');
+          toast(`Role updated to ${ROLE_LABELS[role]} successfully.`, 'success');
           _users = await Api.admin.users();
-          updatePeopleStats();
+          await updatePeopleStats();
           renderPeopleTable();
         } catch (err) {
           toast(err.message, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Save';
         }
       });
     });
