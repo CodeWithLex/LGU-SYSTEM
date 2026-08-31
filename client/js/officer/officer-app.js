@@ -650,13 +650,22 @@ const OfficerApp = (() => {
     const parts = [];
     if (d.event_name)       parts.push(d.event_name);
     if (d.description)      parts.push(d.description);
+    if (d.title)            parts.push(`"${d.title}"`);
+    if (d.count)            parts.push(`${d.count} items`);
+    if (d.changes) {
+      const ch = Array.isArray(d.changes)
+        ? d.changes.filter(c => c !== 'updated_at').map(c => c.replace(/_/g, ' ')).join(', ')
+        : String(d.changes);
+      if (ch) parts.push(`modified: ${ch}`);
+    }
+    if (d.reason)           parts.push(`reason: ${d.reason}`);
     if (d.user_name)        parts.push(`user: ${d.user_name}`);
     if (d.new_role)         parts.push(`role → ${d.new_role}`);
     if (d.amount != null)   parts.push(`₱${fmtNum(d.amount)}`);
     if (d.from_event_name)  parts.push(`from ${d.from_event_name}`);
     if (d.to_event_name)    parts.push(`to ${d.to_event_name}`);
     if (!parts.length) {
-      const keys = Object.keys(d).slice(0, 3);
+      const keys = Object.keys(d).filter(k => k !== 'event_id' && k !== 'transaction_id').slice(0, 3);
       parts.push(...keys.map(k => `${k}: ${String(d[k]).slice(0, 40)}`));
     }
     return parts.join(' · ');

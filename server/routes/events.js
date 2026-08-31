@@ -255,7 +255,12 @@ router.patch('/:id', requireOfficer, async (req, res) => {
   if (error) return res.status(400).json({ error: 'Failed to update event.' });
 
   // Audit log
-  logAudit(req.user.id, 'UPDATE_EVENT', { event_id: id, changes: Object.keys(updates) });
+  const modifiedFields = Object.keys(updates).filter(k => k !== 'updated_at');
+  logAudit(req.user.id, 'UPDATE_EVENT', {
+    event_id: id,
+    event_name: data?.event_name || 'Event',
+    changes: modifiedFields
+  });
 
   res.json(data);
 });

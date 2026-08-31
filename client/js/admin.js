@@ -708,16 +708,17 @@ const Admin = (() => {
 
     const actionLabel = a => {
       const icons = {
-        CREATE_TRANSACTION: { icon: 'solar:add-circle-linear', color: '#22C55E', label: 'Created Transaction' },
-        EDIT_TRANSACTION:   { icon: 'solar:pen-linear', color: '#F97316', label: 'Edited Transaction' },
-        DELETE_TRANSACTION: { icon: 'solar:trash-bin-trash-linear', color: '#ef4444', label: 'Deleted Transaction' },
-        CREATE_EVENT:       { icon: 'solar:calendar-add-linear', color: '#22C55E', label: 'Created Event' },
-        UPDATE_EVENT:       { icon: 'solar:calendar-date-linear', color: '#F97316', label: 'Updated Event' },
-        ARCHIVE_EVENT:      { icon: 'solar:box-minimalistic-linear', color: '#8b5cf6', label: 'Archived Event' },
-        POST_ANNOUNCEMENT:  { icon: 'solar:bell-linear', color: '#f59e0b', label: 'Posted Announcement' },
-        SET_USER_ROLE:      { icon: 'solar:shield-check-linear', color: '#6366f1', label: 'Changed User Role' },
-        BUDGET_TRANSFER:    { icon: 'solar:card-transfer-linear', color: '#14b8a6', label: 'Budget Transfer' },
-        OVER_BUDGET_ALERT:  { icon: 'solar:danger-triangle-linear', color: '#F59E0B', label: 'Over Budget Alert' },
+        CREATE_TRANSACTION:       { icon: 'solar:add-circle-linear', color: '#22C55E', label: 'Created Transaction' },
+        EDIT_TRANSACTION:         { icon: 'solar:pen-linear', color: '#F97316', label: 'Edited Transaction' },
+        DELETE_TRANSACTION:       { icon: 'solar:trash-bin-trash-linear', color: '#ef4444', label: 'Deleted Transaction' },
+        BULK_IMPORT_TRANSACTIONS: { icon: 'solar:upload-track-linear', color: '#3b82f6', label: 'Bulk Import' },
+        CREATE_EVENT:             { icon: 'solar:calendar-add-linear', color: '#22C55E', label: 'Created Event' },
+        UPDATE_EVENT:             { icon: 'solar:calendar-date-linear', color: '#F97316', label: 'Updated Event' },
+        ARCHIVE_EVENT:            { icon: 'solar:box-minimalistic-linear', color: '#8b5cf6', label: 'Archived Event' },
+        POST_ANNOUNCEMENT:        { icon: 'solar:bell-linear', color: '#f59e0b', label: 'Posted Announcement' },
+        SET_USER_ROLE:            { icon: 'solar:shield-check-linear', color: '#6366f1', label: 'Changed User Role' },
+        BUDGET_TRANSFER:          { icon: 'solar:card-transfer-linear', color: '#14b8a6', label: 'Budget Transfer' },
+        OVER_BUDGET_ALERT:        { icon: 'solar:danger-triangle-linear', color: '#F59E0B', label: 'Over Budget Alert' },
       };
       const item = icons[a] || { icon: 'solar:info-circle-linear', color: 'var(--text-secondary)', label: a };
       return `
@@ -741,8 +742,17 @@ const Admin = (() => {
             return `Edited transaction. Reason: ${d.reason}`;
           case 'DELETE_TRANSACTION':
             return `Deleted "${d.description || 'Transaction'}". Reason: ${d.reason}`;
+          case 'BULK_IMPORT_TRANSACTIONS':
+            return `Bulk imported ${d.count || 0} transactions`;
           case 'CREATE_EVENT':
             return `Created event "${d.event_name}" with budget ₱${Number(d.allocated_budget).toLocaleString()}`;
+          case 'UPDATE_EVENT': {
+            const evName = d.event_name ? `"${d.event_name}"` : 'event';
+            const changed = Array.isArray(d.changes)
+              ? d.changes.filter(c => c !== 'updated_at').map(c => c.replace(/_/g, ' ')).join(', ')
+              : (d.changes ? String(d.changes) : '');
+            return `Updated ${evName}${changed ? `: modified ${changed}` : ''}`;
+          }
           case 'ARCHIVE_EVENT':
             return `Archived event "${d.event_name}"`;
           case 'POST_ANNOUNCEMENT':
