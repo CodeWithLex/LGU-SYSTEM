@@ -404,6 +404,23 @@
   color: var(--text-primary);
 }
 
+/* ---------- Animated dropdowns (shared component from main system) ---------- */
+/* Match the trigger to the portal's input sizing */
+.of-field .dd-trigger {
+  padding: 0.7rem 0.85rem;
+}
+/* Lift the field holding an open menu above its siblings so the menu is
+   never covered (same trick main.css applies to .form-group) */
+.of-field:has(.dd.dd-open) {
+  position: relative;
+  z-index: 60;
+}
+/* Filter-bar sort dropdown keeps the compact .of-sort-select sizing */
+.of-filter-bar .dd-trigger {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+}
+
 .of-check {
   display: flex;
   align-items: center;

@@ -94,6 +94,8 @@ const OfficerApp = (() => {
 
     bindTheme();
     bindNav();
+    // Replace the portal's native selects with the shared animated dropdowns
+    Dropdowns.bindAll('#of-shell');
     bindRecordForm();
     bindEventForms();
     bindEventFilters();
@@ -464,6 +466,11 @@ const OfficerApp = (() => {
       e.preventDefault();
       const errEl = $('of-tx-error');
       errEl.classList.add('hidden');
+      if (!eventSel.value) {
+        errEl.textContent = 'Please select an event.';
+        errEl.classList.remove('hidden');
+        return;
+      }
       const btn = $('of-tx-submit');
       btn.disabled = true;
       btn.textContent = 'Recording…';
@@ -547,6 +554,7 @@ const OfficerApp = (() => {
     const opts = '<option value="">Select Event</option>' +
       activeEvents().map(ev => `<option value="${ev.id}">${esc(ev.event_name)}</option>`).join('');
     $('of-tx-event').innerHTML = opts;
+    Dropdowns.syncAll();
   }
 
   // ---------- 3. Events & Budgets ----------
@@ -628,6 +636,16 @@ const OfficerApp = (() => {
       e.preventDefault();
       const errEl = $('of-transfer-error');
       errEl.classList.add('hidden');
+      if (!fromSel.value || !toSel.value) {
+        errEl.textContent = 'Please choose both the source and target events.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      if (fromSel.value === toSel.value) {
+        errEl.textContent = 'Source and target must be different events.';
+        errEl.classList.remove('hidden');
+        return;
+      }
       const btn = $('of-transfer-submit');
       btn.disabled = true;
       btn.textContent = 'Transferring…';
@@ -659,6 +677,7 @@ const OfficerApp = (() => {
       activeEvents().map(ev => `<option value="${ev.id}">${esc(ev.event_name)}</option>`).join('');
     $('of-transfer-from').innerHTML = '<option value="GENERAL">GENERAL FUND</option>' + opts;
     $('of-transfer-to').innerHTML   = opts;
+    Dropdowns.syncAll();
     await renderEventsGrid();
   }
 
