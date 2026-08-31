@@ -239,7 +239,7 @@ function renderMonthlyChart(monthly) {
 
   const labels  = monthly.map(m => {
     const [y, mo] = m.month.split('-');
-    return new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: '2-digit' });
+    return new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
   });
 
   const textColor = getThemeColor('--text-secondary', '#94A3B8');
