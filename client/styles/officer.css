@@ -522,11 +522,11 @@
 /* ---------- Scrollables & Tables ---------- */
 .of-table-wrap {
   overflow-x: auto;
+  overflow-y: visible;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm, 6px);
   background: var(--bg-surface);
-  max-height: 480px;
-  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Custom Scrollbars */
@@ -564,6 +564,16 @@
   background: var(--scrollbar-thumb-hover, rgba(255, 255, 255, 0.32));
 }
 
+.of-table-wrap::-webkit-scrollbar-button,
+.of-scrollable-list::-webkit-scrollbar-button,
+.of-main::-webkit-scrollbar-button,
+.of-sidebar::-webkit-scrollbar-button,
+.of-modal-card::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .of-table {
   width: 100%;
   border-collapse: collapse;
@@ -581,9 +591,6 @@
   background: var(--bg-surface-raised);
   border-bottom: 1px solid var(--border-default);
   white-space: nowrap;
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
 .of-table td {
