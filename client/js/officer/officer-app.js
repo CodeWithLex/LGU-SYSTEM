@@ -1398,6 +1398,7 @@ const OfficerApp = (() => {
   // ---------- 5. People & Access ----------
 
   let _users = [];
+  let _peopleRoleFilter = 'all';
 
   const canAssignRoles = () => _profile.role === 'admin' || _profile.role === 'governor';
   const assignableRoles = () => _profile.role === 'admin'
@@ -1405,7 +1406,40 @@ const OfficerApp = (() => {
     : ['student', 'governor', 'cashier'];
 
   function bindPeopleSearch() {
-    $('of-people-search').addEventListener('input', renderPeopleTable);
+    $('of-people-search')?.addEventListener('input', renderPeopleTable);
+
+    const roleTabs = $('of-people-role-tabs');
+    if (roleTabs) {
+      roleTabs.querySelectorAll('.of-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          roleTabs.querySelectorAll('.of-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _peopleRoleFilter = btn.dataset.roleFilter || 'all';
+          renderPeopleTable();
+        });
+      });
+    }
+  }
+
+  function updatePeopleStats() {
+    const total = _users.length;
+    const students = _users.filter(u => u.role === 'student').length;
+    const officers = _users.filter(u => u.role !== 'student').length;
+
+    const bscoe = _users.filter(u => u.course === 'BSCoE').length;
+    const bsce = _users.filter(u => u.course === 'BSCE').length;
+    const bsece = _users.filter(u => u.course === 'BSECE').length;
+
+    if ($('of-stat-val-users-total')) $('of-stat-val-users-total').textContent = total;
+    if ($('of-stat-val-users-students')) $('of-stat-val-users-students').textContent = students;
+    if ($('of-stat-sub-users-students')) {
+      $('of-stat-sub-users-students').textContent = total ? `${Math.round((students / total) * 100)}% of total accounts` : '0% of total accounts';
+    }
+    if ($('of-stat-val-users-officers')) $('of-stat-val-users-officers').textContent = officers;
+
+    if ($('of-users-bscoe-count')) $('of-users-bscoe-count').textContent = bscoe;
+    if ($('of-users-bsce-count')) $('of-users-bsce-count').textContent = bsce;
+    if ($('of-users-bsece-count')) $('of-users-bsece-count').textContent = bsece;
   }
 
   async function loadPeople(isSilent = false) {
@@ -1418,22 +1452,43 @@ const OfficerApp = (() => {
       ? `You can assign: ${assignableRoles().join(', ')}` + (_profile.role === 'governor' ? ' (admin accounts are out of your reach)' : '')
       : 'Read-only: cashiers cannot assign roles.';
     $('of-people-action-col').style.display = canAssign ? '' : 'none';
+    updatePeopleStats();
     renderPeopleTable();
   }
 
   function renderPeopleTable() {
-    const q = ($('of-people-search').value || '').toLowerCase();
-    const rows = _users.filter(u =>
-      !q || `${u.full_name} ${u.email}`.toLowerCase().includes(q)
-    );
+    const q = ($('of-people-search')?.value || '').toLowerCase().trim();
+    const rows = _users.filter(u => {
+      const matchSearch = !q || `${u.full_name || ''} ${u.email || ''}`.toLowerCase().includes(q);
+      let matchRole = true;
+      if (_peopleRoleFilter === 'student') matchRole = u.role === 'student';
+      else if (_peopleRoleFilter === 'officers') matchRole = u.role !== 'student';
+      return matchSearch && matchRole;
+    });
+
     const canAssign = canAssignRoles();
     const tbody = $('of-people-table').querySelector('tbody');
-    tbody.innerHTML = rows.length ? rows.map(u => `
+    tbody.innerHTML = rows.length ? rows.map(u => {
+      const displayName = u.full_name ? formatStudentName(u.full_name) : (u.email?.split('@')[0] || 'User');
+      const progBadge = u.course
+        ? `<span class="badge" style="background:var(--bg-surface-raised);color:var(--text-primary);border:1px solid var(--border-default);font-size:0.74rem;font-weight:600;padding:2px 6px;border-radius:4px;">${esc(u.course)}</span>`
+        : '<span style="color:var(--text-tertiary);font-size:0.75rem;">—</span>';
+      const yrText = u.year_level ? `<span style="font-size:0.78rem;color:var(--text-secondary);margin-left:0.25rem;">Yr ${esc(u.year_level)}</span>` : '';
+      const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+
+      return `
       <tr>
-        <td><strong>${esc(u.full_name)}</strong></td>
-        <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(u.email)}</td>
+        <td>
+          <div style="font-weight:600;color:var(--text-primary);font-size:0.86rem;">${esc(displayName)}</div>
+        </td>
+        <td style="font-size:0.8rem;color:var(--text-secondary);">${esc(u.email)}</td>
+        <td>
+          ${progBadge}
+          ${yrText}
+        </td>
         <td>${UI.renderStatusBadge(u.role)}</td>
-        <td style="${canAssign ? '' : 'display:none'}">
+        <td style="font-size:0.78rem;color:var(--text-secondary);white-space:nowrap;">${dateStr}</td>
+        <td style="${canAssign ? '' : 'display:none'};white-space:nowrap;">
           ${canAssign && u.id !== _profile.id
             ? `<div style="display:flex;gap:0.4rem;align-items:center;">
                  <select data-role-for="${u.id}" style="padding:0.35rem;border:1px solid var(--border-default);border-radius:6px;font-size:0.78rem;background:var(--bg-surface-raised);color:var(--text-primary);">
@@ -1443,11 +1498,10 @@ const OfficerApp = (() => {
                </div>`
             : (u.id === _profile.id ? '<span style="color:var(--text-tertiary);font-size:0.75rem">You</span>' : '—')}
         </td>
-      </tr>`).join('')
-      : '<tr><td colspan="4">No matching people found.</td></tr>';
+      </tr>`;
+    }).join('')
+      : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary);">No matching accounts found.</td></tr>';
 
-    // Rows are re-created on every render - bind the animated dropdowns to
-    // the freshly injected role selects (bindDropdown skips already-bound ones)
     tbody.querySelectorAll('[data-role-for]').forEach(sel => Dropdowns.bindDropdown(sel));
 
     tbody.querySelectorAll('[data-apply]').forEach(btn => {
@@ -1457,8 +1511,9 @@ const OfficerApp = (() => {
         if (!confirm(`Set this person's role to ${ROLE_LABELS[role]}?`)) return;
         try {
           await Api.admin.setRole(id, role);
-          toast('Role updated.', 'success');
+          toast('Role updated successfully.', 'success');
           _users = await Api.admin.users();
+          updatePeopleStats();
           renderPeopleTable();
         } catch (err) {
           toast(err.message, 'error');
