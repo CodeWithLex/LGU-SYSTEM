@@ -2838,6 +2838,16 @@ iconify-icon {
     display: flex;
     align-items: center;
     gap: 0.65rem;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .app-mobile-brand:hover {
+    opacity: 0.9;
+  }
+  .app-mobile-brand:active {
+    transform: scale(0.96);
   }
   .app-mobile-logo {
     width: 32px;
