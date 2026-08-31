@@ -279,7 +279,13 @@ function renderMonthlyChart(monthly) {
         legend: { position: 'top', labels: { color: textColor, font: { family: 'Inter' } } },
         tooltip: {
           callbacks: {
-            label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            label: ctx => ` ${ctx.dataset.label}: ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`,
+            afterBody: items => {
+              const idx = items[0]?.dataIndex;
+              if (idx == null || !monthly[idx]) return '';
+              const net = (monthly[idx].income || 0) - (monthly[idx].expense || 0);
+              return `Net: ${net >= 0 ? '+' : '-'}₱${Math.abs(net).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+            }
           }
         }
       },
@@ -369,6 +375,14 @@ function reloadCharts() {
 // Redraw charts dynamically when the user switches themes
 window.addEventListener('themechanged', () => {
   reloadCharts();
+});
+
+// Auto-refresh reports when transactions are modified anywhere
+document.addEventListener('transaction-updated', () => {
+  const container = document.getElementById('reports-content');
+  if (container && container.offsetParent !== null) {
+    initReports();
+  }
 });
 
 async function downloadReport(type, eventId, eventName) {

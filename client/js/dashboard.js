@@ -144,8 +144,12 @@ const Dashboard = (() => {
     realtimeChannel = window.supabaseClient
       .channel('dashboard-realtime')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, () => {
+        if (typeof Api !== 'undefined' && Api.invalidateCache) {
+          Api.invalidateCache('/reports', '/transactions', '/dashboard', '/income', '/events');
+        }
         loadStats();
         loadRecentTransactions();
+        document.dispatchEvent(new CustomEvent('transaction-updated'));
         UI.toast('Dashboard updated with a new transaction.', 'info');
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'announcements' }, () => {

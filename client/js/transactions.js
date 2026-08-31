@@ -246,6 +246,7 @@ const Transactions = (() => {
         });
         modal.remove();
         UI.toast('Transaction updated successfully.', 'success');
+        document.dispatchEvent(new CustomEvent('transaction-updated'));
         load();
       } catch (err) {
         errEl.textContent = err.message;
@@ -301,6 +302,7 @@ const Transactions = (() => {
         await Api.transactions.remove(id, { reason });
         modal.remove();
         UI.toast('Transaction deleted.', 'success');
+        document.dispatchEvent(new CustomEvent('transaction-updated'));
         load();
       } catch (err) {
         errEl.textContent = err.message;

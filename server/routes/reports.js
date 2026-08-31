@@ -64,12 +64,28 @@ router.get('/monthly', async (req, res) => {
   if (error) { logError('Monthly Report Error', error); return res.status(500).json({ error: 'Failed to fetch monthly report.' }); }
 
   const monthly = {};
-  data.forEach(tx => {
-    const month = tx.transaction_date.slice(0, 7); // "YYYY-MM"
-    if (!monthly[month]) monthly[month] = { income: 0, expense: 0 };
-    if (tx.type === 'expense') monthly[month].expense += Number(tx.amount);
-    else                       monthly[month].income  += Number(tx.amount);
-  });
+  if (data && data.length > 0) {
+    const firstMonthStr = (data[0].transaction_date || '').slice(0, 7) || '2026-01';
+    const now = new Date();
+    const lastMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    let [cy, cm] = firstMonthStr.split('-').map(Number);
+    const [ey, em] = lastMonthStr.split('-').map(Number);
+
+    while (cy < ey || (cy === ey && cm <= em)) {
+      const key = `${cy}-${String(cm).padStart(2, '0')}`;
+      monthly[key] = { income: 0, expense: 0 };
+      cm++;
+      if (cm > 12) { cm = 1; cy++; }
+    }
+
+    data.forEach(tx => {
+      const month = (tx.transaction_date || '').slice(0, 7);
+      if (!monthly[month]) monthly[month] = { income: 0, expense: 0 };
+      if (tx.type === 'expense') monthly[month].expense += Number(tx.amount || 0);
+      else                       monthly[month].income  += Number(tx.amount || 0);
+    });
+  }
 
   res.json(Object.entries(monthly).map(([month, d]) => ({
     month,

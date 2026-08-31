@@ -122,6 +122,14 @@ const OfficerApp = (() => {
     bindAuditSearch();
     bindAnnouncementForm();
 
+    document.addEventListener('transaction-updated', async () => {
+      await refreshCoreData();
+      const currentActive = document.querySelector('.of-view.active')?.id?.replace('of-view-', '');
+      if (currentActive === 'overview') await loadOverview();
+      if (currentActive === 'reports')  await loadReports();
+      if (currentActive === 'events')   await renderEventsGrid();
+    });
+
     $('of-shell').classList.remove('hidden');
 
     try {
@@ -249,7 +257,13 @@ const OfficerApp = (() => {
           legend: { position: 'top', labels: { color: textColor, font: { family: 'Inter' } } },
           tooltip: {
             callbacks: {
-              label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+              label: ctx => ` ${ctx.dataset.label}: ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`,
+              afterBody: items => {
+                const idx = items[0]?.dataIndex;
+                if (idx == null || !monthly[idx]) return '';
+                const net = (monthly[idx].income || 0) - (monthly[idx].expense || 0);
+                return `Net: ${net >= 0 ? '+' : '-'}₱${Math.abs(net).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+              }
             }
           }
         },
@@ -530,9 +544,13 @@ const OfficerApp = (() => {
         e.target.reset();
         clearReceiptChip();
         $('of-tx-date').value = new Date().toISOString().split('T')[0];
+        if (typeof Api !== 'undefined' && Api.invalidateCache) {
+          Api.invalidateCache('/reports', '/transactions', '/dashboard', '/income', '/events');
+        }
         await refreshCoreData();
         updateEventBalance();
         populateEventSelects();
+        document.dispatchEvent(new CustomEvent('transaction-updated'));
       } catch (err) {
         errEl.textContent = err.message;
         errEl.classList.remove('hidden');
