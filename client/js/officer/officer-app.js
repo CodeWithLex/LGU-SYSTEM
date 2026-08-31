@@ -1023,32 +1023,108 @@ const OfficerApp = (() => {
   }
 
   let _auditRows = [];
+  let _auditCurrentPage = 1;
+  const AUDIT_PAGE_SIZE = 10;
 
   async function loadAudit() {
     _auditRows = await Api.admin.auditLogs({ limit: 100 });
+    _auditCurrentPage = 1;
     renderAuditTable();
   }
 
   function bindAuditSearch() {
-    $('of-audit-search').addEventListener('input', renderAuditTable);
+    $('of-audit-search').addEventListener('input', () => {
+      _auditCurrentPage = 1;
+      renderAuditTable();
+    });
   }
 
   function renderAuditTable() {
     const q = ($('of-audit-search').value || '').toLowerCase();
-    const rows = _auditRows.filter(l => {
+    const filtered = _auditRows.filter(l => {
       if (!q) return true;
       const hay = `${l.profiles?.full_name || ''} ${l.action} ${humanizeAction(l.action)} ${JSON.stringify(l.details || {})}`.toLowerCase();
       return hay.includes(q);
     });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / AUDIT_PAGE_SIZE));
+    if (_auditCurrentPage > totalPages) _auditCurrentPage = totalPages;
+    if (_auditCurrentPage < 1) _auditCurrentPage = 1;
+
+    const startIdx = (_auditCurrentPage - 1) * AUDIT_PAGE_SIZE;
+    const pageRows = filtered.slice(startIdx, startIdx + AUDIT_PAGE_SIZE);
+
     const tbody = $('of-audit-table').querySelector('tbody');
-    tbody.innerHTML = rows.length ? rows.map(log => `
+    tbody.innerHTML = pageRows.length ? pageRows.map(log => `
       <tr>
         <td style="white-space:nowrap">${UI.dateStr(log.created_at)}</td>
-        <td>${esc(log.profiles?.full_name || 'Unknown')}</td>
+        <td><strong>${esc(log.profiles?.full_name || 'Unknown')}</strong></td>
         <td>${auditActionCell(log.action)}</td>
         <td style="font-size:0.78rem;color:var(--text-secondary)">${esc(auditDetails(log))}</td>
       </tr>`).join('')
-      : '<tr><td colspan="4">No matching audit entries.</td></tr>';
+      : '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);padding:1.5rem;">No matching audit entries.</td></tr>';
+
+    renderAuditPagination(filtered.length, totalPages);
+  }
+
+  function renderAuditPagination(totalItems, totalPages) {
+    const pag = $('of-audit-pagination');
+    if (!pag) return;
+    if (totalItems <= AUDIT_PAGE_SIZE) {
+      pag.innerHTML = `
+        <span class="of-pagination-info">Showing all ${totalItems} entries</span>
+        <div></div>
+      `;
+      return;
+    }
+
+    const start = (_auditCurrentPage - 1) * AUDIT_PAGE_SIZE + 1;
+    const end = Math.min(_auditCurrentPage * AUDIT_PAGE_SIZE, totalItems);
+
+    let pagesHTML = '';
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || (p >= _auditCurrentPage - 1 && p <= _auditCurrentPage + 1)) {
+        pagesHTML += `<button type="button" class="of-page-btn ${p === _auditCurrentPage ? 'active' : ''}" data-page="${p}">${p}</button>`;
+      } else if (p === _auditCurrentPage - 2 || p === _auditCurrentPage + 2) {
+        pagesHTML += `<span style="color:var(--text-tertiary);padding:0 2px;font-size:0.8rem;">…</span>`;
+      }
+    }
+
+    pag.innerHTML = `
+      <span class="of-pagination-info">Showing ${start}–${end} of ${totalItems} entries</span>
+      <div class="of-pagination-controls">
+        <button type="button" class="of-page-btn" id="of-audit-prev" ${_auditCurrentPage <= 1 ? 'disabled' : ''}>
+          <iconify-icon icon="solar:alt-arrow-left-linear"></iconify-icon> Prev
+        </button>
+        ${pagesHTML}
+        <button type="button" class="of-page-btn" id="of-audit-next" ${_auditCurrentPage >= totalPages ? 'disabled' : ''}>
+          Next <iconify-icon icon="solar:alt-arrow-right-linear"></iconify-icon>
+        </button>
+      </div>
+    `;
+
+    const prevBtn = $('of-audit-prev');
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+      if (_auditCurrentPage > 1) {
+        _auditCurrentPage--;
+        renderAuditTable();
+      }
+    });
+
+    const nextBtn = $('of-audit-next');
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+      if (_auditCurrentPage < totalPages) {
+        _auditCurrentPage++;
+        renderAuditTable();
+      }
+    });
+
+    pag.querySelectorAll('[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _auditCurrentPage = Number(btn.dataset.page);
+        renderAuditTable();
+      });
+    });
   }
 
   // Raw audit codes read like syntax - present them as plain sentences with

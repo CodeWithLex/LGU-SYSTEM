@@ -666,6 +666,9 @@ const Admin = (() => {
   }
 
   // ── Audit Log Tab ─────────────────────────────────────────────────────────
+  let _auditPage = 1;
+  const ADMIN_AUDIT_PAGE_SIZE = 10;
+
   async function loadAuditLog() {
     const container = document.getElementById('admin-tab-audit');
     if (!container.innerHTML.includes('audit-search')) {
@@ -675,13 +678,17 @@ const Admin = (() => {
         </div>
         <div id="audit-table-container"><div class="loading-state">Loading audit log…</div></div>
       `;
-      document.getElementById('audit-search').addEventListener('input', e => renderAuditTable(e.target.value.toLowerCase()));
+      document.getElementById('audit-search').addEventListener('input', e => {
+        _auditPage = 1;
+        renderAuditTable(e.target.value.toLowerCase());
+      });
     } else {
       document.getElementById('audit-table-container').innerHTML = '<div class="loading-state">Loading audit log…</div>';
     }
 
     try {
       _allLogs = await Api.admin.auditLogs({ limit: 100 });
+      _auditPage = 1;
       renderAuditTable(document.getElementById('audit-search').value.toLowerCase());
     } catch (err) {
       document.getElementById('audit-table-container').innerHTML = `<div class="empty-state"><iconify-icon icon="solar:danger-triangle-linear"></iconify-icon> ${err.message}</div>`;
@@ -700,6 +707,13 @@ const Admin = (() => {
       container.innerHTML = '<div class="empty-state">No audit log entries matched.</div>';
       return;
     }
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / ADMIN_AUDIT_PAGE_SIZE));
+    if (_auditPage > totalPages) _auditPage = totalPages;
+    if (_auditPage < 1) _auditPage = 1;
+
+    const startIdx = (_auditPage - 1) * ADMIN_AUDIT_PAGE_SIZE;
+    const pageRows = filtered.slice(startIdx, startIdx + ADMIN_AUDIT_PAGE_SIZE);
 
     const fmtDate = d => new Date(d).toLocaleString('en-PH', {
       month: 'short', day: 'numeric', year: 'numeric',
@@ -767,12 +781,24 @@ const Admin = (() => {
       }
     };
 
+    const start = (_auditPage - 1) * ADMIN_AUDIT_PAGE_SIZE + 1;
+    const end = Math.min(_auditPage * ADMIN_AUDIT_PAGE_SIZE, filtered.length);
+
+    let pagesHTML = '';
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || (p >= _auditPage - 1 && p <= _auditPage + 1)) {
+        pagesHTML += `<button type="button" class="btn btn-ghost ${p === _auditPage ? 'active' : ''}" style="padding:0.25rem 0.6rem;font-size:0.8rem;${p === _auditPage ? 'background:var(--primary);color:#fff;font-weight:700;' : ''}" data-admin-page="${p}">${p}</button>`;
+      } else if (p === _auditPage - 2 || p === _auditPage + 2) {
+        pagesHTML += `<span style="color:var(--text-tertiary);padding:0 2px;">…</span>`;
+      }
+    }
+
     container.innerHTML = `
         <div class="table-wrapper">
           <table class="data-table">
             <thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Details</th></tr></thead>
             <tbody>
-              ${filtered.map(log => `
+              ${pageRows.map(log => `
                 <tr>
                   <td style="font-size:.8rem;white-space:nowrap">${fmtDate(log.created_at)}</td>
                   <td style="font-size:.8rem">${log.profiles?.full_name || '-'}</td>
@@ -784,8 +810,29 @@ const Admin = (() => {
               `).join('')}
             </tbody>
           </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1rem;flex-wrap:wrap;gap:0.5rem;">
+          <span style="font-size:0.8rem;color:var(--text-secondary)">Showing ${start}–${end} of ${filtered.length} entries</span>
+          <div style="display:flex;gap:0.35rem;align-items:center;">
+            <button type="button" class="btn btn-ghost" id="admin-audit-prev" style="padding:0.25rem 0.6rem;font-size:0.8rem;" ${_auditPage <= 1 ? 'disabled' : ''}>Prev</button>
+            ${pagesHTML}
+            <button type="button" class="btn btn-ghost" id="admin-audit-next" style="padding:0.25rem 0.6rem;font-size:0.8rem;" ${_auditPage >= totalPages ? 'disabled' : ''}>Next</button>
+          </div>
         </div>`;
-}
+
+    document.getElementById('admin-audit-prev')?.addEventListener('click', () => {
+      if (_auditPage > 1) { _auditPage--; renderAuditTable(searchTerm); }
+    });
+    document.getElementById('admin-audit-next')?.addEventListener('click', () => {
+      if (_auditPage < totalPages) { _auditPage++; renderAuditTable(searchTerm); }
+    });
+    container.querySelectorAll('[data-admin-page]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _auditPage = Number(btn.dataset.adminPage);
+        renderAuditTable(searchTerm);
+      });
+    });
+  }
 
   return { init, toggleRole };
 })();
