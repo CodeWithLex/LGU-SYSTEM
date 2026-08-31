@@ -100,11 +100,25 @@
   const onboardingLogoutBtn = document.getElementById('onboarding-logout-btn');
   const onboardingError = document.getElementById('onboarding-error');
 
+  function checkRosterVerification(name) {
+    if (!window.Roster || !name) return null;
+    const match = Roster.findStudent(name);
+    const courseSel = document.getElementById('onboarding-course');
+    const yearSel = document.getElementById('onboarding-year');
+
+    if (match) {
+      if (courseSel && match.course) courseSel.value = match.course;
+      if (yearSel && match.year) yearSel.value = match.year;
+      Dropdowns.syncAll();
+    }
+    return match;
+  }
+
   function showOnboardingModal(user, profile) {
     if (!onboardingModal) return;
     const nameInput = document.getElementById('onboarding-name');
+    let defaultName = user?.user_metadata?.full_name || user?.user_metadata?.name || profile?.full_name || '';
     if (nameInput) {
-      const defaultName = user?.user_metadata?.full_name || user?.user_metadata?.name || profile?.full_name || '';
       nameInput.value = defaultName;
       nameInput.placeholder = 'Firstname Lastname';
     }
@@ -120,9 +134,17 @@
     if (passInput) passInput.value = '';
     if (confirmInput) confirmInput.value = '';
 
+    // Auto-verify and pre-fill program/year from official master roster if available
+    checkRosterVerification(defaultName);
+
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
   }
+
+  // Live auto-match when student types their name in onboarding
+  document.getElementById('onboarding-name')?.addEventListener('input', (e) => {
+    checkRosterVerification(e.target.value.trim());
+  });
 
   if (onboardingLogoutBtn) {
     onboardingLogoutBtn.addEventListener('click', async () => {
