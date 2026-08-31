@@ -718,7 +718,10 @@ html body .hidden {
   top: calc(100% + 6px);
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: 100;
+  max-height: 180px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   margin: 0;
   padding: 0.3rem;
   list-style: none;
@@ -731,6 +734,17 @@ html body .hidden {
   visibility: hidden;
   transform: translateY(-6px) scale(0.98);
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+}
+
+.dd-menu::-webkit-scrollbar {
+  width: 5px;
+}
+.dd-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.dd-menu::-webkit-scrollbar-track {
+  background: transparent;
 }
 .dd.dd-open .dd-menu {
   opacity: 1;
@@ -1294,9 +1308,18 @@ input[type="checkbox"]:checked::before {
   border-radius: var(--radius-lg, 12px);
   padding: 1.25rem 1.5rem;
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 35px rgba(249, 115, 22, 0.06);
-  max-height: 90vh;
+  position: relative;
+}
+
+.onboarding-card .form-group:has(.dd.dd-open) {
+  position: relative;
+  z-index: 100;
+}
+
+.onboarding-card .dd-menu {
+  max-height: 165px;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  z-index: 150;
 }
 
 .onboarding-card .modal-header {
