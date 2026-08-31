@@ -17,9 +17,11 @@ CREATE INDEX IF NOT EXISTS idx_enrolled_students_course ON public.enrolled_stude
 -- RLS Policies
 ALTER TABLE public.enrolled_students ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Allow authenticated users to read enrolled students" ON public.enrolled_students;
 CREATE POLICY "Allow authenticated users to read enrolled students" ON public.enrolled_students
   FOR SELECT TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Allow admins to manage enrolled students" ON public.enrolled_students;
 CREATE POLICY "Allow admins to manage enrolled students" ON public.enrolled_students
   FOR ALL TO authenticated
   USING (
@@ -29,7 +31,9 @@ CREATE POLICY "Allow admins to manage enrolled students" ON public.enrolled_stud
     )
   );
 
--- Populate Master Roster
+-- Clear existing entries and Populate Master Roster
+TRUNCATE TABLE public.enrolled_students;
+
 INSERT INTO public.enrolled_students (full_name, sex, department, course, year_level) VALUES
   ('ADJALAINE, GAGE MASOCOL', 'M', 'CoE', 'BSCE', '1'),
   ('ALIPERIO, JOHN II GOMEZ', 'M', 'CoE', 'BSCE', '1'),
