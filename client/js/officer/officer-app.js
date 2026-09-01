@@ -1738,6 +1738,40 @@ const OfficerApp = (() => {
       });
     }
 
+    // Switch between Enrolled Database & Verification Requests panes
+    const viewTabs = $('of-roster-view-tabs');
+    if (viewTabs) {
+      viewTabs.querySelectorAll('.of-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          viewTabs.querySelectorAll('.of-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const view = btn.dataset.rosterView;
+          if (view === 'requests') {
+            $('of-roster-master-pane')?.classList.add('hidden');
+            $('of-roster-requests-pane')?.classList.remove('hidden');
+            loadRosterRequests();
+          } else {
+            $('of-roster-requests-pane')?.classList.add('hidden');
+            $('of-roster-master-pane')?.classList.remove('hidden');
+            loadRoster();
+          }
+        });
+      });
+    }
+
+    // Status Filter Tabs inside Verification Requests Pane
+    const reqStatusTabs = $('of-requests-status-tabs');
+    if (reqStatusTabs) {
+      reqStatusTabs.querySelectorAll('.of-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          reqStatusTabs.querySelectorAll('.of-filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          _requestsStatusFilter = btn.dataset.status || 'pending';
+          loadRosterRequests();
+        });
+      });
+    }
+
     // Program Filter Tabs
     const progTabs = $('of-roster-prog-tabs');
     if (progTabs) {
