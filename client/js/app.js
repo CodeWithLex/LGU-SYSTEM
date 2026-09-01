@@ -167,10 +167,11 @@
       existingReq = await Api.rosterRequests.getMyRequest();
     }
 
-    if (!existingReq && user?.email) {
+    if (!existingReq) {
       try {
-        const raw = localStorage.getItem(`coe_req_${user.email.toLowerCase()}`) || localStorage.getItem('coe_pending_verification');
-        if (raw) existingReq = JSON.parse(raw);
+        if (user?.email) localStorage.removeItem(`coe_req_${user.email.toLowerCase()}`);
+        if (user?.id) localStorage.removeItem(`coe_req_${user.id}`);
+        localStorage.removeItem('coe_pending_verification');
       } catch {}
     }
 
@@ -217,6 +218,9 @@
     if (!match && existingReq && existingReq.status === 'approved') {
       _isRosterMatched = true;
       applyOnboardingState(true);
+    } else if (!match) {
+      _isRosterMatched = false;
+      applyOnboardingState(false);
     }
 
     Dropdowns.syncAll();

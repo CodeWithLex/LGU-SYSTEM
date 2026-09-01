@@ -336,7 +336,7 @@ const Api = (() => {
         const { data, error } = await query;
         if (error) {
           console.warn('[RosterRequests] getMyRequest warning:', error.message);
-          return cached;
+          return null;
         }
 
         const latest = data && data.length > 0 ? data[0] : null;
@@ -349,15 +349,18 @@ const Api = (() => {
           return latest;
         }
 
-        // If Supabase returned [] (e.g. pending DB sync), fallback to cached record if matching
-        if (cached && (cached.status === 'pending' || cached.email === email || cached.user_id === userId)) {
-          return cached;
-        }
+        // Database returned empty array: request was deleted or does not exist
+        // Clear stale local storage immediately so deleted accounts are treated as brand new
+        try {
+          if (email) localStorage.removeItem(`coe_req_${email}`);
+          if (userId) localStorage.removeItem(`coe_req_${userId}`);
+          localStorage.removeItem('coe_pending_verification');
+        } catch {}
 
-        return cached;
+        return null;
       } catch (err) {
         console.warn('[RosterRequests] getMyRequest exception:', err);
-        return cached;
+        return null;
       }
     },
 
