@@ -83,19 +83,36 @@ const Auth = (() => {
   }
 
   async function updateProfile(userId, updates) {
-    // 1. Primary path: Use the backend API (/api/admin/profile) which uses service-role key to bypass RLS safely
-    if (window.Api && window.Api.profile && window.Api.profile.update) {
+    const session = await getSession();
+    const token = session?.access_token || window._authToken;
+    const apiBase = window.API_BASE || 'https://api.coelgu-system.engineer';
+
+    // 1. Primary path: Use the backend API (/api/admin/profile) with service role
+    if (token) {
       try {
-        const data = await window.Api.profile.update(updates);
-        if (data) return data;
+        const res = await fetch(`${apiBase}/api/admin/profile`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updates)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.id) {
+            return data;
+          }
+        }
       } catch (err) {
-        console.warn('[Auth.updateProfile] Backend API update failed, trying Supabase client:', err?.message || err);
+        console.warn('[Auth.updateProfile] Backend API update exception:', err);
       }
     }
 
     const sb = client();
 
-    // 2. Direct Supabase Client update
+    // 2. Direct Supabase Client update (works when row exists)
     const { data, error } = await sb
       .from('profiles')
       .update(updates)
@@ -103,11 +120,10 @@ const Auth = (() => {
       .select()
       .maybeSingle();
 
-    if (error && !error.message?.includes('row-level security')) throw error;
     if (data) return data;
 
-    // 3. Fallback: If profile row was deleted or missing, UPSERT the row
-    const session = await getSession();
+    // 3. If direct update returned 0 rows and backend was unreachable:
+    // Try upsert and catch any RLS errors with a friendly message
     const email = session?.user?.email || '';
     const { data: upsertData, error: upsertError } = await sb
       .from('profiles')
@@ -118,10 +134,18 @@ const Auth = (() => {
         ...updates
       }, { onConflict: 'id' })
       .select()
-      .single();
+      .maybeSingle();
 
-    if (upsertError) throw upsertError;
-    return upsertData;
+    if (upsertData) return upsertData;
+
+    if (upsertError) {
+      console.error('[Auth.updateProfile] Upsert error:', upsertError);
+      throw new Error(upsertError.message?.includes('row-level security')
+        ? 'Your account profile is pending activation. Please refresh or contact council officers.'
+        : upsertError.message);
+    }
+
+    return null;
   }
 
   async function updatePassword(password) {
