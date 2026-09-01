@@ -414,9 +414,7 @@ const OfficerApp = (() => {
 
     const moreSections = ['roster', 'people', 'announcements'];
     const isMoreActive = moreSections.includes(section);
-    const moreDot = $('of-more-nav-active-dot');
     const moreBtn = $('of-bottom-nav-more-btn');
-    if (moreDot) moreDot.classList.toggle('hidden', !isMoreActive);
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
 
     document.querySelectorAll('.of-view').forEach(v => v.classList.remove('active'));

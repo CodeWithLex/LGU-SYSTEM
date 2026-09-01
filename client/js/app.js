@@ -513,9 +513,7 @@
     // Sync active class on both sidebar and bottom nav
     const moreViews = ['income', 'units', 'admin'];
     const isMoreActive = moreViews.includes(view);
-    const moreDot = document.getElementById('more-nav-active-dot');
     const moreBtn = document.getElementById('bottom-nav-more-btn');
-    if (moreDot) moreDot.classList.toggle('hidden', !isMoreActive);
     if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
 
     document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {

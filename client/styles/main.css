@@ -5674,17 +5674,6 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
   color: var(--primary) !important;
 }
 
-/* More tab active dot indicator */
-.more-nav-dot {
-  position: absolute;
-  top: -1px;
-  right: -2px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 6px rgba(249, 115, 22, 0.8);
-}
 
 /* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card */
 @media (max-width: 768px) {
