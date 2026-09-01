@@ -78,8 +78,16 @@ router.get('/', async (req, res) => {
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
-  if (event_id) query = query.eq('event_id', event_id);
-  if (type)     query = query.eq('type', type);
+  if (event_id) {
+    if (event_id === 'GENERAL' || event_id === 'null' || event_id === 'none') {
+      query = query.is('event_id', null);
+    } else if (isValidUUID(event_id)) {
+      query = query.eq('event_id', event_id);
+    } else {
+      return res.status(400).json({ error: 'Invalid event_id format.' });
+    }
+  }
+  if (type) query = query.eq('type', type);
 
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: 'Failed to fetch transactions.' });
@@ -98,6 +106,11 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
     ? undefined
     : req.body.use_allocation === true || req.body.use_allocation === 'true';
 
+  // Normalize event_id ('GENERAL' or empty string -> null)
+  const cleanEventId = (event_id === 'GENERAL' || event_id === '' || event_id === 'null' || !event_id)
+    ? null
+    : (isValidUUID(event_id) ? event_id : null);
+
   // 1. Required field check (event_id is optional for General Income)
   const missing = assertRequired({ type, amount, description, transaction_date });
   if (missing) return res.status(400).json({ error: missing });
@@ -114,11 +127,11 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
 
   // 4. Budget Overdraft Validation
   if (type === 'expense') {
-    if (use_allocation) {
+    if (use_allocation && cleanEventId) {
       // Check against Event balance
       const [{ data: event }, { data: evTxs }] = await Promise.all([
-        supabase.from('events').select('allocated_budget').eq('id', event_id).single(),
-        supabase.from('transactions').select('type, amount, use_allocation').eq('event_id', event_id)
+        supabase.from('events').select('allocated_budget').eq('id', cleanEventId).single(),
+        supabase.from('transactions').select('type, amount, use_allocation').eq('event_id', cleanEventId)
       ]);
       if (event) {
         let allocExp = 0;
@@ -168,7 +181,7 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
   const { data: tx, error: txError } = await supabase
     .from('transactions')
     .insert({
-      event_id,
+      event_id:         cleanEventId,
       type,
       amount:           Number(amount),
       description:      cleanDesc,
