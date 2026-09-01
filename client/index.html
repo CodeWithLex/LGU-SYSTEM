@@ -347,6 +347,7 @@
                 <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
               </div>
               <h3 class="stat-value" id="stat-income">₱0.00</h3>
+              <p class="stat-sublabel">All incoming funds & collections</p>
             </div>
             <div class="stat-popover" id="pop-income"></div>
           </div>
@@ -358,6 +359,7 @@
                 <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
               </div>
               <h3 class="stat-value" id="stat-expense">₱0.00</h3>
+              <p class="stat-sublabel">Disbursed for events & ops</p>
             </div>
             <div class="stat-popover" id="pop-expense"></div>
           </div>
@@ -369,6 +371,7 @@
                 <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
               </div>
               <h3 class="stat-value" id="stat-balance">₱0.00</h3>
+              <p class="stat-sublabel">Net unreserved cash available</p>
             </div>
             <div class="stat-popover" id="pop-balance"></div>
           </div>
@@ -380,6 +383,7 @@
                 <span class="stat-card-hint"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></span>
               </div>
               <h3 class="stat-value" id="stat-donations">₱0.00</h3>
+              <p class="stat-sublabel">Sponsors & community gifts</p>
             </div>
             <div class="stat-popover" id="pop-donations"></div>
           </div>
@@ -1060,7 +1064,7 @@
     </aside>
   </div>
 
-  <!-- Floating Island Glass Pill Bottom Navigation (Mobile) -->
+  <!-- Floating Island Glass Pill Bottom Navigation (Mobile - 5 Core Destinations) -->
   <nav class="bottom-nav" id="bottom-nav" aria-label="Mobile Navigation">
     <a href="#" class="bottom-nav-item active" data-view="dashboard" title="Dashboard">
       <span class="nav-icon"><iconify-icon icon="solar:widget-2-linear"></iconify-icon></span>
@@ -1074,27 +1078,91 @@
       <span class="nav-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span>
       <span>Ledger</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="income" title="Total Income">
-      <span class="nav-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></span>
-      <span>Income</span>
-    </a>
     <a href="#" class="bottom-nav-item" data-view="reports" title="Financial Reports">
       <span class="nav-icon"><iconify-icon icon="solar:document-text-linear"></iconify-icon></span>
       <span>Reports</span>
     </a>
-    <a href="#" class="bottom-nav-item" data-view="units" title="Academic Progress">
-      <span class="nav-icon"><iconify-icon icon="solar:diploma-verified-linear"></iconify-icon></span>
-      <span>Units</span>
-    </a>
-    <a href="/officer.html" class="bottom-nav-item officer-only officer-nav-link hidden" id="bottom-nav-executive-portal" title="Executive Portal">
-      <span class="nav-icon"><iconify-icon icon="solar:shield-user-linear"></iconify-icon></span>
-      <span>Exec</span>
-    </a>
-    <a href="#" class="bottom-nav-item admin-only hidden" data-view="admin" id="bottom-nav-admin" title="Admin Panel">
-      <span class="nav-icon"><iconify-icon icon="solar:shield-check-linear"></iconify-icon></span>
-      <span>Admin</span>
-    </a>
+    <button type="button" class="bottom-nav-item bottom-nav-more-trigger" id="bottom-nav-more-btn" title="More Views & Services" aria-haspopup="dialog" aria-expanded="false">
+      <span class="nav-icon" style="position:relative;">
+        <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+        <span class="more-nav-dot hidden" id="more-nav-active-dot"></span>
+      </span>
+      <span>More</span>
+    </button>
   </nav>
+
+  <!-- iOS-Style Mobile "More" Slide-Up Bottom Sheet Drawer -->
+  <div id="mobile-more-sheet-backdrop" class="mobile-sheet-backdrop hidden" aria-hidden="true"></div>
+  <div id="mobile-more-sheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-label="More Features and Navigation">
+    <div class="mobile-sheet-drag-zone" id="mobile-sheet-drag-handle">
+      <div class="mobile-sheet-pill-bar"></div>
+    </div>
+    <div class="mobile-sheet-head">
+      <div class="mobile-sheet-title-row">
+        <h3>More Services & Views</h3>
+        <button type="button" class="btn-icon mobile-sheet-close-btn" id="mobile-sheet-close-btn" aria-label="Close menu">
+          <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+        </button>
+      </div>
+      <p class="mobile-sheet-sub">Explore additional academic and administrative tools</p>
+    </div>
+    <div class="mobile-sheet-menu-grid">
+      <button type="button" class="mobile-sheet-card bottom-nav-item" data-view="income" data-sheet-action="nav">
+        <div class="mobile-sheet-card-icon" style="color:var(--status-positive); background:rgba(34,197,94,0.12);">
+          <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Total Income Tracker</span>
+          <span class="mobile-sheet-card-caption">Breakdown & incoming collections</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+
+      <button type="button" class="mobile-sheet-card bottom-nav-item" data-view="units" data-sheet-action="nav">
+        <div class="mobile-sheet-card-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
+          <iconify-icon icon="solar:diploma-verified-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Academic Progress (Units)</span>
+          <span class="mobile-sheet-card-caption">Engineering curriculum checklist</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+
+      <a href="/officer.html" class="mobile-sheet-card officer-only hidden" id="bottom-nav-executive-portal">
+        <div class="mobile-sheet-card-icon" style="color:var(--primary); background:rgba(249,115,22,0.12);">
+          <iconify-icon icon="solar:shield-user-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Executive Portal</span>
+          <span class="mobile-sheet-card-caption">Officer fund administration</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </a>
+
+      <button type="button" class="mobile-sheet-card admin-only hidden bottom-nav-item" data-view="admin" id="bottom-nav-admin" data-sheet-action="nav">
+        <div class="mobile-sheet-card-icon" style="color:#A855F7; background:rgba(168,85,247,0.12);">
+          <iconify-icon icon="solar:shield-check-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Admin Panel</span>
+          <span class="mobile-sheet-card-caption">System logs & user roles</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+
+      <button type="button" class="mobile-sheet-card" id="mobile-sheet-profile-trigger" data-sheet-action="profile">
+        <div class="mobile-sheet-card-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
+          <iconify-icon icon="solar:user-circle-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Profile & Settings</span>
+          <span class="mobile-sheet-card-caption">Avatar, degree program & password</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+    </div>
+  </div>
 
   <!-- Toast -->
   <div class="toast hidden" id="toast" role="status" aria-live="polite">

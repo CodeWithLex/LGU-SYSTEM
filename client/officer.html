@@ -581,7 +581,7 @@
     </main>
   </div>
 
-  <!-- Mobile Floating Island Glass Pill Bottom Navigation -->
+  <!-- Mobile Floating Island Glass Pill Bottom Navigation (5 Core Destinations) -->
   <nav class="of-bottom-nav" id="of-bottom-nav" aria-label="Executive Navigation">
     <button data-of="overview" class="active" title="Fund Overview">
       <iconify-icon icon="solar:chart-2-linear"></iconify-icon>
@@ -599,23 +599,87 @@
       <iconify-icon icon="solar:document-text-linear"></iconify-icon>
       <span>Reports</span>
     </button>
-    <button data-of="people" title="People & Access">
-      <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
-      <span>People</span>
+    <button type="button" id="of-bottom-nav-more-btn" title="More Executive Controls" aria-haspopup="dialog" aria-expanded="false">
+      <span style="position:relative; display:inline-flex;">
+        <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+        <span class="more-nav-dot hidden" id="of-more-nav-active-dot"></span>
+      </span>
+      <span>More</span>
     </button>
-    <button data-of="announcements" title="Announcements">
-      <iconify-icon icon="solar:bell-linear"></iconify-icon>
-      <span>Announce</span>
-    </button>
-    <button data-of="roster" title="Enrolled Roster">
-      <iconify-icon icon="solar:user-plus-linear"></iconify-icon>
-      <span>Roster</span>
-    </button>
-    <a href="/" class="of-nav-link-main" title="Return to Student Portal">
-      <iconify-icon icon="solar:widget-2-linear"></iconify-icon>
-      <span>Home</span>
-    </a>
   </nav>
+
+  <!-- iOS-Style Executive "More" Slide-Up Bottom Sheet Drawer -->
+  <div id="of-mobile-more-sheet-backdrop" class="mobile-sheet-backdrop hidden" aria-hidden="true"></div>
+  <div id="of-mobile-more-sheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-label="More Executive Controls">
+    <div class="mobile-sheet-drag-zone" id="of-mobile-sheet-drag-handle">
+      <div class="mobile-sheet-pill-bar"></div>
+    </div>
+    <div class="mobile-sheet-head">
+      <div class="mobile-sheet-title-row">
+        <h3>Executive Controls</h3>
+        <button type="button" class="btn-icon mobile-sheet-close-btn" id="of-mobile-sheet-close-btn" aria-label="Close menu">
+          <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
+        </button>
+      </div>
+      <p class="mobile-sheet-sub">Administration, verification and system routing</p>
+    </div>
+    <div class="mobile-sheet-menu-grid">
+      <button type="button" class="mobile-sheet-card" data-of="roster" data-of-sheet-action="nav">
+        <div class="mobile-sheet-card-icon" style="color:var(--primary); background:rgba(249,115,22,0.12);">
+          <iconify-icon icon="solar:user-plus-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Enrolled Roster</span>
+          <span class="mobile-sheet-card-caption">Student database verification & approvals</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+
+      <button type="button" class="mobile-sheet-card" data-of="people" data-of-sheet-action="nav">
+        <div class="mobile-sheet-card-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
+          <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">People & Access</span>
+          <span class="mobile-sheet-card-caption">Officer roles and privileges</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+
+      <button type="button" class="mobile-sheet-card" data-of="announcements" data-of-sheet-action="nav">
+        <div class="mobile-sheet-card-icon" style="color:#F59E0B; background:rgba(245,158,11,0.12);">
+          <iconify-icon icon="solar:bell-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Announcements</span>
+          <span class="mobile-sheet-card-caption">Broadcast updates to portal</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+
+      <a href="/" class="mobile-sheet-card" title="Return to Student Portal">
+        <div class="mobile-sheet-card-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
+          <iconify-icon icon="solar:widget-2-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Student Portal</span>
+          <span class="mobile-sheet-card-caption">Return to main dashboard</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </a>
+
+      <button type="button" class="mobile-sheet-card" data-action="open-profile">
+        <div class="mobile-sheet-card-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
+          <iconify-icon icon="solar:settings-minimalistic-linear"></iconify-icon>
+        </div>
+        <div class="mobile-sheet-card-text">
+          <span class="mobile-sheet-card-title">Account Settings</span>
+          <span class="mobile-sheet-card-caption">Avatar, password & profile info</span>
+        </div>
+        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
+      </button>
+    </div>
+  </div>
 
   <!-- Add / Edit Enrolled Student Modal -->
   <div id="of-roster-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">

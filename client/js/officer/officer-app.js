@@ -301,6 +301,58 @@ const OfficerApp = (() => {
       btn.addEventListener('click', () => switchSection(btn.dataset.of));
     });
     bindAutoHideBottomNav();
+    bindOfficerMobileMoreSheet();
+  }
+
+  function bindOfficerMobileMoreSheet() {
+    const moreBtn = $('of-bottom-nav-more-btn');
+    const sheet = $('of-mobile-more-sheet');
+    const backdrop = $('of-mobile-more-sheet-backdrop');
+    const closeBtn = $('of-mobile-sheet-close-btn');
+    const dragHandle = $('of-mobile-sheet-drag-handle');
+
+    function openSheet() {
+      if (!sheet || !backdrop) return;
+      sheet.classList.remove('hidden');
+      backdrop.classList.remove('hidden');
+      if (moreBtn) moreBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSheet() {
+      if (!sheet || !backdrop) return;
+      sheet.classList.add('hidden');
+      backdrop.classList.add('hidden');
+      if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    if (moreBtn) moreBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (sheet && sheet.classList.contains('hidden')) openSheet();
+      else closeSheet();
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSheet);
+    if (backdrop) backdrop.addEventListener('click', closeSheet);
+    if (dragHandle) dragHandle.addEventListener('click', closeSheet);
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && sheet && !sheet.classList.contains('hidden')) {
+        closeSheet();
+      }
+    });
+
+    if (sheet) {
+      sheet.querySelectorAll('[data-of-sheet-action]').forEach(el => {
+        el.addEventListener('click', () => {
+          closeSheet();
+          if (el.dataset.of) {
+            switchSection(el.dataset.of);
+          }
+        });
+      });
+    }
   }
 
   function bindAutoHideBottomNav() {
@@ -356,8 +408,17 @@ const OfficerApp = (() => {
   async function switchSection(section) {
     if (!section || !$(`of-view-${section}`)) section = 'overview';
 
+    const moreSections = ['roster', 'people', 'announcements'];
+    const isMoreActive = moreSections.includes(section);
+    const moreDot = $('of-more-nav-active-dot');
+    const moreBtn = $('of-bottom-nav-more-btn');
+    if (moreDot) moreDot.classList.toggle('hidden', !isMoreActive);
+    if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
+
     document.querySelectorAll('.of-view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('[data-of]').forEach(b => b.classList.toggle('active', b.dataset.of === section));
+    document.querySelectorAll('[data-of]').forEach(b => {
+      if (b !== moreBtn) b.classList.toggle('active', b.dataset.of === section);
+    });
     $(`of-view-${section}`).classList.add('active');
 
     // Remember view across page refreshes and keep URL hash in sync

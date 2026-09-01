@@ -511,8 +511,17 @@
     UI.showView(view);
 
     // Sync active class on both sidebar and bottom nav
+    const moreViews = ['income', 'units', 'admin'];
+    const isMoreActive = moreViews.includes(view);
+    const moreDot = document.getElementById('more-nav-active-dot');
+    const moreBtn = document.getElementById('bottom-nav-more-btn');
+    if (moreDot) moreDot.classList.toggle('hidden', !isMoreActive);
+    if (moreBtn) moreBtn.classList.toggle('active', isMoreActive);
+
     document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.view === view);
+      if (el !== moreBtn) {
+        el.classList.toggle('active', el.dataset.view === view);
+      }
     });
 
     if (view === 'dashboard')    Dashboard.load();
@@ -529,6 +538,66 @@
 
   // Expose navigateTo globally for modular triggers (e.g. dashboard cards, quick links)
   window.navigateTo = navigateTo;
+
+  function bindMobileMoreSheet() {
+    const moreBtn = document.getElementById('bottom-nav-more-btn');
+    const sheet = document.getElementById('mobile-more-sheet');
+    const backdrop = document.getElementById('mobile-more-sheet-backdrop');
+    const closeBtn = document.getElementById('mobile-sheet-close-btn');
+    const dragHandle = document.getElementById('mobile-sheet-drag-handle');
+
+    function openSheet() {
+      if (!sheet || !backdrop) return;
+      sheet.classList.remove('hidden');
+      backdrop.classList.remove('hidden');
+      if (moreBtn) moreBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSheet() {
+      if (!sheet || !backdrop) return;
+      sheet.classList.add('hidden');
+      backdrop.classList.add('hidden');
+      if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    if (moreBtn) moreBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (sheet && sheet.classList.contains('hidden')) openSheet();
+      else closeSheet();
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeSheet);
+    if (backdrop) backdrop.addEventListener('click', closeSheet);
+    if (dragHandle) dragHandle.addEventListener('click', closeSheet);
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && sheet && !sheet.classList.contains('hidden')) {
+        closeSheet();
+      }
+    });
+
+    if (sheet) {
+      sheet.querySelectorAll('[data-sheet-action]').forEach(el => {
+        el.addEventListener('click', () => {
+          const action = el.dataset.sheetAction;
+          if (action === 'nav' && el.dataset.view) {
+            closeSheet();
+            navigateTo(el.dataset.view);
+          } else if (action === 'profile') {
+            closeSheet();
+            if (typeof Profile !== 'undefined' && Profile.open) {
+              Profile.open();
+            } else {
+              document.getElementById('profile-settings-btn')?.click();
+            }
+          }
+        });
+      });
+    }
+  }
+  bindMobileMoreSheet();
 
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
     item.addEventListener('click', async e => {
