@@ -1093,74 +1093,94 @@
 
   <!-- iOS-Style Mobile "More" Slide-Up Bottom Sheet Drawer -->
   <div id="mobile-more-sheet-backdrop" class="mobile-sheet-backdrop hidden" aria-hidden="true"></div>
-  <div id="mobile-more-sheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-label="More Features and Navigation">
+  <div id="mobile-more-sheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-label="More Services & Views">
     <div class="mobile-sheet-drag-zone" id="mobile-sheet-drag-handle">
       <div class="mobile-sheet-pill-bar"></div>
     </div>
     <div class="mobile-sheet-head">
       <div class="mobile-sheet-title-row">
-        <h3>More Services & Views</h3>
+        <div>
+          <h3>More Services & Views</h3>
+          <p class="mobile-sheet-sub">Academic, financial & administrative tools</p>
+        </div>
         <button type="button" class="btn-icon mobile-sheet-close-btn" id="mobile-sheet-close-btn" aria-label="Close menu">
           <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
         </button>
       </div>
-      <p class="mobile-sheet-sub">Explore additional academic and administrative tools</p>
     </div>
-    <div class="mobile-sheet-menu-grid">
-      <button type="button" class="mobile-sheet-card bottom-nav-item" data-view="income" data-sheet-action="nav">
-        <div class="mobile-sheet-card-icon" style="color:var(--status-positive); background:rgba(34,197,94,0.12);">
-          <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
+    <div class="mobile-sheet-body">
+      <!-- Section: ACADEMIC -->
+      <div class="mobile-sheet-section">
+        <span class="mobile-sheet-section-label">Academic</span>
+        <div class="mobile-sheet-group">
+          <button type="button" class="mobile-sheet-row bottom-nav-item" data-view="units" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
+              <iconify-icon icon="solar:diploma-verified-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Academic Progress (Units)</span>
+              <span class="mobile-sheet-row-desc">Engineering curriculum checklist</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
         </div>
-        <div class="mobile-sheet-card-text">
-          <span class="mobile-sheet-card-title">Total Income Tracker</span>
-          <span class="mobile-sheet-card-caption">Breakdown & incoming collections</span>
-        </div>
-        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
-      </button>
+      </div>
 
-      <button type="button" class="mobile-sheet-card bottom-nav-item" data-view="units" data-sheet-action="nav">
-        <div class="mobile-sheet-card-icon" style="color:#38BDF8; background:rgba(56,189,248,0.12);">
-          <iconify-icon icon="solar:diploma-verified-linear"></iconify-icon>
+      <!-- Section: FINANCE -->
+      <div class="mobile-sheet-section">
+        <span class="mobile-sheet-section-label">Finance</span>
+        <div class="mobile-sheet-group">
+          <button type="button" class="mobile-sheet-row bottom-nav-item" data-view="income" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:var(--status-positive); background:rgba(34,197,94,0.12);">
+              <iconify-icon icon="solar:wallet-money-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Total Income Tracker</span>
+              <span class="mobile-sheet-row-desc">Breakdown & incoming collections</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
         </div>
-        <div class="mobile-sheet-card-text">
-          <span class="mobile-sheet-card-title">Academic Progress (Units)</span>
-          <span class="mobile-sheet-card-caption">Engineering curriculum checklist</span>
-        </div>
-        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
-      </button>
+      </div>
 
-      <a href="/officer.html" class="mobile-sheet-card officer-only hidden" id="bottom-nav-executive-portal">
-        <div class="mobile-sheet-card-icon" style="color:var(--primary); background:rgba(249,115,22,0.12);">
-          <iconify-icon icon="solar:shield-user-linear"></iconify-icon>
-        </div>
-        <div class="mobile-sheet-card-text">
-          <span class="mobile-sheet-card-title">Executive Portal</span>
-          <span class="mobile-sheet-card-caption">Officer fund administration</span>
-        </div>
-        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
-      </a>
+      <!-- Section: ADMINISTRATION -->
+      <div class="mobile-sheet-section">
+        <span class="mobile-sheet-section-label">Administration</span>
+        <div class="mobile-sheet-group">
+          <a href="/officer.html" class="mobile-sheet-row officer-only hidden" id="bottom-nav-executive-portal">
+            <div class="mobile-sheet-row-icon" style="color:var(--primary); background:rgba(249,115,22,0.12);">
+              <iconify-icon icon="solar:shield-user-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Executive Portal</span>
+              <span class="mobile-sheet-row-desc">Officer fund administration</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </a>
 
-      <button type="button" class="mobile-sheet-card admin-only hidden bottom-nav-item" data-view="admin" id="bottom-nav-admin" data-sheet-action="nav">
-        <div class="mobile-sheet-card-icon" style="color:#A855F7; background:rgba(168,85,247,0.12);">
-          <iconify-icon icon="solar:shield-check-linear"></iconify-icon>
-        </div>
-        <div class="mobile-sheet-card-text">
-          <span class="mobile-sheet-card-title">Admin Panel</span>
-          <span class="mobile-sheet-card-caption">System logs & user roles</span>
-        </div>
-        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
-      </button>
+          <button type="button" class="mobile-sheet-row admin-only hidden bottom-nav-item" data-view="admin" id="bottom-nav-admin" data-sheet-action="nav">
+            <div class="mobile-sheet-row-icon" style="color:#A855F7; background:rgba(168,85,247,0.12);">
+              <iconify-icon icon="solar:shield-check-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Admin Panel</span>
+              <span class="mobile-sheet-row-desc">System logs & user roles</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
 
-      <button type="button" class="mobile-sheet-card" id="mobile-sheet-profile-trigger" data-sheet-action="profile">
-        <div class="mobile-sheet-card-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
-          <iconify-icon icon="solar:user-circle-linear"></iconify-icon>
+          <button type="button" class="mobile-sheet-row" id="mobile-sheet-profile-trigger" data-sheet-action="profile">
+            <div class="mobile-sheet-row-icon" style="color:var(--text-secondary); background:rgba(255,255,255,0.06);">
+              <iconify-icon icon="solar:user-circle-linear"></iconify-icon>
+            </div>
+            <div class="mobile-sheet-row-content">
+              <span class="mobile-sheet-row-title">Profile & Settings</span>
+              <span class="mobile-sheet-row-desc">Avatar, degree program & password</span>
+            </div>
+            <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-row-chevron"></iconify-icon>
+          </button>
         </div>
-        <div class="mobile-sheet-card-text">
-          <span class="mobile-sheet-card-title">Profile & Settings</span>
-          <span class="mobile-sheet-card-caption">Avatar, degree program & password</span>
-        </div>
-        <iconify-icon icon="solar:alt-arrow-right-linear" class="mobile-sheet-card-chevron"></iconify-icon>
-      </button>
+      </div>
     </div>
   </div>
 

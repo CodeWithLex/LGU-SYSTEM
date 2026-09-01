@@ -344,7 +344,7 @@ const OfficerApp = (() => {
     });
 
     if (sheet) {
-      sheet.querySelectorAll('[data-of-sheet-action]').forEach(el => {
+      sheet.querySelectorAll('[data-of-sheet-action], [data-action="open-profile"]').forEach(el => {
         el.addEventListener('click', () => {
           closeSheet();
           if (el.dataset.of) {
