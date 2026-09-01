@@ -2237,7 +2237,7 @@ const OfficerApp = (() => {
 
   // ---------- Single Student Modal (Add & Edit) ----------
 
-  function bindRosterForm() {
+  function bindRosterModal() {
     const form = $('of-roster-modal-form');
     const cancelBtn = $('of-roster-modal-cancel');
     const modal = $('of-roster-modal');
