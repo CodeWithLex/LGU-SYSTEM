@@ -352,8 +352,12 @@ const OfficerApp = (() => {
       return new Date(y, mo - 1).toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
     });
 
-    const textColor = getThemeColor('--text-secondary', '#94A3B8');
-    const gridColor = getThemeColor('--border', '#28313A');
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const textColor = isLight ? '#64748B' : '#94A3B8';
+    const gridColor = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.04)';
+    const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
+    const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
+    const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
     renderChartInstance(canvasId, {
       type: 'bar',
@@ -364,21 +368,23 @@ const OfficerApp = (() => {
             label: 'Income',
             data: monthly.map(m => m.income),
             backgroundColor: '#F97316',
-            borderRadius: 6,
-            borderSkipped: false,
-            maxBarThickness: 35,
-            categoryPercentage: 0.8,
-            barPercentage: 0.9
+            hoverBackgroundColor: '#FB923C',
+            borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
+            borderSkipped: 'bottom',
+            maxBarThickness: 32,
+            categoryPercentage: 0.75,
+            barPercentage: 0.85
           },
           {
             label: 'Expenses',
             data: monthly.map(m => m.expense),
-            backgroundColor: '#475569',
-            borderRadius: 6,
-            borderSkipped: false,
-            maxBarThickness: 35,
-            categoryPercentage: 0.8,
-            barPercentage: 0.9
+            backgroundColor: isLight ? '#94A3B8' : '#475569',
+            hoverBackgroundColor: isLight ? '#CBD5E1' : '#64748B',
+            borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
+            borderSkipped: 'bottom',
+            maxBarThickness: 32,
+            categoryPercentage: 0.75,
+            barPercentage: 0.85
           }
         ]
       },
@@ -386,22 +392,66 @@ const OfficerApp = (() => {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'top', labels: { color: textColor, font: { family: 'Inter' } } },
+          legend: {
+            position: 'top',
+            align: 'end',
+            labels: {
+              color: textColor,
+              font: { family: 'Inter, sans-serif', size: 12, weight: '500' },
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 7,
+              boxHeight: 7,
+              padding: 16
+            }
+          },
           tooltip: {
+            backgroundColor: tooltipBg,
+            titleColor: tooltipText,
+            bodyColor: tooltipText,
+            borderColor: tooltipBorder,
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+            bodyFont: { family: 'Inter, sans-serif', size: 12 },
+            boxPadding: 4,
+            usePointStyle: true,
             callbacks: {
               label: ctx => ` ${ctx.dataset.label}: ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`,
               afterBody: items => {
                 const idx = items[0]?.dataIndex;
                 if (idx == null || !monthly[idx]) return '';
                 const net = (monthly[idx].income || 0) - (monthly[idx].expense || 0);
-                return `Net: ${net >= 0 ? '+' : '-'}₱${Math.abs(net).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+                return `\nNet Cashflow: ${net >= 0 ? '+' : '-'}₱${Math.abs(net).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
               }
             }
           }
         },
         scales: {
-          x: { grid: { display: false }, ticks: { color: textColor } },
-          y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => `₱${(v / 1000).toFixed(0)}k` } }
+          x: {
+            border: { display: false },
+            grid: { display: false },
+            ticks: {
+              color: textColor,
+              font: { family: 'Inter, sans-serif', size: 11, weight: '500' },
+              padding: 6
+            }
+          },
+          y: {
+            border: { display: false },
+            grid: {
+              color: gridColor,
+              borderDash: [4, 6],
+              drawTicks: false
+            },
+            ticks: {
+              color: textColor,
+              font: { family: 'Inter, sans-serif', size: 11 },
+              padding: 8,
+              callback: v => `₱${(v / 1000).toFixed(0)}k`
+            }
+          }
         }
       }
     });
@@ -411,15 +461,18 @@ const OfficerApp = (() => {
     if (!breakdown) return;
     const typeMap = [
       { key: 'expense',    label: 'Expenses',   color: '#EF4444' },
-      { key: 'allocation', label: 'Allocation', color: '#94A3B8' },
-      { key: 'donation',   label: 'Donations',  color: '#22C55E' },
+      { key: 'allocation', label: 'Allocation', color: '#64748B' },
+      { key: 'donation',   label: 'Donations',  color: '#10B981' },
       { key: 'collection', label: 'Collection', color: '#F97316' },
     ];
 
     const active = typeMap.filter(t => (breakdown[t.key] || 0) > 0);
     const hasData = active.length > 0;
-    const textColor = getThemeColor('--text-secondary', '#94A3B8');
-    const surfaceColor = getThemeColor('--surface', '#111820');
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const textColor = isLight ? '#64748B' : '#94A3B8';
+    const tooltipBg = isLight ? '#FFFFFF' : '#0F172A';
+    const tooltipText = isLight ? '#0F172A' : '#F8FAFC';
+    const tooltipBorder = isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
     renderChartInstance(canvasId, {
       type: 'doughnut',
@@ -428,29 +481,41 @@ const OfficerApp = (() => {
         datasets: [{
           data: hasData ? active.map(t => breakdown[t.key]) : [1],
           backgroundColor: hasData ? active.map(t => t.color) : ['#334155'],
-          borderWidth: 2,
-          borderColor: surfaceColor,
+          borderWidth: 0,
+          spacing: 3,
+          borderRadius: 3,
           hoverOffset: 6
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '65%',
+        cutout: '74%',
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
               color: textColor,
-              font: { family: 'Inter', size: 12 },
-              padding: 14,
+              font: { family: 'Inter, sans-serif', size: 12, weight: '500' },
+              padding: 16,
               usePointStyle: true,
-              pointStyle: 'circle'
+              pointStyle: 'circle',
+              boxWidth: 7,
+              boxHeight: 7
             }
           },
           tooltip: {
+            backgroundColor: tooltipBg,
+            titleColor: tooltipText,
+            bodyColor: tooltipText,
+            borderColor: tooltipBorder,
+            borderWidth: 1,
+            padding: 10,
+            cornerRadius: 8,
+            titleFont: { family: 'Outfit, sans-serif', size: 12, weight: '600' },
+            bodyFont: { family: 'Inter, sans-serif', size: 12 },
             callbacks: {
-              label: ctx => ` ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+              label: ctx => ` ${ctx.label}: ₱${Number(ctx.raw).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
             }
           }
         }
