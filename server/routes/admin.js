@@ -161,6 +161,12 @@ router.post('/budget-transfer', requireOfficer, async (req, res) => {
   if (from_event_id === to_event_id) {
     return res.status(400).json({ error: 'Source and target events must be different.' });
   }
+  if (!isValidUUID(to_event_id)) {
+    return res.status(400).json({ error: 'Target event must be a valid event ID.' });
+  }
+  if (from_event_id !== 'GENERAL' && !isValidUUID(from_event_id)) {
+    return res.status(400).json({ error: 'Source event must be a valid event ID or General Fund.' });
+  }
   if (!isPositiveNumber(amount)) {
     return res.status(400).json({ error: 'Amount must be a positive number.' });
   }

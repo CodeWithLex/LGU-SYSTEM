@@ -253,17 +253,17 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
   }
 
   // Check over-budget for expenses
-  if (type === 'expense') {
-    const { data: ev } = await supabase.from('events').select('allocated_budget, remaining_budget').eq('id', event_id).single();
+  if (type === 'expense' && cleanEventId) {
+    const { data: ev } = await supabase.from('events').select('allocated_budget, remaining_budget').eq('id', cleanEventId).single();
     if (ev && Number(ev.remaining_budget) < Number(ev.allocated_budget) * 0.1) {
       tx.over_budget_warning = true;
-      logAudit(req.user.id, 'OVER_BUDGET_ALERT', { event_id, remaining_budget: ev.remaining_budget });
+      logAudit(req.user.id, 'OVER_BUDGET_ALERT', { event_id: cleanEventId, remaining_budget: ev.remaining_budget });
     }
   }
 
   logAudit(req.user.id, 'CREATE_TRANSACTION', {
     transaction_id: tx.id,
-    event_id,
+    event_id: cleanEventId,
     type,
     amount:      Number(amount),
     description: cleanDesc
@@ -284,7 +284,6 @@ router.post('/bulk', requireAdmin, async (req, res) => {
   for (let i = 0; i < transactions.length; i++) {
     const tx = transactions[i];
     const missing = assertRequired({ 
-      event_id: tx.event_id, 
       type: tx.type, 
       amount: tx.amount, 
       description: tx.description, 
@@ -299,6 +298,12 @@ router.post('/bulk', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: `Row ${i + 1} error: Amount must be > 0.` });
     }
     
+    // Normalize event_id ('GENERAL', 'null', empty string -> null)
+    const rawEvId = tx.event_id;
+    tx.event_id = (rawEvId === 'GENERAL' || rawEvId === '' || rawEvId === 'null' || !rawEvId)
+      ? null
+      : (isValidUUID(rawEvId) ? rawEvId : null);
+
     // Transform inline for insertion
     tx.amount = Number(tx.amount);
     tx.description = sanitizeText(String(tx.description)).slice(0, 500);

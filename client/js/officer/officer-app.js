@@ -975,11 +975,34 @@ const OfficerApp = (() => {
     }
   }
 
+  function getAvailableGeneralFundSync() {
+    let totalIncome = 0;
+    let dashboardExpense = 0;
+    let reservedEnvelopes = 0;
+
+    (_events || []).forEach(e => {
+      if (e.status !== 'archived') {
+        reservedEnvelopes += Number(e.allocated_budget || 0);
+      }
+    });
+
+    (_txs || []).forEach(tx => {
+      if (['donation', 'collection', 'allocation'].includes(tx.type)) {
+        totalIncome += Number(tx.amount || 0);
+      }
+      if (tx.type === 'expense' && !tx.use_allocation) {
+        dashboardExpense += Number(tx.amount || 0);
+      }
+    });
+
+    return Math.max(0, totalIncome - dashboardExpense - reservedEnvelopes);
+  }
+
   function updateCreateEventBudgetUI() {
-    const summary = computeFinancialSummary(_txs, _events);
+    const avail = getAvailableGeneralFundSync();
     const availBalEl = $('of-ev-avail-bal');
     if (availBalEl) {
-      availBalEl.textContent = `₱${fmtNum(summary.remainingBalance)}`;
+      availBalEl.textContent = `₱${fmtNum(avail)}`;
     }
   }
 
@@ -990,9 +1013,9 @@ const OfficerApp = (() => {
       errEl.classList.add('hidden');
 
       const budgetVal = Number($('of-ev-budget').value) || 0;
-      const summary = computeFinancialSummary(_txs, _events);
-      if (budgetVal > summary.remainingBalance) {
-        errEl.textContent = `Insufficient unreserved funds in General Fund. Available: ₱${fmtNum(summary.remainingBalance)}, Requested: ₱${fmtNum(budgetVal)}.`;
+      const avail = getAvailableGeneralFundSync();
+      if (budgetVal > avail) {
+        errEl.textContent = `Insufficient unreserved funds in General Fund. Available: ₱${fmtNum(avail)}, Requested: ₱${fmtNum(budgetVal)}.`;
         errEl.classList.remove('hidden');
         return;
       }
