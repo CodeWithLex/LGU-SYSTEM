@@ -153,11 +153,73 @@ const UI = (() => {
     }
   }
 
+  // Auto-hiding floating bottom navigation on scroll (Facebook / iOS approach)
+  let _autoHideNavBound = false;
+  function initAutoHideBottomNav() {
+    const bottomNav = document.getElementById('bottom-nav');
+    if (!bottomNav || _autoHideNavBound) return;
+    _autoHideNavBound = true;
+
+    const scrollTargets = [
+      document.querySelector('.main-content'),
+      window
+    ].filter(Boolean);
+
+    let lastScrollTop = 0;
+    let ticking = false;
+    const HIDE_THRESHOLD = 15;
+    const SHOW_THRESHOLD = 8;
+
+    function handleScroll(e) {
+      const target = (e.target === document || e.target === window) ? (document.documentElement || document.body) : e.target;
+      const currentScrollTop = target.scrollTop || window.scrollY || 0;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const diff = currentScrollTop - lastScrollTop;
+
+          if (currentScrollTop <= 25) {
+            bottomNav.classList.remove('nav-hidden');
+          } else if (diff > HIDE_THRESHOLD) {
+            // Scrolling DOWN -> Hide floating nav
+            bottomNav.classList.add('nav-hidden');
+          } else if (diff < -SHOW_THRESHOLD) {
+            // Scrolling UP -> Reveal floating nav
+            bottomNav.classList.remove('nav-hidden');
+          }
+
+          lastScrollTop = Math.max(0, currentScrollTop);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    scrollTargets.forEach(target => {
+      target.addEventListener('scroll', handleScroll, { passive: true });
+    });
+
+    document.querySelectorAll('.bottom-nav-item, .nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bottomNav.classList.remove('nav-hidden');
+      });
+    });
+  }
+
   // Keeps the browser/OS chrome color (PWA theme-color meta) in step with the theme
   function syncThemeColor(theme) {
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0F14' : '#F8FAFC');
   }
 
-  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor };
+  // Auto-bind scroll on DOM ready
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAutoHideBottomNav);
+    } else {
+      setTimeout(initAutoHideBottomNav, 100);
+    }
+  }
+
+  return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav };
 })();

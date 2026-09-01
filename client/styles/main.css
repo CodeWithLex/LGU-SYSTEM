@@ -3058,10 +3058,17 @@ iconify-icon {
     overflow-y: hidden !important;
     scrollbar-width: none !important;
     -webkit-overflow-scrolling: touch !important;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, background 0.2s ease !important;
+    will-change: transform, opacity !important;
   }
   body .bottom-nav.visible::-webkit-scrollbar {
     display: none !important;
+  }
+
+  body .bottom-nav.visible.nav-hidden {
+    transform: translateY(calc(100% + 35px + env(safe-area-inset-bottom, 0px))) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
   [data-theme="light"] body .bottom-nav.visible {

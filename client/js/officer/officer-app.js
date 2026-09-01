@@ -300,6 +300,57 @@ const OfficerApp = (() => {
     document.querySelectorAll('[data-of]').forEach(btn => {
       btn.addEventListener('click', () => switchSection(btn.dataset.of));
     });
+    bindAutoHideBottomNav();
+  }
+
+  function bindAutoHideBottomNav() {
+    const bottomNav = $('of-bottom-nav');
+    if (!bottomNav) return;
+
+    const scrollTargets = [
+      document.querySelector('.of-main'),
+      window
+    ].filter(Boolean);
+
+    let lastScrollTop = 0;
+    let ticking = false;
+    const HIDE_THRESHOLD = 15;
+    const SHOW_THRESHOLD = 8;
+
+    function handleScroll(e) {
+      const target = (e.target === document || e.target === window) ? (document.documentElement || document.body) : e.target;
+      const currentScrollTop = target.scrollTop || window.scrollY || 0;
+
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const diff = currentScrollTop - lastScrollTop;
+
+          if (currentScrollTop <= 25) {
+            bottomNav.classList.remove('nav-hidden');
+          } else if (diff > HIDE_THRESHOLD) {
+            // Scrolling DOWN -> Hide floating nav
+            bottomNav.classList.add('nav-hidden');
+          } else if (diff < -SHOW_THRESHOLD) {
+            // Scrolling UP -> Reveal floating nav
+            bottomNav.classList.remove('nav-hidden');
+          }
+
+          lastScrollTop = Math.max(0, currentScrollTop);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    scrollTargets.forEach(target => {
+      target.addEventListener('scroll', handleScroll, { passive: true });
+    });
+
+    document.querySelectorAll('.of-bottom-nav > button, .of-bottom-nav > a, .of-nav .nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bottomNav.classList.remove('nav-hidden');
+      });
+    });
   }
 
   async function switchSection(section) {

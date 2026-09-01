@@ -1566,7 +1566,14 @@
       0 4px 14px rgba(0, 0, 0, 0.25),
       inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
     overflow: visible !important;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease !important;
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, background 0.2s ease !important;
+    will-change: transform, opacity !important;
+  }
+
+  .of-bottom-nav.nav-hidden {
+    transform: translateY(calc(100% + 35px + env(safe-area-inset-bottom, 0px))) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
   [data-theme="light"] .of-bottom-nav {
