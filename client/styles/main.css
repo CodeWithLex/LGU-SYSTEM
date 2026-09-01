@@ -3293,8 +3293,10 @@ iconify-icon {
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  body .main-content { padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important; }
-  body .view { padding: 0 0.75rem 0.75rem !important; }
+  body .main-content { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important; }
+  body .view { padding: 0 0.75rem 0 !important; }
+  body .view > *:last-child,
+  body .dashboard-grid:last-child { margin-bottom: 0 !important; }
   body .view-header {
     position: static !important;
     background: transparent !important;
@@ -5688,7 +5690,7 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
 @media (max-width: 768px) {
   .main-content,
   .of-main {
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

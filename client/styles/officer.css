@@ -1531,7 +1531,13 @@
   .of-view {
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 0 0.85rem 0.75rem !important;
+    padding: 0 0.85rem 0 !important;
+  }
+
+  .of-view > *:last-child,
+  .of-cards:last-child,
+  .dashboard-grid:last-child {
+    margin-bottom: 0 !important;
   }
   .of-view-head {
     padding-top: 1rem;
