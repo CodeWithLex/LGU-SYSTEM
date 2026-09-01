@@ -2777,6 +2777,7 @@ iconify-icon {
 
   .form-row { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .dashboard-grid { grid-template-columns: 1fr !important; gap: 0.85rem !important; }
   .view { padding: 0 1rem 1rem; }
 
   .view-header {
@@ -5434,6 +5435,15 @@ html body .mobile-more-sheet:not(.hidden) .mobile-sheet-section:nth-child(3) {
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
+}
+
+/* Scroll Lock when Mobile More Drawer is Open */
+body.more-sheet-open,
+body.more-sheet-open .main-content,
+body.more-sheet-open .of-main {
+  overflow: hidden !important;
+  touch-action: none !important;
+  overscroll-behavior: none !important;
 }
 
 /* Tactile Spring Micro-interaction on More button trigger */

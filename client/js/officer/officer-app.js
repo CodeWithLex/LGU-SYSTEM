@@ -316,7 +316,7 @@ const OfficerApp = (() => {
       sheet.classList.remove('hidden');
       backdrop.classList.remove('hidden');
       if (moreBtn) moreBtn.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
+      document.body.classList.add('more-sheet-open');
     }
 
     function closeSheet() {
@@ -324,7 +324,7 @@ const OfficerApp = (() => {
       sheet.classList.add('hidden');
       backdrop.classList.add('hidden');
       if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
+      document.body.classList.remove('more-sheet-open');
     }
 
     if (moreBtn) moreBtn.addEventListener('click', e => {
@@ -334,7 +334,10 @@ const OfficerApp = (() => {
     });
 
     if (closeBtn) closeBtn.addEventListener('click', closeSheet);
-    if (backdrop) backdrop.addEventListener('click', closeSheet);
+    if (backdrop) {
+      backdrop.addEventListener('click', closeSheet);
+      backdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    }
     if (dragHandle) dragHandle.addEventListener('click', closeSheet);
 
     document.addEventListener('keydown', e => {
