@@ -105,6 +105,9 @@
   display: none;
   padding: 0 2rem 2rem;
   animation: ofFade 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .of-view.active {
@@ -214,9 +217,12 @@
 /* ---------- Stat Cards Grid & Interactive Popovers ---------- */
 .of-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .of-stat {
@@ -228,6 +234,10 @@
   position: relative;
   cursor: pointer;
   user-select: none;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .of-stat:hover {
@@ -1739,6 +1749,14 @@
   .of-filter-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+/* ---------- 2x2 Grid for Stat Cards on Medium Screens (≤1024px) ---------- */
+@media (max-width: 1024px) {
+  .of-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
   }
 }
 
