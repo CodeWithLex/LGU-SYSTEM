@@ -25,7 +25,7 @@ module.exports = async function authMiddleware(req, res, next) {
     .from('profiles')
     .select('role, full_name, course, enrollment_year, created_at')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   req.user    = user;
   req.profile = profile;

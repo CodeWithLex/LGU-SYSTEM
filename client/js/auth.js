@@ -52,7 +52,7 @@ const Auth = (() => {
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
       return data;
     } catch {
       return null;
@@ -83,14 +83,35 @@ const Auth = (() => {
   }
 
   async function updateProfile(userId, updates) {
-    const { data, error } = await client()
+    const sb = client();
+
+    // 1. Attempt update using maybeSingle() so zero-row results (deleted or missing profile) don't throw PGRST116
+    const { data, error } = await sb
       .from('profiles')
       .update(updates)
       .eq('id', userId)
       .select()
-      .single();
+      .maybeSingle();
+
     if (error) throw error;
-    return data;
+    if (data) return data;
+
+    // 2. Fallback: If profile row was deleted or doesn't exist yet, UPSERT the row
+    const session = await getSession();
+    const email = session?.user?.email || '';
+    const { data: upsertData, error: upsertError } = await sb
+      .from('profiles')
+      .upsert({
+        id: userId,
+        email: email,
+        role: 'student',
+        ...updates
+      }, { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (upsertError) throw upsertError;
+    return upsertData;
   }
 
   async function updatePassword(password) {
