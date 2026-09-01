@@ -147,12 +147,15 @@ const Dropdowns = (() => {
       if (!dd.contains(e.target) && !menu.contains(e.target)) close();
     });
 
-    window.addEventListener('scroll', () => {
-      if (dd.classList.contains('dd-open')) close();
+    window.addEventListener('scroll', e => {
+      if (!dd.classList.contains('dd-open')) return;
+      // Do NOT close if scrolling inside the dropdown choices list itself!
+      if (e.target === menu || (e.target && menu.contains(e.target))) return;
+      positionMenu();
     }, { capture: true, passive: true });
 
     window.addEventListener('resize', () => {
-      if (dd.classList.contains('dd-open')) close();
+      if (dd.classList.contains('dd-open')) positionMenu();
     }, { passive: true });
 
     dd.append(trigger, menu);
