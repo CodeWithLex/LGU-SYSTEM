@@ -690,36 +690,50 @@
 
     // ---- Strict Student Masterlist & Verification Gate ----
     if (!officerRole) {
-      // If the student already has a complete, registered profile in the database, admit them directly!
-      const hasCompletedProfile = Boolean(profile?.course && profile?.year_level && profile?.enrollment_year);
+      // 1. Check if student is found in the official enrolled masterlist
+      let rosterMatch = null;
+      if (window.Roster && window.Roster.findStudentAsync) {
+        rosterMatch = await Roster.findStudentAsync(
+          profile?.full_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name,
+          session.user.email
+        );
+      }
 
-      if (!hasCompletedProfile) {
-        // 1. Check if student is found in the official enrolled masterlist
-        let rosterMatch = null;
-        if (window.Roster && window.Roster.findStudentAsync) {
-          rosterMatch = await Roster.findStudentAsync(
-            profile?.full_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name,
-            session.user.email
-          );
+      // 2. Check if student has an existing approved verification request
+      let existingReq = null;
+      if (window.Api && window.Api.rosterRequests) {
+        try {
+          existingReq = await Api.rosterRequests.getMyRequest();
+        } catch (e) {
+          console.warn('[Gate] Verification request check error:', e);
         }
+      }
 
-        // 2. Check if student has an existing verification request
-        let existingReq = null;
-        if (window.Api && window.Api.rosterRequests) {
-          try {
-            existingReq = await Api.rosterRequests.getMyRequest();
-          } catch (e) {
-            console.warn('[Gate] Verification request check error:', e);
-          }
-        }
+      const isApproved = existingReq && existingReq.status === 'approved';
+      const isVerified = Boolean(rosterMatch || isApproved);
 
+      // BLOCK unverified students (not in masterlist AND not approved)
+      // Displays the "Enrollment Verification Required" modal
+      if (!isVerified) {
         if (splash) {
           splash.style.opacity = '0';
           splash.style.visibility = 'hidden';
           splash.classList.add('hidden');
         }
         await showOnboardingModal(session.user, profile);
-        return; // BLOCK unverified or incomplete student accounts from entering the portal
+        return; // BLOCK unverified student accounts from entering the portal
+      }
+
+      // If verified, check if they need to complete their profile setup
+      const needsProfileSetup = !profile?.course || !profile?.year_level || !profile?.enrollment_year;
+      if (needsProfileSetup) {
+        if (splash) {
+          splash.style.opacity = '0';
+          splash.style.visibility = 'hidden';
+          splash.classList.add('hidden');
+        }
+        await showOnboardingModal(session.user, profile);
+        return; // Prompt verified students to complete registration & profile
       }
     }
 
