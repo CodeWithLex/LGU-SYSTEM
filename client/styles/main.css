@@ -5401,87 +5401,114 @@ html body.is-admin th.admin-only {
 }
 
 /* Navigation Row Component */
+.mobile-more-sheet .mobile-sheet-row,
 .mobile-sheet-row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.85rem;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: var(--text-primary);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background var(--transition), transform 0.12s ease;
-  width: 100%;
-  box-sizing: border-box;
-  text-align: left;
-  min-height: 56px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.75rem !important;
+  padding: 0.65rem 0.85rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  color: var(--text-primary) !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: background var(--transition), transform 0.12s ease !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  text-align: left !important;
+  min-height: 56px !important;
+  height: auto !important;
+  border-radius: 0 !important;
 }
 
+[data-theme="light"] .mobile-more-sheet .mobile-sheet-row,
 [data-theme="light"] .mobile-sheet-row {
-  border-bottom-color: rgba(0, 0, 0, 0.05);
+  border-bottom-color: rgba(0, 0, 0, 0.05) !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row:last-child,
 .mobile-sheet-row:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row:hover,
+.mobile-more-sheet .mobile-sheet-row:active,
 .mobile-sheet-row:hover,
 .mobile-sheet-row:active {
-  background: var(--surface-hover);
+  background: var(--surface-hover) !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row:active,
 .mobile-sheet-row:active {
-  transform: scale(0.99);
+  transform: scale(0.99) !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row-icon,
 .mobile-sheet-row-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  flex-shrink: 0;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.15rem !important;
+  flex-shrink: 0 !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row-content,
 .mobile-sheet-row-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  gap: 0.1rem;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  gap: 0.12rem !important;
+  text-align: left !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row-title,
 .mobile-sheet-row-title {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  margin: 0 !important;
+  display: block !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row-desc,
 .mobile-sheet-row-desc {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.72rem !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  margin: 0 !important;
+  display: block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row-chevron,
 .mobile-sheet-row-chevron {
-  color: var(--text-tertiary);
-  font-size: 1rem;
-  flex-shrink: 0;
-  opacity: 0.7;
+  color: var(--text-tertiary) !important;
+  font-size: 1rem !important;
+  flex-shrink: 0 !important;
+  opacity: 0.7 !important;
+  margin-left: auto !important;
 }
 
+.mobile-more-sheet .mobile-sheet-row:hover .mobile-sheet-row-chevron,
 .mobile-sheet-row:hover .mobile-sheet-row-chevron {
-  opacity: 1;
-  color: var(--primary);
+  opacity: 1 !important;
+  color: var(--primary) !important;
 }
 
 /* More tab active dot indicator */
