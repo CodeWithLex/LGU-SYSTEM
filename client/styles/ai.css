@@ -1078,8 +1078,22 @@
   .ursa-drawer {
     width: 100vw;
     max-width: 100vw;
-    right: -100vw;
+    right: -105vw;
     border-left: none;
+  }
+
+  .ursa-drawer:not(.active) {
+    visibility: hidden !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    right: -105vw !important;
+  }
+
+  .ursa-drawer.active {
+    right: 0 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.7) !important;
   }
 
   .ursa-header {
