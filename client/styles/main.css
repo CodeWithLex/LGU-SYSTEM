@@ -3203,12 +3203,14 @@ iconify-icon {
     flex: 1 1 0% !important;
     min-width: 44px !important;
     height: 48px !important;
-    padding: 3px 1px !important;
-    border-radius: 18px !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    border: none !important;
     color: var(--text-tertiary) !important;
     text-decoration: none !important;
     position: relative !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: color 0.2s ease !important;
     user-select: none !important;
     -webkit-tap-highlight-color: transparent !important;
     touch-action: manipulation !important;
@@ -3216,7 +3218,7 @@ iconify-icon {
   }
 
   body .bottom-nav-item .nav-icon {
-    font-size: 1.18rem !important;
+    font-size: 1.5rem !important;
     line-height: 1 !important;
     display: flex !important;
     align-items: center !important;
@@ -3225,17 +3227,7 @@ iconify-icon {
   }
 
   body .bottom-nav-item span:not(.nav-icon) {
-    font-size: 0.68rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.01em !important;
-    line-height: 1.15 !important;
-    margin-top: 2px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 100% !important;
-    display: block !important;
-    transition: color 0.2s ease, font-weight 0.2s ease !important;
+    display: none !important;
   }
 
   body .bottom-nav-item.bottom-nav-more-trigger {
@@ -3245,28 +3237,23 @@ iconify-icon {
     font-family: var(--font-ui);
   }
 
-  /* Active State - Subtle Glowing Pill */
+  /* Active State - Icon color accent only, no background box */
   body .bottom-nav-item.active {
     color: var(--primary) !important;
-    background: rgba(249, 115, 22, 0.12) !important;
+    background: none !important;
   }
 
   [data-theme="light"] body .bottom-nav-item.active {
-    background: rgba(249, 115, 22, 0.1) !important;
+    background: none !important;
     color: var(--primary) !important;
   }
 
   body .bottom-nav-item.active .nav-icon {
-    transform: translateY(-1px) scale(1.08) !important;
+    transform: scale(1.1) !important;
     color: var(--primary) !important;
   }
 
-  body .bottom-nav-item.active span:not(.nav-icon) {
-    font-weight: 700 !important;
-    color: var(--primary) !important;
-  }
-
-  /* Officer Executive Link Special Highlight */
+  /* Officer Executive Link Special Highlight - icon color only */
   body .bottom-nav-item.officer-nav-link {
     color: var(--primary) !important;
   }
@@ -3275,7 +3262,7 @@ iconify-icon {
   }
   body .bottom-nav-item.officer-nav-link.active,
   body .bottom-nav-item.officer-nav-link:active {
-    background: rgba(249, 115, 22, 0.15) !important;
+    background: none !important;
     color: #FB923C !important;
   }
 
@@ -3283,13 +3270,14 @@ iconify-icon {
     color: #EA580C !important;
   }
   [data-theme="light"] body .bottom-nav-item.officer-nav-link.active {
-    background: rgba(249, 115, 22, 0.12) !important;
+    background: none !important;
     color: #EA580C !important;
   }
 
   /* Tap Interaction */
   body .bottom-nav-item:active {
-    transform: scale(0.92) !important;
+    transform: scale(0.88) !important;
+    opacity: 0.75 !important;
   }
 
   /* Layout Base Adjustments */
