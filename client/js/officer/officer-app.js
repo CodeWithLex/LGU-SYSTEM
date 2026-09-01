@@ -1723,7 +1723,7 @@ const OfficerApp = (() => {
 
     if ($('of-stat-val-users-officers')) $('of-stat-val-users-officers').textContent = officers;
     if ($('of-stat-sub-users-officers')) {
-      $('of-stat-sub-users-officers').textContent = `${officers} admin, governor, cashier`;
+      $('of-stat-sub-users-officers').textContent = `${officers} admin, governor, officer, cashier`;
     }
 
     if ($('of-users-bscoe-count')) $('of-users-bscoe-count').textContent = bscoe;
@@ -1739,7 +1739,7 @@ const OfficerApp = (() => {
     const canAssign = canAssignRoles();
     $('of-people-sub').textContent = canAssign
       ? `You can assign: ${assignableRoles().join(', ')}` + (_profile.role === 'governor' ? ' (admin accounts are out of your reach)' : '')
-      : 'Read-only: cashiers cannot assign roles.';
+      : (_profile.role === 'officer' ? 'Read-only: officers cannot assign roles.' : 'Read-only: cashiers cannot assign roles.');
     $('of-people-action-col').style.display = canAssign ? '' : 'none';
     await updatePeopleStats();
     renderPeopleTable();

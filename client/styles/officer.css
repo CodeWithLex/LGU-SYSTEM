@@ -239,12 +239,19 @@
 .of-stat .of-stat-label {
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--text-secondary);
   font-weight: 600;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.4rem;
+}
+
+.of-stat .of-stat-label > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .of-stat .of-stat-value {
