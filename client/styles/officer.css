@@ -264,6 +264,38 @@
   margin-top: 0.35rem;
 }
 
+.of-prog-badge-grid {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+  min-height: 28px;
+}
+
+.of-prog-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default);
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+.of-prog-chip strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+[data-theme="light"] .of-prog-chip {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 .of-stat.is-green .of-stat-value { color: var(--status-positive); }
 .of-stat.is-red   .of-stat-value { color: var(--status-negative); }
 
