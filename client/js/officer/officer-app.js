@@ -748,6 +748,7 @@ const OfficerApp = (() => {
     `;
 
     bindStatPopovers();
+    updateCreateEventBudgetUI();
 
     // Render Overview Charts
     requestAnimationFrame(() => {
@@ -974,11 +975,28 @@ const OfficerApp = (() => {
     }
   }
 
+  function updateCreateEventBudgetUI() {
+    const summary = computeFinancialSummary(_txs, _events);
+    const availBalEl = $('of-ev-avail-bal');
+    if (availBalEl) {
+      availBalEl.textContent = `₱${fmtNum(summary.remainingBalance)}`;
+    }
+  }
+
   function bindEventForms() {
     $('of-event-form').addEventListener('submit', async e => {
       e.preventDefault();
       const errEl = $('of-ev-error');
       errEl.classList.add('hidden');
+
+      const budgetVal = Number($('of-ev-budget').value) || 0;
+      const summary = computeFinancialSummary(_txs, _events);
+      if (budgetVal > summary.remainingBalance) {
+        errEl.textContent = `Insufficient unreserved funds in General Fund. Available: ₱${fmtNum(summary.remainingBalance)}, Requested: ₱${fmtNum(budgetVal)}.`;
+        errEl.classList.remove('hidden');
+        return;
+      }
+
       const btn = $('of-ev-submit');
       btn.disabled = true;
       btn.textContent = 'Creating…';

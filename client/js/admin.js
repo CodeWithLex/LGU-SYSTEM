@@ -13,6 +13,7 @@ const Admin = (() => {
 
   async function init() {
     await populateEventDropdown();
+    await updateEvAvailableBalanceUI();
     if (!_initialized) {
       bindTabSwitching();
       bindEventForm();
@@ -85,7 +86,17 @@ const Admin = (() => {
       e.preventDefault();
       errEl.classList.add('hidden');
       btn.disabled = true;
-      btn.textContent = 'Creating…';
+      const budgetVal = Number(document.getElementById('ev-budget').value) || 0;
+      const availEl = document.getElementById('ev-avail-bal');
+      const availBal = Number(availEl?.dataset?.availBal || 0);
+
+      if (availEl && budgetVal > availBal) {
+        errEl.textContent = `Insufficient unreserved funds in General Fund. Available: ${UI.currency(availBal)}, Requested: ${UI.currency(budgetVal)}.`;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Create Event';
+        return;
+      }
 
       try {
         const ev = await Api.events.create({
@@ -98,6 +109,7 @@ const Admin = (() => {
         UI.toast('Event created successfully!', 'success');
         form.reset();
         await populateEventDropdown();
+        await updateEvAvailableBalanceUI();
       } catch (err) {
         errEl.textContent = err.message;
         errEl.classList.remove('hidden');
@@ -106,6 +118,19 @@ const Admin = (() => {
         btn.textContent = 'Create Event';
       }
     });
+  }
+
+  async function updateEvAvailableBalanceUI() {
+    const el = document.getElementById('ev-avail-bal');
+    if (!el) return;
+    try {
+      const summary = await Api.reports.getSummary();
+      const rem = summary.remainingBalance || 0;
+      el.textContent = UI.currency(rem);
+      el.dataset.availBal = rem;
+    } catch {
+      el.textContent = '₱0.00';
+    }
   }
 
   // ── Manage Events (edit / archive / restore) ───────────────────────────────

@@ -144,6 +144,41 @@ router.post('/', requireOfficer, async (req, res) => {
     return res.status(400).json({ error: 'Description must be 2000 characters or less.' });
   }
 
+  // 5. Validate against Available General Fund balance
+  const requestedBudget = Number(allocated_budget);
+  const [{ data: txs, error: txErr }, { data: existingEvents, error: evErr }] = await Promise.all([
+    supabase.from('transactions').select('type, amount, use_allocation'),
+    supabase.from('events').select('allocated_budget')
+  ]);
+
+  if (txErr || evErr) {
+    return res.status(500).json({ error: 'Failed to verify General Fund balance.' });
+  }
+
+  let totalIncome = 0;
+  let dashboardExpense = 0;
+  (txs || []).forEach(tx => {
+    if (['donation', 'collection', 'allocation'].includes(tx.type)) {
+      totalIncome += Number(tx.amount || 0);
+    }
+    if (tx.type === 'expense' && !tx.use_allocation) {
+      dashboardExpense += Number(tx.amount || 0);
+    }
+  });
+
+  let totalReservedEnvelopes = 0;
+  (existingEvents || []).forEach(e => {
+    totalReservedEnvelopes += Number(e.allocated_budget || 0);
+  });
+
+  const availableGeneralFund = totalIncome - dashboardExpense - totalReservedEnvelopes;
+
+  if (requestedBudget > availableGeneralFund) {
+    return res.status(400).json({
+      error: `Insufficient unreserved funds in General Fund. Available: ₱${Math.max(0, availableGeneralFund).toLocaleString('en-PH', { minimumFractionDigits: 2 })}, Requested: ₱${requestedBudget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}.`
+    });
+  }
+
   const { data, error } = await supabase
     .from('events')
     .insert({
@@ -243,15 +278,43 @@ router.patch('/:id', requireOfficer, async (req, res) => {
   // Keep remaining_budget coherent when the allocation changes: shift it by
   // the same delta so spent amounts and past transfers stay factored in.
   if (updates.allocated_budget !== undefined) {
-    const { data: current, error: curErr } = await supabase
-      .from('events')
-      .select('allocated_budget, remaining_budget')
-      .eq('id', id)
-      .single();
+    const [{ data: current, error: curErr }, { data: txs, error: txErr }, { data: existingEvents, error: evErr }] = await Promise.all([
+      supabase.from('events').select('allocated_budget, remaining_budget').eq('id', id).single(),
+      supabase.from('transactions').select('type, amount, use_allocation'),
+      supabase.from('events').select('allocated_budget')
+    ]);
 
     if (curErr || !current) return res.status(404).json({ error: 'Event not found.' });
+    if (txErr || evErr) return res.status(500).json({ error: 'Failed to verify General Fund balance.' });
 
     const delta = updates.allocated_budget - Number(current.allocated_budget);
+
+    if (delta > 0) {
+      let totalIncome = 0;
+      let dashboardExpense = 0;
+      (txs || []).forEach(tx => {
+        if (['donation', 'collection', 'allocation'].includes(tx.type)) {
+          totalIncome += Number(tx.amount || 0);
+        }
+        if (tx.type === 'expense' && !tx.use_allocation) {
+          dashboardExpense += Number(tx.amount || 0);
+        }
+      });
+
+      let totalReservedEnvelopes = 0;
+      (existingEvents || []).forEach(e => {
+        totalReservedEnvelopes += Number(e.allocated_budget || 0);
+      });
+
+      const availableGeneralFund = totalIncome - dashboardExpense - totalReservedEnvelopes;
+
+      if (delta > availableGeneralFund) {
+        return res.status(400).json({
+          error: `Insufficient unreserved funds in General Fund for budget increase. Available: ₱${Math.max(0, availableGeneralFund).toLocaleString('en-PH', { minimumFractionDigits: 2 })}, Requested Increase: ₱${delta.toLocaleString('en-PH', { minimumFractionDigits: 2 })}.`
+        });
+      }
+    }
+
     updates.remaining_budget = Number(current.remaining_budget) + delta;
   }
 

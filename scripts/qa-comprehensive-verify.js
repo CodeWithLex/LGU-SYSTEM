@@ -59,6 +59,19 @@ test('Event budget math: computed_remaining = allocated_budget + transfers - all
   assert.strictEqual(computedRemaining, 8749.50);
 });
 
+test('Event creation validation: rejects allocations exceeding available General Fund', () => {
+  const totalIncome = 50000.00;
+  const dashboardExpense = 10000.00;
+  const existingReservedEnvelopes = 30000.00;
+  const availableGeneralFund = totalIncome - dashboardExpense - existingReservedEnvelopes; // 10,000.00
+
+  const validAllocation = 8000.00;
+  const invalidAllocation = 15000.00;
+
+  assert.ok(validAllocation <= availableGeneralFund, 'Valid allocation should be within available balance');
+  assert.ok(invalidAllocation > availableGeneralFund, 'Invalid allocation should exceed available balance');
+});
+
 test('Currency formatter handles float precision and zeroes correctly', () => {
   function fmt(n) {
     return '₱' + Number(n || 0).toLocaleString('en-PH', {

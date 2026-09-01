@@ -1,0 +1,133 @@
+{
+  "target": "https://lgu-system.onrender.com",
+  "timestamp": "2026-09-01T17:10:04.965Z",
+  "summary": {
+    "passed": 30,
+    "failed": 0,
+    "warnings": 0,
+    "total": 30,
+    "score": "100%"
+  },
+  "results": [
+    {
+      "name": "Protected GET /api/notifications returns 401 or 429 without token",
+      "result": "PASS"
+    },
+    {
+      "name": "Protected POST /api/transactions returns 401 or 429 without token",
+      "result": "PASS"
+    },
+    {
+      "name": "Protected POST /api/events returns 401 or 429 without token",
+      "result": "PASS"
+    },
+    {
+      "name": "Protected POST /api/announcements returns 401 or 429 without token",
+      "result": "PASS"
+    },
+    {
+      "name": "Protected PATCH /api/admin/users/:id/role returns 401 or 429 without token",
+      "result": "PASS"
+    },
+    {
+      "name": "Protected DELETE /api/transactions/:id returns 401 or 429 without token",
+      "result": "PASS"
+    },
+    {
+      "name": "Tampered JWT is rejected with 401",
+      "result": "PASS"
+    },
+    {
+      "name": "Empty Bearer token is rejected with 401",
+      "result": "PASS"
+    },
+    {
+      "name": "Non-Bearer scheme is rejected with 401",
+      "result": "PASS"
+    },
+    {
+      "name": "SQL injection in event_id query param is blocked (400, 401, or 403 from WAF/App)",
+      "result": "PASS"
+    },
+    {
+      "name": "SQL injection in event ID path param returns 400",
+      "result": "PASS"
+    },
+    {
+      "name": "UUID format enforced — non-UUID event_id is rejected with 400",
+      "result": "PASS"
+    },
+    {
+      "name": "'GENERAL' string event_id returns 400 or 401 not 500",
+      "result": "PASS"
+    },
+    {
+      "name": "Oversized request body (>50kb) is rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "Rapid-fire requests to /api/health do NOT get rate-limited (exempt)",
+      "result": "PASS"
+    },
+    {
+      "name": "Burst of 25 rapid POSTs to /api/announcements (sensitive) gets rate-limited (429)",
+      "result": "PASS"
+    },
+    {
+      "name": "Unknown origin is blocked by CORS",
+      "result": "PASS"
+    },
+    {
+      "name": "Security headers are present on API responses",
+      "result": "PASS"
+    },
+    {
+      "name": "Server version header is NOT exposed",
+      "result": "PASS"
+    },
+    {
+      "name": "Unauthenticated POST /api/admin/budget-transfer returns 401 or 429",
+      "result": "PASS"
+    },
+    {
+      "name": "Unauthenticated admin role assignment returns 401 or 429",
+      "result": "PASS"
+    },
+    {
+      "name": "Unauthenticated bulk import returns 401 or 429",
+      "result": "PASS"
+    },
+    {
+      "name": "Path traversal does NOT leak server files: /api/events/../../etc/passwd",
+      "result": "PASS"
+    },
+    {
+      "name": "Path traversal does NOT leak server files: /api/events/..%2F..%2Fetc%2Fpasswd",
+      "result": "PASS"
+    },
+    {
+      "name": "Path traversal does NOT leak server files: /api/events/%2e%2e%2f%2e%2e%2fetc%2fpass",
+      "result": "PASS"
+    },
+    {
+      "name": "Non-UUID event ID returns 400 not 500",
+      "result": "PASS"
+    },
+    {
+      "name": "Negative amount transaction rejected (no auth needed to verify input schema)",
+      "result": "PASS"
+    },
+    {
+      "name": "Zero amount transaction rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "Invalid transaction type enum rejected",
+      "result": "PASS"
+    },
+    {
+      "name": "SSRF attempt via receipt_url is blocked by validate.js",
+      "result": "PASS"
+    }
+  ]
+}
