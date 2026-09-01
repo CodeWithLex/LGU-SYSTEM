@@ -2140,8 +2140,9 @@ input[type="checkbox"]:checked::before {
 .status-dot--collection,
 .status-dot--income,
 .status-dot--donation,
-.status-dot--ongoing {
-  background: var(--status-positive);
+.status-dot--ongoing,
+.status-dot--officer {
+  background: var(--accent);
 }
 
 .status-dot--expense,
@@ -4798,9 +4799,9 @@ html body.is-admin th.admin-only {
 }
 
 .role-badge.role-officer {
-  background: rgba(20, 184, 166, 0.14);
-  color: #2DD4BF;
-  border: 1px solid rgba(20, 184, 166, 0.35);
+  background: rgba(249, 115, 22, 0.14);
+  color: #FB923C;
+  border: 1px solid rgba(249, 115, 22, 0.35);
 }
 
 /* Officer Portal Launch Banner in Profile Modal */
@@ -5152,9 +5153,9 @@ html body.is-admin th.admin-only {
 }
 
 [data-theme="light"] .role-badge.role-officer {
-  background: #F0FDFA;
-  color: #0F766E;
-  border: 1px solid #CCFBF1;
+  background: #FFF7ED;
+  color: #EA580C;
+  border: 1px solid #FFEDD5;
 }
 
 [data-theme="light"] .tx-overbudget-badge {
