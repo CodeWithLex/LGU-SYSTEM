@@ -173,12 +173,16 @@ const UI = (() => {
     function handleScroll(e) {
       const target = (e.target === document || e.target === window) ? (document.documentElement || document.body) : e.target;
       const currentScrollTop = target.scrollTop || window.scrollY || 0;
+      const clientHeight = target.clientHeight || window.innerHeight || 0;
+      const scrollHeight = target.scrollHeight || document.documentElement.scrollHeight || 0;
+      const isAtBottom = (currentScrollTop + clientHeight >= scrollHeight - 32);
 
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const diff = currentScrollTop - lastScrollTop;
 
-          if (currentScrollTop <= 25) {
+          if (currentScrollTop <= 25 || isAtBottom) {
+            // At the top OR reached the bottom -> Always reveal floating bottom nav!
             bottomNav.classList.remove('nav-hidden');
           } else if (diff > HIDE_THRESHOLD) {
             // Scrolling DOWN -> Hide floating nav

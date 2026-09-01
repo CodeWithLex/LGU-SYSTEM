@@ -5383,6 +5383,7 @@ html body .mobile-more-sheet.hidden {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
+  box-shadow: none !important;
   transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease, visibility 0.32s !important;
 }
 
@@ -5669,3 +5670,75 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
     padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+/* =============================================
+   Institutional Portal Footer
+   ============================================= */
+.portal-footer {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.65rem;
+  color: var(--text-tertiary);
+  width: 100%;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.portal-footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+}
+
+.portal-footer-logo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  opacity: 0.85;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
+}
+
+.portal-footer-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.portal-footer-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.portal-footer-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+}
+
+.portal-footer-meta {
+  font-size: 0.62rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+[data-theme="light"] .portal-footer-title {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .portal-footer-logo {
+  filter: none;
+}
+
