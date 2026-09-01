@@ -7,7 +7,7 @@ const supabase = require('../lib/supabase');
 const { isPositiveNumber, isValidEnum, isValidUUID, sanitizeText } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { logError } = require('../lib/logger');
-const { requireAdmin, requireOfficer } = require('../middleware/roles');
+const { requireAdmin, requireGovernorOrAdmin, requireOfficer } = require('../middleware/roles');
 const { createNotification } = require('./notifications');
 
 const ASSIGNABLE_ROLES = ['admin', 'student', 'governor', 'cashier', 'officer'];
@@ -26,7 +26,7 @@ router.get('/users', requireOfficer, async (req, res) => {
 
 // ── PATCH /api/admin/users/:id/role ──────────────────────────────────────────
 // Admins may assign any role; governors may assign officer/student roles but
-// never touch admin accounts; cashiers have no role-assignment power.
+// never touch admin accounts; officers and cashiers have no role-assignment power.
 router.patch('/users/:id/role', async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -38,8 +38,8 @@ router.patch('/users/:id/role', async (req, res) => {
   if (!isValidEnum(role, ASSIGNABLE_ROLES)) {
     return res.status(400).json({ error: `Role must be one of: ${ASSIGNABLE_ROLES.join(', ')}.` });
   }
-  if (actorRole === 'cashier') {
-    return res.status(403).json({ error: 'Cashiers cannot assign roles.' });
+  if (['cashier', 'officer'].includes(actorRole)) {
+    return res.status(403).json({ error: 'Officers and cashiers cannot assign roles.' });
   }
   if (actorRole === 'governor') {
     if (!OFFICER_ASSIGNABLE_ROLES.includes(role)) {
@@ -152,7 +152,7 @@ router.get('/audit-logs', requireOfficer, async (req, res) => {
 });
 
 // ── POST /api/admin/budget-transfer ──────────────────────────────────────────
-router.post('/budget-transfer', requireOfficer, async (req, res) => {
+router.post('/budget-transfer', requireGovernorOrAdmin, async (req, res) => {
   const { from_event_id, to_event_id, amount, reason } = req.body;
 
   if (!from_event_id || !to_event_id) {
@@ -280,7 +280,7 @@ router.post('/budget-transfer', requireOfficer, async (req, res) => {
 });
 
 // ── PATCH /api/admin/events/:id/archive ──────────────────────────────────────
-router.patch('/events/:id/archive', requireOfficer, async (req, res) => {
+router.patch('/events/:id/archive', requireGovernorOrAdmin, async (req, res) => {
   const { id } = req.params;
 
   if (!isValidUUID(id)) {

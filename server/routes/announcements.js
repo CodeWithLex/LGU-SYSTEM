@@ -4,7 +4,7 @@ const supabase = require('../lib/supabase');
 const { sendAnnouncementEmail } = require('../lib/email');
 const { sanitizeText, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
-const { requireOfficer } = require('../middleware/roles');
+const { requireAdmin, requireGovernorOrAdmin, requireOfficer } = require('../middleware/roles');
 const { createNotification } = require('./notifications');
 
 const MAX_TITLE_LENGTH = 100;
@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
   res.json(data);
 });
 
-// POST /api/announcements (officers and admins)
-router.post('/', requireOfficer, async (req, res) => {
+// POST /api/announcements (governors and admins)
+router.post('/', requireGovernorOrAdmin, async (req, res) => {
   const { title, body } = req.body;
 
   // 1. Required fields

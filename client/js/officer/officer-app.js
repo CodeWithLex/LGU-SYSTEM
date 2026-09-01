@@ -10,6 +10,15 @@ const OfficerApp = (() => {
 
   const OFFICER_ROLES = ['admin', 'governor', 'cashier', 'officer'];
   const ROLE_LABELS   = { admin: 'Admin', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
+  const isExecutive   = () => _profile && (_profile.role === 'admin' || _profile.role === 'governor');
+
+  function applyRolePermissionsUI() {
+    const exec = isExecutive();
+    const execEventActions = $('of-exec-event-actions');
+    if (execEventActions) execEventActions.style.display = exec ? '' : 'none';
+    const announceFormCard = $('of-exec-announce-card');
+    if (announceFormCard) announceFormCard.style.display = exec ? '' : 'none';
+  }
 
   let _profile   = null;
   let _events    = [];
@@ -142,6 +151,7 @@ const OfficerApp = (() => {
     }
 
     _profile = profile;
+    applyRolePermissionsUI();
 
     // Header identity
     const name = profile.full_name || user.email;
@@ -1174,11 +1184,11 @@ const OfficerApp = (() => {
           <div class="of-budget-labels"><span>Spent ₱${fmtNum(spent)}</span><span>Alloc ₱${fmtNum(budget)}</span></div>
           ${over ? `<div class="of-over-note">Over budget by ₱${fmtNum(spent - budget)}</div>` : ''}
           <div class="of-event-actions">
-            <button class="of-btn of-btn-ghost" data-act="detail">Manage</button>
-            ${ev.status !== 'completed' && ev.status !== 'archived' ? '<button class="of-btn of-btn-ghost" data-act="complete">Complete</button>' : ''}
-            ${ev.status !== 'archived'
+            <button class="of-btn of-btn-ghost" data-act="detail">${isExecutive() ? 'Manage' : 'View'}</button>
+            ${isExecutive() && ev.status !== 'completed' && ev.status !== 'archived' ? '<button class="of-btn of-btn-ghost" data-act="complete">Complete</button>' : ''}
+            ${isExecutive() && ev.status !== 'archived'
               ? '<button class="of-btn of-btn-ghost" data-act="archive">Archive</button>'
-              : '<button class="of-btn of-btn-ghost" data-act="restore">Restore</button>'}
+              : (isExecutive() ? '<button class="of-btn of-btn-ghost" data-act="restore">Restore</button>' : '')}
           </div>
         </div>`;
     }).join('') : '<p style="color:var(--text-secondary);font-size:0.85rem">No matching events found.</p>';
@@ -1279,6 +1289,17 @@ const OfficerApp = (() => {
 
     // Bind custom animated dropdown to modal select
     Dropdowns.bindAll('#of-event-modal');
+
+    if (!isExecutive()) {
+      ['of-me-name', 'of-me-status', 'of-me-budget', 'of-me-date', 'of-me-desc'].forEach(id => {
+        const el = $(id);
+        if (el) el.disabled = true;
+      });
+      const saveBtn = $('of-detail-save');
+      if (saveBtn) saveBtn.style.display = 'none';
+      const cancelBtn = $('of-detail-cancel');
+      if (cancelBtn) cancelBtn.textContent = 'Close';
+    }
 
     const closeModal = () => {
       modal.classList.add('hidden');

@@ -4,7 +4,7 @@ const supabase = require('../lib/supabase');
 const { sanitizeText, isPositiveNumber, isValidEnum, isValidUUID, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { sendNewEventEmail } = require('../lib/email');
-const { requireAdmin, requireOfficer } = require('../middleware/roles');
+const { requireAdmin, requireGovernorOrAdmin, requireOfficer } = require('../middleware/roles');
 const { createNotification } = require('./notifications');
 
 const VALID_STATUSES = ['upcoming', 'ongoing', 'completed', 'cancelled'];
@@ -115,8 +115,8 @@ router.get('/:id', async (req, res) => {
   });
 });
 
-// POST /api/events (admin only)
-router.post('/', requireOfficer, async (req, res) => {
+// POST /api/events (governor/admin only)
+router.post('/', requireGovernorOrAdmin, async (req, res) => {
   const { event_name, description, allocated_budget, event_date, status } = req.body;
 
   // 1. Required fields
@@ -225,8 +225,8 @@ router.post('/', requireOfficer, async (req, res) => {
   res.status(201).json(data);
 });
 
-// PATCH /api/events/:id (admin only)
-router.patch('/:id', requireOfficer, async (req, res) => {
+// PATCH /api/events/:id (governor/admin only)
+router.patch('/:id', requireGovernorOrAdmin, async (req, res) => {
   const { id }    = req.params;
   const { event_name, description, allocated_budget, event_date, status } = req.body;
 
