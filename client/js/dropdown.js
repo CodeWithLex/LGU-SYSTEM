@@ -84,8 +84,28 @@ const Dropdowns = (() => {
       });
     }
 
+    function positionMenu() {
+      const rect = trigger.getBoundingClientRect();
+      const menuHeight = Math.min(menu.scrollHeight || 180, 180);
+      const spaceBelow = window.innerHeight - rect.bottom;
+
+      menu.style.position = 'fixed';
+      menu.style.left = `${Math.max(10, Math.min(rect.left, window.innerWidth - 140))}px`;
+      menu.style.minWidth = `${Math.max(rect.width, 120)}px`;
+      menu.style.zIndex = '999999';
+
+      if (spaceBelow < menuHeight + 10 && rect.top > menuHeight + 10) {
+        menu.style.top = 'auto';
+        menu.style.bottom = `${window.innerHeight - rect.top + 6}px`;
+      } else {
+        menu.style.bottom = 'auto';
+        menu.style.top = `${rect.bottom + 6}px`;
+      }
+    }
+
     function open() {
       buildMenu(); // rebuild so dynamically-added options appear
+      positionMenu();
       dd.classList.add('dd-open');
       trigger.setAttribute('aria-expanded', 'true');
       markSelected();
@@ -121,8 +141,16 @@ const Dropdowns = (() => {
     });
 
     document.addEventListener('click', e => {
-      if (!dd.contains(e.target)) close();
+      if (!dd.contains(e.target) && !menu.contains(e.target)) close();
     });
+
+    window.addEventListener('scroll', () => {
+      if (dd.classList.contains('dd-open')) close();
+    }, { capture: true, passive: true });
+
+    window.addEventListener('resize', () => {
+      if (dd.classList.contains('dd-open')) close();
+    }, { passive: true });
 
     dd.append(trigger, menu);
     if (wrap) wrap.insertBefore(dd, select);
