@@ -24,6 +24,52 @@ router.get('/users', requireOfficer, async (req, res) => {
   res.json(data);
 });
 
+// ── POST /api/admin/profile ───────────────────────────────────────────
+// Allows an authenticated user to create or update their own profile safely
+router.post('/profile', async (req, res) => {
+  const userId = req.user?.id;
+  const email = req.user?.email || '';
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User session not active.' });
+  }
+
+  const { full_name, course, year_level, enrollment_year, avatar_url } = req.body;
+
+  // Preserve existing role if present; default to student for new profile rows
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  const role = existing?.role || 'student';
+
+  const updates = {
+    id: userId,
+    email: email,
+    full_name: sanitizeText(full_name || req.user.user_metadata?.full_name || 'COE Member'),
+    role: role,
+    course: course || null,
+    year_level: year_level || null,
+    enrollment_year: enrollment_year ? Number(enrollment_year) : null,
+    ...(avatar_url !== undefined && { avatar_url })
+  };
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert(updates, { onConflict: 'id' })
+    .select()
+    .single();
+
+  if (error) {
+    logError('Profile self-upsert failed:', error);
+    return res.status(400).json({ error: 'Failed to update profile details.' });
+  }
+
+  res.json(data);
+});
+
 // ── PATCH /api/admin/users/:id/role ──────────────────────────────────────────
 // Admins may assign any role; governors may assign officer/student roles but
 // never touch admin accounts; officers and cashiers have no role-assignment power.

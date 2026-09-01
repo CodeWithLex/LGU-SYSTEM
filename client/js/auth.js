@@ -83,9 +83,19 @@ const Auth = (() => {
   }
 
   async function updateProfile(userId, updates) {
+    // 1. Primary path: Use the backend API (/api/admin/profile) which uses service-role key to bypass RLS safely
+    if (window.Api && window.Api.profile && window.Api.profile.update) {
+      try {
+        const data = await window.Api.profile.update(updates);
+        if (data) return data;
+      } catch (err) {
+        console.warn('[Auth.updateProfile] Backend API update failed, trying Supabase client:', err?.message || err);
+      }
+    }
+
     const sb = client();
 
-    // 1. Attempt update using maybeSingle() so zero-row results (deleted or missing profile) don't throw PGRST116
+    // 2. Direct Supabase Client update
     const { data, error } = await sb
       .from('profiles')
       .update(updates)
@@ -93,10 +103,10 @@ const Auth = (() => {
       .select()
       .maybeSingle();
 
-    if (error) throw error;
+    if (error && !error.message?.includes('row-level security')) throw error;
     if (data) return data;
 
-    // 2. Fallback: If profile row was deleted or doesn't exist yet, UPSERT the row
+    // 3. Fallback: If profile row was deleted or missing, UPSERT the row
     const session = await getSession();
     const email = session?.user?.email || '';
     const { data: upsertData, error: upsertError } = await sb

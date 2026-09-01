@@ -510,6 +510,10 @@ const Api = (() => {
     }
   };
 
+  const profile = {
+    update: (updates) => _request('POST', '/admin/profile', updates),
+  };
+
   return {
     events,
     transactions,
@@ -519,6 +523,7 @@ const Api = (() => {
     announcements,
     roster,
     rosterRequests,
+    profile,
     request: _request,
     invalidateCache,
     hasCache,
