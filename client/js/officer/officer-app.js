@@ -155,7 +155,7 @@ const OfficerApp = (() => {
     bindTheme();
     bindLogout();
     bindNav();
-    Dropdowns.bindAll('#of-shell');
+    Dropdowns.bindAll('body');
     if (typeof ProfileModal !== 'undefined') {
       ProfileModal.init();
       ProfileModal.populateFields(profile, { user });
@@ -2138,15 +2138,19 @@ const OfficerApp = (() => {
 
   // ---------- Single Student Modal (Add & Edit) ----------
 
-  function bindRosterModal() {
-    const modal = $('of-roster-modal');
-    const closeBtn = $('of-roster-modal-close');
-    const cancelBtn = $('of-roster-modal-cancel');
+  function bindRosterForm() {
     const form = $('of-roster-modal-form');
+    const cancelBtn = $('of-roster-modal-cancel');
+    const modal = $('of-roster-modal');
 
-    const closeModal = () => modal?.classList.add('hidden');
+    Dropdowns.bindAll('#of-roster-modal');
 
-    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    function closeModal() {
+      if (modal) modal.classList.add('hidden');
+      if (form) form.reset();
+      Dropdowns.syncAll();
+    }
+
     if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
     if (modal) {
       modal.addEventListener('click', e => {
@@ -2230,6 +2234,9 @@ const OfficerApp = (() => {
       if (courseSelect) courseSelect.value = 'BSCE';
       if (yearSelect) yearSelect.value = '1';
     }
+
+    Dropdowns.bindAll('#of-roster-modal');
+    Dropdowns.syncAll();
 
     modal.classList.remove('hidden');
     nameInput?.focus();
