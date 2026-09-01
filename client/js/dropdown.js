@@ -90,8 +90,11 @@ const Dropdowns = (() => {
       const spaceBelow = window.innerHeight - rect.bottom;
 
       menu.style.position = 'fixed';
-      menu.style.left = `${Math.max(10, Math.min(rect.left, window.innerWidth - 140))}px`;
-      menu.style.minWidth = `${Math.max(rect.width, 120)}px`;
+      menu.style.left = `${rect.left}px`;
+      menu.style.width = `${rect.width}px`;
+      menu.style.minWidth = `${rect.width}px`;
+      menu.style.maxWidth = `${rect.width}px`;
+      menu.style.right = 'auto';
       menu.style.zIndex = '999999';
 
       if (spaceBelow < menuHeight + 10 && rect.top > menuHeight + 10) {
