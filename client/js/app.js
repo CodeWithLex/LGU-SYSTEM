@@ -103,6 +103,7 @@
   const onboardingRefreshBtn = document.getElementById('onboarding-refresh-btn');
 
   let _isRosterMatched = false;
+  let _existingRequest = null;
   let _currentUser = null;
   let _currentProfile = null;
 
@@ -112,10 +113,12 @@
     const courseSel = document.getElementById('onboarding-course');
     const yearSel = document.getElementById('onboarding-year');
 
-    if (match) {
+    const isApproved = Boolean(match || (_existingRequest && _existingRequest.status === 'approved'));
+
+    if (isApproved) {
       _isRosterMatched = true;
-      if (courseSel && match.course) courseSel.value = match.course;
-      if (yearSel && match.year) yearSel.value = match.year;
+      if (courseSel && match?.course) courseSel.value = match.course;
+      if (yearSel && match?.year) yearSel.value = match.year;
       Dropdowns.syncAll();
       applyOnboardingState(true);
     } else {
@@ -170,6 +173,8 @@
         if (raw) existingReq = JSON.parse(raw);
       } catch {}
     }
+
+    _existingRequest = existingReq;
 
     if (existingReq && existingReq.status === 'pending') {
       // Show pending review state screen
@@ -685,30 +690,29 @@
 
     // ---- Strict Student Masterlist & Verification Gate ----
     if (!officerRole) {
-      // 1. Check if student is found in the official enrolled masterlist
-      let rosterMatch = null;
-      if (window.Roster && window.Roster.findStudentAsync) {
-        rosterMatch = await Roster.findStudentAsync(
-          profile?.full_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name,
-          session.user.email
-        );
-      }
+      // If the student already has a complete, registered profile in the database, admit them directly!
+      const hasCompletedProfile = Boolean(profile?.course && profile?.year_level && profile?.enrollment_year);
 
-      // 2. Check if student has an existing verification request
-      let existingReq = null;
-      if (window.Api && window.Api.rosterRequests) {
-        try {
-          existingReq = await Api.rosterRequests.getMyRequest();
-        } catch (e) {
-          console.warn('[Gate] Verification request check error:', e);
+      if (!hasCompletedProfile) {
+        // 1. Check if student is found in the official enrolled masterlist
+        let rosterMatch = null;
+        if (window.Roster && window.Roster.findStudentAsync) {
+          rosterMatch = await Roster.findStudentAsync(
+            profile?.full_name || session.user.user_metadata?.full_name || session.user.user_metadata?.name,
+            session.user.email
+          );
         }
-      }
 
-      const isApproved = existingReq && existingReq.status === 'approved';
-      const isVerified = Boolean(rosterMatch || isApproved);
-      const needsProfileSetup = !profile?.course || !profile?.year_level || !profile?.enrollment_year;
+        // 2. Check if student has an existing verification request
+        let existingReq = null;
+        if (window.Api && window.Api.rosterRequests) {
+          try {
+            existingReq = await Api.rosterRequests.getMyRequest();
+          } catch (e) {
+            console.warn('[Gate] Verification request check error:', e);
+          }
+        }
 
-      if (!isVerified || needsProfileSetup) {
         if (splash) {
           splash.style.opacity = '0';
           splash.style.visibility = 'hidden';
