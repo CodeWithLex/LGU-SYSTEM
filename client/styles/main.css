@@ -5689,22 +5689,6 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
   user-select: none;
 }
 
-.portal-footer-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-}
-
-.portal-footer-logo {
-  width: 26px;
-  height: 26px;
-  object-fit: contain;
-  opacity: 0.85;
-  flex-shrink: 0;
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.3));
-}
-
 .portal-footer-text {
   display: flex;
   flex-direction: column;
@@ -5736,9 +5720,5 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
 
 [data-theme="light"] .portal-footer-title {
   color: var(--text-primary);
-}
-
-[data-theme="light"] .portal-footer-logo {
-  filter: none;
 }
 
