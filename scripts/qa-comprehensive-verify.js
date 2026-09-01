@@ -380,6 +380,14 @@ test('Migration 019_notifications_schema.sql exists and defines required tables'
   assert.ok(sql.includes('supabase_realtime ADD TABLE public.notifications'), '019_notifications_schema.sql missing realtime publication');
 });
 
+test('server/routes/notifications.js loads cleanly without undefined middleware callbacks', async () => {
+  const { createRequire } = await import('node:module');
+  const req = createRequire(import.meta.url);
+  assert.doesNotThrow(() => {
+    req('../server/routes/notifications');
+  }, 'Failed to require server/routes/notifications.js');
+});
+
 console.log(`\n=============================================================`);
 console.log(`🎉 QA Verification Complete: ${passedTests}/${totalTests} tests passed (${Math.round(passedTests/totalTests*100)}%)`);
 console.log(`=============================================================\n`);

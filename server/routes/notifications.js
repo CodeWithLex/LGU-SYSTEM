@@ -1,7 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-const { requireAuth, requireOfficer } = require('../middleware/roles');
+const { requireOfficer } = require('../middleware/roles');
 const { sanitizeText } = require('../lib/validate');
 
 /**
@@ -41,7 +41,7 @@ async function createNotification({ userId = null, targetRole = 'all', type = 's
 }
 
 // GET /api/notifications - Get unread category badges & recent notifications for logged in user
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', async (req, res) => {
   const userId = req.user.id;
   const userRole = req.user.role || 'student';
 
@@ -114,7 +114,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // POST /api/notifications/read - Mark category or specific notification as read
-router.post('/read', requireAuth, async (req, res) => {
+router.post('/read', async (req, res) => {
   const userId = req.user.id;
   const userRole = req.user.role || 'student';
   const { category, notification_id } = req.body;
