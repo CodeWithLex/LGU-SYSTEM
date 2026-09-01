@@ -125,7 +125,13 @@ const Events = (() => {
         : '';
       return `
         <div class="event-card" data-id="${ev.id}">
-          ${UI.renderStatusBadge(ev.status)}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+            ${UI.renderStatusBadge(ev.status)}
+            <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
+              <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--accent-primary,#f97316)"></iconify-icon>
+              ${ev.funding_source || 'General Fund'}
+            </span>
+          </div>
           <h3>${ev.event_name}</h3>
           ${dateLine}
           <p>${ev.description || 'No description provided.'}</p>
@@ -160,7 +166,13 @@ const Events = (() => {
 
       container.innerHTML = `
         <div style="margin-bottom:1.5rem">
-          ${UI.renderStatusBadge(ev.status)}
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:0.4rem;">
+            ${UI.renderStatusBadge(ev.status)}
+            <span style="font-size:0.75rem;background:rgba(255,255,255,0.08);padding:3px 10px;border-radius:12px;color:var(--text-secondary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
+              <iconify-icon icon="solar:vault-linear" style="font-size:13px;color:var(--accent-primary,#f97316)"></iconify-icon>
+              Source: ${ev.funding_source || 'General Fund'}
+            </span>
+          </div>
           <h2 style="font-size:1.75rem;margin:0.5rem 0">${ev.event_name}</h2>
           <p style="color:var(--text-secondary)">${ev.description || ''}</p>
           ${ev.event_date ? `<p style="font-size:0.85rem;margin-top:0.4rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:calendar-date-linear" style="font-size:15px"></iconify-icon> ${UI.dateStr(ev.event_date)}</p>` : ''}

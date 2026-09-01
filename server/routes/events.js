@@ -46,6 +46,7 @@ router.get('/', async (req, res) => {
     const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0, budget_injections: 0 };
     return {
       ...ev,
+      funding_source: ev.funding_source || 'General Fund',
       computed_expenses: stats.expenses, // Total expenses (allocated + general)
       computed_income: stats.income,
       // Event remaining budget strictly enforces the initial allocation,
@@ -186,6 +187,7 @@ router.post('/', requireOfficer, async (req, res) => {
       description:      cleanDesc,
       allocated_budget: Number(allocated_budget),
       remaining_budget: Number(allocated_budget),
+      funding_source:   req.body.funding_source || 'General Fund',
       event_date:       event_date || null,
       status:           finalStatus,
       created_by:       req.user.id,

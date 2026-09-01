@@ -1160,7 +1160,13 @@ const OfficerApp = (() => {
       const pct    = over ? 100 : (budget > 0 ? Math.min((spent / budget) * 100, 100) : 0);
       return `
         <div class="of-event-card" data-ev="${ev.id}">
-          ${UI.renderStatusBadge(ev.status)}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+            ${UI.renderStatusBadge(ev.status)}
+            <span style="font-size:0.72rem;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;color:var(--text-tertiary,#94a3b8);display:inline-flex;align-items:center;gap:4px;">
+              <iconify-icon icon="solar:vault-linear" style="font-size:12px;color:var(--accent-primary,#f97316)"></iconify-icon>
+              ${ev.funding_source || 'General Fund'}
+            </span>
+          </div>
           <h4>${esc(ev.event_name)}</h4>
           ${ev.event_date ? `<div class="of-event-date"><iconify-icon icon="solar:calendar-date-linear"></iconify-icon> ${UI.dateStr(ev.event_date)}</div>` : ''}
           <p>${esc(ev.description || 'No description provided.')}</p>
