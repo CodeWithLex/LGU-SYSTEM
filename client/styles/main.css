@@ -2779,8 +2779,18 @@ iconify-icon {
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   .view { padding: 0 1rem 1rem; }
 
-  .view-header { flex-wrap: wrap; gap: 0.75rem; padding-top: 1.5rem; }
-  .view-header h2 { font-size: 1.3rem; }
+  .view-header {
+    position: static !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.25rem !important;
+    margin-bottom: 0.75rem !important;
+    box-shadow: none !important;
+  }
+  .view-header h2 { font-size: 1.25rem; }
 
   .data-table th,
   .data-table td { padding: 0.6rem 0.75rem; font-size: 0.8rem; }
@@ -2805,8 +2815,8 @@ iconify-icon {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 0.75rem !important;
-    padding-top: 1.15rem !important;
-    padding-bottom: 0.65rem !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 0.5rem !important;
   }
 
   .tx-filter-bar {
@@ -2838,9 +2848,13 @@ iconify-icon {
   /* Dashboard & Grid Overrides */
   html body #view-dashboard .view-header { 
     display: flex !important; 
-    margin-bottom: 0.75rem !important;
-    padding-bottom: 0.5rem !important;
-    border-bottom: 1px solid var(--col-border) !important;
+    position: static !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    margin-bottom: 0.65rem !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.25rem !important;
+    box-shadow: none !important;
   }
   html body #view-dashboard .view-header h2 { font-size: 1.1rem !important; }
   html body #view-dashboard .view-header p { font-size: 0.7rem !important; }
@@ -3281,7 +3295,14 @@ iconify-icon {
   body #app-screen { flex-direction: column !important; }
   body .main-content { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
   body .view { padding: 0 0.75rem 0.75rem !important; }
-  body .view-header { padding-top: 1.25rem !important; }
+  body .view-header {
+    position: static !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.25rem !important;
+    box-shadow: none !important;
+  }
   body .auth-card { margin: 0.5rem !important; padding: 1.25rem 1rem !important; }
   body #view-transactions .table-wrapper { 
     display: none !important; 
