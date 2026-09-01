@@ -8,8 +8,8 @@
 
 const OfficerApp = (() => {
 
-  const OFFICER_ROLES = ['admin', 'governor', 'cashier'];
-  const ROLE_LABELS   = { admin: 'Admin', governor: 'Governor', cashier: 'Cashier', student: 'Student' };
+  const OFFICER_ROLES = ['admin', 'governor', 'cashier', 'officer'];
+  const ROLE_LABELS   = { admin: 'Admin', governor: 'Governor', cashier: 'Cashier', officer: 'Officer', student: 'Student' };
 
   let _profile   = null;
   let _events    = [];
@@ -1650,8 +1650,8 @@ const OfficerApp = (() => {
 
   const canAssignRoles = () => _profile.role === 'admin' || _profile.role === 'governor';
   const assignableRoles = () => _profile.role === 'admin'
-    ? ['student', 'governor', 'cashier', 'admin']
-    : ['student', 'governor', 'cashier'];
+    ? ['student', 'officer', 'governor', 'cashier', 'admin']
+    : ['student', 'officer', 'governor', 'cashier'];
 
   function bindPeopleSearch() {
     $('of-people-search')?.addEventListener('input', renderPeopleTable);

@@ -10,8 +10,8 @@ const { logError } = require('../lib/logger');
 const { requireAdmin, requireOfficer } = require('../middleware/roles');
 const { createNotification } = require('./notifications');
 
-const ASSIGNABLE_ROLES = ['admin', 'student', 'governor', 'cashier'];
-const OFFICER_ASSIGNABLE_ROLES = ['student', 'governor', 'cashier'];
+const ASSIGNABLE_ROLES = ['admin', 'student', 'governor', 'cashier', 'officer'];
+const OFFICER_ASSIGNABLE_ROLES = ['student', 'governor', 'cashier', 'officer'];
 
 // ── GET /api/admin/users ──────────────────────────────────────────────────────
 router.get('/users', requireOfficer, async (req, res) => {

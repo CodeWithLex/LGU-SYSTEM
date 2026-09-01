@@ -2,7 +2,7 @@
 // roles.js - Shared Role Middleware
 // =============================================
 
-const OFFICER_ROLES = ['admin', 'governor', 'cashier'];
+const OFFICER_ROLES = ['admin', 'governor', 'cashier', 'officer'];
 
 function requireAdmin(req, res, next) {
   if (req.profile?.role !== 'admin') {
