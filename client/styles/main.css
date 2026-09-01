@@ -5356,9 +5356,9 @@ html body.is-admin th.admin-only {
 html body .mobile-sheet-backdrop {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0, 0, 0, 0.68) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(8, 12, 20, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
   z-index: 10050 !important;
   display: block !important;
   opacity: 1 !important;

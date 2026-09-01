@@ -311,12 +311,25 @@ const OfficerApp = (() => {
     const closeBtn = $('of-mobile-sheet-close-btn');
     const dragHandle = $('of-mobile-sheet-drag-handle');
 
+    function preventScrollOutsideSheet(e) {
+      if (!sheet || sheet.classList.contains('hidden')) return;
+      if (!sheet.contains(e.target)) {
+        e.preventDefault();
+      }
+    }
+
     function openSheet() {
       if (!sheet || !backdrop) return;
       sheet.classList.remove('hidden');
       backdrop.classList.remove('hidden');
       if (moreBtn) moreBtn.setAttribute('aria-expanded', 'true');
       document.body.classList.add('more-sheet-open');
+      const ofMain = document.querySelector('.of-main');
+      if (ofMain) {
+        ofMain.style.overflow = 'hidden';
+        ofMain.style.touchAction = 'none';
+      }
+      document.addEventListener('touchmove', preventScrollOutsideSheet, { passive: false });
     }
 
     function closeSheet() {
@@ -325,6 +338,12 @@ const OfficerApp = (() => {
       backdrop.classList.add('hidden');
       if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('more-sheet-open');
+      const ofMain = document.querySelector('.of-main');
+      if (ofMain) {
+        ofMain.style.overflow = '';
+        ofMain.style.touchAction = '';
+      }
+      document.removeEventListener('touchmove', preventScrollOutsideSheet);
     }
 
     if (moreBtn) moreBtn.addEventListener('click', e => {

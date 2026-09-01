@@ -544,12 +544,25 @@
     const closeBtn = document.getElementById('mobile-sheet-close-btn');
     const dragHandle = document.getElementById('mobile-sheet-drag-handle');
 
+    function preventScrollOutsideSheet(e) {
+      if (!sheet || sheet.classList.contains('hidden')) return;
+      if (!sheet.contains(e.target)) {
+        e.preventDefault();
+      }
+    }
+
     function openSheet() {
       if (!sheet || !backdrop) return;
       sheet.classList.remove('hidden');
       backdrop.classList.remove('hidden');
       if (moreBtn) moreBtn.setAttribute('aria-expanded', 'true');
       document.body.classList.add('more-sheet-open');
+      const main = document.querySelector('.main-content');
+      if (main) {
+        main.style.overflow = 'hidden';
+        main.style.touchAction = 'none';
+      }
+      document.addEventListener('touchmove', preventScrollOutsideSheet, { passive: false });
     }
 
     function closeSheet() {
@@ -558,6 +571,12 @@
       backdrop.classList.add('hidden');
       if (moreBtn) moreBtn.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('more-sheet-open');
+      const main = document.querySelector('.main-content');
+      if (main) {
+        main.style.overflow = '';
+        main.style.touchAction = '';
+      }
+      document.removeEventListener('touchmove', preventScrollOutsideSheet);
     }
 
     if (moreBtn) moreBtn.addEventListener('click', e => {
