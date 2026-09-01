@@ -1531,7 +1531,7 @@
   .of-view {
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 0 0.85rem calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 0 0.85rem 0.75rem !important;
   }
   .of-view-head {
     padding-top: 1rem;
