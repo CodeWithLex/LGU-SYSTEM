@@ -4092,13 +4092,13 @@ html body.is-admin th.admin-only {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 500px;
-  max-width: 92vw;
-  max-height: 90vh;
+  width: 520px;
+  max-width: 94vw;
+  max-height: 94vh;
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg, 12px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -4122,18 +4122,18 @@ html body.is-admin th.admin-only {
 
 .profile-modal-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  padding: 1.25rem 1.4rem 1rem;
+  padding: 0.85rem 1.25rem 0.75rem;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-default);
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .profile-modal-hero {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
   flex: 1;
   min-width: 0;
 }
@@ -4151,8 +4151,8 @@ html body.is-admin th.admin-only {
 }
 
 .profile-modal-avatar-lg {
-  width: 58px;
-  height: 58px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: var(--bg-surface-raised);
   border: 2px solid var(--primary);
@@ -4160,10 +4160,10 @@ html body.is-admin th.admin-only {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   font-weight: 700;
   overflow: hidden;
-  box-shadow: 0 0 16px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
   position: relative;
 }
 
@@ -4179,15 +4179,15 @@ html body.is-admin th.admin-only {
   position: absolute;
   bottom: -2px;
   right: -2px;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: var(--primary);
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
   border: 2px solid var(--bg-surface);
   transition: transform 0.15s ease;
@@ -4200,7 +4200,7 @@ html body.is-admin th.admin-only {
 .profile-modal-identity {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
   min-width: 0;
 }
 
@@ -4213,14 +4213,14 @@ html body.is-admin th.admin-only {
 
 .profile-modal-title-row h3 {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
 .profile-modal-sub {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -4228,8 +4228,8 @@ html body.is-admin th.admin-only {
 }
 
 .profile-close-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   color: var(--text-tertiary);
   border-radius: 50%;
   display: flex;
@@ -4243,7 +4243,7 @@ html body.is-admin th.admin-only {
 }
 
 .profile-close-btn iconify-icon {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
 }
 
 .profile-close-btn:hover {
@@ -4257,7 +4257,7 @@ html body.is-admin th.admin-only {
 .avatar-picker-section {
   background: #0E141B;
   border-bottom: 1px solid var(--border-default);
-  padding: 0.85rem 1.4rem;
+  padding: 0.75rem 1.25rem;
   transition: all 0.25s ease;
 }
 
@@ -4271,7 +4271,7 @@ html body.is-admin th.admin-only {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.55rem;
   flex-wrap: wrap;
 }
 
@@ -4279,7 +4279,7 @@ html body.is-admin th.admin-only {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -4288,16 +4288,16 @@ html body.is-admin th.admin-only {
 
 .avatar-picker-title iconify-icon {
   color: var(--primary);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .avatar-cat-tabs {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.3rem;
   overflow-x: auto;
   scrollbar-width: none;
   background: var(--bg-surface-raised, #161D25);
-  padding: 3px;
+  padding: 2px;
   border-radius: var(--radius-sm, 6px);
   border: 1px solid var(--border-default, #28313A);
 }
@@ -4312,9 +4312,9 @@ html body.is-admin th.admin-only {
   color: var(--text-secondary);
   border-radius: 4px;
   font-family: var(--font-ui);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 500;
-  padding: 0.25rem 0.6rem;
+  padding: 0.2rem 0.5rem;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
@@ -4335,9 +4335,9 @@ html body.is-admin th.admin-only {
 /* Gallery Track */
 .avatar-gallery-track {
   display: flex;
-  gap: 0.65rem;
+  gap: 0.55rem;
   overflow-x: auto;
-  padding: 0.4rem 0.2rem 0.5rem;
+  padding: 0.3rem 0.1rem 0.4rem;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -4348,8 +4348,8 @@ html body.is-admin th.admin-only {
 
 .avatar-thumb-card {
   position: relative;
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--bg-surface);
   border: 2px solid var(--border-default);
@@ -4385,15 +4385,15 @@ html body.is-admin th.admin-only {
   position: absolute;
   top: -2px;
   right: -2px;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   background: #22C55E;
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 9px;
   border: 1.5px solid var(--bg-surface);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
@@ -4403,8 +4403,8 @@ html body.is-admin th.admin-only {
   display: flex;
   background: var(--bg-surface-raised);
   border-bottom: 1px solid var(--border-default);
-  padding: 0 1.4rem;
-  gap: 1.25rem;
+  padding: 0 1.25rem;
+  gap: 1.15rem;
 }
 
 .profile-tab-btn {
@@ -4413,9 +4413,9 @@ html body.is-admin th.admin-only {
   border-bottom: 2px solid transparent;
   color: var(--text-secondary);
   font-family: var(--font-ui);
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  padding: 0.75rem 0.2rem;
+  padding: 0.6rem 0.2rem;
   cursor: pointer;
   transition: all var(--transition);
 }
@@ -4432,9 +4432,9 @@ html body.is-admin th.admin-only {
 
 /* Body & Content */
 .profile-modal-body {
-  padding: 1.35rem 1.4rem;
+  padding: 0.95rem 1.25rem 1rem;
   overflow-y: auto;
-  max-height: calc(90vh - 220px);
+  max-height: calc(94vh - 150px);
   touch-action: pan-y;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
@@ -4450,23 +4450,32 @@ html body.is-admin th.admin-only {
 }
 
 .profile-tab-content .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 0.65rem;
 }
 
 .profile-tab-content .form-group label {
   display: block;
-  font-size: 0.74rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.25rem;
 }
 
 .form-row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.85rem;
+  gap: 0.75rem;
+}
+
+.profile-modal input.input-field,
+.profile-modal select.select-field,
+.profile-modal .dd-trigger {
+  height: 38px;
+  min-height: 38px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.84rem;
 }
 
 /* Custom Select Styling */
@@ -4477,13 +4486,13 @@ html body.is-admin th.admin-only {
 
 .custom-select-wrap select {
   width: 100%;
-  padding: 0.6rem 2rem 0.6rem 0.85rem;
+  padding: 0.45rem 2rem 0.45rem 0.75rem;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 0.875rem;
+  font-size: 0.84rem;
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
@@ -4495,7 +4504,7 @@ html body.is-admin th.admin-only {
 .custom-select-wrap::after {
   content: "";
   position: absolute;
-  right: 0.85rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   width: 0;
@@ -4516,13 +4525,13 @@ html body.is-admin th.admin-only {
 
 .profile-modal .dd-trigger {
   width: 100%;
-  height: 42px;
-  padding: 0.55rem 0.85rem;
+  height: 38px;
+  padding: 0.45rem 0.75rem;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 0.84rem;
   font-family: var(--font-ui);
   display: flex;
   justify-content: space-between;
@@ -4546,7 +4555,7 @@ html body.is-admin th.admin-only {
   left: 0;
   right: 0;
   z-index: 200;
-  max-height: 220px;
+  max-height: 180px;
   overflow-y: auto;
   background: var(--bg-surface-raised);
   border: 1px solid var(--border-hover);
@@ -4562,6 +4571,7 @@ html body.is-admin th.admin-only {
 
 .reset-avatar-btn {
   height: 38px;
+  min-height: 38px;
   width: 100%;
   font-size: 0.78rem;
   display: flex;
@@ -4571,6 +4581,15 @@ html body.is-admin th.admin-only {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
+  background: var(--bg-surface-raised);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.reset-avatar-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
 }
 
 .reset-avatar-btn:hover {
@@ -4725,9 +4744,15 @@ html body.is-admin th.admin-only {
   align-items: center;
   justify-content: flex-end;
   gap: 0.65rem;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
   border-top: 1px solid var(--border-default);
+}
+
+.profile-modal-footer .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.84rem;
+  height: 36px;
 }
 
 .profile-modal-footer .btn {
