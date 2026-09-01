@@ -5249,51 +5249,110 @@ html body.is-admin th.admin-only {
 /* =============================================
    iOS Slide-Up Bottom Sheet Drawer ("More" Menu)
    ============================================= */
-.mobile-sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 10050;
-  opacity: 1;
-  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+html body .mobile-sheet-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.68) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 10050 !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.32s !important;
+  will-change: opacity, visibility;
 }
 
-.mobile-sheet-backdrop.hidden {
-  opacity: 0;
-  pointer-events: none;
+html body .mobile-sheet-backdrop.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
-.mobile-more-sheet {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  max-width: 520px;
-  margin: 0 auto;
-  background: var(--bg-surface);
-  border-top: 1px solid var(--border-default);
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
-  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-  z-index: 10055;
-  padding: 0.65rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  max-height: 85vh;
-  overflow-y: auto;
-  transform: translateY(0);
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
-  box-sizing: border-box;
+html body .mobile-more-sheet {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  background: var(--bg-surface) !important;
+  border-top: 1px solid var(--border-default) !important;
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+  box-shadow: 0 -16px 48px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+  z-index: 10055 !important;
+  padding: 0.65rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+  transform: translate3d(0, 0, 0) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.28s ease, visibility 0.4s !important;
+  will-change: transform, opacity, visibility;
 }
 
-.mobile-more-sheet.hidden {
-  transform: translateY(105%);
-  opacity: 0;
-  pointer-events: none;
+html body .mobile-more-sheet.hidden {
+  transform: translate3d(0, 105%, 0) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.22s ease, visibility 0.32s !important;
+}
+
+/* Staggered smooth entry for sections inside the sheet */
+html body .mobile-more-sheet:not(.hidden) .mobile-sheet-section {
+  animation: sheetSectionCascade 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html body .mobile-more-sheet:not(.hidden) .mobile-sheet-section:nth-child(1) {
+  animation-delay: 0.06s;
+}
+html body .mobile-more-sheet:not(.hidden) .mobile-sheet-section:nth-child(2) {
+  animation-delay: 0.11s;
+}
+html body .mobile-more-sheet:not(.hidden) .mobile-sheet-section:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+@keyframes sheetSectionCascade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Tactile Spring Micro-interaction on More button trigger */
+body .bottom-nav-more-trigger,
+#of-bottom-nav-more-btn {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease !important;
+}
+
+body .bottom-nav-more-trigger:active,
+#of-bottom-nav-more-btn:active {
+  transform: scale(0.88) !important;
+}
+
+body .bottom-nav-more-trigger[aria-expanded="true"] .nav-icon,
+#of-bottom-nav-more-btn[aria-expanded="true"] iconify-icon {
+  transform: rotate(90deg) scale(1.12) !important;
+  color: var(--primary) !important;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease !important;
+}
+
+body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
+#of-bottom-nav-more-btn:not([aria-expanded="true"]) iconify-icon {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
 }
 
 .mobile-sheet-drag-zone {
