@@ -3242,6 +3242,30 @@ iconify-icon {
     font-family: var(--font-ui);
   }
 
+  /* Unread Notification Orange Highlight Badge */
+  body .bottom-nav-item.has-unread .nav-icon,
+  body .sidebar-nav .nav-item.has-unread .nav-icon {
+    position: relative !important;
+  }
+  body .bottom-nav-item.has-unread .nav-icon::after,
+  body .sidebar-nav .nav-item.has-unread .nav-icon::after {
+    content: '' !important;
+    position: absolute !important;
+    top: -2px !important;
+    right: -3px !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #F97316 !important;
+    box-shadow: 0 0 8px #F97316, 0 0 3px #F97316 !important;
+    animation: pulseNotifBadge 2s infinite ease-in-out !important;
+  }
+
+  @keyframes pulseNotifBadge {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.85; }
+  }
+
   /* Active State - Subtle Glowing Pill */
   body .bottom-nav-item.active {
     color: var(--primary) !important;

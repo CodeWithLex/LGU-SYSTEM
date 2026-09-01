@@ -1637,6 +1637,27 @@
     transition: color 0.2s ease, font-weight 0.2s ease !important;
   }
 
+  /* Unread Executive Notification Orange Badge */
+  .of-bottom-nav > button.has-unread iconify-icon,
+  .of-bottom-nav > a.has-unread iconify-icon,
+  .of-nav .nav-item.has-unread .nav-icon {
+    position: relative !important;
+  }
+  .of-bottom-nav > button.has-unread iconify-icon::after,
+  .of-bottom-nav > a.has-unread iconify-icon::after,
+  .of-nav .nav-item.has-unread .nav-icon::after {
+    content: '' !important;
+    position: absolute !important;
+    top: -2px !important;
+    right: -3px !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #F97316 !important;
+    box-shadow: 0 0 8px #F97316, 0 0 3px #F97316 !important;
+    animation: pulseNotifBadge 2s infinite ease-in-out !important;
+  }
+
   .of-bottom-nav > button.active {
     color: var(--accent) !important;
     background: rgba(249, 115, 22, 0.12) !important;

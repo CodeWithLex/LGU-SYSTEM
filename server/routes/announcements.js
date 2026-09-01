@@ -5,6 +5,7 @@ const { sendAnnouncementEmail } = require('../lib/email');
 const { sanitizeText, assertRequired } = require('../lib/validate');
 const { logAudit } = require('../lib/audit');
 const { requireOfficer } = require('../middleware/roles');
+const { createNotification } = require('./notifications');
 
 const MAX_TITLE_LENGTH = 100;
 const MAX_BODY_LENGTH  = 5000;
@@ -51,6 +52,17 @@ router.post('/', requireOfficer, async (req, res) => {
 
   // Audit log
   logAudit(req.user.id, 'POST_ANNOUNCEMENT', { announcement_id: data.id, title: cleanTitle });
+
+  // Create real-time notification for all users
+  createNotification({
+    targetRole: 'all',
+    type: 'announcement',
+    title: `📢 New Announcement: ${cleanTitle}`,
+    message: cleanBody.length > 120 ? cleanBody.substring(0, 120) + '...' : cleanBody,
+    category: 'announcements',
+    link: 'more',
+    metadata: { announcement_id: data.id }
+  });
 
   // Send email notifications in the background (non-blocking) - DISABLED AS PER REQUEST
   /*

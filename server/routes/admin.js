@@ -8,6 +8,7 @@ const { isPositiveNumber, isValidEnum, isValidUUID, sanitizeText } = require('..
 const { logAudit } = require('../lib/audit');
 const { logError } = require('../lib/logger');
 const { requireAdmin, requireOfficer } = require('../middleware/roles');
+const { createNotification } = require('./notifications');
 
 const ASSIGNABLE_ROLES = ['admin', 'student', 'governor', 'cashier'];
 const OFFICER_ASSIGNABLE_ROLES = ['student', 'governor', 'cashier'];
@@ -70,6 +71,19 @@ router.patch('/users/:id/role', async (req, res) => {
     new_role: role,
     changed_by_role: actorRole
   });
+
+  // Targeted notification for the user whose role was updated
+  createNotification({
+    userId: id,
+    targetRole: 'all',
+    type: 'system',
+    title: `🎓 Account Status Updated`,
+    message: `Your account role has been set to ${role.toUpperCase()}.`,
+    category: 'units',
+    link: 'units',
+    metadata: { new_role: role }
+  });
+
   res.json(data);
 });
 

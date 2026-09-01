@@ -6,6 +6,7 @@ const { sanitizeText, validateDriveUrl, isPositiveNumber, isValidEnum, isValidUU
 const { logAudit } = require('../lib/audit');
 const { logError } = require('../lib/logger');
 const { requireAdmin, requireOfficer } = require('../middleware/roles');
+const { createNotification } = require('./notifications');
 
 const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation'];
 const MAX_LIMIT      = 100;
@@ -181,6 +182,17 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
     .single();
 
   if (txError) return res.status(400).json({ error: 'Failed to create transaction.' });
+
+  // Auto-dispatch real-time notification for transactions category (Ledger)
+  createNotification({
+    targetRole: 'all',
+    type: 'transaction',
+    title: `💳 New Transaction: ₱${Number(amount).toLocaleString()} (${type.toUpperCase()})`,
+    message: cleanDesc,
+    category: 'transactions',
+    link: 'transactions',
+    metadata: { transaction_id: tx.id, amount, type }
+  });
 
   let receiptWarning = null;
 

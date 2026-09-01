@@ -5,6 +5,7 @@ const { sanitizeText, isPositiveNumber, isValidEnum, isValidUUID, assertRequired
 const { logAudit } = require('../lib/audit');
 const { sendNewEventEmail } = require('../lib/email');
 const { requireAdmin, requireOfficer } = require('../middleware/roles');
+const { createNotification } = require('./notifications');
 
 const VALID_STATUSES = ['upcoming', 'ongoing', 'completed', 'cancelled'];
 
@@ -166,6 +167,17 @@ router.post('/', requireOfficer, async (req, res) => {
     event_id:         data.id,
     event_name:       cleanName,
     allocated_budget: Number(allocated_budget),
+  });
+
+  // Dispatch real-time notification for Events category
+  createNotification({
+    targetRole: 'all',
+    type: 'event',
+    title: `📅 New Event Created: ${cleanName}`,
+    message: `Allocated budget: ₱${Number(allocated_budget).toLocaleString()} | Status: ${finalStatus.toUpperCase()}`,
+    category: 'events',
+    link: 'events',
+    metadata: { event_id: data.id, allocated_budget: Number(allocated_budget) }
   });
 
   // Send email notifications to students in background

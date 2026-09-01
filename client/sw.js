@@ -9,7 +9,7 @@
 // tokens and must never be served stale.
 // =============================================
 
-const CACHE_VERSION = 'coe-pwa-v3';
+const CACHE_VERSION = 'coe-pwa-v4';
 
 // Relative paths resolve against the service worker scope
 const APP_SHELL = [
@@ -36,6 +36,7 @@ const APP_SHELL = [
   './js/admin.js',
   './js/ai-assistant.js',
   './js/profile.js',
+  './js/notifications.js',
   './js/officer/officer-app.js',
   './assets/coe-logo.png',
   './assets/icons/icon-192.png',

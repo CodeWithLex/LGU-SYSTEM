@@ -356,6 +356,7 @@ test('All frontend JS files have valid syntax without scope redeclarations', () 
       'client/js/admin.js',
       'client/js/ai-assistant.js',
       'client/js/profile.js',
+      'client/js/notifications.js',
       'client/js/app.js',
       'client/js/officer/officer-app.js'
     ];
@@ -365,6 +366,18 @@ test('All frontend JS files have valid syntax without scope redeclarations', () 
       assert.doesNotThrow(() => new vm.Script(code), `Syntax or redeclaration error in ${file}`);
     });
   });
+});
+
+// -------------------------------------------------------------
+// 8. NOTIFICATION SYSTEM INTEGRITY VERIFICATION
+// -------------------------------------------------------------
+console.log('\n--- 8. Notification System Integrity Audit ---');
+
+test('Migration 019_notifications_schema.sql exists and defines required tables', () => {
+  const sql = fs.readFileSync('supabase/migrations/019_notifications_schema.sql', 'utf8');
+  assert.ok(sql.includes('public.notifications'), '019_notifications_schema.sql missing public.notifications table');
+  assert.ok(sql.includes('public.notification_reads'), '019_notifications_schema.sql missing public.notification_reads table');
+  assert.ok(sql.includes('supabase_realtime ADD TABLE public.notifications'), '019_notifications_schema.sql missing realtime publication');
 });
 
 console.log(`\n=============================================================`);

@@ -11,6 +11,7 @@ const reportsRouter       = require("./routes/reports");
 const announcementsRouter = require("./routes/announcements");
 const adminRouter         = require("./routes/admin");
 const unitsRouter         = require("./routes/units");
+const { router: notificationsRouter } = require("./routes/notifications");
 const authMiddleware      = require("./middleware/auth");
 const keepAlive           = require("./lib/keepAlive");
 
@@ -159,6 +160,7 @@ app.use("/api/reports",       authMiddleware, onlyWrites(writeLimiter), reportsR
 app.use("/api/announcements", authMiddleware, onlyWrites(writeLimiter), announcementsRouter);
 app.use("/api/admin",         authMiddleware, onlyWrites(writeLimiter), adminRouter);
 app.use("/api/units",         authMiddleware, onlyWrites(writeLimiter), unitsRouter);
+app.use("/api/notifications", authMiddleware, onlyWrites(writeLimiter), notificationsRouter);
 
 // =============================================
 // SPA Fallback
