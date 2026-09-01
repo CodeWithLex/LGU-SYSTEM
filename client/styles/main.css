@@ -2992,7 +2992,7 @@ iconify-icon {
   .app-mobile-actions {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.25rem;
   }
   .app-mobile-actions .btn-icon {
     width: 36px;
@@ -3000,22 +3000,28 @@ iconify-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-sm);
-    background: var(--bg-surface-raised);
-    border: 1px solid var(--border-default);
+    border-radius: 50%;
+    background: transparent;
+    border: none;
     color: var(--text-secondary);
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     text-decoration: none;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.18s ease;
   }
-  .app-mobile-actions .btn-icon:hover {
+  .app-mobile-actions .btn-icon:hover,
+  .app-mobile-actions .btn-icon:active {
     color: var(--text-primary);
-    border-color: var(--border-hover);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  [data-theme="light"] .app-mobile-actions .btn-icon:hover,
+  [data-theme="light"] .app-mobile-actions .btn-icon:active {
+    background: rgba(0, 0, 0, 0.06);
   }
   .app-mobile-actions #app-mobile-logout-btn:hover,
   .app-mobile-actions #app-mobile-logout-btn:active {
     color: var(--status-negative);
+    background: rgba(239, 68, 68, 0.12);
   }
 
   /* Navigation Overrides - Floating Island Glass Pill */
