@@ -3279,7 +3279,7 @@ iconify-icon {
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  body .main-content { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important; }
+  body .main-content { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important; }
   body .view { padding: 0 0.75rem 0.75rem !important; }
   body .view-header { padding-top: 1.25rem !important; }
   body .auth-card { margin: 0.5rem !important; padding: 1.25rem 1rem !important; }
@@ -5663,62 +5663,11 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
   box-shadow: 0 0 6px rgba(249, 115, 22, 0.8);
 }
 
-/* Safe scroll clearance so floating bars never obscure content */
+/* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card */
 @media (max-width: 768px) {
   .main-content,
   .of-main {
-    padding-bottom: calc(95px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
   }
-}
-
-/* =============================================
-   Institutional Portal Footer
-   ============================================= */
-.portal-footer {
-  margin-top: 2rem;
-  padding: 1.5rem 1rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid var(--border-default);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.65rem;
-  color: var(--text-tertiary);
-  width: 100%;
-  box-sizing: border-box;
-  user-select: none;
-}
-
-.portal-footer-text {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.portal-footer-title {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  letter-spacing: -0.01em;
-}
-
-.portal-footer-sub {
-  margin: 0.15rem 0 0;
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-}
-
-.portal-footer-meta {
-  font-size: 0.62rem;
-  color: var(--text-tertiary);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-weight: 500;
-  opacity: 0.8;
-}
-
-[data-theme="light"] .portal-footer-title {
-  color: var(--text-primary);
 }
 
