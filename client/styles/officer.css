@@ -1543,8 +1543,8 @@
     display: flex !important;
     position: fixed !important;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 8px !important;
-    right: 8px !important;
+    left: 10px !important;
+    right: 10px !important;
     width: auto !important;
     max-width: 440px !important;
     margin: 0 auto !important;
