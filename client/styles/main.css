@@ -11,13 +11,13 @@
      70% graphite/slate backgrounds · 20% neutral typography ·
      8% steel blue accents · 2% engineering orange (action only).
      Orange is reserved for ACTION / ACTIVE / IMPORTANT - never a fill. */
-  --background: #0B0F14;        /* app shell, page background */
-  --surface: #111820;           /* sidebar, modals, cards */
-  --surface-secondary: #161D25; /* input fields, raised surfaces */
-  --surface-hover: #1D2733;     /* hover states */
+  --background: #090D14;        /* app shell, page background */
+  --surface: #0E1520;           /* sidebar, modals, cards */
+  --surface-secondary: #131B27; /* input fields, raised surfaces */
+  --surface-hover: #192332;     /* hover states */
 
-  --border: #28313A;            /* subtle borders - the primary elevation tool */
-  --border-hover: #3A4550;
+  --border: rgba(255, 255, 255, 0.05);            /* ultra-subtle border - modern tonal depth */
+  --border-hover: rgba(255, 255, 255, 0.12);
 
   --primary: #F97316;           /* engineering orange - action/active only */
   --primary-hover: #FB923C;
@@ -50,14 +50,14 @@
 
   /* Radius */
   --radius-sm: 6px;
-  --radius-md: 6px;
+  --radius-md: 8px;
 
-  /* Shadows - reserve for dropdown/popover menus ONLY, never on cards/inputs/buttons */
-  --shadow-popover: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-card: none;
-  --shadow-card-hover: 0 4px 14px rgba(0, 0, 0, 0.35);
-  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.7);
-  --bg-surface-elevated: #161F2C;
+  /* Shadows - modern tonal depth with top-edge ambient highlight */
+  --shadow-popover: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  --shadow-card: inset 0 1px 0 0 rgba(255, 255, 255, 0.05), 0 4px 20px -2px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 8px 28px -4px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 25px 65px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  --bg-surface-elevated: #131B27;
 
   /* Sleek Scrollbar Tokens */
   --scrollbar-thumb: rgba(255, 255, 255, 0.16);
@@ -1799,7 +1799,7 @@ input[type="checkbox"]:checked::before {
   display: flex;
   align-items: center;
   gap: 1.15rem;
-  box-shadow: var(--shadow-card, none);
+  box-shadow: var(--shadow-card);
   transition: border-color var(--transition), box-shadow var(--transition), transform 0.15s ease;
   cursor: pointer;
 }
@@ -1807,7 +1807,7 @@ input[type="checkbox"]:checked::before {
 .stat-card.hover-active {
   z-index: 10;
   border-color: var(--border-hover);
-  box-shadow: var(--shadow-card-hover, none);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .stat-body {
@@ -2028,7 +2028,7 @@ input[type="checkbox"]:checked::before {
   padding: 1.35rem 1.5rem;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-card, none);
+  box-shadow: var(--shadow-card);
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
