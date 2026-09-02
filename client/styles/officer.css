@@ -390,7 +390,8 @@
 /* ---------- Charts & Dashboard Grids ---------- */
 .of-chart-box {
   position: relative;
-  height: 260px;
+  height: 280px;
+  min-height: 280px;
 }
 
 .dashboard-grid {
@@ -1601,7 +1602,7 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 10px)) !important;
   }
 
   .of-view {
@@ -1634,7 +1635,7 @@
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
     left: 10px !important;
     right: 10px !important;
     width: auto !important;
@@ -1880,7 +1881,8 @@
     padding: 1rem;
   }
   .of-chart-box {
-    height: 220px;
+    height: 290px !important;
+    min-height: 290px !important;
   }
   /* The 290px event-card track overflows 320px screens — force single column */
   .of-events-grid {

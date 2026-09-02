@@ -686,14 +686,17 @@ const OfficerApp = (() => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '74%',
+        cutout: '68%',
+        layout: {
+          padding: { top: 6, bottom: 8, left: 6, right: 6 }
+        },
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
               color: textColor,
-              font: { family: 'Inter, sans-serif', size: 12, weight: '500' },
-              padding: 16,
+              font: { family: 'Inter, sans-serif', size: 11, weight: '500' },
+              padding: 12,
               usePointStyle: true,
               pointStyle: 'circle',
               boxWidth: 7,

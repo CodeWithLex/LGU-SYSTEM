@@ -149,16 +149,17 @@ router.get('/audit-logs', requireOfficer, async (req, res) => {
     return res.status(500).json({ error: 'Failed to fetch audit logs.' });
   }
 
-  // Manual join for profiles to bypass missing FK relationships
-  const userIds = [...new Set(logs.map(l => l.user_id).filter(Boolean))];
+  // Manual join for profiles to bypass missing FK relationships (only query valid UUIDs)
+  const userIds = [...new Set(logs.map(l => l.user_id).filter(isValidUUID))];
   
   // Collect detailed enrichment IDs
-  const targetUserIds = [...new Set(logs.map(l => l.details?.target_user_id).filter(Boolean))];
+  const targetUserIds = [...new Set(logs.map(l => l.details?.target_user_id).filter(isValidUUID))];
   const allProfileIds = [...new Set([...userIds, ...targetUserIds])];
 
+  // Only query valid UUIDs in events table; non-UUID identifiers like 'GENERAL' represent the General Fund
   const eventIds = [...new Set(logs.flatMap(l => {
     const d = l.details || {};
-    return [d.event_id, d.from_event_id, d.to_event_id].filter(Boolean);
+    return [d.event_id, d.from_event_id, d.to_event_id].filter(isValidUUID);
   }))];
 
   let profilesMap = {};
@@ -181,10 +182,16 @@ router.get('/audit-logs', requireOfficer, async (req, res) => {
   const mergedData = logs.map(log => {
     const d = { ...(log.details || {}) };
     
-    // Inject names if missing but ID exists
-    if (d.event_id && !d.event_name) d.event_name = eventsMap[d.event_id];
-    if (d.from_event_id && !d.from_event_name) d.from_event_name = eventsMap[d.from_event_id];
-    if (d.to_event_id && !d.to_event_name) d.to_event_name = eventsMap[d.to_event_id];
+    // Inject names if missing but ID exists (resolve 'GENERAL' to 'General Fund')
+    if (d.event_id === 'GENERAL') d.event_name = d.event_name || 'General Fund';
+    else if (d.event_id && !d.event_name) d.event_name = eventsMap[d.event_id];
+
+    if (d.from_event_id === 'GENERAL') d.from_event_name = d.from_event_name || 'General Fund';
+    else if (d.from_event_id && !d.from_event_name) d.from_event_name = eventsMap[d.from_event_id];
+
+    if (d.to_event_id === 'GENERAL') d.to_event_name = d.to_event_name || 'General Fund';
+    else if (d.to_event_id && !d.to_event_name) d.to_event_name = eventsMap[d.to_event_id];
+
     if (d.target_user_id && !d.user_name) d.user_name = profilesMap[d.target_user_id]?.full_name;
 
     return {

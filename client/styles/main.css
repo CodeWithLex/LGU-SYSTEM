@@ -3253,7 +3253,7 @@ iconify-icon {
   body .bottom-nav.visible {
     display: flex !important;
     position: fixed !important;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
     left: 10px !important;
     right: 10px !important;
     width: auto !important;
@@ -3429,7 +3429,7 @@ iconify-icon {
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  body .main-content { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
+  body .main-content { padding-bottom: calc(76px + env(safe-area-inset-bottom, 10px)) !important; }
   body .view { padding: 0 0.75rem 0 !important; }
   body .view > *:last-child,
   body .dashboard-grid:last-child { margin-bottom: 0 !important; }
