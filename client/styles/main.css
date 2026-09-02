@@ -4056,7 +4056,7 @@ html body.is-admin th.admin-only {
 
 .unit-row {
   display: grid;
-  grid-template-columns: 88px 1fr 110px auto;
+  grid-template-columns: 88px 1fr 115px 96px;
   align-items: center;
   min-height: 48px;
   gap: 0.85rem;
@@ -4127,6 +4127,10 @@ html body.is-admin th.admin-only {
   background: transparent;
   border: none;
   padding: 0;
+  width: 115px;
+  max-width: 115px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .unit-badge::before {
   content: '';
@@ -4145,10 +4149,13 @@ html body.is-admin th.admin-only {
 .unit-badge--none       { color: var(--text-tertiary); font-weight: 400; }
 
 .unit-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px 28px 28px;
+  gap: 4px;
+  justify-content: end;
   align-items: center;
-  gap: 0.25rem;
-  justify-content: flex-end;
+  width: 96px;
+  min-width: 96px;
 }
 
 .unit-action-btn {
@@ -4184,9 +4191,20 @@ html body.is-admin th.admin-only {
   background: rgba(239, 68, 68, 0.08);
 }
 
+.unit-action-placeholder {
+  width: 28px;
+  height: 28px;
+  display: inline-block;
+  pointer-events: none;
+}
+
 .unit-log-btn {
-  padding: 0.25rem 0.75rem;
+  grid-column: 1 / -1;
+  justify-self: end;
+  width: 64px;
+  padding: 0.25rem 0.5rem;
   font-size: 0.76rem;
+  text-align: center;
 }
 
 /* Year filter tabs - segmented pill that flows inline at the bottom of the
@@ -4260,9 +4278,9 @@ html body.is-admin th.admin-only {
 @media (max-width: 768px) {
   .unit-row { grid-template-columns: 1fr auto; }
   .unit-code    { grid-column: 1; grid-row: 1; }
-  .unit-actions { grid-column: 2; grid-row: 1; }
+  .unit-actions { grid-column: 2; grid-row: 1; width: auto; }
   .unit-title   { grid-column: 1; grid-row: 2; }
-  .unit-badge   { grid-column: 2; grid-row: 2; justify-self: end; }
+  .unit-badge   { grid-column: 2; grid-row: 2; justify-self: end; width: auto; max-width: none; }
 }
 
 @media (max-width: 480px) {

@@ -321,7 +321,9 @@ const Units = (() => {
     const actions = rec
       ? `
         <button class="unit-action-btn" data-act="edit" data-id="${rec.id}" data-subject="${s.id}" title="Edit grade / status"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
-        ${rec.status !== 'passed' ? `<button class="unit-action-btn unit-action-btn--pass" data-act="passed" data-id="${rec.id}" title="Mark as passed"><iconify-icon icon="solar:check-circle-linear"></iconify-icon></button>` : ''}
+        ${rec.status !== 'passed'
+          ? `<button class="unit-action-btn unit-action-btn--pass" data-act="passed" data-id="${rec.id}" title="Mark as passed"><iconify-icon icon="solar:check-circle-linear"></iconify-icon></button>`
+          : `<span class="unit-action-placeholder" aria-hidden="true"></span>`}
         <button class="unit-action-btn unit-action-btn--del" data-act="drop" data-id="${rec.id}" title="Remove record"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>`
       : `<button class="btn btn-ghost unit-log-btn" data-act="log" data-subject="${s.id}">Log</button>`;
 
