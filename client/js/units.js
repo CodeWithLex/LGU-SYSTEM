@@ -316,6 +316,45 @@ const Units = (() => {
     updateTabSlider();
   }
 
+  // Show only the selected year's blocks (or all); keeps the active tab in sync.
+  function applyYearFilter() {
+    document.querySelectorAll('#units-checklist .unit-year').forEach(el => {
+      el.style.display = (selectedYear === 'all' || el.dataset.year === selectedYear) ? '' : 'none';
+    });
+    document.querySelectorAll('#units-filter-tabs-wrapper .units-tab-btn').forEach(t => {
+      t.classList.toggle('active', t.dataset.year === selectedYear);
+    });
+  }
+
+  // Slide + morph the orange backplate onto the active tab.
+  let sliderInit = false;
+
+  function updateTabSlider() {
+    const activeTab = document.querySelector('#units-filter-tabs-wrapper .units-tab-btn.active');
+    const slider = document.getElementById('units-tab-slider');
+    const wrapper = document.getElementById('units-filter-tabs-wrapper');
+    if (!activeTab || !slider || !wrapper) return;
+
+    // The slider's absolute `left: 4px` rests at the content start (padding
+    // edge + padding), so translate relative to the content box - measuring
+    // from the border-box would leave the pill offset by the border width.
+    const cs = getComputedStyle(wrapper);
+    const contentLeft = wrapper.getBoundingClientRect().left
+      + (parseFloat(cs.borderLeftWidth) || 0)
+      + (parseFloat(cs.paddingLeft) || 0);
+
+    const tabRect = activeTab.getBoundingClientRect();
+
+    if (!sliderInit) slider.style.transition = 'none';
+    slider.style.width = `${tabRect.width}px`;
+    slider.style.transform = `translateX(${tabRect.left - contentLeft}px)`;
+    if (!sliderInit) {
+      void slider.offsetWidth; // commit position before enabling the transition
+      slider.style.transition = '';
+      sliderInit = true;
+    }
+  }
+
   function updateBatchBar() {
     const bar = document.getElementById('units-batch-bar');
     if (!bar) return;
