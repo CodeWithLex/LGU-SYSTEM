@@ -215,6 +215,7 @@ const OfficerApp = (() => {
     });
 
     $('of-shell').classList.remove('hidden');
+    $('of-bottom-nav')?.classList.remove('hidden');
 
     try {
       await refreshCoreData();
