@@ -39,7 +39,7 @@ const Transactions = (() => {
           ${tx.type === 'expense' ? '-' : (tx.type === 'transfer' ? '' : '+')}${UI.currency(tx.amount)}
         </td>
         <td>${tx.receipt_url
-          ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(tx.events?.event_name || '').replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> View</a>`
+          ? `<button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(tx.events?.event_name || '').replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> View</button>`
           : '<span style="color:var(--text-tertiary)">-</span>'}</td>
         <td style="color:var(--text-secondary);font-size:0.82rem">${tx.profiles?.full_name || '-'}</td>
         ${_isAdmin ? `
@@ -74,7 +74,7 @@ const Transactions = (() => {
                <span class="tx-amount ${tx.type}" style="font-size:1.2rem;font-weight:800;">
                 ${tx.type === 'expense' ? '-' : '+'}${UI.currency(tx.amount)}
               </span>
-              ${tx.receipt_url ? `<a href="${tx.receipt_url}" target="_blank" class="receipt-link" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(tx.events?.event_name || '').replace(/"/g, '&quot;')}" style="font-size:0.8rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</a>` : ''}
+              ${tx.receipt_url ? `<button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(tx.events?.event_name || '').replace(/"/g, '&quot;')}" style="font-size:0.8rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</button>` : ''}
             </div>
             <div style="font-size:0.72rem;color:var(--text-secondary);display:flex;align-items:center;gap:0.3rem;">
               <iconify-icon icon="solar:user-linear" style="font-size:12px"></iconify-icon> ${tx.profiles?.full_name || 'System'}

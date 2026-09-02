@@ -1381,7 +1381,7 @@ const OfficerApp = (() => {
                 </div>
                 <div style="text-align:right">
                   <span class="${tx.type === 'expense' ? 'is-neg' : 'is-pos'}">${tx.type === 'expense' ? '-' : '+'}₱${fmtNum(tx.amount)}</span>
-                  ${tx.receipt_url ? `<div><a class="receipt-link" href="${tx.receipt_url}" target="_blank" data-desc="${esc(tx.description || '')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${esc(ev.event_name || '')}" style="font-size:0.75rem;color:var(--accent);display:inline-flex;align-items:center;gap:2px;"><iconify-icon icon="solar:paperclip-linear"></iconify-icon> Receipt</a></div>` : ''}
+                  ${tx.receipt_url ? `<div><button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${esc(tx.description || '')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${esc(ev.event_name || '')}" style="font-size:0.75rem;color:var(--accent);display:inline-flex;align-items:center;gap:2px;"><iconify-icon icon="solar:paperclip-linear"></iconify-icon> Receipt</button></div>` : ''}
                 </div>
               </div>`).join('')
           : '<p style="font-size:0.8rem;color:var(--text-secondary)">No transactions for this event yet.</p>';

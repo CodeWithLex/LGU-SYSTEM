@@ -20,7 +20,6 @@ const ReceiptModal = (() => {
   let _descEl = null;
   let _amountBadge = null;
   let _dateBadge = null;
-  let _openTabBtn = null;
   let _rotation = 0;
   let _isZoomed = false;
   let _currentUrl = '';
@@ -77,9 +76,7 @@ const ReceiptModal = (() => {
             <button type="button" class="receipt-viewer-btn" id="receipt-zoom-btn" title="Toggle Zoom" aria-label="Toggle Zoom">
               <iconify-icon icon="solar:magnifer-zoom-in-linear"></iconify-icon>
             </button>
-            <a href="#" target="_blank" rel="noopener noreferrer" class="receipt-viewer-btn" id="receipt-open-tab-btn" title="Open Raw File in New Tab" aria-label="Open in New Tab">
-              <iconify-icon icon="solar:square-top-down-linear"></iconify-icon>
-            </a>
+            <span class="receipt-viewer-divider"></span>
             <button type="button" class="receipt-viewer-btn receipt-viewer-close" id="receipt-close-btn" title="Close (Esc)" aria-label="Close">
               <iconify-icon icon="solar:close-circle-linear"></iconify-icon>
             </button>
@@ -95,11 +92,11 @@ const ReceiptModal = (() => {
 
           <div class="receipt-viewer-error hidden" id="receipt-viewer-error">
             <iconify-icon icon="solar:shield-warning-linear" class="receipt-error-icon"></iconify-icon>
-            <h4>Unable to preview this receipt</h4>
-            <p>The document or photo could not be rendered inline. You can still inspect it via the direct link below.</p>
-            <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" id="receipt-fallback-btn">
-              <iconify-icon icon="solar:link-circle-linear"></iconify-icon> Open in External Window
-            </a>
+            <h4>Receipt preview unavailable</h4>
+            <p>The document or image could not be loaded. Please check your connection or try again.</p>
+            <button type="button" class="btn btn-secondary btn-sm" id="receipt-retry-btn">
+              <iconify-icon icon="solar:refresh-linear"></iconify-icon> Retry
+            </button>
           </div>
 
           <div class="receipt-img-scroller" id="receipt-img-scroller">
@@ -144,7 +141,17 @@ const ReceiptModal = (() => {
     _descEl = document.getElementById('receipt-viewer-desc');
     _amountBadge = document.getElementById('receipt-meta-amount');
     _dateBadge = document.getElementById('receipt-meta-date');
-    _openTabBtn = document.getElementById('receipt-open-tab-btn');
+
+    // Bind Retry button
+    const retryBtn = document.getElementById('receipt-retry-btn');
+    if (retryBtn) {
+      retryBtn.addEventListener('click', () => {
+        if (_currentUrl) open(_currentUrl, {
+          title: _titleEl?.textContent,
+          desc: _descEl?.textContent,
+        });
+      });
+    }
 
     // Bind Close events
     document.getElementById('receipt-close-btn').addEventListener('click', close);
@@ -233,10 +240,6 @@ const ReceiptModal = (() => {
     const desc = meta.desc || meta.description || 'Transaction Receipt Proof';
     if (_titleEl) _titleEl.textContent = meta.title || 'Official Receipt';
     if (_descEl) _descEl.textContent = desc;
-
-    if (_openTabBtn) _openTabBtn.href = url;
-    const fallbackBtn = document.getElementById('receipt-fallback-btn');
-    if (fallbackBtn) fallbackBtn.href = url;
 
     // Currency Amount
     const amountValEl = document.getElementById('receipt-meta-amount-val');

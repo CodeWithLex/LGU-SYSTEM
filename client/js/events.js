@@ -221,7 +221,7 @@ const Events = (() => {
                     </div>
                     <div class="tx-meta">${UI.dateStr(tx.transaction_date)}</div>
                   </div>
-                  ${tx.receipt_url ? `<a class="receipt-link" href="${tx.receipt_url}" target="_blank" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(ev.event_name || '').replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</a>` : ''}
+                  ${tx.receipt_url ? `<button type="button" class="receipt-link" data-receipt-url="${tx.receipt_url}" data-desc="${(tx.description || '').replace(/"/g, '&quot;')}" data-amount="${tx.amount}" data-date="${tx.transaction_date}" data-type="${tx.type}" data-event="${(ev.event_name || '').replace(/"/g, '&quot;')}" style="display:flex;align-items:center;gap:0.3rem;"><iconify-icon icon="solar:paperclip-linear" style="font-size:15px"></iconify-icon> Receipt</button>` : ''}
                 </div>`).join('')
               : '<div class="empty-state"><span class="empty-icon"><iconify-icon icon="solar:card-transfer-linear"></iconify-icon></span><p>No transactions recorded yet.</p></div>'
             }
