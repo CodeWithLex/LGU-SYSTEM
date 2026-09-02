@@ -264,15 +264,6 @@ router.post('/budget-transfer', requireGovernorOrAdmin, async (req, res) => {
       });
     }
 
-    // UPDATE: Increase target event's budgets
-    // Note: Since this is coming from the dashboard, it increases the total "Allocated" for this event.
-    const { error: updErr } = await supabase.from('events').update({
-      allocated_budget: Number(targetEv.allocated_budget) + transferAmount,
-      remaining_budget: Number(targetEv.remaining_budget) + transferAmount
-    }).eq('id', to_event_id);
-
-    if (updErr) return res.status(500).json({ error: 'Failed to update target event budget.' });
-
   } 
   // ── CASE 2: Transfer from another Event ─────────────────────────────
   else {
@@ -291,25 +282,38 @@ router.post('/budget-transfer', requireGovernorOrAdmin, async (req, res) => {
     if (Number(fromEv.remaining_budget) < transferAmount) {
       return res.status(400).json({ error: `Insufficient remaining budget in "${fromEv.event_name}". Available: ₱${Number(fromEv.remaining_budget).toLocaleString()}.` });
     }
-
-    // Deduct from source, add to target
-    const [{ error: e1 }, { error: e2 }] = await Promise.all([
-      supabase.from('events').update({ remaining_budget: Number(fromEv.remaining_budget) - transferAmount }).eq('id', from_event_id),
-      supabase.from('events').update({ remaining_budget: Number(toEv.remaining_budget) + transferAmount }).eq('id', to_event_id),
-    ]);
-
-    if (e1 || e2) return res.status(500).json({ error: 'Transfer failed. Please try again.' });
   }
 
-  // ── SHARED: Record transfer and Audit ────────────────────────────
-  await supabase.from('transactions').insert({
-    event_id:         to_event_id,
-    type:             'transfer', // Changed from allocation to transfer
-    amount:           transferAmount,
-    description:      `Budget transfer from "${fromEventName}": ${sanitizeText(reason)}`,
-    added_by:         req.user.id,
-    transaction_date: new Date().toISOString().split('T')[0],
-  });
+  // ── SHARED: Record paired transfer transactions and Audit ─────────
+  const today = new Date().toISOString().split('T')[0];
+  const cleanReason = sanitizeText(reason);
+  const sourceEventId = from_event_id === 'GENERAL' ? null : from_event_id;
+
+  const { error: insErr } = await supabase.from('transactions').insert([
+    {
+      event_id:         sourceEventId,
+      type:             'transfer',
+      direction:        'out',
+      amount:           transferAmount,
+      description:      `Budget transfer to "${toEventName}": ${cleanReason}`,
+      added_by:         req.user.id,
+      transaction_date: today,
+    },
+    {
+      event_id:         to_event_id,
+      type:             'transfer',
+      direction:        'in',
+      amount:           transferAmount,
+      description:      `Budget transfer from "${fromEventName}": ${cleanReason}`,
+      added_by:         req.user.id,
+      transaction_date: today,
+    }
+  ]);
+
+  if (insErr) {
+    logError('Budget Transfer Insert Error', insErr);
+    return res.status(500).json({ error: 'Failed to record budget transfer transactions.' });
+  }
 
   logAudit(req.user.id, 'BUDGET_TRANSFER', {
     from_event_id,
@@ -317,7 +321,7 @@ router.post('/budget-transfer', requireGovernorOrAdmin, async (req, res) => {
     to_event_id,
     to_event_name:   toEventName,
     amount:          transferAmount,
-    reason:          sanitizeText(reason),
+    reason:          cleanReason,
   });
 
   res.json({

@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 
   const [{ data: events, error: evtErr }, { data: transactions, error: txErr }] = await Promise.all([
     eventsQuery,
-    supabase.from('transactions').select('event_id, type, amount, use_allocation')
+    supabase.from('transactions').select('event_id, type, amount, use_allocation, direction')
   ]);
 
   if (evtErr) return res.status(500).json({ error: 'Failed to fetch events.' });
@@ -27,15 +27,20 @@ router.get('/', async (req, res) => {
   const txStats = {};
   if (transactions) {
     transactions.forEach(tx => {
-      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0, alloc_expenses: 0, budget_injections: 0 };
+      if (!txStats[tx.event_id]) txStats[tx.event_id] = { income: 0, expenses: 0, alloc_expenses: 0, transfers_in: 0, transfers_out: 0 };
       if (tx.type === 'expense') {
         txStats[tx.event_id].expenses += Number(tx.amount);
         if (tx.use_allocation) {
           txStats[tx.event_id].alloc_expenses += Number(tx.amount);
         }
-      } else if (tx.type === 'allocation' || tx.type === 'transfer') {
-        // Budget top-ups that increase the event's envelope
-        txStats[tx.event_id].budget_injections += Number(tx.amount);
+      } else if (tx.type === 'transfer') {
+        if (tx.direction === 'in') {
+          txStats[tx.event_id].transfers_in += Number(tx.amount);
+        } else if (tx.direction === 'out') {
+          txStats[tx.event_id].transfers_out += Number(tx.amount);
+        }
+      } else if (tx.type === 'allocation') {
+        txStats[tx.event_id].transfers_in += Number(tx.amount);
       } else {
         txStats[tx.event_id].income += Number(tx.amount);
       }
@@ -43,15 +48,15 @@ router.get('/', async (req, res) => {
   }
 
   const enrichedEvents = events.map(ev => {
-    const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0, budget_injections: 0 };
+    const stats = txStats[ev.id] || { income: 0, expenses: 0, alloc_expenses: 0, transfers_in: 0, transfers_out: 0 };
     return {
       ...ev,
       funding_source: ev.funding_source || 'General Fund',
       computed_expenses: stats.expenses, // Total expenses (allocated + general)
       computed_income: stats.income,
       // Event remaining budget strictly enforces the initial allocation,
-      // adjusted for transfers in and explicit budget allocations
-      computed_remaining: Number(ev.allocated_budget) + stats.budget_injections - stats.alloc_expenses
+      // adjusted for paired transfers (in/out) and allocation-funded expenses
+      computed_remaining: Number(ev.allocated_budget) + stats.transfers_in - stats.transfers_out - stats.alloc_expenses
     };
   });
 
@@ -78,14 +83,21 @@ router.get('/:id', async (req, res) => {
   let expenses = 0;
   let alloc_expenses = 0;
   let income = 0;
-  let budget_injections = 0;
+  let transfers_in = 0;
+  let transfers_out = 0;
   if (transactions) {
     transactions.forEach(tx => {
       if (tx.type === 'expense') {
         expenses += Number(tx.amount);
         if (tx.use_allocation) alloc_expenses += Number(tx.amount);
-      } else if (tx.type === 'allocation' || tx.type === 'transfer') {
-        budget_injections += Number(tx.amount);
+      } else if (tx.type === 'transfer') {
+        if (tx.direction === 'in') {
+          transfers_in += Number(tx.amount);
+        } else if (tx.direction === 'out') {
+          transfers_out += Number(tx.amount);
+        }
+      } else if (tx.type === 'allocation') {
+        transfers_in += Number(tx.amount);
       } else {
         income += Number(tx.amount);
       }
@@ -110,7 +122,7 @@ router.get('/:id', async (req, res) => {
     ...event,
     computed_expenses: expenses,
     computed_income: income,
-    computed_remaining: Number(event.allocated_budget) + budget_injections - alloc_expenses,
+    computed_remaining: Number(event.allocated_budget) + transfers_in - transfers_out - alloc_expenses,
     transactions: signedTransactions
   });
 });
