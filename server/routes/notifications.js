@@ -1,7 +1,7 @@
 const express  = require('express');
 const router   = express.Router();
 const supabase = require('../lib/supabase');
-const { requireOfficer } = require('../middleware/roles');
+const { requireOfficer, OFFICER_ROLES } = require('../middleware/roles');
 const { sanitizeText } = require('../lib/validate');
 
 /**
@@ -43,7 +43,8 @@ async function createNotification({ userId = null, targetRole = 'all', type = 's
 // GET /api/notifications - Get unread category badges & recent notifications for logged in user
 router.get('/', async (req, res) => {
   const userId = req.user.id;
-  const userRole = req.user.role || 'student';
+  const userRole = req.profile?.role || 'student';
+  const isOfficer = OFFICER_ROLES.includes(userRole);
 
   try {
     // 1. Fetch relevant notifications for user (role-targeted or specific to user)
@@ -54,7 +55,7 @@ router.get('/', async (req, res) => {
       .limit(50);
 
     // Filter by target role ('all', user's role, or specifically assigned user_id)
-    if (userRole === 'admin' || userRole === 'officer') {
+    if (isOfficer) {
       query = query.or(`user_id.eq.${userId},target_role.in.(all,officer,admin)`);
     } else {
       query = query.or(`user_id.eq.${userId},target_role.in.(all,student)`);
@@ -116,7 +117,8 @@ router.get('/', async (req, res) => {
 // POST /api/notifications/read - Mark category or specific notification as read
 router.post('/read', async (req, res) => {
   const userId = req.user.id;
-  const userRole = req.user.role || 'student';
+  const userRole = req.profile?.role || 'student';
+  const isOfficer = OFFICER_ROLES.includes(userRole);
   const { category, notification_id } = req.body;
 
   try {
@@ -131,7 +133,7 @@ router.post('/read', async (req, res) => {
         .select('id')
         .eq('category', category);
 
-      if (userRole === 'admin' || userRole === 'officer') {
+      if (isOfficer) {
         query = query.or(`user_id.eq.${userId},target_role.in.(all,officer,admin)`);
       } else {
         query = query.or(`user_id.eq.${userId},target_role.in.(all,student)`);
