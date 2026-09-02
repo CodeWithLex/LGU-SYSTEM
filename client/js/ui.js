@@ -222,11 +222,26 @@ const UI = (() => {
   // ---- Sliding Active Indicator (liquid pill that glides between icons) ----
   // One absolutely-positioned pill per bottom nav; instead of each item
   // painting its own background, the pill physically travels to the item
-  // that just became active.
+  // that just became active. Inspired by the "slide tabs" pattern: the pill
+  // never fades out or teleports — on a move it stretches like a water
+  // droplet over both icons (the middle loosens), then contracts into the
+  // destination icon.
   const _navIndicatorPlaced = new WeakSet();
   const _navIndicatorBound = new WeakSet();
 
-  function moveNavIndicator(nav) {
+  function placeIndicatorAt(indicator, left, width) {
+    indicator.style.transform = `translateX(${left}px)`;
+    indicator.style.width = `${width}px`;
+  }
+
+  function currentIndicatorPosition(indicator) {
+    const matrix = new DOMMatrixReadOnly(getComputedStyle(indicator).transform);
+    return { left: matrix.m41, width: indicator.getBoundingClientRect().width };
+  }
+
+  // previewTarget (optional): element to glide to without changing the active
+  // item — used for the desktop hover-chase, returning to active on leave.
+  function moveNavIndicator(nav, previewTarget) {
     if (!nav) return;
     let indicator = nav.querySelector(':scope > .nav-indicator');
     if (!indicator) {
@@ -237,34 +252,80 @@ const UI = (() => {
       nav.prepend(indicator);
       nav.classList.add('has-nav-indicator');
     }
-    const target = Array.from(nav.children).find(el => el !== indicator && el.classList.contains('active'));
+    const target = previewTarget ||
+      Array.from(nav.children).find(el => el !== indicator && el.classList.contains('active'));
     if (!target) return;
-    const x = target.offsetLeft;
-    const w = target.offsetWidth;
-    if (!w) return; // nav not laid out yet (hidden screen / desktop) — retry on next call
+    const toLeft = target.offsetLeft;
+    const toWidth = target.offsetWidth;
+    if (!toWidth) return; // nav not laid out yet (hidden screen / desktop) — retry on next call
+
     const firstPlacement = !_navIndicatorPlaced.has(nav);
-    if (firstPlacement) {
-      // Land instantly on the resting pill so the first reveal doesn't slide in from the edge
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    _navIndicatorPlaced.add(nav);
+
+    // First reveal (or reduced motion): land instantly on the resting pill so
+    // it never slides in from the edge.
+    if (firstPlacement || reduceMotion || typeof indicator.animate !== 'function') {
       indicator.style.transition = 'none';
-    }
-    indicator.style.width = `${w}px`;
-    indicator.style.transform = `translateX(${x}px)`;
-    if (firstPlacement) {
+      placeIndicatorAt(indicator, toLeft, toWidth);
       void indicator.offsetWidth; // flush styles so the next move animates
       indicator.style.transition = '';
-      _navIndicatorPlaced.add(nav);
+      return;
     }
+
+    const from = currentIndicatorPosition(indicator);
+    if (Math.abs(from.left - toLeft) < 0.5 && Math.abs(from.width - toWidth) < 0.5) return;
+
+    // Start from wherever the droplet currently is, even mid-glide
+    indicator.getAnimations().forEach(a => a.cancel());
+
+    // Liquid transfer: swell out over both icons, then settle into the target
+    const spanLeft = Math.min(from.left, toLeft);
+    const spanRight = Math.max(from.left + from.width, toLeft + toWidth);
+    const glide = indicator.animate(
+      [
+        {
+          transform: `translateX(${from.left}px) scaleY(1)`,
+          width: `${from.width}px`,
+          easing: 'cubic-bezier(0.35, 0, 0.25, 1)'
+        },
+        {
+          transform: `translateX(${spanLeft}px) scaleY(0.85)`,
+          width: `${spanRight - spanLeft}px`,
+          offset: 0.45,
+          easing: 'cubic-bezier(0.35, 0, 0.3, 1.12)'
+        },
+        { transform: `translateX(${toLeft}px) scaleY(1)`, width: `${toWidth}px` }
+      ],
+      { duration: 600, fill: 'both' }
+    );
+    glide.onfinish = () => {
+      placeIndicatorAt(indicator, toLeft, toWidth);
+      glide.cancel(); // drop the fill so the committed inline styles take over
+    };
   }
 
   function initNavIndicators() {
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
     [document.getElementById('bottom-nav'), document.getElementById('of-bottom-nav')]
       .filter(Boolean)
       .forEach(nav => {
         moveNavIndicator(nav);
-        if (!_navIndicatorBound.has(nav)) {
-          _navIndicatorBound.add(nav);
-          window.addEventListener('resize', () => moveNavIndicator(nav));
-        }
+        if (_navIndicatorBound.has(nav)) return;
+        _navIndicatorBound.add(nav);
+        window.addEventListener('resize', () => moveNavIndicator(nav));
+        // Slide-tabs hover chase: on pointer devices the droplet follows the
+        // hovered icon and flows back to the selected one on leave.
+        Array.from(nav.children).forEach(item => {
+          if (item.addEventListener) {
+            item.addEventListener('mouseenter', () => {
+              if (canHover.matches) moveNavIndicator(nav, item);
+            });
+          }
+        });
+        nav.addEventListener('mouseleave', () => {
+          if (canHover.matches) moveNavIndicator(nav);
+        });
       });
   }
 
