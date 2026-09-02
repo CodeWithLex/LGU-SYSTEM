@@ -23,14 +23,15 @@ async function signReceipt(tx) {
 // ── GET /api/reports/summary ──────────────────────────────────────────────────
 router.get('/summary', async (req, res) => {
   const [{ data: txs, error: txErr }, { data: events, error: evErr }] = await Promise.all([
-    supabase.from('transactions').select('type, amount, use_allocation'),
-    supabase.from('events').select('allocated_budget')
+    supabase.from('transactions').select('event_id, type, amount, use_allocation, direction'),
+    supabase.from('events').select('id, allocated_budget')
   ]);
 
   if (txErr) { logError('Report Summary Error', txErr); return res.status(500).json({ error: 'Failed to fetch report summary.' }); }
   if (evErr) { logError('Report Summary Error', evErr); return res.status(500).json({ error: 'Failed to fetch report summary.' }); }
 
-  const summary = txs.reduce((acc, tx) => {
+  const eventStats = {};
+  const summary = (txs || []).reduce((acc, tx) => {
     acc[tx.type] = (acc[tx.type] || 0) + Number(tx.amount);
     
     // Track global system spending
@@ -41,28 +42,55 @@ router.get('/summary', async (req, res) => {
       }
     }
 
+    if (tx.event_id) {
+      if (!eventStats[tx.event_id]) {
+        eventStats[tx.event_id] = { allocExpenses: 0, transfersIn: 0, transfersOut: 0 };
+      }
+      if (tx.type === 'expense' && tx.use_allocation) {
+        eventStats[tx.event_id].allocExpenses += Number(tx.amount);
+      } else if (tx.type === 'transfer') {
+        if (tx.direction === 'in') {
+          eventStats[tx.event_id].transfersIn += Number(tx.amount);
+        } else if (tx.direction === 'out') {
+          eventStats[tx.event_id].transfersOut += Number(tx.amount);
+        }
+      } else if (tx.type === 'allocation') {
+        eventStats[tx.event_id].transfersIn += Number(tx.amount);
+      }
+    }
+
     return acc;
   }, { expense: 0, donation: 0, collection: 0, allocation: 0, transfer: 0, dashboard_expense: 0, total_system_expense: 0 });
 
   let totalReservedEnvelopes = 0;
+  let totalEnvelopeDeficits = 0;
+
   (events || []).forEach(e => {
-     totalReservedEnvelopes += Number(e.allocated_budget);
+    const allocated = Number(e.allocated_budget) || 0;
+    totalReservedEnvelopes += allocated;
+
+    const stats = eventStats[e.id] || { allocExpenses: 0, transfersIn: 0, transfersOut: 0 };
+    const effectiveEnvelope = allocated + stats.transfersIn - stats.transfersOut;
+    const deficit = Math.max(0, stats.allocExpenses - effectiveEnvelope);
+    totalEnvelopeDeficits += deficit;
   });
 
   const totalIncome  = summary.allocation + summary.donation + summary.collection;
   const totalExpense = summary.total_system_expense; // Re-mapped to include ALL expenses
   const generalExpense = summary.dashboard_expense;
   
-  const remainingBalance = totalIncome - generalExpense - totalReservedEnvelopes;
+  const remainingBalance = totalIncome - generalExpense - totalReservedEnvelopes - totalEnvelopeDeficits;
 
   res.json({
     totalIncome,
     totalExpense,
     generalExpense,
+    totalEnvelopeDeficits,
     remainingBalance,
     breakdown: {
       ...summary,
-      reserved_envelopes: totalReservedEnvelopes
+      reserved_envelopes: totalReservedEnvelopes,
+      envelope_deficits: totalEnvelopeDeficits
     }
   });
 });
