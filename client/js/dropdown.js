@@ -88,12 +88,19 @@ const Dropdowns = (() => {
       const rect = trigger.getBoundingClientRect();
       const menuHeight = Math.min(menu.scrollHeight || 180, 180);
       const spaceBelow = window.innerHeight - rect.bottom;
+      const viewportWidth = window.innerWidth;
+
+      const width = Math.min(rect.width, viewportWidth - 16);
+      let left = Math.max(8, rect.left);
+      if (left + width > viewportWidth - 8) {
+        left = Math.max(8, viewportWidth - width - 8);
+      }
 
       menu.style.position = 'fixed';
-      menu.style.left = `${rect.left}px`;
-      menu.style.width = `${rect.width}px`;
-      menu.style.minWidth = `${rect.width}px`;
-      menu.style.maxWidth = `${rect.width}px`;
+      menu.style.left = `${left}px`;
+      menu.style.width = `${width}px`;
+      menu.style.minWidth = `${width}px`;
+      menu.style.maxWidth = `${viewportWidth - 16}px`;
       menu.style.right = 'auto';
       menu.style.zIndex = '999999';
 
@@ -146,6 +153,10 @@ const Dropdowns = (() => {
     document.addEventListener('click', e => {
       if (!dd.contains(e.target) && !menu.contains(e.target)) close();
     });
+
+    document.addEventListener('touchstart', e => {
+      if (!dd.contains(e.target) && !menu.contains(e.target)) close();
+    }, { passive: true });
 
     window.addEventListener('scroll', e => {
       if (!dd.classList.contains('dd-open')) return;

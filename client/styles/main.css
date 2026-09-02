@@ -255,6 +255,14 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button, a, input, select, textarea, .btn, .stat-card, .nav-item, .bottom-nav-item, .tab-btn {
+  touch-action: manipulation;
+}
+
 body {
   font-family: var(--font-ui);
   background: var(--bg-base);
@@ -1727,7 +1735,11 @@ input[type="checkbox"]:checked::before {
 .main-content {
   flex: 1;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
   background: var(--bg-base);
 }
 
@@ -3019,8 +3031,8 @@ iconify-icon {
     display: flex !important;
     align-items: center;
     justify-content: space-between;
-    padding: 0.85rem 1.25rem;
-    min-height: 64px;
+    padding: calc(0.85rem + env(safe-area-inset-top, 0px)) calc(1.25rem + env(safe-area-inset-right, 0px)) 0.85rem calc(1.25rem + env(safe-area-inset-left, 0px)) !important;
+    min-height: calc(64px + env(safe-area-inset-top, 0px));
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-default);
     position: sticky;
@@ -3349,7 +3361,7 @@ iconify-icon {
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  body .main-content { padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important; }
+  body .main-content { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important; }
   body .view { padding: 0 0.75rem 0 !important; }
   body .view > *:last-child,
   body .dashboard-grid:last-child { margin-bottom: 0 !important; }
@@ -3443,6 +3455,11 @@ iconify-icon {
   justify-content: center;
   z-index: 9999;
   animation: fadeIn .15s ease;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1rem;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .modal-card {
   background: var(--bg-surface);
@@ -3451,6 +3468,10 @@ iconify-icon {
   padding: 1.75rem;
   width: 100%;
   max-width: 480px;
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: modalIn .16s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -5936,6 +5957,7 @@ html body.is-admin th.admin-only {
   border-radius: 18px;
   width: min(760px, 100%);
   max-height: 92vh;
+  max-height: 92dvh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255, 255, 255, 0.12);
@@ -6296,6 +6318,7 @@ html body.is-admin th.admin-only {
 
   .receipt-viewer-card {
     max-height: 90vh;
+    max-height: 90dvh;
     border-radius: 20px;
     width: 100%;
     max-width: 440px;
@@ -6712,7 +6735,7 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
 @media (max-width: 768px) {
   .main-content,
   .of-main {
-    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

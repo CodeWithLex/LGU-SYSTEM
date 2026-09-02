@@ -1510,7 +1510,8 @@
     display: flex !important;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: calc(0.75rem + env(safe-area-inset-top, 0px)) calc(1rem + env(safe-area-inset-right, 0px)) 0.75rem calc(1rem + env(safe-area-inset-left, 0px)) !important;
+    min-height: calc(56px + env(safe-area-inset-top, 0px));
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-default);
     position: sticky;
@@ -1600,6 +1601,7 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .of-view {
@@ -1612,6 +1614,17 @@
   .of-cards:last-child,
   .dashboard-grid:last-child {
     margin-bottom: 0 !important;
+  }
+
+  /* Prevent iOS zoom on inputs */
+  body input,
+  body select,
+  body textarea,
+  .of-field input,
+  .of-field select,
+  .of-field textarea,
+  .of-sort-select {
+    font-size: 16px !important;
   }
   .of-view-head {
     padding-top: 1rem;

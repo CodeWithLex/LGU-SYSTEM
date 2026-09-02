@@ -367,11 +367,58 @@ const OfficerApp = (() => {
       backdrop.addEventListener('click', closeSheet);
       backdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
     }
-    if (dragHandle) dragHandle.addEventListener('click', closeSheet);
+
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    if (dragHandle) {
+      dragHandle.addEventListener('click', closeSheet);
+      dragHandle.addEventListener('touchstart', e => {
+        if (!e.touches || !e.touches[0]) return;
+        startY = e.touches[0].clientY;
+        currentY = startY;
+        isDragging = true;
+      }, { passive: true });
+
+      dragHandle.addEventListener('touchmove', e => {
+        if (!isDragging || !e.touches || !e.touches[0]) return;
+        currentY = e.touches[0].clientY;
+        const diffY = currentY - startY;
+        if (diffY > 0) {
+          sheet.style.transform = `translateY(${diffY}px)`;
+        }
+      }, { passive: true });
+
+      dragHandle.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffY = currentY - startY;
+        sheet.style.transform = '';
+        if (diffY > 50) {
+          closeSheet();
+        }
+      });
+    }
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && sheet && !sheet.classList.contains('hidden')) {
-        closeSheet();
+      if (e.key === 'Escape') {
+        if (sheet && !sheet.classList.contains('hidden')) {
+          closeSheet();
+          return;
+        }
+        const rModal = $('of-roster-modal');
+        if (rModal && !rModal.classList.contains('hidden')) {
+          rModal.classList.add('hidden');
+          document.body.classList.remove('modal-open');
+          return;
+        }
+        const impModal = $('of-roster-import-modal');
+        if (impModal && !impModal.classList.contains('hidden')) {
+          impModal.classList.add('hidden');
+          document.body.classList.remove('modal-open');
+          return;
+        }
       }
     });
 
@@ -1298,6 +1345,7 @@ const OfficerApp = (() => {
     if (!modal || !content) return;
 
     modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
 
     content.innerHTML = `
       <div class="of-modal-head">
@@ -1387,6 +1435,7 @@ const OfficerApp = (() => {
 
     const closeModal = () => {
       modal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
     };
 
     $('of-detail-close').addEventListener('click', closeModal);
@@ -2680,6 +2729,7 @@ const OfficerApp = (() => {
       if (modal) modal.classList.add('hidden');
       if (form) form.reset();
       Dropdowns.syncAll();
+      document.body.classList.remove('modal-open');
     }
 
     if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
@@ -2770,6 +2820,7 @@ const OfficerApp = (() => {
     Dropdowns.syncAll();
 
     modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
     nameInput?.focus();
   }
 
@@ -2790,6 +2841,7 @@ const OfficerApp = (() => {
       $('of-import-preview-area')?.classList.add('hidden');
       $('of-import-error')?.classList.add('hidden');
       if (confirmBtn) confirmBtn.disabled = true;
+      document.body.classList.remove('modal-open');
     };
 
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
@@ -2856,6 +2908,7 @@ const OfficerApp = (() => {
     const confirmBtn = $('of-import-confirm-btn');
     if (confirmBtn) confirmBtn.disabled = true;
     modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
   }
 
   function handleRosterCSVFile(file) {

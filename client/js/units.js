@@ -501,13 +501,15 @@ const Units = (() => {
   // fadeOut finishes. Reopening mid-close cancels cleanly.
   function openModalOverlay(id) {
     const el = document.getElementById(id);
+    if (!el) return;
     el.classList.remove('modal-closing');
     el.classList.remove('hidden');
+    document.body.classList.add('modal-open');
   }
 
   function closeModalOverlay(id) {
     const el = document.getElementById(id);
-    if (el.classList.contains('hidden') || el.classList.contains('modal-closing')) return;
+    if (!el || el.classList.contains('hidden') || el.classList.contains('modal-closing')) return;
     el.classList.add('modal-closing');
     el.addEventListener('animationend', function done(e) {
       if (e.target !== el) return; // the card's animation bubbles up
@@ -515,6 +517,9 @@ const Units = (() => {
       if (!el.classList.contains('modal-closing')) return; // reopened mid-close
       el.classList.remove('modal-closing');
       el.classList.add('hidden');
+      if (!document.querySelector('.modal-overlay:not(.hidden), .profile-modal-overlay:not(.hidden)')) {
+        document.body.classList.remove('modal-open');
+      }
     });
   }
 
@@ -733,6 +738,15 @@ const Units = (() => {
   document.getElementById('units-current-modal-close').addEventListener('click', closeCurrentModal);
   document.getElementById('units-current-modal').addEventListener('click', e => {
     if (e.target.id === 'units-current-modal') closeCurrentModal();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const uModal = document.getElementById('units-modal');
+      if (uModal && !uModal.classList.contains('hidden')) closeModal();
+      const cModal = document.getElementById('units-current-modal');
+      if (cModal && !cModal.classList.contains('hidden')) closeCurrentModal();
+    }
   });
 
   document.getElementById('units-program').addEventListener('change', e => {

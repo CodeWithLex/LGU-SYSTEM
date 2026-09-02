@@ -188,6 +188,7 @@
         if (courseEl) courseEl.textContent = `${existingReq.course} - Year ${existingReq.year_level}`;
       }
       onboardingModal.classList.remove('hidden');
+      document.body.classList.add('modal-open');
       return;
     }
 
@@ -225,6 +226,7 @@
 
     Dropdowns.syncAll();
     onboardingModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
   }
 
   // Live auto-match when student types their name in onboarding
@@ -378,6 +380,7 @@
         setTimeout(() => {
           onboardingModal.classList.add('hidden');
           onboardingModal.classList.remove('modal-closing');
+          document.body.classList.remove('modal-open');
         }, 160);
 
         UI.toast('Profile & credentials setup complete! Welcome to COE Portal.', 'success');
@@ -622,7 +625,39 @@
       backdrop.addEventListener('click', closeSheet);
       backdrop.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
     }
-    if (dragHandle) dragHandle.addEventListener('click', closeSheet);
+
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+
+    if (dragHandle) {
+      dragHandle.addEventListener('click', closeSheet);
+      dragHandle.addEventListener('touchstart', e => {
+        if (!e.touches || !e.touches[0]) return;
+        startY = e.touches[0].clientY;
+        currentY = startY;
+        isDragging = true;
+      }, { passive: true });
+
+      dragHandle.addEventListener('touchmove', e => {
+        if (!isDragging || !e.touches || !e.touches[0]) return;
+        currentY = e.touches[0].clientY;
+        const diffY = currentY - startY;
+        if (diffY > 0) {
+          sheet.style.transform = `translateY(${diffY}px)`;
+        }
+      }, { passive: true });
+
+      dragHandle.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        const diffY = currentY - startY;
+        sheet.style.transform = '';
+        if (diffY > 50) {
+          closeSheet();
+        }
+      });
+    }
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && sheet && !sheet.classList.contains('hidden')) {
