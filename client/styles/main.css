@@ -19,8 +19,10 @@
   --border: rgba(255, 255, 255, 0.08);            /* crisp subtle border - modern tonal depth */
   --border-hover: rgba(255, 255, 255, 0.16);
 
-  --primary: #C2410C;           /* engineering orange - action/active only (WCAG AA compliant) */
-  --primary-hover: #9A3412;
+  --primary: #FF5E14;           /* vibrant electric engineering orange */
+  --primary-hover: #FF7527;     /* glowing radiant hover */
+  --primary-active: #E64A00;
+  --primary-glow: rgba(255, 94, 20, 0.35);
 
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
@@ -38,7 +40,7 @@
   --border-default: var(--border);
 
   --accent: var(--primary);
-  --accent-muted: rgba(249, 115, 22, 0.12);
+  --accent-muted: rgba(255, 94, 20, 0.14);
   --accent-text-on: #FFFFFF;
 
   --border-focus: var(--accent); /* focus = orange, matching the action color */
@@ -128,8 +130,8 @@
   --border: #E2E8F0;            /* slate-200 borders */
   --border-hover: #CBD5E1;      /* slate-300 borders */
 
-  --primary: #C2410C;           /* keeps engineering orange (WCAG AA compliant) */
-  --primary-hover: #9A3412;     /* accessible darker orange for light surfaces */
+  --primary: #FF5E14;           /* radiant engineering orange */
+  --primary-hover: #EA4C00;     /* rich hover orange for light surfaces */
 
   --text-primary: #0F172A;      /* slate-900 typography */
   --text-secondary: #475569;    /* slate-600 typography */
@@ -460,8 +462,8 @@ html body .hidden {
   --surface-hover: #1D2733;
   --border: #28313A;
   --border-hover: #3A4550;
-  --primary: #C2410C;
-  --primary-hover: #9A3412;
+  --primary: #FF5E14;
+  --primary-hover: #FF7527;
   --text-primary: #F1F5F9;
   --text-secondary: #94A3B8;
   --text-tertiary: #64748B;
@@ -469,8 +471,8 @@ html body .hidden {
   --bg-surface: #111820;
   --bg-surface-raised: #161D25;
   --border-default: #28313A;
-  --accent: #C2410C;
-  --accent-muted: rgba(249, 115, 22, 0.12);
+  --accent: #FF5E14;
+  --accent-muted: rgba(255, 94, 20, 0.14);
   --accent-text-on: #FFFFFF;
   --border-focus: var(--accent);
   --bg-surface-elevated: #161F2C;
@@ -1196,22 +1198,26 @@ input[type="checkbox"]:checked::before {
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, #FF6B1A 0%, #FF5000 100%);
   color: var(--accent-text-on);
-  border: 1px solid var(--primary);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   padding: 0.78rem 1.4rem;
   font-weight: 700;
-  transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  letter-spacing: 0.015em;
+  box-shadow: 0 4px 16px rgba(255, 80, 0, 0.28), 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 .btn-primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); /* restrained lift - no orange glow */
+  background: linear-gradient(135deg, #FF7B2E 0%, #FF5E14 100%);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 6px 22px rgba(255, 94, 20, 0.42), 0 2px 4px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
 }
 .btn-primary:active {
-  transform: scale(0.98);
+  transform: translateY(0) scale(0.98);
   filter: brightness(0.95);
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(255, 80, 0, 0.3);
 }
 
 .btn-secondary,
@@ -5515,7 +5521,7 @@ html body.is-admin th.admin-only {
 
 [data-theme="light"] .role-badge.role-student {
   background: #FFF7ED;
-  color: #C2410C;
+  color: #EA580C;
   border: 1px solid #FFEDD5;
 }
 
@@ -5527,7 +5533,7 @@ html body.is-admin th.admin-only {
 
 [data-theme="light"] .role-badge.role-governor {
   background: #FFF7ED;
-  color: #C2410C;
+  color: #EA580C;
   border: 1px solid #FFEDD5;
 }
 

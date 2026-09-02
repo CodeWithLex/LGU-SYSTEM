@@ -132,7 +132,7 @@ content: `
         <span style="
           display: inline-block;
           background: #fff3e0;
-          color: #c2410c;
+          color: #ea580c;
           padding: 5px 16px;
           border-radius: 100px;
           font-size: 11px;
