@@ -4136,18 +4136,18 @@ html body.is-admin th.admin-only {
 
 .unit-row {
   display: grid;
-  grid-template-columns: 88px 1fr 115px 104px;
+  grid-template-columns: 84px 1fr 110px 104px;
   align-items: center;
-  min-height: 48px;
-  gap: 0.85rem;
-  padding: 0.6rem 1.15rem;
+  min-height: 40px;
+  gap: 0.75rem;
+  padding: 0.38rem 1.15rem;
   border-top: 1px solid var(--border-default);
   background: var(--bg-surface);
   transition: background var(--transition);
 }
 .unit-row.has-batch-check {
-  grid-template-columns: 24px 88px 1fr 115px 104px;
-  gap: 0.75rem;
+  grid-template-columns: 24px 84px 1fr 110px 104px;
+  gap: 0.65rem;
 }
 .unit-row--selected {
   background: rgba(249, 115, 22, 0.04) !important;
@@ -4251,21 +4251,79 @@ html body.is-admin th.admin-only {
   min-width: 104px;
 }
 
+/* Primary Action: Log Subject (High-contrast, prominent SaaS button) */
+.unit-log-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  height: 28px;
+  padding: 0 0.75rem;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #FF6B1A 0%, #FF5000 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(255, 80, 0, 0.22);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.unit-log-btn iconify-icon {
+  font-size: 0.95rem;
+  color: #FFFFFF;
+  transition: transform 0.15s ease;
+}
+
+.unit-log-btn:hover {
+  background: linear-gradient(135deg, #FF7B2E 0%, #FF5E14 100%);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 14px rgba(255, 94, 20, 0.38);
+  transform: translateY(-1px);
+}
+
+.unit-log-btn:hover iconify-icon {
+  transform: scale(1.12);
+}
+
+.unit-log-btn:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 1px 4px rgba(255, 80, 0, 0.2);
+}
+
+.unit-log-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.unit-log-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Secondary Action Group: Edit, Pass & Delete (Subtle, sleek, non-cluttered) */
 .unit-action-group {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  padding: 2px;
-  gap: 2px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  transition: border-color var(--transition), background var(--transition);
+  height: 28px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 1px;
+  gap: 1px;
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
 .unit-row:hover .unit-action-group {
-  border-color: var(--border-hover);
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 .unit-action-btn {
@@ -4273,85 +4331,115 @@ html body.is-admin th.admin-only {
   align-items: center;
   justify-content: center;
   width: 26px;
-  height: 26px;
+  height: 24px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: calc(var(--radius-sm) - 2px);
-  color: var(--text-tertiary);
+  border-radius: 4px;
+  color: var(--text-secondary);
   font-size: 0.92rem;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.unit-row:hover .unit-action-btn {
-  color: var(--text-secondary);
+.unit-action-btn iconify-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Hover & Active States */
 .unit-action-btn:hover {
-  background: var(--surface-hover);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text-primary);
-  border-color: var(--border-default);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-0.5px);
+}
+
+.unit-action-btn:active {
+  transform: scale(0.94);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.unit-action-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.unit-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Specific Accent / Destructive Hovers */
+.unit-action-btn--pass {
+  color: var(--status-positive);
 }
 
 .unit-action-btn--pass:hover {
   color: #22C55E !important;
   border-color: rgba(34, 197, 94, 0.35) !important;
-  background: rgba(34, 197, 94, 0.12) !important;
+  background: rgba(34, 197, 94, 0.14) !important;
+}
+
+.unit-action-btn--pass:active {
+  background: rgba(34, 197, 94, 0.24) !important;
 }
 
 .unit-action-btn--edit:hover {
-  color: var(--accent) !important;
-  border-color: rgba(255, 94, 20, 0.35) !important;
-  background: var(--accent-muted) !important;
+  color: #FFFFFF !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Delete: understated by default, distinctly destructive on hover */
+.unit-action-btn--del {
+  color: var(--text-tertiary);
 }
 
 .unit-action-btn--del:hover {
   color: #EF4444 !important;
   border-color: rgba(239, 68, 68, 0.35) !important;
-  background: rgba(239, 68, 68, 0.12) !important;
+  background: rgba(239, 68, 68, 0.15) !important;
 }
 
-.unit-log-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  height: 30px;
-  padding: 0 0.75rem;
-  font-family: var(--font-ui);
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
+.unit-action-btn--del:active {
+  background: rgba(239, 68, 68, 0.25) !important;
 }
 
-.unit-log-btn iconify-icon {
-  font-size: 0.88rem;
-  color: var(--text-tertiary);
-  transition: color var(--transition);
+/* Light Theme Overrides */
+[data-theme="light"] .unit-action-group {
+  background: rgba(15, 23, 42, 0.03);
+  border-color: rgba(15, 23, 42, 0.08);
 }
 
-.unit-row:hover .unit-log-btn {
-  border-color: var(--border-hover);
-  color: var(--text-primary);
+[data-theme="light"] .unit-row:hover .unit-action-group {
+  background: rgba(15, 23, 42, 0.06);
+  border-color: rgba(15, 23, 42, 0.14);
 }
 
-.unit-log-btn:hover {
-  background: var(--accent-muted) !important;
-  color: var(--accent) !important;
-  border-color: var(--accent) !important;
-  box-shadow: 0 2px 8px rgba(255, 94, 20, 0.2);
+[data-theme="light"] .unit-action-btn {
+  color: #64748B;
 }
 
-.unit-log-btn:hover iconify-icon {
-  color: var(--accent);
+[data-theme="light"] .unit-action-btn--edit:hover {
+  background: rgba(15, 23, 42, 0.07);
+  color: #0F172A;
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+[data-theme="light"] .unit-action-btn--del:hover {
+  background: #FEF2F2 !important;
+  color: #DC2626 !important;
+  border-color: #FECACA !important;
+}
+
+[data-theme="light"] .unit-action-btn--pass:hover {
+  background: #F0FDF4 !important;
+  color: #16A34A !important;
+  border-color: #BBF7D0 !important;
 }
 
 /* ---- Floating Batch Action Bar (Multi-Select Mode) ---- */

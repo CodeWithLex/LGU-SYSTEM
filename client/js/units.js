@@ -437,14 +437,14 @@ const Units = (() => {
 
     const actions = rec
       ? `
-        <div class="unit-action-group">
+        <div class="unit-action-group" role="group" aria-label="Subject actions">
           ${rec.status !== 'passed'
-            ? `<button class="unit-action-btn unit-action-btn--pass" data-act="passed" data-id="${rec.id}" title="Mark as passed"><iconify-icon icon="solar:check-circle-linear"></iconify-icon></button>`
+            ? `<button type="button" class="unit-action-btn unit-action-btn--pass" data-act="passed" data-id="${rec.id}" title="Mark as passed" aria-label="Mark as passed"><iconify-icon icon="solar:check-circle-linear"></iconify-icon></button>`
             : ''}
-          <button class="unit-action-btn unit-action-btn--edit" data-act="edit" data-id="${rec.id}" data-subject="${s.id}" title="Edit grade / status"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
-          <button class="unit-action-btn unit-action-btn--del" data-act="drop" data-id="${rec.id}" title="Remove record"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
+          <button type="button" class="unit-action-btn unit-action-btn--edit" data-act="edit" data-id="${rec.id}" data-subject="${s.id}" title="Edit grade or status" aria-label="Edit record"><iconify-icon icon="solar:pen-linear"></iconify-icon></button>
+          <button type="button" class="unit-action-btn unit-action-btn--del" data-act="drop" data-id="${rec.id}" title="Remove record" aria-label="Remove record"><iconify-icon icon="solar:trash-bin-trash-linear"></iconify-icon></button>
         </div>`
-      : `<button class="unit-log-btn" data-act="log" data-subject="${s.id}" title="Log subject status or grade"><iconify-icon icon="solar:add-circle-linear"></iconify-icon> Log</button>`;
+      : `<button type="button" class="unit-log-btn" data-act="log" data-subject="${s.id}" title="Log subject grade or enrollment"><iconify-icon icon="solar:add-circle-linear"></iconify-icon><span>Log</span></button>`;
 
     const prereq = s.prerequisites
       ? `<div class="unit-prereq">Prerequisite: ${esc(s.prerequisites)}</div>`
