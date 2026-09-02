@@ -364,8 +364,7 @@ content: `
           font-size: 12px;
           color: #94a3b8;
           line-height: 1.6;
-        ">You received this because you're subscribed to event notifications.<br/>
-        <a href="${APP_URL}/settings/notifications" style="color: #94a3b8; text-decoration: underline;">Manage preferences</a></p>
+        ">You received this because you are subscribed to event notifications.<br/>Manage your account preferences in the student portal.</p>
       </td>
     </tr>
   </table>
