@@ -1631,13 +1631,6 @@
     margin-bottom: 1rem;
   }
 
-  /* Floating Island Glass Pill Navigation */
-  /* Officer bottom nav entrance */
-  @keyframes ofNavBarIn {
-    from { transform: translateY(110%); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
@@ -1667,10 +1660,6 @@
     overflow: visible !important;
     transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, background 0.2s ease !important;
     will-change: transform, opacity !important;
-    animation: ofNavBarIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both !important;
-  }
-  .of-bottom-nav.nav-bar-entered {
-    animation: none !important;
   }
 
   .of-bottom-nav.nav-hidden {
@@ -1694,7 +1683,7 @@
     min-width: 0 !important;
     height: 48px !important;
     padding: 4px 1px !important;
-    border-radius: 22px !important;
+    border-radius: 12px !important;
     color: var(--text-tertiary) !important;
     background: none !important;
     border: none !important;
@@ -1707,38 +1696,18 @@
     touch-action: manipulation !important;
     text-decoration: none !important;
     -webkit-tap-highlight-color: transparent !important;
-    transition:
-      color 0.2s ease,
-      background 0.2s ease !important;
-    isolation: isolate !important;
+    transition: color 0.15s ease !important;
   }
 
   .of-bottom-nav > button iconify-icon,
   .of-bottom-nav > a iconify-icon {
-    font-size: 1.22rem !important;
+    font-size: 1.25rem !important;
     line-height: 1 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition:
-      color 0.22s ease,
-      filter 0.22s ease,
-      transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    will-change: transform !important;
-  }
-
-  /* Icon warm glow on hover (desktop) */
-  @media (hover: hover) and (pointer: fine) {
-    .of-bottom-nav > button:hover iconify-icon,
-    .of-bottom-nav > a:hover iconify-icon {
-      color: var(--text-primary) !important;
-      transform: translateY(-2px) scale(1.12) !important;
-      filter: drop-shadow(0 2px 6px rgba(255, 94, 20, 0.3)) !important;
-    }
-    .of-bottom-nav > button:hover span,
-    .of-bottom-nav > a:hover span {
-      color: var(--text-primary) !important;
-    }
+    color: var(--text-tertiary) !important;
+    transition: color 0.15s ease !important;
   }
 
   .of-bottom-nav > button span,
@@ -1752,12 +1721,8 @@
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     max-width: 100% !important;
-    transition: color 0.22s ease, font-weight 0.2s ease, opacity 0.22s ease !important;
-  }
-
-  .of-bottom-nav > button:not(.active) span,
-  .of-bottom-nav > a:not(.active) span {
-    opacity: 0.75 !important;
+    color: var(--text-tertiary) !important;
+    transition: color 0.15s ease !important;
   }
 
   /* Unread Executive Notification Orange Badge */
@@ -1780,88 +1745,42 @@
     border: 1.5px solid var(--bg-surface, #0E1520) !important;
   }
 
-  /* Sliding Active Indicator - elastic liquid pill */
+  /* Sliding Active Indicator removed - only the icon is orange */
   .of-bottom-nav .of-bottom-nav-indicator {
-    position: absolute !important;
-    top: 5px !important;
-    left: 0 !important;
-    height: 48px !important;
-    width: 0;
-    border-radius: 14px !important;
-    background: rgba(255, 94, 20, 0.13) !important;
-    box-shadow:
-      0 0 0 1px rgba(255, 94, 20, 0.08) inset,
-      0 2px 12px rgba(255, 80, 0, 0.08) !important;
-    pointer-events: none !important;
-    transition:
-      transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-      width    0.48s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform, width !important;
-  }
-  [data-theme="light"] .of-bottom-nav .of-bottom-nav-indicator {
-    background: rgba(249, 115, 22, 0.1) !important;
-    box-shadow:
-      0 0 0 1px rgba(249, 115, 22, 0.06) inset,
-      0 2px 8px rgba(249, 115, 22, 0.07) !important;
-  }
-  /* Once the gliding pill exists, the per-item static background is redundant */
-  .of-bottom-nav.has-nav-indicator > button.active {
-    background: none !important;
-  }
-  [data-theme="light"] .of-bottom-nav.has-nav-indicator > button.active {
-    background: none !important;
+    display: none !important;
   }
 
-  .of-bottom-nav > button.active {
-    color: var(--accent) !important;
-    background: rgba(249, 115, 22, 0.12) !important;
-    font-weight: 700 !important;
+  .of-bottom-nav > button.active,
+  [data-theme="light"] .of-bottom-nav > button.active {
+    background: none !important;
   }
 
   .of-bottom-nav > button.active iconify-icon {
-    transform: translateY(-1px) scale(1.08) !important;
-    color: var(--accent) !important;
-    filter: drop-shadow(0 1px 5px rgba(255, 94, 20, 0.35)) !important;
+    color: var(--primary) !important;
+    transform: none !important;
+    filter: none !important;
   }
 
-  /* Pop animation for officer nav icon */
-  .of-bottom-nav > button iconify-icon.nav-icon-pop,
-  .of-bottom-nav > a iconify-icon.nav-icon-pop {
-    animation: navIconPop 0.52s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-  }
-
-  /* Active label slide-up */
-  .of-bottom-nav > button.active span,
-  .of-bottom-nav > a.active span {
-    animation: navLabelIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-    font-weight: 700 !important;
-    color: var(--accent) !important;
+  .of-bottom-nav > button.active span {
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
   }
 
   /* Main System Link Special Highlight */
   .of-bottom-nav > a.of-nav-link-main {
-    color: var(--primary) !important;
+    color: var(--text-tertiary) !important;
   }
   .of-bottom-nav > a.of-nav-link-main iconify-icon {
     color: var(--primary) !important;
   }
   .of-bottom-nav > a.of-nav-link-main:active {
-    background: rgba(249, 115, 22, 0.15) !important;
-    color: #FB923C !important;
+    background: none !important;
   }
 
-  [data-theme="light"] .of-bottom-nav > button.active {
-    background: rgba(249, 115, 22, 0.1) !important;
-    color: var(--accent) !important;
-  }
-  [data-theme="light"] .of-bottom-nav > a.of-nav-link-main {
-    color: #EA580C !important;
-  }
-
-  /* Tap squish + bounce */
+  /* Tap Interaction */
   .of-bottom-nav > button:active,
   .of-bottom-nav > a:active {
-    animation: navTapPulse 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+    transform: scale(0.96) !important;
   }
 
   .of-form-row {

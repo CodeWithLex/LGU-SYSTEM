@@ -3304,85 +3304,9 @@ iconify-icon {
       inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
   }
 
-  /* ---- Bottom Nav Animation Keyframes ---- */
-
-  /* Icon spring pop on activation */
-  @keyframes navIconPop {
-    0%   { transform: translateY(0) scale(1); }
-    28%  { transform: translateY(-5px) scale(1.22); }
-    55%  { transform: translateY(-1px) scale(1.06); }
-    72%  { transform: translateY(-2.5px) scale(1.13); }
-    88%  { transform: translateY(-0.5px) scale(1.03); }
-    100% { transform: translateY(-1px) scale(1.08); }
-  }
-
-  /* Label fade-up on activation */
-  @keyframes navLabelIn {
-    from { opacity: 0; transform: translateY(4px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Nav bar entrance from below on first paint */
-  @keyframes navBarIn {
-    from { transform: translateY(110%); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-
-  /* Tap ripple — whole item briefly squishes then bounces */
-  @keyframes navTapPulse {
-    0%   { transform: scale(1); }
-    35%  { transform: scale(0.88); }
-    70%  { transform: scale(1.05); }
-    100% { transform: scale(1); }
-  }
-
-  /* Reduced-motion: skip all nav animations */
-  @media (prefers-reduced-motion: reduce) {
-    body .bottom-nav { animation: none !important; }
-    body .bottom-nav-item .nav-icon { animation: none !important; }
-    body .bottom-nav-item span:not(.nav-icon) { animation: none !important; }
-    body .bottom-nav .bottom-nav-indicator {
-      transition: none !important;
-    }
-  }
-
-  /* Nav bar entrance */
-  body .bottom-nav.visible {
-    animation: navBarIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  body .bottom-nav.visible.nav-bar-entered {
-    animation: none !important;
-  }
-
-  /* Sliding Active Indicator - elastic liquid pill */
+  /* Sliding Active Indicator removed - only the icon is orange */
   body .bottom-nav .bottom-nav-indicator {
-    position: absolute !important;
-    top: 4px !important;
-    left: 0 !important;
-    height: 48px !important;
-    width: 0;
-    border-radius: 14px !important;
-    /* Warm orange inner glow + subtle top highlight */
-    background: rgba(255, 94, 20, 0.13) !important;
-    box-shadow:
-      0 0 0 1px rgba(255, 94, 20, 0.08) inset,
-      0 2px 12px rgba(255, 80, 0, 0.08) !important;
-    pointer-events: none !important;
-    transition:
-      transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-      width    0.48s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform, width !important;
-  }
-  [data-theme="light"] body .bottom-nav .bottom-nav-indicator {
-    background: rgba(249, 115, 22, 0.1) !important;
-    box-shadow:
-      0 0 0 1px rgba(249, 115, 22, 0.06) inset,
-      0 2px 8px rgba(249, 115, 22, 0.07) !important;
-  }
-  /* Once the gliding pill exists, the per-item static background is redundant */
-  body .bottom-nav.has-nav-indicator .bottom-nav-item.active,
-  [data-theme="light"] body .bottom-nav.has-nav-indicator .bottom-nav-item.active {
-    background: none !important;
+    display: none !important;
   }
 
   body .bottom-nav-item {
@@ -3394,43 +3318,26 @@ iconify-icon {
     min-width: 44px !important;
     height: 48px !important;
     padding: 3px 1px !important;
-    border-radius: 18px !important;
+    border-radius: 12px !important;
     color: var(--text-tertiary) !important;
+    background: none !important;
     text-decoration: none !important;
     position: relative !important;
-    transition:
-      color 0.2s ease,
-      background 0.2s ease !important;
+    transition: color 0.15s ease !important;
     user-select: none !important;
     -webkit-tap-highlight-color: transparent !important;
     touch-action: manipulation !important;
     flex-shrink: 0 !important;
-    isolation: isolate !important;
   }
 
   body .bottom-nav-item .nav-icon {
-    font-size: 1.22rem !important;
+    font-size: 1.25rem !important;
     line-height: 1 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition:
-      color 0.22s ease,
-      filter 0.22s ease,
-      transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    will-change: transform !important;
-  }
-
-  /* Icon warm glow filter on hover (desktop only) */
-  @media (hover: hover) and (pointer: fine) {
-    body .bottom-nav-item:hover .nav-icon {
-      color: var(--text-primary) !important;
-      transform: translateY(-2px) scale(1.12) !important;
-      filter: drop-shadow(0 2px 6px rgba(255, 94, 20, 0.3)) !important;
-    }
-    body .bottom-nav-item:hover span:not(.nav-icon) {
-      color: var(--text-primary) !important;
-    }
+    color: var(--text-tertiary) !important;
+    transition: color 0.15s ease !important;
   }
 
   body .bottom-nav-item span:not(.nav-icon) {
@@ -3444,7 +3351,8 @@ iconify-icon {
     text-overflow: ellipsis !important;
     max-width: 100% !important;
     display: block !important;
-    transition: color 0.22s ease, font-weight 0.2s ease, opacity 0.22s ease !important;
+    color: var(--text-tertiary) !important;
+    transition: color 0.15s ease !important;
   }
 
   body .bottom-nav-item.bottom-nav-more-trigger {
@@ -3478,65 +3386,45 @@ iconify-icon {
     50% { transform: scale(1.4); opacity: 0.85; }
   }
 
-  /* Active State */
-  body .bottom-nav-item.active {
-    color: var(--primary) !important;
-    background: rgba(249, 115, 22, 0.12) !important;
-  }
-
+  /* Active State - ONLY the icon is orange, no orange background pill */
+  body .bottom-nav-item.active,
   [data-theme="light"] body .bottom-nav-item.active {
-    background: rgba(249, 115, 22, 0.1) !important;
-    color: var(--primary) !important;
+    background: none !important;
   }
 
-  /* Active icon: spring pop (played via .nav-icon-pop class, then held in resting state) */
   body .bottom-nav-item.active .nav-icon {
     color: var(--primary) !important;
-    filter: drop-shadow(0 1px 5px rgba(255, 94, 20, 0.35)) !important;
-    transform: translateY(-1px) scale(1.08) !important;
+    transform: none !important;
+    filter: none !important;
   }
 
-  /* Animation class added/removed by JS on each activation */
-  body .bottom-nav-item .nav-icon.nav-icon-pop {
-    animation: navIconPop 0.52s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-  }
-
-  /* Active label: brighter + bolder, small slide-up entrance */
   body .bottom-nav-item.active span:not(.nav-icon) {
-    font-weight: 700 !important;
-    color: var(--primary) !important;
-    animation: navLabelIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-  }
-
-  /* Inactive label: slightly dimmer */
-  body .bottom-nav-item:not(.active) span:not(.nav-icon) {
-    opacity: 0.75 !important;
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
   }
 
   /* Officer Executive Link Special Highlight */
   body .bottom-nav-item.officer-nav-link {
-    color: var(--primary) !important;
+    color: var(--text-tertiary) !important;
   }
   body .bottom-nav-item.officer-nav-link .nav-icon {
     color: var(--primary) !important;
   }
-  body .bottom-nav-item.officer-nav-link.active,
-  body .bottom-nav-item.officer-nav-link:active {
-    background: rgba(249, 115, 22, 0.15) !important;
-    color: #FB923C !important;
+  body .bottom-nav-item.officer-nav-link.active {
+    background: none !important;
+    color: var(--text-primary) !important;
+  }
+  body .bottom-nav-item.officer-nav-link.active .nav-icon {
+    color: var(--primary) !important;
   }
 
-  [data-theme="light"] body .bottom-nav-item.officer-nav-link {
-    color: #EA580C !important;
-  }
   [data-theme="light"] body .bottom-nav-item.officer-nav-link.active {
-    background: rgba(249, 115, 22, 0.12) !important;
-    color: #EA580C !important;
+    background: none !important;
   }
 
-  /* Tap Interaction — squish + bounce */
+  /* Tap Interaction */
   body .bottom-nav-item:active {
-    animation: navTapPulse 0.28s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+    transform: scale(0.96) !important;
   }
 
   /* Layout Base Adjustments */
