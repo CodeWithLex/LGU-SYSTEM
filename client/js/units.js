@@ -10,6 +10,8 @@ const Units = (() => {
   let program      = null;
   let selectedYear = 'all'; // 'all' | '1' | '2' | '3' | '4'
   let enrollmentYear = null; // profile.enrollment_year - cohort that anchors prospectus SY prefill
+  let batchMode = false; // multi-select mode toggle
+  const selectedBatchSubjectIds = new Set();
 
   const VALID_PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
   const PROGRAM_NAMES = {
@@ -235,12 +237,26 @@ const Units = (() => {
     return myUnits.find(u => u.subjects?.id === subjectId) || null;
   }
 
+  function checklistControls() {
+    const card = currentSemesterButton();
+    const batchBtn = `
+      <button type="button" class="units-batch-toggle ${batchMode ? 'active' : ''}" data-act="toggle-batch" id="units-batch-toggle" title="Select multiple subjects to log or enroll at once">
+        <iconify-icon icon="${batchMode ? 'solar:close-circle-linear' : 'solar:checklist-minimalistic-linear'}"></iconify-icon>
+        <span>${batchMode ? 'Done Selecting' : 'Select Multiple'}</span>
+      </button>`;
+    return `
+      <div class="units-checklist-controls">
+        ${card}
+        ${batchBtn}
+      </div>`;
+  }
+
   function renderChecklist() {
     const container = document.getElementById('units-checklist');
-    const card = currentSemesterButton();
+    const headerControls = checklistControls();
 
     if (!subjects.length) {
-      container.innerHTML = card + `
+      container.innerHTML = headerControls + `
         <div class="empty-state">
           <iconify-icon icon="solar:diploma-verified-linear" class="empty-icon"></iconify-icon>
           <p>No subjects are set up for ${esc(program)} - ${esc(PROGRAM_NAMES[program] || '')} yet.</p>
@@ -256,59 +272,119 @@ const Units = (() => {
       return { year, sems };
     }).filter(y => y.sems.length);
 
-    container.innerHTML = card + years.map(({ year, sems }) => `
+    const batchBar = `
+      <div class="units-batch-bar ${batchMode && selectedBatchSubjectIds.size > 0 ? 'visible' : ''}" id="units-batch-bar">
+        <div class="units-batch-bar-inner">
+          <div class="units-batch-info">
+            <span class="units-batch-badge">${selectedBatchSubjectIds.size}</span>
+            <span class="units-batch-text">selected</span>
+          </div>
+          <div class="units-batch-actions">
+            <button type="button" class="btn btn-primary units-batch-btn" data-batch-action="pass" ${selectedBatchSubjectIds.size === 0 ? 'disabled' : ''}>
+              <iconify-icon icon="solar:check-circle-linear"></iconify-icon> Mark Passed (${selectedBatchSubjectIds.size})
+            </button>
+            <button type="button" class="btn btn-ghost units-batch-btn" data-batch-action="enroll" ${selectedBatchSubjectIds.size === 0 ? 'disabled' : ''}>
+              <iconify-icon icon="solar:calendar-date-linear"></iconify-icon> Mark Enrolled (${selectedBatchSubjectIds.size})
+            </button>
+            <button type="button" class="btn btn-ghost units-batch-btn--cancel" data-batch-action="cancel">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>`;
+
+    container.innerHTML = headerControls + years.map(({ year, sems }) => `
       <div class="unit-year" data-year="${year}">
-        <div class="unit-year-banner">Year ${year}</div>
+        <div class="unit-year-banner">
+          <span>Year ${year}</span>
+          ${batchMode ? `<label class="unit-banner-select" title="Select all subjects in Year ${year}"><input type="checkbox" class="unit-year-check" data-batch-year="${year}" /> Select Year</label>` : ''}
+        </div>
         ${sems.map(({ sem, subjects: list }) => `
           <div class="unit-sem">
-            <div class="unit-sem-banner">${SEM_LABELS[sem] || `Semester ${sem}`}</div>
+            <div class="unit-sem-banner">
+              <span>${SEM_LABELS[sem] || `Semester ${sem}`}</span>
+              ${batchMode ? `<label class="unit-banner-select" title="Select all subjects in this semester"><input type="checkbox" class="unit-sem-check" data-batch-year="${year}" data-batch-sem="${sem}" /> Select Sem</label>` : ''}
+            </div>
             ${list.map(subjectRow).join('')}
           </div>
         `).join('')}
       </div>
-    `).join('');
+    `).join('') + batchBar;
 
     sliderInit = false; // a fresh bar positions itself instantly, then animates
     applyYearFilter();
     updateTabSlider();
   }
 
-  // Show only the selected year's blocks (or all); keeps the active tab in sync.
-  function applyYearFilter() {
-    document.querySelectorAll('#units-checklist .unit-year').forEach(el => {
-      el.style.display = (selectedYear === 'all' || el.dataset.year === selectedYear) ? '' : 'none';
-    });
-    document.querySelectorAll('#units-filter-tabs-wrapper .units-tab-btn').forEach(t => {
-      t.classList.toggle('active', t.dataset.year === selectedYear);
-    });
+  function updateBatchBar() {
+    const bar = document.getElementById('units-batch-bar');
+    if (!bar) return;
+    const count = selectedBatchSubjectIds.size;
+    bar.classList.toggle('visible', batchMode && count > 0);
+    const badge = bar.querySelector('.units-batch-badge');
+    if (badge) badge.textContent = count;
+    const passBtn = bar.querySelector('[data-batch-action="pass"]');
+    if (passBtn) {
+      passBtn.disabled = count === 0;
+      passBtn.innerHTML = `<iconify-icon icon="solar:check-circle-linear"></iconify-icon> Mark Passed (${count})`;
+    }
+    const enrollBtn = bar.querySelector('[data-batch-action="enroll"]');
+    if (enrollBtn) {
+      enrollBtn.disabled = count === 0;
+      enrollBtn.innerHTML = `<iconify-icon icon="solar:calendar-date-linear"></iconify-icon> Mark Enrolled (${count})`;
+    }
   }
 
-  // Slide + morph the orange backplate onto the active tab.
-  let sliderInit = false;
+  async function batchMarkPassed() {
+    if (selectedBatchSubjectIds.size === 0) return;
+    const count = selectedBatchSubjectIds.size;
+    if (!confirm(`Mark all ${count} selected subject(s) as Passed in your official curriculum record?`)) return;
 
-  function updateTabSlider() {
-    const activeTab = document.querySelector('#units-filter-tabs-wrapper .units-tab-btn.active');
-    const slider = document.getElementById('units-tab-slider');
-    const wrapper = document.getElementById('units-filter-tabs-wrapper');
-    if (!activeTab || !slider || !wrapper) return;
+    try {
+      const items = Array.from(selectedBatchSubjectIds).map(id => {
+        const subj = subjects.find(s => s.id === id);
+        return {
+          subject_id: id,
+          school_year: prospectusSchoolYear(subj),
+          semester: Number(subj.semester),
+          status: 'passed',
+          grade: null,
+        };
+      });
 
-    // The slider's absolute `left: 4px` rests at the content start (padding
-    // edge + padding), so translate relative to the content box - measuring
-    // from the border-box would leave the pill offset by the border width.
-    const cs = getComputedStyle(wrapper);
-    const contentLeft = wrapper.getBoundingClientRect().left
-      + (parseFloat(cs.borderLeftWidth) || 0)
-      + (parseFloat(cs.paddingLeft) || 0);
+      await Api.units.batchEnroll(items);
+      UI.toast(`Successfully marked ${count} subject${count === 1 ? '' : 's'} as Passed!`, 'success');
+      selectedBatchSubjectIds.clear();
+      batchMode = false;
+      await load();
+    } catch (err) {
+      UI.toast(err.message || 'Failed to update selected subjects.', 'error');
+    }
+  }
 
-    const tabRect = activeTab.getBoundingClientRect();
+  async function batchMarkEnrolled() {
+    if (selectedBatchSubjectIds.size === 0) return;
+    const count = selectedBatchSubjectIds.size;
+    const sy = currentSchoolYear();
+    const sem = currentSemester();
+    if (!confirm(`Mark ${count} selected subject(s) as Enrolled for ${SEM_SHORT[sem]}, AY ${sy}?`)) return;
 
-    if (!sliderInit) slider.style.transition = 'none';
-    slider.style.width = `${tabRect.width}px`;
-    slider.style.transform = `translateX(${tabRect.left - contentLeft}px)`;
-    if (!sliderInit) {
-      void slider.offsetWidth; // commit position before enabling the transition
-      slider.style.transition = '';
-      sliderInit = true;
+    try {
+      const items = Array.from(selectedBatchSubjectIds).map(id => ({
+        subject_id: id,
+        school_year: sy,
+        semester: Number(sem),
+        status: 'enrolled',
+        grade: null,
+      }));
+
+      await Api.units.batchEnroll(items);
+      UI.toast(`Successfully enrolled in ${count} subject${count === 1 ? '' : 's'} for this term!`, 'success');
+      selectedBatchSubjectIds.clear();
+      batchMode = false;
+      await load();
+    } catch (err) {
+      UI.toast(err.message || 'Failed to enroll selected subjects.', 'error');
     }
   }
 
@@ -331,8 +407,15 @@ const Units = (() => {
       ? `<div class="unit-prereq">Prerequisite: ${esc(s.prerequisites)}</div>`
       : '';
 
+    const checkCol = batchMode
+      ? `<label class="unit-row-check-label"><input type="checkbox" class="unit-row-check" data-subject-id="${s.id}" data-year="${s.year_level}" data-sem="${s.semester}" ${selectedBatchSubjectIds.has(s.id) ? 'checked' : ''} /></label>`
+      : '';
+
+    const isSelected = batchMode && selectedBatchSubjectIds.has(s.id);
+
     return `
-      <div class="unit-row">
+      <div class="unit-row ${batchMode ? 'has-batch-check' : ''} ${isSelected ? 'unit-row--selected' : ''}" data-row-subject="${s.id}">
+        ${checkCol}
         <span class="unit-code">${esc(s.code)}</span>
         <div class="unit-title">
           <div>${esc(s.title)} <span class="unit-units">${s.units} unit${s.units === 1 ? '' : 's'}</span></div>
@@ -513,6 +596,12 @@ const Units = (() => {
     const btn = e.target.closest('[data-act]');
     if (!btn) return;
     const act = btn.dataset.act;
+    if (act === 'toggle-batch') {
+      batchMode = !batchMode;
+      if (!batchMode) selectedBatchSubjectIds.clear();
+      renderChecklist();
+      return;
+    }
     if (act === 'view-current') { openCurrentModal(); return; }
     const subject = subjects.find(s => s.id === btn.dataset.subject);
     const record = btn.dataset.id ? myUnits.find(u => u.id === btn.dataset.id) : null;
@@ -521,6 +610,75 @@ const Units = (() => {
     if (act === 'edit' && subject) openModal(subject, record || recordFor(subject.id));
     if (act === 'passed') markPassed(btn.dataset.id);
     if (act === 'drop') dropRecord(btn.dataset.id);
+  });
+
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-batch-action]');
+    if (!btn) return;
+    const act = btn.dataset.batchAction;
+    if (act === 'pass') batchMarkPassed();
+    if (act === 'enroll') batchMarkEnrolled();
+    if (act === 'cancel') {
+      selectedBatchSubjectIds.clear();
+      batchMode = false;
+      renderChecklist();
+    }
+  });
+
+  document.getElementById('units-checklist').addEventListener('change', e => {
+    const rowCheck = e.target.closest('.unit-row-check');
+    if (rowCheck) {
+      const id = rowCheck.dataset.subjectId;
+      if (rowCheck.checked) selectedBatchSubjectIds.add(id);
+      else selectedBatchSubjectIds.delete(id);
+      const row = rowCheck.closest('.unit-row');
+      if (row) row.classList.toggle('unit-row--selected', rowCheck.checked);
+      updateBatchBar();
+      return;
+    }
+
+    const semCheck = e.target.closest('.unit-sem-check');
+    if (semCheck) {
+      const year = Number(semCheck.dataset.batchYear);
+      const sem = Number(semCheck.dataset.batchSem);
+      const semSubjects = subjects.filter(s => s.year_level === year && s.semester === sem);
+      const isChecked = semCheck.checked;
+      semSubjects.forEach(s => {
+        if (isChecked) selectedBatchSubjectIds.add(s.id);
+        else selectedBatchSubjectIds.delete(s.id);
+      });
+      const semEl = semCheck.closest('.unit-sem');
+      if (semEl) {
+        semEl.querySelectorAll('.unit-row-check').forEach(cb => {
+          cb.checked = isChecked;
+          const r = cb.closest('.unit-row');
+          if (r) r.classList.toggle('unit-row--selected', isChecked);
+        });
+      }
+      updateBatchBar();
+      return;
+    }
+
+    const yearCheck = e.target.closest('.unit-year-check');
+    if (yearCheck) {
+      const year = Number(yearCheck.dataset.batchYear);
+      const yearSubjects = subjects.filter(s => s.year_level === year);
+      const isChecked = yearCheck.checked;
+      yearSubjects.forEach(s => {
+        if (isChecked) selectedBatchSubjectIds.add(s.id);
+        else selectedBatchSubjectIds.delete(s.id);
+      });
+      const yearEl = yearCheck.closest('.unit-year');
+      if (yearEl) {
+        yearEl.querySelectorAll('.unit-sem-check, .unit-row-check').forEach(cb => {
+          cb.checked = isChecked;
+          const r = cb.closest('.unit-row');
+          if (r) r.classList.toggle('unit-row--selected', isChecked);
+        });
+      }
+      updateBatchBar();
+      return;
+    }
   });
 
   document.getElementById('units-modal-save').addEventListener('click', saveModal);

@@ -167,11 +167,12 @@ const Api = (() => {
   };
 
   const units = {
-    checklists: (program) => _request('GET', `/units/checklists${program ? '?program=' + encodeURIComponent(program) : ''}`, null, false, 180000),
-    my:         ()        => _request('GET', '/units/my', null, false, 30000),
-    enroll:     (body)    => _request('POST',  '/units/enroll', body),
-    update:     (id, b)   => _request('PATCH', `/units/update/${id}`, b),
-    drop:       (id)      => _request('DELETE', `/units/drop/${id}`),
+    checklists:  (program) => _request('GET', `/units/checklists${program ? '?program=' + encodeURIComponent(program) : ''}`, null, false, 180000),
+    my:          ()        => _request('GET', '/units/my', null, false, 30000),
+    enroll:      (body)    => _request('POST',  '/units/enroll', body),
+    batchEnroll: (items)   => _request('POST',  '/units/batch-enroll', { items }),
+    update:      (id, b)   => _request('PATCH', `/units/update/${id}`, b),
+    drop:        (id)      => _request('DELETE', `/units/drop/${id}`),
   };
 
   const announcements = {

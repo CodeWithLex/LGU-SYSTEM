@@ -456,6 +456,91 @@ router.post('/enroll', async (req, res) => {
   }
 });
 
+// POST /api/units/batch-enroll
+// Bulk log or update multiple subjects for the current student in one single atomic call.
+router.post('/batch-enroll', async (req, res) => {
+  try {
+    const { items } = req.body || {};
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Items array is required.' });
+    }
+    if (items.length > 80) {
+      return res.status(400).json({ error: 'Cannot log more than 80 subjects at once.' });
+    }
+
+    const studentProgram = VALID_PROGRAMS.find(
+      p => p.toUpperCase() === String(req.profile?.course || '').trim().toUpperCase()
+    );
+
+    const subjectIds = items.map(it => it.subject_id).filter(isValidUUID);
+    if (subjectIds.length !== items.length) {
+      return res.status(400).json({ error: 'All items must have a valid subject_id UUID.' });
+    }
+
+    const { data: dbSubjects, error: fetchErr } = await supabase
+      .from('subjects')
+      .select('id, program')
+      .in('id', subjectIds);
+
+    if (fetchErr) {
+      logError('units/batch-enroll fetch', fetchErr);
+      return res.status(500).json({ error: 'Failed to verify subjects.' });
+    }
+
+    const validSubjectMap = new Map((dbSubjects || []).map(s => [s.id, s]));
+
+    const rowsToUpsert = [];
+    for (const item of items) {
+      const { subject_id, school_year, semester, status = 'enrolled', grade = null } = item;
+      if (!SCHOOL_YEAR_RE.test(school_year)) {
+        return res.status(400).json({ error: `Invalid school year format: ${school_year}` });
+      }
+      if (![1, 2, 3].includes(Number(semester))) {
+        return res.status(400).json({ error: `Invalid semester: ${semester}` });
+      }
+      if (!isValidEnum(status, VALID_STATUSES)) {
+        return res.status(400).json({ error: `Invalid status: ${status}` });
+      }
+      if (!isValidGrade(grade)) {
+        return res.status(400).json({ error: `Invalid grade: ${grade}` });
+      }
+
+      const subj = validSubjectMap.get(subject_id);
+      if (!subj) {
+        return res.status(404).json({ error: `Subject ${subject_id} not found.` });
+      }
+      if (studentProgram && subj.program !== studentProgram) {
+        return res.status(403).json({ error: 'You can only log subjects from your enrolled program.' });
+      }
+
+      rowsToUpsert.push({
+        student_id: req.user.id,
+        subject_id,
+        school_year,
+        semester: Number(semester),
+        status,
+        grade: normalizeGrade(grade),
+      });
+    }
+
+    const { error: upsertErr } = await supabase
+      .from('student_units')
+      .upsert(rowsToUpsert, {
+        onConflict: 'student_id,subject_id,school_year,semester',
+      });
+
+    if (upsertErr) {
+      logError('units/batch-enroll upsert', upsertErr);
+      return res.status(500).json({ error: 'Failed to batch log subjects.' });
+    }
+
+    res.status(200).json({ ok: true, count: rowsToUpsert.length });
+  } catch (err) {
+    logError('units/batch-enroll', err);
+    res.status(500).json({ error: 'Failed to batch log subjects.' });
+  }
+});
+
 // PATCH /api/units/update/:id
 // Update status / grade / school year / semester of one of the student's records.
 router.patch('/update/:id', async (req, res) => {
