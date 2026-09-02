@@ -44,7 +44,7 @@ router.post('/', requireGovernorOrAdmin, async (req, res) => {
 
   const { data, error } = await supabase
     .from('announcements')
-    .insert({ title: cleanTitle, body: cleanBody })
+    .insert({ title: cleanTitle, body: cleanBody, posted_by: req.user.id })
     .select()
     .single();
 
