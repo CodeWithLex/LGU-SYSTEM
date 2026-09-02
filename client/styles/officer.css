@@ -1752,7 +1752,7 @@
     height: 48px !important;
     width: 0 !important;
     border-radius: 22px !important;
-    background: rgba(70, 110, 153, 0.12) !important;
+    background: rgba(249, 115, 22, 0.12) !important;
     pointer-events: none !important;
     /* No !important here: JS toggles an inline `transition: none` for the
        first placement, and an !important rule would override it. */
@@ -1762,7 +1762,7 @@
     will-change: transform, width !important;
   }
   [data-theme="light"] .of-bottom-nav .of-bottom-nav-indicator {
-    background: rgba(70, 110, 153, 0.1) !important;
+    background: rgba(249, 115, 22, 0.1) !important;
   }
   /* Once the gliding pill exists, the per-item static background is redundant */
   .of-bottom-nav.has-nav-indicator > button.active {

@@ -3246,7 +3246,7 @@ iconify-icon {
     height: 48px !important;
     width: 0 !important;
     border-radius: 12px !important;
-    background: rgba(70, 110, 153, 0.12) !important;
+    background: rgba(249, 115, 22, 0.12) !important;
     pointer-events: none !important;
     /* No !important here: JS toggles an inline `transition: none` for the
        first placement, and an !important rule would override it. */
@@ -3256,7 +3256,7 @@ iconify-icon {
     will-change: transform, width !important;
   }
   [data-theme="light"] body .bottom-nav .bottom-nav-indicator {
-    background: rgba(70, 110, 153, 0.1) !important;
+    background: rgba(249, 115, 22, 0.1) !important;
   }
   /* Once the gliding pill exists, the per-item static background is redundant */
   body .bottom-nav.has-nav-indicator .bottom-nav-item.active,
