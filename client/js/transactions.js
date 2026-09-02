@@ -6,18 +6,64 @@ const Transactions = (() => {
 
   let allTxs = [];
   let _isAdmin = false;
+  let _currentPage = 1;
+  let _totalPages = 1;
+  let _totalCount = 0;
+  let _searchDebounce = null;
 
   async function load() {
     // Check admin status from the sidebar role label
     _isAdmin = document.getElementById('user-role')?.textContent?.includes('Admin');
+    bindFilter();
+    bindPagination();
+    bindTableEvents();
+    await populateEventFilter();
+    await fetchPage(1);
+  }
+
+  async function fetchPage(page = 1) {
+    _currentPage = Math.max(1, page);
+    const typeEl   = document.getElementById('filter-type');
+    const eventEl  = document.getElementById('filter-event');
+    const searchEl = document.getElementById('tx-search');
+
+    const params = {
+      page: _currentPage,
+      limit: 100
+    };
+    if (typeEl && typeEl.value !== 'all') params.type = typeEl.value;
+    if (eventEl && eventEl.value !== 'all') params.event_id = eventEl.value;
+    if (searchEl && searchEl.value.trim()) params.search = searchEl.value.trim();
+
     try {
-      allTxs = await Api.transactions.list({ limit: 200 });
+      const res = await Api.transactions.list(params);
+      if (Array.isArray(res)) {
+        allTxs = res;
+        _totalCount = res.length;
+        _totalPages = 1;
+      } else {
+        allTxs = res.data || [];
+        _totalCount = res.total || 0;
+        _totalPages = res.totalPages || Math.max(1, Math.ceil(_totalCount / 100));
+      }
       renderTable(allTxs);
-      bindFilter();
+      updatePagination();
     } catch (err) {
       document.getElementById('tx-table-body').innerHTML =
         `<tr><td colspan="8" class="loading-state">Failed to load transactions.</td></tr>`;
     }
+  }
+
+  function updatePagination() {
+    const pageInfo = document.getElementById('tx-page-info');
+    const prevBtn  = document.getElementById('tx-prev-btn');
+    const nextBtn  = document.getElementById('tx-next-btn');
+
+    if (pageInfo) {
+      pageInfo.textContent = `Page ${_currentPage} of ${_totalPages} (${_totalCount} transaction${_totalCount === 1 ? '' : 's'})`;
+    }
+    if (prevBtn) prevBtn.disabled = _currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = _currentPage >= _totalPages;
   }
 
   function renderTable(txs) {
@@ -117,69 +163,63 @@ const Transactions = (() => {
     tbody._bound = true;
   }
 
+  function bindPagination() {
+    const prevBtn = document.getElementById('tx-prev-btn');
+    const nextBtn = document.getElementById('tx-next-btn');
+
+    if (prevBtn && !prevBtn._bound) {
+      prevBtn.addEventListener('click', () => {
+        if (_currentPage > 1) fetchPage(_currentPage - 1);
+      });
+      prevBtn._bound = true;
+    }
+    if (nextBtn && !nextBtn._bound) {
+      nextBtn.addEventListener('click', () => {
+        if (_currentPage < _totalPages) fetchPage(_currentPage + 1);
+      });
+      nextBtn._bound = true;
+    }
+  }
+
   function bindFilter() {
     const typeEl   = document.getElementById('filter-type');
     const eventEl  = document.getElementById('filter-event');
     const searchEl = document.getElementById('tx-search');
-    
-    // Initial population of event filter
-    populateEventFilter();
-    bindTableEvents();
 
-    function applyFilters() {
-      const type    = typeEl ? typeEl.value : 'all';
-      const eventId = eventEl ? eventEl.value : 'all';
-      const text    = searchEl ? searchEl.value.toLowerCase().trim() : '';
-
-      const filtered = allTxs.filter(t => {
-        const matchesType  = (type === 'all') || (t.type === type);
-        const matchesEvent = (eventId === 'all') || (String(t.event_id) === eventId);
-        const matchesText  = !text || 
-          (t.description || '').toLowerCase().includes(text) || 
-          (t.profiles?.full_name || '').toLowerCase().includes(text) ||
-          (t.events?.event_name || '').toLowerCase().includes(text);
-        
-        return matchesType && matchesEvent && matchesText;
-      });
-      renderTable(filtered);
+    function triggerFilter() {
+      fetchPage(1);
     }
 
     if (typeEl && !typeEl._bound) {
-      typeEl.addEventListener('change', applyFilters);
+      typeEl.addEventListener('change', triggerFilter);
       typeEl._bound = true;
     }
     if (eventEl && !eventEl._bound) {
-      eventEl.addEventListener('change', applyFilters);
+      eventEl.addEventListener('change', triggerFilter);
       eventEl._bound = true;
     }
     if (searchEl && !searchEl._bound) {
-      searchEl.addEventListener('input', applyFilters);
+      searchEl.addEventListener('input', () => {
+        clearTimeout(_searchDebounce);
+        _searchDebounce = setTimeout(() => fetchPage(1), 300);
+      });
       searchEl._bound = true;
     }
   }
 
-  function populateEventFilter() {
+  async function populateEventFilter() {
     const eventEl = document.getElementById('filter-event');
-    if (!eventEl) return;
+    if (!eventEl || eventEl._populated) return;
 
-    // Get unique events from the current transaction set
-    const uniqueEvents = [];
-    const seen = new Set();
-
-    allTxs.forEach(tx => {
-      if (tx.event_id && tx.events && !seen.has(tx.event_id)) {
-        uniqueEvents.push({ id: tx.event_id, name: tx.events.event_name });
-        seen.add(tx.event_id);
-      }
-    });
-
-    // Add "Unassociated / General" if any tx has no event_id
-    if (allTxs.some(tx => !tx.event_id)) {
-      uniqueEvents.push({ id: 'null', name: 'General Fund (No Event)' });
-    }
-
-    eventEl.innerHTML = '<option value="all">All Events</option>' + 
-      uniqueEvents.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+    try {
+      const events = await Api.events.list();
+      const currentVal = eventEl.value;
+      eventEl.innerHTML = '<option value="all">All Events</option>' +
+        '<option value="GENERAL">General Fund (No Event)</option>' +
+        (events || []).map(e => `<option value="${e.id}">${e.event_name}</option>`).join('');
+      if (currentVal) eventEl.value = currentVal;
+      eventEl._populated = true;
+    } catch { /* ignore */ }
   }
 
   // ── Edit Modal ──────────────────────────────────────────────────────────

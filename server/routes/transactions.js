@@ -62,21 +62,30 @@ async function signReceipt(tx) {
 
 // GET /api/transactions
 router.get('/', async (req, res) => {
-  const event_id = req.query.event_id   || null;
-  const type     = req.query.type       || null;
-  const limit    = Math.min(Number(req.query.limit)  || 50, MAX_LIMIT);
-  const offset   = Math.min(Number(req.query.offset) || 0,  MAX_OFFSET);
-
-  // Validate type enum if provided
-  if (type && !isValidEnum(type, VALID_TX_TYPES)) {
-    return res.status(400).json({ error: 'Invalid transaction type filter.' });
-  }
+  const event_id = req.query.event_id || null;
+  const type     = req.query.type     || null;
+  const search   = req.query.search   ? String(req.query.search).trim() : null;
+  const page     = req.query.page     ? Math.max(1, parseInt(req.query.page, 10) || 1) : null;
+  const limit    = Math.min(Math.max(1, parseInt(req.query.limit, 10) || 100), MAX_LIMIT);
+  const offset   = page !== null ? (page - 1) * limit : Math.min(Math.max(0, parseInt(req.query.offset, 10) || 0), MAX_OFFSET);
 
   let query = supabase
     .from('transactions')
-    .select('*, profiles!added_by(full_name), events(event_name)')
-    .order('created_at', { ascending: false })
-    .range(offset, offset + limit - 1);
+    .select('*, profiles!added_by(full_name), events(event_name)', { count: 'exact' });
+
+  // Validate type filter (supports single type or comma-separated list)
+  if (type) {
+    const types = type.split(',').map(t => t.trim()).filter(Boolean);
+    const invalid = types.find(t => !isValidEnum(t, VALID_TX_TYPES));
+    if (invalid) {
+      return res.status(400).json({ error: `Invalid transaction type filter: ${invalid}.` });
+    }
+    if (types.length === 1) {
+      query = query.eq('type', types[0]);
+    } else {
+      query = query.in('type', types);
+    }
+  }
 
   if (event_id) {
     if (event_id === 'GENERAL' || event_id === 'null' || event_id === 'none') {
@@ -87,13 +96,36 @@ router.get('/', async (req, res) => {
       return res.status(400).json({ error: 'Invalid event_id format.' });
     }
   }
-  if (type) query = query.eq('type', type);
 
-  const { data, error } = await query;
-  if (error) return res.status(500).json({ error: 'Failed to fetch transactions.' });
+  if (search) {
+    query = query.ilike('description', `%${search}%`);
+  }
+
+  query = query
+    .order('transaction_date', { ascending: false })
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  const { data, count, error } = await query;
+  if (error) {
+    logError('Transactions List Error', error);
+    return res.status(500).json({ error: 'Failed to fetch transactions.' });
+  }
 
   const signed = await Promise.all((data || []).map(signReceipt));
-  res.json(signed);
+  res.set('X-Total-Count', String(count || 0));
+
+  if (page !== null || req.query.paginate === 'true') {
+    res.json({
+      data: signed,
+      total: count || 0,
+      page: page || 1,
+      limit,
+      totalPages: Math.max(1, Math.ceil((count || 0) / limit))
+    });
+  } else {
+    res.json(signed);
+  }
 });
 
 // POST /api/transactions (officers and admins)

@@ -486,6 +486,13 @@
           </table>
         </div>
         <div id="tx-mobile-cards" class="mobile-cards-container"></div>
+        <div id="tx-pagination" class="pagination-bar" style="display:flex;justify-content:space-between;align-items:center;padding:1rem 0;margin-top:0.5rem;flex-wrap:wrap;gap:0.5rem;">
+          <span id="tx-page-info" style="font-size:0.85rem;color:var(--text-secondary);">Page 1 of 1 (0 transactions)</span>
+          <div style="display:flex;gap:0.5rem;">
+            <button type="button" id="tx-prev-btn" class="btn btn-ghost" style="padding:0.4rem 0.8rem;" disabled><iconify-icon icon="solar:arrow-left-linear"></iconify-icon> Previous</button>
+            <button type="button" id="tx-next-btn" class="btn btn-ghost" style="padding:0.4rem 0.8rem;" disabled>Next <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></button>
+          </div>
+        </div>
       </section>
 
       <!-- TOTAL INCOME -->
