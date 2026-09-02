@@ -7,6 +7,19 @@ const { isValidUUID } = require('../lib/validate');
 const { logError } = require('../lib/logger');
 const { requireOfficer } = require('../middleware/roles');
 
+// Signs storage-backed receipt paths for export; legacy links pass through.
+async function signReceipt(tx) {
+  if (tx.receipt_url && tx.receipt_url.startsWith('receipts/')) {
+    const { data, error } = await supabase.storage
+      .from('receipts')
+      .createSignedUrl(tx.receipt_url.replace(/^receipts\//, ''), 3600);
+    if (!error && data?.signedUrl) {
+      return { ...tx, receipt_url: data.signedUrl };
+    }
+  }
+  return tx;
+}
+
 // ── GET /api/reports/summary ──────────────────────────────────────────────────
 router.get('/summary', async (req, res) => {
   const [{ data: txs, error: txErr }, { data: events, error: evErr }] = await Promise.all([
@@ -348,9 +361,11 @@ router.get('/excel/:eventId', requireOfficer, async (req, res) => {
   });
   headerRow.height = 22;
 
+  const signedTransactions = await Promise.all((transactions || []).map(signReceipt));
+
   // ── Data rows ──
   let totalIncome = 0, totalExpense = 0;
-  (transactions || []).forEach((tx, i) => {
+  (signedTransactions || []).forEach((tx, i) => {
     const isExpense = tx.type === 'expense';
     if (isExpense) totalExpense += Number(tx.amount);
     else           totalIncome  += Number(tx.amount);
