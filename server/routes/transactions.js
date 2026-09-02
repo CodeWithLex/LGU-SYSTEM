@@ -8,7 +8,7 @@ const { logError } = require('../lib/logger');
 const { requireAdmin, requireOfficer } = require('../middleware/roles');
 const { createNotification } = require('./notifications');
 
-const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation'];
+const VALID_TX_TYPES = ['expense', 'donation', 'collection', 'allocation', 'transfer'];
 const MAX_LIMIT      = 100;
 const MAX_OFFSET     = 10000;
 const MAX_RECEIPT_BYTES = 5 * 1024 * 1024;
@@ -118,6 +118,9 @@ router.post('/', requireOfficer, parseReceiptWhenMultipart, async (req, res) => 
   // 2. Type enum validation
   if (!isValidEnum(type, VALID_TX_TYPES)) {
     return res.status(400).json({ error: `Invalid type. Must be one of: ${VALID_TX_TYPES.join(', ')}.` });
+  }
+  if (type === 'transfer') {
+    return res.status(400).json({ error: 'Transfer transactions can only be created via the budget transfer interface.' });
   }
 
   // 3. Amount must be a positive number
@@ -294,6 +297,9 @@ router.post('/bulk', requireAdmin, async (req, res) => {
     if (!isValidEnum(tx.type, VALID_TX_TYPES)) {
       return res.status(400).json({ error: `Row ${i + 1} error: Invalid type (${tx.type}).` });
     }
+    if (tx.type === 'transfer') {
+      return res.status(400).json({ error: `Row ${i + 1} error: Transfer transactions cannot be bulk imported.` });
+    }
     if (!isPositiveNumber(tx.amount)) {
       return res.status(400).json({ error: `Row ${i + 1} error: Amount must be > 0.` });
     }
@@ -341,6 +347,10 @@ router.patch('/:id', requireAdmin, async (req, res) => {
 
   if (!reason || String(reason).trim().length < 5) {
     return res.status(400).json({ error: 'A reason of at least 5 characters is required to edit a transaction.' });
+  }
+
+  if (req.body.type === 'transfer') {
+    return res.status(400).json({ error: 'Transfer transactions cannot be modified directly.' });
   }
 
   const updates = {};
