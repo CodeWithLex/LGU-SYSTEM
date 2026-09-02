@@ -12,8 +12,9 @@ const Transactions = (() => {
   let _searchDebounce = null;
 
   async function load() {
-    // Check admin status from the sidebar role label
-    _isAdmin = document.getElementById('user-role')?.textContent?.includes('Admin');
+    // Check admin status from the in-memory profile object
+    const profile = await Auth.getProfile();
+    _isAdmin = profile?.role === 'admin';
     bindFilter();
     bindPagination();
     bindTableEvents();
