@@ -799,40 +799,124 @@ const OfficerApp = (() => {
   }
 
   function bindStatPopovers() {
-    // On touch devices a tap fires a synthetic mouseenter before click, which
-    // would open the popover and then let the click handler close it again —
-    // so hover listeners are only bound when the device really supports hover.
-    const canHover = window.matchMedia?.('(hover: hover)').matches;
-    document.querySelectorAll('.of-stat').forEach(card => {
-      if (canHover) {
-        card.addEventListener('mouseenter', () => card.classList.add('hover-active'));
-        card.addEventListener('mouseleave', () => card.classList.remove('hover-active'));
+    const cards = Array.from(document.querySelectorAll('.of-stat'));
+    if (!cards.length) return;
+
+    let activeCard = null;
+    let longPressTimer = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let hasLongPressed = false;
+    let suppressClickUntil = 0;
+
+    function adjustPosition(card) {
+      const popover = card.querySelector('.stat-popover');
+      if (!popover) return;
+      const rect = popover.getBoundingClientRect();
+      if (rect.right > window.innerWidth - 10) {
+        popover.style.left = 'auto';
+        popover.style.right = '0px';
+      } else if (rect.left < 10) {
+        popover.style.left = '0px';
+        popover.style.right = 'auto';
       }
-      card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const active = card.classList.contains('hover-active');
-        document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
-        if (!active) {
-          card.classList.add('hover-active');
-          const popover = card.querySelector('.stat-popover');
-          if (popover) {
-            const rect = popover.getBoundingClientRect();
-            if (rect.right > window.innerWidth - 10) {
-              popover.style.left = 'auto';
-              popover.style.right = '0px';
-            } else if (rect.left < 10) {
-              popover.style.left = '0px';
-              popover.style.right = 'auto';
+    }
+
+    function showCard(card) {
+      if (!card) return;
+      if (activeCard && activeCard !== card) {
+        activeCard.classList.remove('hover-active');
+      }
+      activeCard = card;
+      card.classList.add('hover-active');
+      adjustPosition(card);
+    }
+
+    function hideAll() {
+      cards.forEach(c => c.classList.remove('hover-active'));
+      activeCard = null;
+    }
+
+    const canHover = window.matchMedia?.('(hover: hover)').matches;
+
+    cards.forEach(card => {
+      if (canHover) {
+        card.addEventListener('mouseenter', () => showCard(card));
+        card.addEventListener('mouseleave', () => hideAll());
+      }
+
+      // Touch & Hold and Finger Slide
+      card.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        hasLongPressed = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+
+        clearTimeout(longPressTimer);
+        longPressTimer = setTimeout(() => {
+          hasLongPressed = true;
+          showCard(card);
+          if (navigator.vibrate) {
+            try { navigator.vibrate(25); } catch {}
+          }
+        }, 220);
+      }, { passive: true });
+
+      card.addEventListener('touchmove', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        const touch = e.touches[0];
+        const dist = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
+
+        if (dist > 10 && !hasLongPressed) {
+          clearTimeout(longPressTimer);
+        }
+
+        if (hasLongPressed || activeCard) {
+          const el = document.elementFromPoint(touch.clientX, touch.clientY);
+          const hoveredCard = el ? el.closest('.of-stat') : null;
+          if (hoveredCard && hoveredCard !== activeCard) {
+            showCard(hoveredCard);
+            if (navigator.vibrate) {
+              try { navigator.vibrate(15); } catch {}
             }
           }
         }
+      }, { passive: true });
+
+      card.addEventListener('touchend', () => {
+        clearTimeout(longPressTimer);
+        if (hasLongPressed) {
+          suppressClickUntil = Date.now() + 350;
+        }
+      });
+
+      card.addEventListener('touchcancel', () => {
+        clearTimeout(longPressTimer);
+      });
+
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (Date.now() < suppressClickUntil) {
+          e.preventDefault();
+          return;
+        }
+        const active = card.classList.contains('hover-active');
+        if (!active) {
+          showCard(card);
+        } else {
+          hideAll();
+        }
       });
     });
+
     if (!bindStatPopovers._docBound) {
       bindStatPopovers._docBound = true;
-      document.addEventListener('click', () => {
-        document.querySelectorAll('.of-stat').forEach(c => c.classList.remove('hover-active'));
-      });
+      document.addEventListener('click', hideAll);
+      document.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('.of-stat')) {
+          hideAll();
+        }
+      }, { passive: true });
     }
   }
 

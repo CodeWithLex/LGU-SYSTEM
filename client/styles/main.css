@@ -1802,12 +1802,18 @@ input[type="checkbox"]:checked::before {
   box-shadow: var(--shadow-card);
   transition: border-color var(--transition), box-shadow var(--transition), transform 0.15s ease;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 .stat-card.hover-active {
-  z-index: 10;
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-card-hover);
+  z-index: 100 !important;
+  border-color: var(--accent) !important;
+  box-shadow: var(--shadow-popover), 0 0 0 1px var(--accent) !important;
+  transform: translateY(-2px);
 }
 
 .stat-body {
@@ -1902,14 +1908,16 @@ input[type="checkbox"]:checked::before {
   opacity: 0;
   visibility: hidden;
   transform: translateY(-8px);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 46;
+  transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.22s;
+  z-index: 110;
+  pointer-events: none;
 }
 
 .stat-card.hover-active .stat-popover {
   opacity: 1;
   visibility: visible;
   transform: translateY(12px);
+  pointer-events: auto;
 }
 
 /* Right-column popovers align to the card's right edge so they never overflow
@@ -1917,6 +1925,14 @@ input[type="checkbox"]:checked::before {
 .stat-card:nth-child(even) .stat-popover {
   left: auto;
   right: 0;
+}
+
+@media (max-width: 640px) {
+  .stat-popover {
+    min-width: 230px;
+    max-width: min(290px, calc(100vw - 32px));
+    padding: 0.9rem 1rem;
+  }
 }
 
 .stat-pop-row {

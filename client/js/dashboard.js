@@ -19,29 +19,174 @@ const Dashboard = (() => {
   }
 
   function bindPopovers() {
-    document.querySelectorAll('.stat-card').forEach(card => {
-      const showHover = () => card.classList.add('hover-active');
-      const hideHover = () => card.classList.remove('hover-active');
-      
-      card.addEventListener('mouseenter', showHover);
-      card.addEventListener('mouseleave', hideHover);
+    const cards = Array.from(document.querySelectorAll('.stat-card'));
+    if (!cards.length) return;
 
-      // Tap / Click navigation: opens target view directly
+    let activeCard = null;
+    let longPressTimer = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchInteracting = false;
+    let hasLongPressed = false;
+    let suppressClickUntil = 0;
+
+    function adjustPosition(card) {
+      const popover = card.querySelector('.stat-popover');
+      if (!popover) return;
+      popover.style.transform = '';
+      const rect = popover.getBoundingClientRect();
+      const pad = 12;
+      const vw = window.innerWidth;
+
+      if (rect.right > vw - pad) {
+        const overflow = rect.right - (vw - pad);
+        popover.style.transform = `translateY(12px) translateX(-${overflow}px)`;
+      } else if (rect.left < pad) {
+        const overflow = pad - rect.left;
+        popover.style.transform = `translateY(12px) translateX(${overflow}px)`;
+      }
+    }
+
+    function showCard(card) {
+      if (!card) return;
+      if (activeCard && activeCard !== card) {
+        activeCard.classList.remove('hover-active');
+      }
+      activeCard = card;
+      card.classList.add('hover-active');
+      adjustPosition(card);
+    }
+
+    function hideCard(card) {
+      if (card) {
+        card.classList.remove('hover-active');
+        if (activeCard === card) activeCard = null;
+      }
+    }
+
+    function hideAll() {
+      cards.forEach(c => c.classList.remove('hover-active'));
+      activeCard = null;
+    }
+
+    cards.forEach(card => {
+      // Desktop mouse hover
+      card.addEventListener('mouseenter', () => {
+        if (!isTouchInteracting) showCard(card);
+      });
+      card.addEventListener('mouseleave', () => {
+        if (!isTouchInteracting) hideCard(card);
+      });
+
+      // Mobile touch interactions: Touch & Hold + Finger Slide
+      card.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        isTouchInteracting = true;
+        hasLongPressed = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+
+        clearTimeout(longPressTimer);
+        longPressTimer = setTimeout(() => {
+          hasLongPressed = true;
+          showCard(card);
+          if (navigator.vibrate) {
+            try { navigator.vibrate(25); } catch {}
+          }
+        }, 220); // 220ms hold trigger
+      }, { passive: true });
+
+      card.addEventListener('touchmove', (e) => {
+        if (!e.touches || !e.touches[0]) return;
+        const touch = e.touches[0];
+        const dist = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
+
+        // Cancel long-press timer if finger moves > 10px before firing (allows smooth natural scrolling)
+        if (dist > 10 && !hasLongPressed) {
+          clearTimeout(longPressTimer);
+        }
+
+        // Finger slide scrubbing: switch popover to whichever card the finger slides over
+        if (hasLongPressed || activeCard) {
+          const el = document.elementFromPoint(touch.clientX, touch.clientY);
+          const hoveredCard = el ? el.closest('.stat-card') : null;
+          if (hoveredCard && hoveredCard !== activeCard) {
+            showCard(hoveredCard);
+            if (navigator.vibrate) {
+              try { navigator.vibrate(15); } catch {}
+            }
+          }
+        }
+      }, { passive: true });
+
+      card.addEventListener('touchend', () => {
+        clearTimeout(longPressTimer);
+        if (hasLongPressed) {
+          // Keep popover open on release; suppress the immediate synthetic click
+          suppressClickUntil = Date.now() + 350;
+        }
+        setTimeout(() => { isTouchInteracting = false; }, 350);
+      });
+
+      card.addEventListener('touchcancel', () => {
+        clearTimeout(longPressTimer);
+        isTouchInteracting = false;
+      });
+
+      // Tap / Click Handler
       card.addEventListener('click', (e) => {
         const actionLink = e.target.closest('.stat-pop-action');
-        const targetView = actionLink ? actionLink.dataset.nav : card.dataset.nav;
+        if (actionLink) {
+          e.stopPropagation();
+          const targetView = actionLink.dataset.nav || card.dataset.nav;
+          hideAll();
+          if (targetView && typeof window.navigateTo === 'function') {
+            window.navigateTo(targetView);
+          }
+          return;
+        }
+
+        // If long-press just ended, suppress navigation so user can view dropdown
+        if (Date.now() < suppressClickUntil) {
+          e.stopPropagation();
+          e.preventDefault();
+          return;
+        }
+
+        const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+
+        if (isTouch) {
+          // On touch: first tap reveals the dropdown popover!
+          if (activeCard !== card) {
+            e.stopPropagation();
+            e.preventDefault();
+            showCard(card);
+            return;
+          }
+        }
+
+        // If already active or mouse click on desktop: navigate to target view
+        const targetView = card.dataset.nav;
         if (targetView && typeof window.navigateTo === 'function') {
           e.stopPropagation();
-          hideHover();
+          hideAll();
           window.navigateTo(targetView);
         }
       });
     });
 
-    // Close any open popovers when clicking elsewhere
-    document.addEventListener('click', () => {
-      document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('hover-active'));
-    });
+    // Close any open popovers when tapping or clicking elsewhere
+    const handleOutside = (e) => {
+      if (!e.target.closest('.stat-card')) {
+        hideAll();
+      }
+    };
+    document.addEventListener('click', handleOutside);
+    document.addEventListener('touchstart', (e) => {
+      if (!e.target.closest('.stat-card')) {
+        hideAll();
+      }
+    }, { passive: true });
   }
 
   async function loadStats() {
