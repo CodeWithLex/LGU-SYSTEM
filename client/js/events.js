@@ -139,7 +139,7 @@ const Events = (() => {
             <div class="event-budget-fill${over ? ' over' : ''}" style="width:${pct}%"></div>
           </div>
           <div class="event-budget-labels">
-            <span>Spent: <strong>${UI.currency(spent)}</strong></span>
+            <span>Total Event Spending: <strong>${UI.currency(spent)}</strong></span>
             <span>Budget: <strong>${UI.currency(budget)}</strong></span>
           </div>
           ${overNote}
@@ -182,22 +182,23 @@ const Events = (() => {
           <div class="stat-card stat-balance">
             <div class="stat-icon"><iconify-icon icon="solar:wallet-money-linear"></iconify-icon></div>
             <div class="stat-body">
-              <p class="stat-label">Allocated</p>
+              <p class="stat-label">Initial Allocation</p>
               <h3 class="stat-value">${UI.currency(budget)}</h3>
             </div>
           </div>
           <div class="stat-card stat-expense">
             <div class="stat-icon"><iconify-icon icon="solar:chart-square-linear"></iconify-icon></div>
             <div class="stat-body">
-              <p class="stat-label">Expenses</p>
+              <p class="stat-label">Total Event Spending</p>
               <h3 class="stat-value">${UI.currency(spent)}</h3>
             </div>
           </div>
           <div class="stat-card stat-income">
             <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
             <div class="stat-body">
-              <p class="stat-label">Remaining</p>
-              <h3 class="stat-value">${UI.currency(ev.computed_remaining)}</h3>
+              <p class="stat-label">Budget Utilization</p>
+              <h3 class="stat-value">${UI.currency(Math.max(0, budget - Number(ev.computed_remaining)))}</h3>
+              <p class="stat-sublabel" style="font-size:0.75rem;color:var(--text-secondary)">Remaining: ${UI.currency(ev.computed_remaining)}</p>
             </div>
           </div>
         </div>

@@ -124,7 +124,11 @@ function buildReportsHTML(summary, monthly, events) {
       </div>
       <div class="stat-card stat-balance">
         <div class="stat-icon"><iconify-icon icon="solar:wallet-2-linear"></iconify-icon></div>
-        <div class="stat-body"><p class="stat-label">Net Balance</p><h3 class="stat-value">${fmt(summary.remainingBalance)}</h3></div>
+        <div class="stat-body">
+          <p class="stat-label">Available General Fund</p>
+          <h3 class="stat-value">${fmt(summary.remainingBalance)}</h3>
+          <p class="stat-sublabel" style="font-size:0.75rem;color:var(--text-secondary)">Net Cash: ${fmt(summary.totalIncome - summary.totalExpense)}</p>
+        </div>
       </div>
       <div class="stat-card stat-donations">
         <div class="stat-icon"><iconify-icon icon="solar:pie-chart-2-linear"></iconify-icon></div>

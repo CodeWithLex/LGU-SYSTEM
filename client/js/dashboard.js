@@ -69,12 +69,14 @@ const Dashboard = (() => {
         <a class="stat-pop-action" data-nav="transactions"><span>View Transactions Ledger</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 
+      const netCashBalance = summary.totalIncome - summary.totalExpense;
       document.getElementById('pop-balance').innerHTML = `
         <div class="stat-pop-row income"><span>Total Income</span> <span>${UI.currency(summary.totalIncome)}</span></div>
-        <div class="stat-pop-row expense"><span>Misc Expenses</span> <span>-${UI.currency(summary.generalExpense)}</span></div>
-        <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Reserved (Events)</span> <span>-${UI.currency(summary.breakdown.reserved_envelopes)}</span></div>
-        <div class="stat-pop-row total"><span>Available Fund</span> <span>${UI.currency(summary.remainingBalance)}</span></div>
-        <p style="font-size:0.65rem;color:var(--text-tertiary);margin-top:0.4rem;line-height:1.2;">Unreserved cash available for new allocations or general operations.</p>
+        <div class="stat-pop-row expense"><span>Total Expenses</span> <span>-${UI.currency(summary.totalExpense)}</span></div>
+        <div class="stat-pop-row" style="border-top:1px dashed var(--border);margin-top:0.25rem;padding-top:0.25rem;font-weight:600;"><span>Net Cash Balance</span> <span>${UI.currency(netCashBalance)}</span></div>
+        <div class="stat-pop-row" style="color:var(--status-neutral)"><span>Unspent Envelopes</span> <span>-${UI.currency(Math.max(0, (summary.breakdown.reserved_envelopes || 0) - (summary.totalExpense - summary.generalExpense)))}</span></div>
+        <div class="stat-pop-row total"><span>Available General Fund</span> <span>${UI.currency(summary.remainingBalance)}</span></div>
+        <p style="font-size:0.65rem;color:var(--text-tertiary);margin-top:0.4rem;line-height:1.2;">Available General Fund = Net Cash Balance − unspent event envelopes.</p>
         <a class="stat-pop-action" data-nav="reports"><span>View Financial Reports & Trends</span> <iconify-icon icon="solar:arrow-right-linear"></iconify-icon></a>
       `;
 

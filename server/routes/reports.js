@@ -289,7 +289,7 @@ router.get('/pdf/:eventId', requireOfficer, async (req, res) => {
   doc.text(`Total Income:   ${fmt(totalIncome)}`,   66,  sumY + 8);
   doc.text(`Total Expenses: ${fmt(totalExpense)}`,   66,  sumY + 24);
   doc.fillColor(accent).fontSize(11)
-     .text(`Net Balance:    ${fmt(totalIncome - totalExpense)}`, 280, sumY + 18);
+     .text(`Net Cash Balance: ${fmt(totalIncome - totalExpense)}`, 280, sumY + 18);
 
   // Footer line
   doc.moveDown(4);
@@ -437,7 +437,7 @@ router.get('/excel/:eventId', requireOfficer, async (req, res) => {
   expRow.getCell(5).numFmt = '₱#,##0.00';
   expRow.getCell(5).font = { bold: true, color: { argb: 'FFEF4444' } };
 
-  const balRow = sheet.addRow(['', '', '', 'Net Balance:', totalIncome - totalExpense, '']);
+  const balRow = sheet.addRow(['', '', '', 'Net Cash Balance:', totalIncome - totalExpense, '']);
   balRow.getCell(4).font = { bold: true, size: 12, color: { argb: 'FF1a1f35' } };
   balRow.getCell(5).numFmt = '₱#,##0.00';
   balRow.getCell(5).font = { bold: true, size: 12, color: { argb: 'FF6384ff' } };
