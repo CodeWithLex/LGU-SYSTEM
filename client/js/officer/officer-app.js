@@ -2782,10 +2782,16 @@ const OfficerApp = (() => {
     reader.onload = e => {
       try {
         const text = e.target.result;
-        const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
-        if (lines.length < 2) throw new Error('CSV file appears empty or missing header row.');
+        let rows = [];
+        if (window.Papa) {
+          const parsed = Papa.parse(text, { skipEmptyLines: true });
+          rows = parsed.data || [];
+        } else {
+          rows = text.split(/\r?\n/).filter(l => l.trim().length > 0).map(l => l.split(','));
+        }
+        if (rows.length < 2) throw new Error('CSV file appears empty or missing header row.');
 
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z]/g, ''));
+        const headers = rows[0].map(h => String(h || '').trim().toLowerCase().replace(/[^a-z]/g, ''));
         const nameIdx = headers.findIndex(h => h.includes('name'));
         const sexIdx = headers.findIndex(h => h.includes('sex') || h.includes('gender'));
         const courseIdx = headers.findIndex(h => h.includes('course') || h.includes('program'));
@@ -2796,8 +2802,8 @@ const OfficerApp = (() => {
         }
 
         const records = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',').map(c => c.trim().replace(/^["']|["']$/g, ''));
+        for (let i = 1; i < rows.length; i++) {
+          const cols = rows[i].map(c => String(c || '').trim());
           const rawName = cols[nameIdx];
           if (!rawName) continue;
 
