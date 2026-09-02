@@ -20,6 +20,23 @@ async function signReceipt(tx) {
   return tx;
 }
 
+// Robust date formatter: parses YYYY-MM-DD components directly to prevent UTC midnight timezone shift
+function fmtDate(d) {
+  if (!d) return '-';
+  const match = String(d).trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    const year = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1;
+    const day = parseInt(match[3], 10);
+    return new Date(year, month, day).toLocaleDateString('en-PH', {
+      year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Manila'
+    });
+  }
+  return new Date(d).toLocaleDateString('en-PH', {
+    year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Manila'
+  });
+}
+
 // ── GET /api/reports/summary ──────────────────────────────────────────────────
 router.get('/summary', async (req, res) => {
   const [{ data: txs, error: txErr }, { data: events, error: evErr }] = await Promise.all([
@@ -217,7 +234,6 @@ router.get('/pdf/:eventId', requireOfficer, async (req, res) => {
      .text(event.event_name, 66, infoY + 14, { width: pageWidth - 32 });
 
   const fmt = n => `₱${Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '-';
 
   let pdfAllExp = 0, pdfAllocExp = 0, pdfInc = 0;
   (transactions || []).forEach(tx => {
@@ -351,7 +367,6 @@ router.get('/excel/:eventId', requireOfficer, async (req, res) => {
 
   // ── Event Info ──
   const fmt = n => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2 });
-  const fmtDate = d => d ? new Date(d).toLocaleDateString('en-PH', { year:'numeric', month:'long', day:'numeric' }) : '-';
 
   let xlAllExp = 0, xlAllocExp = 0, xlInc = 0;
   (transactions || []).forEach(tx => {

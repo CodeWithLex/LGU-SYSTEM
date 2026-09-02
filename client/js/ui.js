@@ -87,8 +87,17 @@ const UI = (() => {
 
   function dateStr(dateString) {
     if (!dateString) return '-';
+    const match = String(dateString).trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      const year = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1;
+      const day = parseInt(match[3], 10);
+      return new Date(year, month, day).toLocaleDateString('en-PH', {
+        year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila'
+      });
+    }
     return new Date(dateString).toLocaleDateString('en-PH', {
-      year: 'numeric', month: 'short', day: 'numeric'
+      year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila'
     });
   }
 
