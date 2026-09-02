@@ -835,6 +835,24 @@
   white-space: nowrap;
 }
 
+.of-table th.of-col-check,
+.of-table td.of-col-check {
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  text-align: center;
+  padding: 0.65rem 0.4rem;
+}
+
+.of-check-input {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+  accent-color: var(--primary);
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
 .of-table td {
   padding: 0.75rem 0.85rem;
   border-bottom: 1px solid var(--border-default);
@@ -848,6 +866,10 @@
 
 .of-table tr:hover td {
   background: var(--surface-hover);
+}
+
+.of-table tr.of-row-selected td {
+  background: rgba(249, 115, 22, 0.08) !important;
 }
 
 .of-table .num {

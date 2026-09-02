@@ -1887,6 +1887,7 @@ const OfficerApp = (() => {
   let _rosterCurrentView = 'masterlist';
   let _requestsStatusFilter = 'pending';
   let _allVerificationRequests = [];
+  let _selectedRequestIds = new Set();
 
   const COMPOUND_SURNAME_PREFIXES = [
     'DEL ROSARIO',
@@ -1955,6 +1956,7 @@ const OfficerApp = (() => {
     bindRosterImportModal();
     bindRosterViewTabs();
     bindRequestsStatusTabs();
+    bindRequestsBulkActions();
   }
 
   function bindRosterViewTabs() {
@@ -1978,6 +1980,8 @@ const OfficerApp = (() => {
         _rosterCurrentView = 'requests';
         if (masterPane) masterPane.classList.add('hidden');
         if (reqPane) reqPane.classList.remove('hidden');
+        _selectedRequestIds.clear();
+        updateBulkBar();
         loadRosterRequests();
       });
     }
@@ -1992,9 +1996,96 @@ const OfficerApp = (() => {
         tabsContainer.querySelectorAll('.of-filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         _requestsStatusFilter = btn.dataset.status || 'pending';
+        _selectedRequestIds.clear();
+        updateBulkBar();
         loadRosterRequests();
       });
     });
+  }
+
+  function bindRequestsBulkActions() {
+    const approveBtn = $('of-requests-bulk-approve-btn');
+    const clearBtn = $('of-requests-bulk-clear-btn');
+
+    if (approveBtn) {
+      approveBtn.addEventListener('click', async () => {
+        const count = _selectedRequestIds.size;
+        if (count === 0) return;
+
+        if (!confirm(`Are you sure you want to approve ${count} student enrollment verification request(s) and add them to the officially enrolled database?`)) {
+          return;
+        }
+
+        const ids = Array.from(_selectedRequestIds);
+        approveBtn.disabled = true;
+        const btnText = $('of-requests-bulk-btn-text');
+        if (btnText) btnText.textContent = `Approving ${count}…`;
+
+        try {
+          await Api.rosterRequests.bulkApprove(ids);
+          toast(`Approved and enrolled ${count} student(s) successfully!`, 'success');
+          _selectedRequestIds.clear();
+          if (window.Roster && window.Roster.getRoster) window.Roster.getRoster().catch(() => {});
+          await loadRosterRequests(true);
+          await loadRoster(true);
+        } catch (err) {
+          toast(`Bulk approval failed: ${err.message}`, 'error');
+        } finally {
+          approveBtn.disabled = false;
+          if (btnText) btnText.textContent = 'Approve Selected';
+          updateBulkBar();
+        }
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        _selectedRequestIds.clear();
+        renderRosterRequestsTable();
+      });
+    }
+  }
+
+  function updateBulkBar() {
+    const bulkBar = $('of-requests-bulk-bar');
+    const countEl = $('of-requests-selected-count');
+    const btnText = $('of-requests-bulk-btn-text');
+    const selectAllBox = $('of-requests-select-all');
+
+    const pendingRequests = _allVerificationRequests.filter(r => r.status === 'pending');
+    const count = _selectedRequestIds.size;
+
+    if (bulkBar) {
+      if (count > 0) {
+        bulkBar.classList.remove('hidden');
+      } else {
+        bulkBar.classList.add('hidden');
+      }
+    }
+
+    if (countEl) {
+      countEl.textContent = `${count} selected`;
+    }
+
+    if (btnText) {
+      btnText.textContent = `Approve Selected (${count})`;
+    }
+
+    if (selectAllBox && pendingRequests.length > 0) {
+      if (count === pendingRequests.length) {
+        selectAllBox.checked = true;
+        selectAllBox.indeterminate = false;
+      } else if (count > 0 && count < pendingRequests.length) {
+        selectAllBox.checked = false;
+        selectAllBox.indeterminate = true;
+      } else {
+        selectAllBox.checked = false;
+        selectAllBox.indeterminate = false;
+      }
+    } else if (selectAllBox) {
+      selectAllBox.checked = false;
+      selectAllBox.indeterminate = false;
+    }
   }
 
   function bindRosterControls() {
@@ -2158,9 +2249,19 @@ const OfficerApp = (() => {
     const container = $('of-roster-requests-table-container');
     if (!container) return;
 
+    const pendingRequests = _allVerificationRequests.filter(r => r.status === 'pending');
+
     if (_allVerificationRequests.length === 0) {
+      _selectedRequestIds.clear();
+      updateBulkBar();
       container.innerHTML = `<p style="font-size:0.85rem;color:var(--text-secondary);padding:2rem 1rem;text-align:center;">No ${_requestsStatusFilter === 'all' ? '' : _requestsStatusFilter} verification requests found.</p>`;
       return;
+    }
+
+    // Retain only IDs that are still in pendingRequests
+    const pendingIds = new Set(pendingRequests.map(r => r.id));
+    for (const id of _selectedRequestIds) {
+      if (!pendingIds.has(id)) _selectedRequestIds.delete(id);
     }
 
     let html = `
@@ -2168,6 +2269,11 @@ const OfficerApp = (() => {
         <table class="of-table">
           <thead>
             <tr>
+              <th class="of-col-check">
+                ${pendingRequests.length > 0 ? `
+                  <input type="checkbox" id="of-requests-select-all" class="of-check-input" title="Select all pending requests" />
+                ` : ''}
+              </th>
               <th style="min-width:180px;">Student Name</th>
               <th>CJC GSuite Email</th>
               <th>Program &amp; Year</th>
@@ -2194,7 +2300,13 @@ const OfficerApp = (() => {
       const notesHtml = req.notes ? `<div style="font-size:0.75rem;color:var(--text-tertiary);margin-top:2px;">Note: ${esc(req.notes)}</div>` : '';
 
       let actionsHtml = '';
+      let checkColHtml = '';
+
       if (req.status === 'pending') {
+        const isChecked = _selectedRequestIds.has(req.id);
+        checkColHtml = `
+          <input type="checkbox" class="of-check-input of-request-checkbox" data-id="${req.id}" data-name="${esc(displayName)}" ${isChecked ? 'checked' : ''} aria-label="Select ${esc(displayName)}" />
+        `;
         actionsHtml = `
           <button type="button" class="of-btn of-btn-primary approve-req-btn" data-id="${req.id}" data-name="${esc(displayName)}" style="padding:0.25rem 0.6rem;font-size:0.8rem;margin-right:0.35rem;">
             <iconify-icon icon="solar:check-circle-linear"></iconify-icon> Approve
@@ -2204,11 +2316,15 @@ const OfficerApp = (() => {
           </button>
         `;
       } else {
+        checkColHtml = `<span style="color:var(--text-tertiary);font-size:0.75rem;">—</span>`;
         actionsHtml = `<span style="font-size:0.78rem;color:var(--text-tertiary);">${req.reviewed_at ? 'Reviewed' : 'Completed'}</span>`;
       }
 
       html += `
-        <tr>
+        <tr class="${_selectedRequestIds.has(req.id) ? 'of-row-selected' : ''}">
+          <td class="of-col-check">
+            ${checkColHtml}
+          </td>
           <td>
             <div style="font-weight:600;color:var(--text-primary);font-size:0.86rem;">${esc(displayName)}</div>
             ${notesHtml}
@@ -2234,6 +2350,34 @@ const OfficerApp = (() => {
     `;
 
     container.innerHTML = html;
+    updateBulkBar();
+
+    // Select-all checkbox listener
+    const selectAllBox = $('of-requests-select-all');
+    if (selectAllBox) {
+      selectAllBox.addEventListener('change', () => {
+        if (selectAllBox.checked) {
+          pendingRequests.forEach(r => _selectedRequestIds.add(r.id));
+        } else {
+          _selectedRequestIds.clear();
+        }
+        renderRosterRequestsTable();
+      });
+    }
+
+    // Row checkbox listeners
+    container.querySelectorAll('.of-request-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const id = cb.dataset.id;
+        if (cb.checked) {
+          _selectedRequestIds.add(id);
+        } else {
+          _selectedRequestIds.delete(id);
+        }
+        updateBulkBar();
+        cb.closest('tr')?.classList.toggle('of-row-selected', cb.checked);
+      });
+    });
 
     // Attach approve / reject click events
     container.querySelectorAll('.approve-req-btn').forEach(btn => {

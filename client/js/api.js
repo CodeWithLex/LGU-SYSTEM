@@ -492,6 +492,51 @@ const Api = (() => {
       return data;
     },
 
+    async bulkApprove(requestIds) {
+      if (!window.supabaseClient) throw new Error('Supabase client not available');
+      if (!requestIds || requestIds.length === 0) return [];
+      const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+      // 1. Fetch request details for all selected requests
+      const { data: reqs, error: reqErr } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .select('*')
+        .in('id', requestIds);
+      if (reqErr) throw new Error(reqErr.message || 'Failed to fetch verification requests');
+      if (!reqs || reqs.length === 0) return [];
+
+      // 2. Prepare enrolled_students bulk payload
+      const studentsToInsert = reqs.map(r => ({
+        full_name: r.full_name,
+        sex: r.sex || 'M',
+        department: 'CoE',
+        course: r.course,
+        year_level: r.year_level
+      }));
+
+      try {
+        await window.supabaseClient
+          .from('enrolled_students')
+          .insert(studentsToInsert);
+      } catch (e) {
+        console.warn('[RosterRequests] Bulk student insert note:', e);
+      }
+
+      // 3. Mark all selected requests as approved
+      const { data, error: updateErr } = await window.supabaseClient
+        .from('enrollment_verification_requests')
+        .update({
+          status: 'approved',
+          reviewed_by: user?.id || null,
+          reviewed_at: new Date().toISOString()
+        })
+        .in('id', requestIds)
+        .select();
+
+      if (updateErr) throw new Error(updateErr.message);
+      return data || [];
+    },
+
     async reject(requestId, reason = '') {
       if (!window.supabaseClient) throw new Error('Supabase client not available');
       const { data: { user } } = await window.supabaseClient.auth.getUser();

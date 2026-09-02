@@ -575,11 +575,25 @@
                 </h3>
                 <p style="font-size:0.8rem; color:var(--text-secondary); margin:0.25rem 0 0;">Students who signed in with Google but were not yet listed in the S.Y. 2026–2027 masterlist</p>
               </div>
-              <div class="of-filter-tabs" id="of-requests-status-tabs">
-                <button type="button" class="of-filter-btn active" data-status="pending">Pending</button>
-                <button type="button" class="of-filter-btn" data-status="approved">Approved</button>
-                <button type="button" class="of-filter-btn" data-status="rejected">Rejected</button>
-                <button type="button" class="of-filter-btn" data-status="all">All</button>
+              <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                <!-- Bulk Action Controls -->
+                <div id="of-requests-bulk-bar" class="hidden" style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-surface-raised); border:1px solid var(--border-default); padding:0.25rem 0.65rem; border-radius:var(--radius-sm);">
+                  <span id="of-requests-selected-count" style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">0 selected</span>
+                  <button type="button" class="of-btn of-btn-primary" id="of-requests-bulk-approve-btn" style="padding:0.28rem 0.75rem; font-size:0.8rem;">
+                    <iconify-icon icon="solar:check-circle-linear"></iconify-icon>
+                    <span id="of-requests-bulk-btn-text">Approve Selected</span>
+                  </button>
+                  <button type="button" class="of-btn of-btn-ghost" id="of-requests-bulk-clear-btn" title="Deselect All" style="padding:0.28rem 0.5rem; font-size:0.78rem; color:var(--text-tertiary);">
+                    Cancel
+                  </button>
+                </div>
+
+                <div class="of-filter-tabs" id="of-requests-status-tabs">
+                  <button type="button" class="of-filter-btn active" data-status="pending">Pending</button>
+                  <button type="button" class="of-filter-btn" data-status="approved">Approved</button>
+                  <button type="button" class="of-filter-btn" data-status="rejected">Rejected</button>
+                  <button type="button" class="of-filter-btn" data-status="all">All</button>
+                </div>
               </div>
             </div>
 
