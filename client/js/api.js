@@ -132,7 +132,7 @@ const Api = (() => {
 
   // ---- Endpoints with Calibrated SWR TTLs ----
   const events = {
-    list:    ()       => _request('GET', '/events', null, false, 60000),
+    list:    ()       => _request('GET', window.IS_PUBLIC_VIEWER ? '/public/events' : '/events', null, false, 60000),
     get:     (id)     => _request('GET', `/events/${id}`, null, false, 60000),
     create:  (body)   => _request('POST', '/events', body),
     update:  (id, b)  => _request('PATCH', `/events/${id}`, b),
@@ -151,7 +151,7 @@ const Api = (() => {
   };
 
   const reports = {
-    summary:       () => _request('GET', '/reports/summary', null, false, 45000),
+    summary:       () => _request('GET', window.IS_PUBLIC_VIEWER ? '/public/summary' : '/reports/summary', null, false, 45000),
     monthly:       () => _request('GET', '/reports/monthly', null, false, 45000),
     eventsSummary: () => _request('GET', '/reports/events-summary', null, false, 45000),
   };

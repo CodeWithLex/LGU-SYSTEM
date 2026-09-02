@@ -12,6 +12,7 @@ const announcementsRouter = require("./routes/announcements");
 const adminRouter         = require("./routes/admin");
 const unitsRouter         = require("./routes/units");
 const { router: notificationsRouter } = require("./routes/notifications");
+const publicRouter        = require("./routes/public");
 const authMiddleware      = require("./middleware/auth");
 const keepAlive           = require("./lib/keepAlive");
 
@@ -150,6 +151,7 @@ app.use(express.static(path.join(__dirname, "../client")));
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+app.use("/api/public", publicRouter);
 
 // =============================================
 // Protected API Routes

@@ -512,7 +512,20 @@
       await bootApp(session);
     }
   } else {
-    UI.showScreen('auth');
+    try {
+      const publicStatus = await fetch(`${window.API_BASE || ''}/api/public/status`).then(r => r.json()).catch(() => ({ enabled: false }));
+      if (publicStatus?.enabled) {
+        window.IS_PUBLIC_VIEWER = true;
+        UI.showScreen('app');
+        UI.showView('dashboard');
+        Dashboard.load();
+        document.querySelectorAll('[data-view="admin"], [data-view="income"], [data-view="units"]').forEach(el => el.style.display = 'none');
+      } else {
+        UI.showScreen('auth');
+      }
+    } catch {
+      UI.showScreen('auth');
+    }
   }
 
   // ---- Navigation (sidebar + bottom nav) ----
