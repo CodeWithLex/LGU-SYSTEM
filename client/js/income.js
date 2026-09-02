@@ -73,7 +73,7 @@ const Income = (() => {
         document.dispatchEvent(new Event('transaction-updated'));
         
         // Use UI.js generic alert or something, or fallback to an alert
-        alert('Income added to general fund successfully!');
+        UI.toast('Income added to general fund successfully!', 'success');
       } catch (err) {
         errEl.textContent = err.message;
         errEl.classList.remove('hidden');
