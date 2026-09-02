@@ -229,7 +229,7 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md, 8px);
-  padding: 1.15rem 1.25rem;
+  padding: 1rem 1.15rem;
   transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
   position: relative;
   cursor: pointer;
@@ -242,7 +242,7 @@
 
 .of-stat:hover {
   border-color: var(--border-hover);
-  transform: translateY(-2px);
+  transform: translateY(-1.5px);
   box-shadow: var(--shadow-card-hover);
 }
 
@@ -650,7 +650,6 @@
 .of-check input[type="checkbox"]:checked {
   background: var(--primary) !important;
   border-color: var(--primary) !important;
-  box-shadow: 0 0 10px rgba(249, 115, 22, 0.35) !important;
 }
 
 .of-check input[type="checkbox"]:checked::before {
@@ -1702,9 +1701,8 @@
     width: 8px !important;
     height: 8px !important;
     border-radius: 50% !important;
-    background: #F97316 !important;
-    box-shadow: 0 0 8px #F97316, 0 0 3px #F97316 !important;
-    animation: pulseNotifBadge 2s infinite ease-in-out !important;
+    background: var(--primary) !important;
+    border: 1.5px solid var(--bg-surface, #0E1520) !important;
   }
 
   .of-bottom-nav > button.active {
