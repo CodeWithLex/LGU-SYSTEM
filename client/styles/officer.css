@@ -1608,7 +1608,9 @@
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y pinch-zoom !important;
     overscroll-behavior-y: contain;
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 10px)) !important;
+    /* Scroll clearance shared with .main-content (main.css): 58px nav + 10px
+       float gap + 18px breathing + full safe-area inset */
+    padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .of-view {
@@ -1641,7 +1643,9 @@
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
+    /* Canonical floating-tab offset shared with .bottom-nav.visible (main.css) —
+       both portals must sit at exactly the same height on mobile */
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     left: 10px !important;
     right: 10px !important;
     width: auto !important;

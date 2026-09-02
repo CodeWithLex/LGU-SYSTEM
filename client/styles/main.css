@@ -3253,7 +3253,9 @@ iconify-icon {
   body .bottom-nav.visible {
     display: flex !important;
     position: fixed !important;
-    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
+    /* Canonical floating-tab offset shared with .of-bottom-nav (officer.css) —
+       both portals must sit at exactly the same height on mobile */
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
     left: 10px !important;
     right: 10px !important;
     width: auto !important;
@@ -3429,7 +3431,10 @@ iconify-icon {
 
   /* Layout Base Adjustments */
   body #app-screen { flex-direction: column !important; }
-  body .main-content { padding-bottom: calc(76px + env(safe-area-inset-bottom, 10px)) !important; }
+  /* Scroll clearance shared with .of-main (officer.css): 58px nav + 10px float
+     gap + 18px breathing + full safe-area inset — keeps the gap above the
+     floating nav identical on both portals */
+  body .main-content { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important; }
   body .view { padding: 0 0.75rem 0 !important; }
   body .view > *:last-child,
   body .dashboard-grid:last-child { margin-bottom: 0 !important; }
@@ -3461,7 +3466,7 @@ iconify-icon {
     padding: 0.25rem 0 !important;
   }
   body .admin-panels { grid-template-columns: 1fr !important; }
-  body .toast { bottom: 85px !important; left: 0.75rem !important; right: 0.75rem !important; max-width: 100% !important; }
+  body .toast { bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important; left: 0.75rem !important; right: 0.75rem !important; max-width: 100% !important; }
 }
 
 /* =============================================
@@ -6799,11 +6804,12 @@ body .bottom-nav-more-trigger:not([aria-expanded="true"]) .nav-icon,
 }
 
 
-/* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card */
+/* Safe scroll clearance so scrolling stops cleanly right at the bottom of the card.
+   Must match .main-content above and .of-main in officer.css — one shared value. */
 @media (max-width: 768px) {
   .main-content,
   .of-main {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
