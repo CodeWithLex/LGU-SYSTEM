@@ -438,6 +438,12 @@ const OfficerApp = (() => {
     const bottomNav = $('of-bottom-nav');
     if (!bottomNav) return;
 
+    if (!bottomNav.classList.contains('nav-bar-entered')) {
+      bottomNav.addEventListener('animationend', () => {
+        bottomNav.classList.add('nav-bar-entered');
+      }, { once: true });
+    }
+
     const scrollTargets = [
       document.querySelector('.of-main'),
       window

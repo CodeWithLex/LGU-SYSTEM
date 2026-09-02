@@ -37,7 +37,17 @@ const UI = (() => {
 
     // Show bottom nav only when app is active (mobile only via CSS)
     const bottomNav = document.getElementById('bottom-nav');
-    if (bottomNav) bottomNav.classList.toggle('visible', screenId === 'app');
+    if (bottomNav) {
+      const wasVisible = bottomNav.classList.contains('visible');
+      bottomNav.classList.toggle('visible', screenId === 'app');
+      // Mark entered after the intro slide-up animation finishes once,
+      // so navBarIn never replays on subsequent showScreen calls.
+      if (!wasVisible && screenId === 'app' && !bottomNav.classList.contains('nav-bar-entered')) {
+        bottomNav.addEventListener('animationend', () => {
+          bottomNav.classList.add('nav-bar-entered');
+        }, { once: true });
+      }
+    }
   }
 
   // Shape the boot splash skeleton to match the view being loaded, so a
@@ -273,6 +283,20 @@ const UI = (() => {
       return;
     }
 
+    // Trigger the icon spring pop immediately on the newly active item for instant tactile response
+    if (!previewTarget && !firstPlacement && !reduceMotion) {
+      const activeItem = target;
+      const icon = activeItem && (activeItem.querySelector('.nav-icon') || activeItem.querySelector('iconify-icon'));
+      if (icon) {
+        icon.classList.remove('nav-icon-pop');
+        void icon.offsetWidth; // Force reflow to restart animation reliably
+        icon.classList.add('nav-icon-pop');
+        icon.addEventListener('animationend', () => {
+          icon.classList.remove('nav-icon-pop');
+        }, { once: true });
+      }
+    }
+
     const from = currentIndicatorPosition(indicator);
     if (Math.abs(from.left - toLeft) < 0.5 && Math.abs(from.width - toWidth) < 0.5) return;
 
@@ -290,14 +314,14 @@ const UI = (() => {
           easing: 'cubic-bezier(0.35, 0, 0.25, 1)'
         },
         {
-          transform: `translateX(${spanLeft}px) scaleY(0.85)`,
+          transform: `translateX(${spanLeft}px) scaleY(0.82)`,
           width: `${spanRight - spanLeft}px`,
-          offset: 0.45,
-          easing: 'cubic-bezier(0.35, 0, 0.3, 1.12)'
+          offset: 0.42,
+          easing: 'cubic-bezier(0.2, 0, 0.2, 1.2)'
         },
         { transform: `translateX(${toLeft}px) scaleY(1)`, width: `${toWidth}px` }
       ],
-      { duration: 600, fill: 'both' }
+      { duration: 460, fill: 'both' }
     );
     glide.onfinish = () => {
       placeIndicatorAt(indicator, toLeft, toWidth);
