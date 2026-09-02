@@ -48,15 +48,25 @@ const Auth = (() => {
     if (!session || !window.supabaseClient) return null;
 
     try {
-      const { data } = await window.supabaseClient
+      const { data, error } = await window.supabaseClient
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .maybeSingle();
-      return data;
+      if (!error && data) {
+        try { localStorage.setItem('cached_profile_' + session.user.id, JSON.stringify(data)); } catch {}
+        return data;
+      }
     } catch {
-      return null;
+      /* offline or network error */
     }
+
+    try {
+      const cached = localStorage.getItem('cached_profile_' + session.user.id);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+
+    return null;
   }
 
   async function loginWithGoogle() {

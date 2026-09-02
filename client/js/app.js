@@ -528,6 +528,16 @@
     }
   }
 
+  // ---- Offline banner listeners ----
+  window.addEventListener('offline', () => {
+    const b = document.getElementById('offline-banner');
+    if (b) b.classList.remove('hidden');
+  });
+  window.addEventListener('online', () => {
+    const b = document.getElementById('offline-banner');
+    if (b) b.classList.add('hidden');
+  });
+
   // ---- Navigation (sidebar + bottom nav) ----
   function navigateTo(view) {
     UI.showView(view);
@@ -701,12 +711,16 @@
       splash.classList.remove('hidden');
     }
 
+    const isOffline = (navigator.onLine === false);
     const profile = await Auth.getProfile();
     const roleKey = profile?.role || 'student';
     const officerRole = ['admin', 'governor', 'cashier', 'officer'].includes(roleKey);
 
+    const offlineBanner = document.getElementById('offline-banner');
+    if (offlineBanner) offlineBanner.classList.toggle('hidden', !isOffline);
+
     // ---- Strict Student Masterlist & Verification Gate ----
-    if (!officerRole) {
+    if (!officerRole && !isOffline) {
       // 1. Check if student is found in the official enrolled masterlist
       let rosterMatch = null;
       if (window.Roster && window.Roster.findStudentAsync) {
