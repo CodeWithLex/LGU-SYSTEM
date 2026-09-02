@@ -415,9 +415,9 @@
           <div class="filter-bar" style="display:flex;gap:0.5rem;align-items:center;">
             <div style="position:relative;display:flex;align-items:center;">
               <iconify-icon icon="solar:magnifer-linear" style="position:absolute; left:0.75rem; font-size:15px; color:var(--col-text-muted)" ></iconify-icon>
-              <input type="text" id="events-search" placeholder="Search events…" style="padding:0.55rem 1rem 0.55rem 2.25rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;width:200px;" />
+              <input type="text" id="events-search" placeholder="Search events…" aria-label="Search events" style="padding:0.55rem 1rem 0.55rem 2.25rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;width:200px;" />
             </div>
-            <select id="events-sort" style="padding:0.55rem 1rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;">
+            <select id="events-sort" aria-label="Sort events" style="padding:0.55rem 1rem;background:var(--col-card);border:1px solid var(--col-border);border-radius:var(--radius-sm);color:var(--col-text);font-size:0.87rem;">
               <option value="newest">Newest First</option>
               <option value="date-asc">Date (Soonest)</option>
               <option value="name-asc">Name (A-Z)</option>
@@ -456,17 +456,17 @@
           </div>
           <div class="filter-bar tx-filter-bar">
             <div class="search-input-wrapper">
-              <input type="text" id="tx-search" placeholder="Search transactions..." />
+              <input type="text" id="tx-search" placeholder="Search transactions..." aria-label="Search transactions" />
               <iconify-icon icon="solar:magnifer-linear"></iconify-icon>
             </div>
-            <select id="filter-type">
+            <select id="filter-type" aria-label="Filter by transaction type">
               <option value="all">All Types</option>
               <option value="expense">Expenses</option>
               <option value="donation">Donations</option>
               <option value="collection">Collections</option>
               <option value="allocation">Allocations</option>
             </select>
-            <select id="filter-event">
+            <select id="filter-event" aria-label="Filter by event">
               <option value="all">All Events</option>
             </select>
           </div>
