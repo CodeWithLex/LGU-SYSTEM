@@ -390,8 +390,8 @@
 /* ---------- Charts & Dashboard Grids ---------- */
 .of-chart-box {
   position: relative;
-  height: 280px;
-  min-height: 280px;
+  height: 300px;
+  min-height: 300px;
 }
 
 .dashboard-grid {
@@ -1602,7 +1602,7 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 10px)) !important;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .of-view {
@@ -1635,47 +1635,51 @@
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: max(10px, env(safe-area-inset-bottom, 10px)) !important;
-    left: 10px !important;
-    right: 10px !important;
-    width: auto !important;
-    max-width: 440px !important;
-    margin: 0 auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     z-index: 1000 !important;
     box-sizing: border-box !important;
     
-    background: rgba(17, 24, 32, 0.88) !important;
+    background: rgba(15, 23, 42, 0.96) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 30px !important;
-    padding: 5px 4px !important;
+    border-top: 1px solid var(--border-default) !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+    padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px)) 12px !important;
     justify-content: space-around !important;
     align-items: center !important;
     gap: 2px !important;
     
     box-shadow: 
-      0 12px 36px -4px rgba(0, 0, 0, 0.5),
-      0 4px 14px rgba(0, 0, 0, 0.25),
-      inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+      0 -4px 20px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
     overflow: visible !important;
     transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, background 0.2s ease !important;
     will-change: transform, opacity !important;
   }
 
   .of-bottom-nav.nav-hidden {
-    transform: translateY(calc(100% + 35px + env(safe-area-inset-bottom, 0px))) !important;
+    transform: translateY(100%) !important;
     opacity: 0 !important;
     pointer-events: none !important;
   }
 
   [data-theme="light"] .of-bottom-nav {
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
     box-shadow: 
-      0 12px 36px -4px rgba(0, 0, 0, 0.12),
-      0 4px 12px rgba(0, 0, 0, 0.06),
-      inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+      0 -4px 20px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
   }
 
   .of-bottom-nav > button,
@@ -1881,8 +1885,8 @@
     padding: 1rem;
   }
   .of-chart-box {
-    height: 290px !important;
-    min-height: 290px !important;
+    height: 300px !important;
+    min-height: 300px !important;
   }
   /* The 290px event-card track overflows 320px screens — force single column */
   .of-events-grid {
