@@ -1154,12 +1154,16 @@
   /* Compact Clean Ambient Chip Bar on Mobile */
   .grizz-dashboard-bar,
   .ursa-dashboard-widget {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.28rem 0.55rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+    padding: 0.4rem 0.65rem;
     margin-bottom: 0.85rem;
-    min-height: 36px;
+    min-height: auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
@@ -1168,6 +1172,9 @@
   .ursa-dash-left {
     padding: 0;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
   }
 
   .grizz-bar-divider {
@@ -1177,9 +1184,14 @@
   .grizz-chips-track,
   .ursa-dash-chips {
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     display: flex;
     gap: 0.45rem;
     padding-bottom: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
     mask-image: linear-gradient(to right, black 88%, transparent 100%);
     -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);
   }
