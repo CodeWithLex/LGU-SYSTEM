@@ -124,7 +124,7 @@ const Admin = (() => {
     const el = document.getElementById('ev-avail-bal');
     if (!el) return;
     try {
-      const summary = await Api.reports.getSummary();
+      const summary = await Api.reports.summary();
       const rem = summary.remainingBalance || 0;
       el.textContent = UI.currency(rem);
       el.dataset.availBal = rem;
@@ -315,7 +315,7 @@ const Admin = (() => {
         } else {
           // Fetch dashboard balance
           try {
-            const summary = await Api.reports.getSummary();
+            const summary = await Api.reports.summary();
             const rem = summary.remainingBalance || 0;
             balInd.textContent = `(Available General Fund: ${UI.currency(rem)})`;
             balInd.dataset.maxAmount = rem;
