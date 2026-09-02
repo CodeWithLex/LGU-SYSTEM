@@ -275,9 +275,14 @@ const Units = (() => {
     const batchBar = `
       <div class="units-batch-bar ${batchMode && selectedBatchSubjectIds.size > 0 ? 'visible' : ''}" id="units-batch-bar">
         <div class="units-batch-bar-inner">
-          <div class="units-batch-info">
-            <span class="units-batch-badge">${selectedBatchSubjectIds.size}</span>
-            <span class="units-batch-text">selected</span>
+          <div class="units-batch-header">
+            <div class="units-batch-info">
+              <span class="units-batch-badge">${selectedBatchSubjectIds.size}</span>
+              <span class="units-batch-text">selected</span>
+            </div>
+            <button type="button" class="units-batch-cancel-btn" data-batch-action="cancel" title="Cancel selection">
+              <iconify-icon icon="solar:close-circle-linear"></iconify-icon> Cancel
+            </button>
           </div>
           <div class="units-batch-actions">
             <button type="button" class="btn btn-primary units-batch-btn" data-batch-action="pass" ${selectedBatchSubjectIds.size === 0 ? 'disabled' : ''}>
@@ -285,9 +290,6 @@ const Units = (() => {
             </button>
             <button type="button" class="btn btn-ghost units-batch-btn" data-batch-action="enroll" ${selectedBatchSubjectIds.size === 0 ? 'disabled' : ''}>
               <iconify-icon icon="solar:calendar-date-linear"></iconify-icon> Mark Enrolled (${selectedBatchSubjectIds.size})
-            </button>
-            <button type="button" class="btn btn-ghost units-batch-btn--cancel" data-batch-action="cancel">
-              Cancel
             </button>
           </div>
         </div>
