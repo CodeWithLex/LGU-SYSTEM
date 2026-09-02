@@ -6,10 +6,13 @@ const Income = (() => {
 
   async function load() {
     try {
-      // Fetch transactions (shares SWR cache with Transactions view)
-      const txs = await Api.transactions.list({ limit: 200 });
-      // Filter out only incomes
-      const incomes = txs.filter(t => ['donation', 'collection', 'allocation'].includes(t.type));
+      // Query income types directly from server with pagination support
+      const res = await Api.transactions.list({
+        type: 'donation,collection,allocation',
+        page: 1,
+        limit: 100
+      });
+      const incomes = Array.isArray(res) ? res : (res.data || []);
       renderTable(incomes);
     } catch (err) {
       document.getElementById('income-table-body').innerHTML = 
