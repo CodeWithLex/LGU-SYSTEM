@@ -4136,7 +4136,7 @@ html body.is-admin th.admin-only {
 
 .unit-row {
   display: grid;
-  grid-template-columns: 88px 1fr 115px 96px;
+  grid-template-columns: 88px 1fr 115px 104px;
   align-items: center;
   min-height: 48px;
   gap: 0.85rem;
@@ -4146,7 +4146,7 @@ html body.is-admin th.admin-only {
   transition: background var(--transition);
 }
 .unit-row.has-batch-check {
-  grid-template-columns: 24px 88px 1fr 115px 96px;
+  grid-template-columns: 24px 88px 1fr 115px 104px;
   gap: 0.75rem;
 }
 .unit-row--selected {
@@ -4244,62 +4244,114 @@ html body.is-admin th.admin-only {
 .unit-badge--none       { color: var(--text-tertiary); font-weight: 400; }
 
 .unit-actions {
-  display: grid;
-  grid-template-columns: 28px 28px 28px;
-  gap: 4px;
-  justify-content: end;
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
-  width: 96px;
-  min-width: 96px;
+  width: 104px;
+  min-width: 104px;
+}
+
+.unit-action-group {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.unit-row:hover .unit-action-group {
+  border-color: var(--border-hover);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .unit-action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: calc(var(--radius-sm) - 2px);
   color: var(--text-tertiary);
   font-size: 0.92rem;
   cursor: pointer;
-  transition: all var(--transition);
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
 }
+
 .unit-row:hover .unit-action-btn {
   color: var(--text-secondary);
 }
+
 .unit-action-btn:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
   border-color: var(--border-default);
 }
+
 .unit-action-btn--pass:hover {
-  color: var(--status-positive);
-  border-color: rgba(34, 197, 94, 0.35);
-  background: rgba(34, 197, 94, 0.08);
-}
-.unit-action-btn--del:hover {
-  color: var(--status-negative);
-  border-color: rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.08);
+  color: #22C55E !important;
+  border-color: rgba(34, 197, 94, 0.35) !important;
+  background: rgba(34, 197, 94, 0.12) !important;
 }
 
-.unit-action-placeholder {
-  width: 28px;
-  height: 28px;
-  display: inline-block;
-  pointer-events: none;
+.unit-action-btn--edit:hover {
+  color: var(--accent) !important;
+  border-color: rgba(255, 94, 20, 0.35) !important;
+  background: var(--accent-muted) !important;
+}
+
+.unit-action-btn--del:hover {
+  color: #EF4444 !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  background: rgba(239, 68, 68, 0.12) !important;
 }
 
 .unit-log-btn {
-  grid-column: 1 / -1;
-  justify-self: end;
-  width: 64px;
-  padding: 0.25rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.75rem;
+  font-family: var(--font-ui);
   font-size: 0.76rem;
-  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.unit-log-btn iconify-icon {
+  font-size: 0.88rem;
+  color: var(--text-tertiary);
+  transition: color var(--transition);
+}
+
+.unit-row:hover .unit-log-btn {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.unit-log-btn:hover {
+  background: var(--accent-muted) !important;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 2px 8px rgba(255, 94, 20, 0.2);
+}
+
+.unit-log-btn:hover iconify-icon {
+  color: var(--accent);
 }
 
 /* ---- Floating Batch Action Bar (Multi-Select Mode) ---- */
