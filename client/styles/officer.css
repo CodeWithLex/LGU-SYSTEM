@@ -1656,7 +1656,11 @@ html, body {
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    /* Floating-tab offset shared with .bottom-nav.visible (main.css) — both
+       portals identical. max() parks the pill directly on top of the iPhone
+       home-indicator zone in the standalone PWA (no extra gap below it) and
+       keeps the plain 10px float in browsers where the inset is 0 */
+    bottom: max(env(safe-area-inset-bottom, 0px), 10px) !important;
     left: 10px !important;
     right: 10px !important;
     width: auto !important;

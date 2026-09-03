@@ -252,15 +252,37 @@ const UI = (() => {
     if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0F14' : '#F8FAFC');
   }
 
+  // iOS standalone PWA quirk (iPhone home-indicator devices): the first layout
+  // can be computed against a stale viewport height, leaving a phantom gap at
+  // the very bottom of the screen until the user interacts. Nudge WebKit to
+  // re-measure shortly after launch and whenever the app becomes visible again.
+  function kickViewportRelayout() {
+    const body = document.body;
+    if (!body) return;
+    body.style.setProperty('min-height', 'calc(100dvh + 1px)', 'important');
+    // setTimeout instead of rAF: rAF is suspended in occluded tabs, and this
+    // must also run when the PWA window is restored from the background
+    setTimeout(() => {
+      body.style.removeProperty('min-height');
+      window.dispatchEvent(new Event('resize'));
+    }, 30);
+  }
+
   // Auto-bind scroll on DOM ready
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initAutoHideBottomNav);
       document.addEventListener('DOMContentLoaded', initNavIndicators);
+      document.addEventListener('DOMContentLoaded', () => setTimeout(kickViewportRelayout, 350));
     } else {
       setTimeout(initAutoHideBottomNav, 100);
       setTimeout(initNavIndicators, 100);
+      setTimeout(kickViewportRelayout, 350);
     }
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) setTimeout(kickViewportRelayout, 150);
+    });
+    window.addEventListener('pageshow', e => { if (e.persisted) kickViewportRelayout(); });
   }
 
   return { showView, showScreen, setSplashView, toast, currency, dateStr, capitalize, renderStatusBadge, setAdminVisibility, setOfficerVisibility, setLoading, setEmpty, syncThemeColor, initAutoHideBottomNav, moveNavIndicator, initNavIndicators };
