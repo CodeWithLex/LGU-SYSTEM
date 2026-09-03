@@ -511,7 +511,10 @@
   });
 
   // ---- Boot on existing session ----
-  const session = await Auth.getSession();
+  // validateSession() (not plain getSession()) drops localStorage sessions whose
+  // token the server no longer accepts — those are what produce the recurring
+  // JwtSignatureError noise in the Supabase realtime logs.
+  const session = await (Auth.validateSession ? Auth.validateSession() : Auth.getSession());
   if (session) {
     if (_bootedUserId !== session.user.id) {
       _bootedUserId = session.user.id;

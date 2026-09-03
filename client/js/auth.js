@@ -43,6 +43,45 @@ const Auth = (() => {
     }
   }
 
+  // Validates the stored session against GoTrue. A session restored from
+  // localStorage can carry a token that no longer verifies (e.g. signed with a
+  // pre-rotation JWT secret) — the app still works because data flows through
+  // the backend with the service key, but every realtime join it attempts then
+  // fails with JwtSignatureError on the Supabase logs. Purge such sessions so
+  // the user re-authenticates with a fresh token.
+  async function validateSession() {
+    const session = await getSession();
+    if (!session || !window.supabaseClient?.auth) return null;
+
+    try {
+      const { error } = await window.supabaseClient.auth.getUser();
+      if (!error) return session;
+
+      // 401/403 = GoTrue definitively rejected the token. Anything else
+      // (offline, timeout, 5xx) must NOT log the user out.
+      if (error.status === 401 || error.status === 403) {
+        console.warn('[Auth] Stored session token was rejected by the server — clearing it. Please sign in again.');
+        try { await window.supabaseClient.auth.signOut({ scope: 'local' }); } catch {}
+        // Belt and braces: guarantee the rejected token is gone even when the
+        // signOut network call itself fails with the same 401.
+        try {
+          Object.keys(localStorage)
+            .filter((k) => k.startsWith('sb-') && k.endsWith('-auth-token'))
+            .forEach((k) => localStorage.removeItem(k));
+        } catch {}
+        try { window.supabaseClient.realtime?.setAuth?.(window.SUPABASE_ANON); } catch {}
+        return null;
+      }
+
+      console.debug('[Auth] Session validation skipped (non-rejection error):', error.message);
+      return session;
+    } catch (err) {
+      // Network-level failure — keep the session, offline usage must survive.
+      console.debug('[Auth] Session validation unreachable:', err?.message);
+      return session;
+    }
+  }
+
   async function getProfile() {
     const session = await getSession();
     if (!session || !window.supabaseClient) return null;
@@ -180,7 +219,7 @@ const Auth = (() => {
     });
   }
 
-  return { login, loginWithGoogle, register, logout, getSession, getProfile, updateProfile, updatePassword, onAuthChange };
+  return { login, loginWithGoogle, register, logout, getSession, validateSession, getProfile, updateProfile, updatePassword, onAuthChange };
 })();
 
 
