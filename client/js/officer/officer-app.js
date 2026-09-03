@@ -214,7 +214,10 @@ const OfficerApp = (() => {
       }
     });
 
-    $('of-shell').classList.remove('hidden');
+    document.body.classList.remove('more-sheet-open');
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
+    $('of-shell')?.classList.remove('hidden');
     $('of-bottom-nav')?.classList.remove('hidden');
 
     try {
@@ -430,6 +433,12 @@ const OfficerApp = (() => {
           if (el.dataset.of) {
             switchSection(el.dataset.of);
           }
+        });
+      });
+
+      sheet.querySelectorAll('a.mobile-sheet-row, a[href]').forEach(a => {
+        a.addEventListener('click', () => {
+          closeSheet();
         });
       });
     }

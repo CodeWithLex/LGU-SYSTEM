@@ -3,16 +3,28 @@
    Directly inherits and extends main.css tokens
    ============================================= */
 
-/* Shell Layout — fixed viewport like the main system:
-   only .of-main scrolls; sidebar and section titles stay put */
+/* Complete layout isolation from main.css */
+html, body {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Shell Layout — fixed viewport filling the real screen without iOS dvh clipping */
 .of-shell {
   display: flex;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
   background: var(--bg-base);
   color: var(--text-primary);
-  width: 100%;
+  z-index: 1;
 }
 
 /* Sidebar overrides & refinements */
@@ -1498,13 +1510,15 @@
 
 @media (max-width: 900px) {
   .of-shell {
-    flex-direction: column !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-    max-height: 100dvh !important;
-    overflow: hidden !important;
+    position: fixed !important;
+    inset: 0 !important;
     width: 100% !important;
-    position: relative !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    z-index: 1 !important;
   }
   .of-sidebar {
     display: none !important;
@@ -1608,9 +1622,8 @@
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-y pinch-zoom !important;
     overscroll-behavior-y: contain;
-    /* Scroll clearance shared with .main-content (main.css): 58px nav + 10px
-       float gap + 18px breathing + full safe-area inset */
-    padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
+    /* Clean scroll clearance: 58px floating nav + 12px float gap + safe-area inset */
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 14px)) !important;
   }
 
   .of-view {
@@ -1643,11 +1656,9 @@
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    /* Canonical floating-tab offset shared with .bottom-nav.visible (main.css) —
-       both portals must sit at exactly the same height on mobile */
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
-    left: 10px !important;
-    right: 10px !important;
+    bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+    left: 12px !important;
+    right: 12px !important;
     width: auto !important;
     max-width: 480px !important;
     margin: 0 auto !important;
@@ -1796,10 +1807,27 @@
 
   .of-form-row {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
   .of-filter-bar {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  /* Executive More Button Micro-interaction */
+  #of-bottom-nav-more-btn {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, color 0.2s ease !important;
+  }
+  #of-bottom-nav-more-btn:active {
+    transform: scale(0.88) !important;
+  }
+  #of-bottom-nav-more-btn[aria-expanded="true"] iconify-icon {
+    transform: rotate(90deg) scale(1.12) !important;
+    color: var(--primary) !important;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease !important;
+  }
+  #of-bottom-nav-more-btn:not([aria-expanded="true"]) iconify-icon {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
   }
 }
 
@@ -1888,7 +1916,23 @@
     font-size: 1.3rem;
   }
   .of-card {
-    padding: 1rem;
+    padding: 1rem !important;
+  }
+  .of-field {
+    margin-bottom: 0.75rem !important;
+  }
+  .of-field label {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .of-field input,
+  .of-field select,
+  .of-field textarea {
+    padding: 0.65rem 0.85rem !important;
+  }
+  .of-record-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
   }
   .of-chart-box {
     height: 300px !important;

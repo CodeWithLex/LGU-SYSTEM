@@ -685,6 +685,12 @@
           }
         });
       });
+
+      sheet.querySelectorAll('a.mobile-sheet-row, a[href]').forEach(a => {
+        a.addEventListener('click', () => {
+          closeSheet();
+        });
+      });
     }
   }
   bindMobileMoreSheet();
