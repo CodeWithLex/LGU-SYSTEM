@@ -90,8 +90,12 @@ const GrizzAI = (() => {
       });
     });
 
-    // Keyboard support for cards (Enter / Space)
+    // Keyboard support: Escape closes drawer, Enter / Space activates cards
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        close();
+        return;
+      }
       if (e.key === 'Enter' || e.key === ' ') {
         const promptCard = document.activeElement?.closest('.ursa-prompt-card');
         if (promptCard && promptCard.dataset.action) {
@@ -273,8 +277,19 @@ const GrizzAI = (() => {
     isOpen = true;
     const drawer = document.getElementById('ursa-drawer');
     const overlay = document.getElementById('ursa-overlay');
+    const bottomNav = document.querySelector('.bottom-nav') || document.querySelector('.of-bottom-nav');
+
+    // Dismiss mobile more sheet if currently open
+    const moreClose = document.getElementById('mobile-sheet-close-btn') || document.getElementById('of-mobile-sheet-close-btn');
+    const moreSheet = document.getElementById('mobile-more-sheet') || document.getElementById('of-mobile-more-sheet');
+    if (moreClose && moreSheet && !moreSheet.classList.contains('hidden')) {
+      moreClose.click();
+    }
+
     if (drawer) drawer.classList.add('active');
     if (overlay) overlay.classList.add('active');
+    document.body.classList.add('ursa-open');
+    if (bottomNav) bottomNav.classList.add('nav-hidden');
 
     // Preload student profile & academic records
     await loadData();
@@ -285,8 +300,11 @@ const GrizzAI = (() => {
     isOpen = false;
     const drawer = document.getElementById('ursa-drawer');
     const overlay = document.getElementById('ursa-overlay');
+    const bottomNav = document.querySelector('.bottom-nav') || document.querySelector('.of-bottom-nav');
     if (drawer) drawer.classList.remove('active');
     if (overlay) overlay.classList.remove('active');
+    document.body.classList.remove('ursa-open');
+    if (bottomNav) bottomNav.classList.remove('nav-hidden');
   }
 
   // ---- Data Loader ----

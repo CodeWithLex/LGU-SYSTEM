@@ -469,6 +469,12 @@ const OfficerApp = (() => {
         window.requestAnimationFrame(() => {
           const diff = currentScrollTop - lastScrollTop;
 
+          // Do not reveal bottom nav if Grizz AI assistant or mobile more drawer is open
+          if (document.body.classList.contains('ursa-open') || document.body.classList.contains('more-sheet-open')) {
+            ticking = false;
+            return;
+          }
+
           if (currentScrollTop <= 25 || isAtBottom) {
             // At the top OR reached the bottom -> Always reveal floating bottom nav!
             bottomNav.classList.remove('nav-hidden');

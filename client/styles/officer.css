@@ -1684,10 +1684,13 @@ html, body {
     will-change: transform, opacity !important;
   }
 
-  .of-bottom-nav.nav-hidden {
-    transform: translateY(calc(100% + 35px + env(safe-area-inset-bottom, 0px))) !important;
+  .of-bottom-nav.nav-hidden,
+  body.ursa-open .of-bottom-nav,
+  body:has(#ursa-drawer.active) .of-bottom-nav {
+    transform: translateY(calc(100% + 40px + env(safe-area-inset-bottom, 0px))) !important;
     opacity: 0 !important;
     pointer-events: none !important;
+    visibility: hidden !important;
   }
 
   [data-theme="light"] .of-bottom-nav {
