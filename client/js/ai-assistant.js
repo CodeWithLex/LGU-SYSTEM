@@ -605,6 +605,7 @@ const GrizzAI = (() => {
 
     // Late Night: 10:00 PM - 11:59 PM
     const lateGreetings = [
+      'Gabie nmn diay, ting relapse?',
       `It's late already, engineer, you need to rest`,
       `It's late already, ${displayName}, you need to rest`,
       `It's late already, ${displayName}. Time to commit your work and get some sleep.`,
@@ -630,7 +631,8 @@ const GrizzAI = (() => {
       `Maayong kadlawon! Please remember: ang 2 AM confidence dili parehas sa 8 AM confidence.`,
       `${displayName}, kadlawn na. Even the calculator wants you to sleep.`,
       `12 AM na. Time to compute your remaining brain cells.`,
-      `Maayong kadlawon! Deadline tomorrow? Ah, so technically today. 😭`
+      'Hohhh, try lng natin, if it doesnt work, at least we tried.',
+      `Maayong kadlawon! Deadline tomorrow? Ah, so technically today.`
     ];
 
     let list;
