@@ -447,10 +447,10 @@ html body .hidden {
   display: none !important;
 }
 .screen {
-  display: none;
+  display: none !important;
 }
 .screen.active {
-  display: flex;
+  display: flex !important;
 }
 
 /* ---- Flat Surface Layout (replaces glassmorphism) ---- */
@@ -823,9 +823,13 @@ html body .hidden {
   margin-bottom: 1rem;
 }
 
-/* ---- Responsive: mobile collapses to single column ---- */
+/* ---- Responsive: mobile collapses to single column with 50/50 picture & form ---- */
 @media (max-width: 768px) {
-  #auth-screen {
+  #auth-screen:not(.active) {
+    display: none !important;
+  }
+  #auth-screen.active {
+    display: flex !important;
     flex-direction: column;
     height: auto;
     min-height: 100vh;
@@ -833,23 +837,40 @@ html body .hidden {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    display: flex;
     background-color: var(--bg-base);
   }
 
+  /* Top 50%: Hero Branding with Full Picture Artwork */
   .auth-brand-panel {
     border-right: none;
     border-bottom: 1px solid var(--border-default);
-    height: auto;
-    min-height: 160px;
-    flex: 0 0 auto;
+    flex: 0 0 48vh;
+    flex: 0 0 48dvh;
+    height: 48vh;
+    height: 48dvh;
+    min-height: 290px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: calc(1.5rem + env(safe-area-inset-top, 0px)) 1.25rem 1.25rem;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    background-color: #0D0E10;
+  }
+  .auth-brand-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('../assets/bg-pattern-front.png');
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    opacity: 0.95;
   }
   .auth-brand-content {
+    position: relative;
+    z-index: 2;
     padding: 0;
     gap: 0.75rem;
     align-items: center;
@@ -858,11 +879,11 @@ html body .hidden {
     width: 100%;
   }
   .auth-brand-logo-img {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
   }
   .auth-identity h1 {
-    font-size: clamp(1.15rem, 4.5vw, 1.45rem);
+    font-size: clamp(1.2rem, 5vw, 1.55rem);
     white-space: normal;
     word-break: break-word;
     line-height: 1.2;
@@ -870,23 +891,28 @@ html body .hidden {
     letter-spacing: 0.02em;
   }
   .auth-subtitle {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     margin-top: 0.35rem;
     letter-spacing: 0.08em;
     text-align: center;
   }
   .auth-brand-desc {
+    display: block !important;
     font-size: 0.8rem;
     line-height: 1.45;
     text-align: center;
     opacity: 0.88;
     margin: 0;
+    max-width: 330px;
   }
 
+  /* Bottom 50%: Form Panel */
   .auth-form-panel {
     flex: 1 1 auto;
     width: 100%;
     max-width: 100%;
+    min-height: 52vh;
+    min-height: 52dvh;
     margin: 0;
     padding: 2rem 1.25rem calc(1.75rem + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
@@ -894,7 +920,6 @@ html body .hidden {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    min-height: 0;
   }
 
   .auth-form-container {
@@ -931,60 +956,67 @@ html body .hidden {
 
 @media (max-width: 480px) {
   .auth-brand-panel {
+    flex: 0 0 46vh;
+    flex: 0 0 46dvh;
+    height: 46vh;
+    height: 46dvh;
+    min-height: 270px;
     padding: calc(1.2rem + env(safe-area-inset-top, 0px)) 1rem 1rem;
-    min-height: 140px;
   }
   .auth-brand-logo-img {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
   }
   .auth-brand-content {
-    gap: 0.45rem;
+    gap: 0.5rem;
   }
   .auth-brand-desc {
-    display: none; /* Hide marketing sentence on small phones to keep Google login and credentials visible */
+    display: block !important;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    max-width: 300px;
   }
   .auth-form-panel {
     padding: 1.75rem 1.15rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
   }
   .auth-form-header {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.15rem;
   }
   .auth-form-header h2 {
-    font-size: 1.4rem !important;
+    font-size: 1.35rem !important;
     letter-spacing: -0.02em !important;
   }
   .auth-form-header p {
-    font-size: 0.82rem !important;
-    margin-top: 0.35rem !important;
+    font-size: 0.8rem !important;
+    margin-top: 0.3rem !important;
   }
   .btn-google {
-    font-size: 0.88rem !important;
+    font-size: 0.86rem !important;
     padding: 0.75rem 1rem !important;
-    min-height: 48px !important;
+    min-height: 46px !important;
     border-radius: 10px !important;
   }
   .auth-divider {
-    margin: 1.15rem 0 !important;
+    margin: 1.1rem 0 !important;
   }
   .auth-form-panel .form-group {
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.95rem !important;
   }
   .auth-form-panel .form-group label {
     font-size: 0.72rem !important;
     letter-spacing: 0.04em !important;
     text-transform: uppercase !important;
     font-weight: 700 !important;
-    margin-bottom: 0.4rem !important;
+    margin-bottom: 0.35rem !important;
   }
   .auth-form-panel .form-group input {
     font-size: 16px !important;
-    min-height: 48px !important;
+    min-height: 46px !important;
     border-radius: 10px !important;
     padding: 0.75rem 1rem !important;
   }
   .auth-password-notice {
-    font-size: 0.75rem !important;
+    font-size: 0.74rem !important;
     line-height: 1.45 !important;
     padding: 0.5rem 0.65rem !important;
     border-radius: 8px !important;
@@ -992,11 +1024,11 @@ html body .hidden {
     border: 1px solid rgba(255, 94, 20, 0.2) !important;
   }
   .btn-primary.btn-full {
-    min-height: 48px !important;
-    font-size: 1rem !important;
+    min-height: 46px !important;
+    font-size: 0.98rem !important;
     font-weight: 700 !important;
     border-radius: 10px !important;
-    margin-top: 1.15rem !important;
+    margin-top: 1.1rem !important;
   }
 }
 
