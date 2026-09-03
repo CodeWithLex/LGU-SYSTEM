@@ -169,6 +169,13 @@ const Auth = (() => {
     window.supabaseClient.auth.onAuthStateChange((event, session) => {
       // Expose token globally so reports downloads can authenticate
       window._authToken = session?.access_token || null;
+      if (event === 'SIGNED_OUT' || !session) {
+        try {
+          if (window.supabaseClient?.realtime && typeof window.supabaseClient.realtime.setAuth === 'function' && window.SUPABASE_ANON) {
+            window.supabaseClient.realtime.setAuth(window.SUPABASE_ANON);
+          }
+        } catch {}
+      }
       callback(event, session);
     });
   }

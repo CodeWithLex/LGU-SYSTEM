@@ -35,8 +35,20 @@ export const PROFILE = {
   created_at: '2025-06-01T00:00:00Z',
 };
 
+// Valid structural mock JWT (header.payload.signature) to prevent Supabase Realtime MalformedJWT errors
+const MOCK_JWT_HEADER = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+const MOCK_JWT_PAYLOAD = Buffer.from(JSON.stringify({
+  iss: 'supabase',
+  ref: 'hchkfunaofyoualrdnkk',
+  role: 'authenticated',
+  userId: USER.id,
+  exp: 2094081683
+})).toString('base64url');
+const MOCK_JWT_SIGNATURE = 'mock_signature_for_local_testing_only';
+export const MOCK_JWT = `${MOCK_JWT_HEADER}.${MOCK_JWT_PAYLOAD}.${MOCK_JWT_SIGNATURE}`;
+
 export const session = () => ({
-  access_token: 'mock-access-token',
+  access_token: MOCK_JWT,
   token_type: 'bearer',
   expires_in: 60 * 60 * 24 * 30,
   expires_at: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30,
@@ -179,6 +191,9 @@ export async function routeMocks(page, receipt, { verbose = false } = {}) {
 
   // Block the service worker so it can't serve cached shells
   await page.route(/\/sw\.js(\?.*)?$/, r => r.fulfill({ status: 404, body: '' }));
+
+  // Abort Realtime websocket requests so mock tests never hit the live Supabase realtime cluster
+  await page.route(/supabase\.co\/realtime\/v1\/websocket/, r => r.abort());
 
   // Supabase auth
   await page.route(/supabase\.co\/auth\/v1\/token/, r => { hit('auth/token'); reply(r, json(session())); });

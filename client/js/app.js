@@ -504,6 +504,9 @@
       try { sessionStorage.removeItem('lastView'); } catch { /* storage unavailable */ }
       UI.showScreen('auth');
       Dashboard.destroy();
+      if (typeof Notifications !== 'undefined' && Notifications.destroy) {
+        Notifications.destroy();
+      }
     }
   });
 
@@ -844,6 +847,10 @@
       GrizzAI.init();
     } else if (window.UrsaAI) {
       UrsaAI.init();
+    }
+
+    if (typeof Notifications !== 'undefined' && Notifications.init) {
+      Notifications.init();
     }
 
     // Return the user to the view they were last on instead of resetting to

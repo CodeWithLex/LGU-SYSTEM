@@ -289,7 +289,19 @@ const Dashboard = (() => {
     }
   }
 
-  function subscribeRealtime() {
+  async function subscribeRealtime() {
+    if (!window.supabaseClient || typeof window.supabaseClient.channel !== 'function') return;
+
+    try {
+      const { data: { session } } = await window.supabaseClient.auth.getSession();
+      const token = session?.access_token || window.SUPABASE_ANON;
+      if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+        return;
+      }
+    } catch {
+      return;
+    }
+
     if (realtimeChannel) window.supabaseClient.removeChannel(realtimeChannel);
 
     realtimeChannel = window.supabaseClient

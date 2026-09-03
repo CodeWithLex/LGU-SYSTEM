@@ -1656,9 +1656,9 @@ html, body {
   .of-bottom-nav {
     display: flex !important;
     position: fixed !important;
-    bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
-    left: 12px !important;
-    right: 12px !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 10px !important;
+    right: 10px !important;
     width: auto !important;
     max-width: 480px !important;
     margin: 0 auto !important;
@@ -1866,11 +1866,13 @@ html, body {
     max-width: 100% !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 0.75rem 0.65rem !important;
+    padding: 0.65rem 0.5rem !important;
     border-radius: var(--radius-md, 8px) !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
   .of-stat .of-stat-label {
-    font-size: 0.62rem !important;
+    font-size: clamp(0.56rem, 2.3vw, 0.62rem) !important;
     letter-spacing: 0.03em !important;
     min-width: 0 !important;
     max-width: 100% !important;
@@ -1882,18 +1884,18 @@ html, body {
     white-space: nowrap !important;
   }
   .of-stat .of-stat-value {
-    font-size: clamp(0.95rem, 3.6vw, 1.15rem) !important;
-    margin-top: 0.25rem !important;
+    font-size: clamp(0.82rem, 3.4vw, 1.05rem) !important;
+    margin-top: 0.2rem !important;
     line-height: 1.2 !important;
     min-width: 0 !important;
     max-width: 100% !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
     white-space: nowrap !important;
   }
   .of-stat .of-stat-sub {
-    font-size: 0.64rem !important;
-    margin-top: 0.2rem !important;
+    font-size: 0.6rem !important;
+    margin-top: 0.15rem !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
