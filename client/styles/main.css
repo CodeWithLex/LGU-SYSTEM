@@ -3198,7 +3198,7 @@ iconify-icon {
     font-size: 0.65rem !important;
     white-space: nowrap !important;
     color: var(--text-secondary) !important;
-  }!important; }
+  }
 
   /* Generic Content */
   body .announce-item { padding: 0.65rem !important; margin-bottom: 0.5rem !important; }
