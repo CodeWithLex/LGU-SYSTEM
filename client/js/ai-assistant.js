@@ -569,20 +569,41 @@ const GrizzAI = (() => {
       `Good afternoon, engineer ${displayName}! The system is fully operational.`,
       `Afternoon, ${displayName}! Let's optimize your study load.`,
       `Good afternoon, ${displayName}. Staying hydrated? Don't forget to take short breaks.`,
-      `Hello, ${displayName}. Ready for some afternoon curriculum planning?`
+      `Hello, ${displayName}. Ready for some afternoon curriculum planning?`,
+      `Maayong hapon, ${displayName}! Na-compute na ba ang imong remaining energy?`,
+      `Good afternoon! Hapon na, pero ang deadline nagdali gihapon.`,
+      `Maayong hapon! Ready na ba mo mag-engineer, or nag-loading pa ang brain?`,
+      `Hapon na, ${displayName}. Ang adlaw init, ang workload mas init.`,
+      `Good afternoon! May your coffee be strong and your calculations stronger.`,
+      `Maayong hapon! Unsay atong i-solve karon — equation or existential crisis?`,
+      `Hapon na! Time to convert caffeine into engineering solutions.`,
+      `Maayong hapon, ${displayName}! Ayaw kabalaka, dili pa late… basin.`,
+      `Good afternoon! Ang brain nimo naka-afternoon mode na, pero ang requirements naka-hard mode.`,
+      `Maayong hapon! Let's make some questionable calculations with confidence.`
     ];
 
     // Evening: 6:00 PM - 9:59 PM
     const eveningGreetings = [
       `Good evening, ${displayName}`,
+      `Maayong gabii diha, ${displayName}`,
       `Evening, ${displayName}! Let's wrap up today's calculations.`,
       `Good evening, engineer ${displayName}. How did the classes go?`,
       `Hope you're having a relaxing evening, ${displayName}.`,
       `Good evening, ${displayName}. Let's plan ahead for the next semester.`,
-      `Evening, ${displayName}. What's on your mind tonight?`
+      `Evening, ${displayName}. What's on your mind tonight?`,
+      `Good evening, ${displayName}! Buhi pa ba, or nag-surrender na sa computation?`,
+      `Maayong gabii! Ready na ba ta mag-solve, or ready na maghilak?`,
+      `Good evening, ${displayName}! Ang adlaw niundang na, pero ang requirements wala pa.`,
+      `Maayong gabii! Unsa man, mag-engineer ta karon or mag-overthink sa life?`,
+      `Gabii na, ${displayName}. Time to calculate… pila pa ka oras before deadline?`,
+      `Maayong gabii! May your equations be correct and your professors merciful.`,
+      `Good evening, ${displayName}! Ang stress nimo karon, linear ba or exponential?`,
+      `Maayong gabii! Ayaw kabalaka, masolve ra nato ni… hopefully.`,
+      `Gabii na! Perfect time para mag-design, mag-compute, ug mag-question sa life choices.`,
+      `Maayong gabii, ${displayName}! Nakakaon na ka, or gi-feed na pud ka sa problem set?`
     ];
 
-    // Late Night / Too Late: 10:00 PM - 4:59 AM
+    // Late Night: 10:00 PM - 11:59 PM
     const lateGreetings = [
       `It's late already, engineer, you need to rest`,
       `It's late already, ${displayName}, you need to rest`,
@@ -593,6 +614,25 @@ const GrizzAI = (() => {
       `Late night session, ${displayName}? Don't forget to recharge your own batteries.`
     ];
 
+    // Midnight / Past Midnight: 12:00 AM - 4:59 AM — extra chaotic hours
+    const midnightGreetings = [
+      `Maayong kadlawon, ${displayName}! Ngano gising pa man ta?`,
+      `12 AM na, ${displayName}. Dili na ni study session. Survival mission na ni.`,
+      `Maayong kadlawon! Ang uban nangatulog, ang engineers nag-debug gihapon.`,
+      `Good midnight, ${displayName}! Your sleep schedule has officially been deprecated.`,
+      `Kadlawn na, ${displayName}. Ang calculator awake, ikaw nalang kulang.`,
+      `Maayong kadlawon! Naa pa kay energy, or imaginary nalang?`,
+      `12:00 AM. Congratulations, ${displayName}! You have unlocked another level of academic suffering.`,
+      `Kadlawn na! Perfect time to ask: 'Ngano man gud nag-engineering ko?'`,
+      `Maayong kadlawon, ${displayName}. If you're still awake, either deadline ni or love life.`,
+      `Pass midnight na, ${displayName}! Sleep is optional, apparently.`,
+      `Kadlawn na. Ang problem wala pa na-solve, pero ang breakdown kay solved na.`,
+      `Maayong kadlawon! Please remember: ang 2 AM confidence dili parehas sa 8 AM confidence.`,
+      `${displayName}, kadlawn na. Even the calculator wants you to sleep.`,
+      `12 AM na. Time to compute your remaining brain cells.`,
+      `Maayong kadlawon! Deadline tomorrow? Ah, so technically today. 😭`
+    ];
+
     let list;
     if (hour >= 5 && hour < 12) {
       list = morningGreetings;
@@ -600,8 +640,10 @@ const GrizzAI = (() => {
       list = afternoonGreetings;
     } else if (hour >= 18 && hour < 22) {
       list = eveningGreetings;
-    } else {
+    } else if (hour >= 22) {
       list = lateGreetings;
+    } else {
+      list = midnightGreetings;
     }
 
     const randomIndex = Math.floor(Math.random() * list.length);
