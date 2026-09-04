@@ -11,6 +11,7 @@ const router   = express.Router();
 const supabase = require('../lib/supabase');
 const { logError } = require('../lib/logger');
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
+const authMiddleware = require('../middleware/auth');
 
 // Feedback is low-value to an attacker and high-noise if spammed:
 // 5 submissions per IP per hour is generous for humans, hostile to bots.
@@ -80,6 +81,59 @@ router.post('/', async (req, res) => {
     return res.status(201).json({ ok: true });
   } catch (err) {
     logError('Feedback Route Error', err);
+    return res.status(500).json({ error: 'An internal server error occurred.' });
+  }
+});
+
+// =============================================
+// GET /api/feedback - Developer-only viewer feed
+// Mounted behind Supabase auth + an email allowlist
+// (DEVELOPER_EMAILS env var, comma-separated). Fails closed.
+// =============================================
+function devGate(req, res, next) {
+  const allow = (process.env.DEVELOPER_EMAILS || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (allow.length === 0) {
+    return res.status(403).json({ error: 'Developer access is not configured (DEVELOPER_EMAILS is empty).' });
+  }
+  if (!req.user?.email || !allow.includes(req.user.email.toLowerCase())) {
+    return res.status(403).json({ error: 'This view is restricted to the developer.' });
+  }
+  next();
+}
+
+router.get('/', authMiddleware, devGate, async (req, res) => {
+  try {
+    const { data: items, error } = await supabase
+      .from('feedback')
+      .select('id, ease, accuracy, ledger, grizz, performance, improve, bug, program, year_level, user_agent, created_at')
+      .order('created_at', { ascending: false })
+      .limit(500);
+
+    if (error) {
+      logError('Feedback Fetch Error', error);
+      return res.status(500).json({ error: 'Could not load feedback.' });
+    }
+
+    const ratingFields = ['ease', 'accuracy', 'ledger', 'grizz', 'performance'];
+    const stats = { total: items.length, avg: {}, perProgram: {} };
+    for (const f of ratingFields) {
+      const vals = items.map((it) => it[f]).filter((v) => typeof v === 'number');
+      stats.avg[f] = vals.length
+        ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10
+        : null;
+      stats.avg[f + '_n'] = vals.length;
+    }
+    for (const it of items) {
+      if (it.program) stats.perProgram[it.program] = (stats.perProgram[it.program] || 0) + 1;
+    }
+
+    return res.json({ stats, items });
+  } catch (err) {
+    logError('Feedback View Error', err);
     return res.status(500).json({ error: 'An internal server error occurred.' });
   }
 });

@@ -146,6 +146,12 @@ function onlyWrites(limiter) {
 // =============================================
 app.use(express.static(path.join(__dirname, "../client")));
 
+// Standalone portal pages - static handler can't resolve extensionless
+// directory paths to their .html files, so route them explicitly.
+const feedbackDir = path.join(__dirname, "../client/feedback");
+app.get(["/feedback", "/feedback/"],        (req, res) => res.sendFile(path.join(feedbackDir, "index.html")));
+app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view.html")));
+
 // =============================================
 // Public Routes
 // =============================================

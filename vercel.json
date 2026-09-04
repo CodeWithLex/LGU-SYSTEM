@@ -16,6 +16,10 @@
       "dest": "server/index.js"
     },
     {
+      "src": "/feedback/view",
+      "dest": "client/feedback/view.html"
+    },
+    {
       "src": "/feedback",
       "dest": "client/feedback/index.html"
     },
