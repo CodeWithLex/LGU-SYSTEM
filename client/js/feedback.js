@@ -163,7 +163,7 @@
     submitBtn.textContent = 'Submitting…';
 
     try {
-      const res = await fetch('/api/feedback', {
+      const res = await fetch((window.API_BASE || '') + '/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

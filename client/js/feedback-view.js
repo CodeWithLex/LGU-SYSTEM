@@ -65,7 +65,7 @@
 
     let res;
     try {
-      res = await fetch('/api/feedback', {
+      res = await fetch((window.API_BASE || '') + '/api/feedback', {
         headers: { Authorization: 'Bearer ' + session.access_token },
       });
     } catch {
