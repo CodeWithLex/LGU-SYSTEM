@@ -16,6 +16,14 @@
       "dest": "server/index.js"
     },
     {
+      "src": "/feedback",
+      "dest": "client/feedback/index.html"
+    },
+    {
+      "src": "/feedback/",
+      "dest": "client/feedback/index.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "client/$1",
       "check": true
