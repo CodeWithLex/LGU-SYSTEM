@@ -15,6 +15,7 @@ const authMiddleware = require('../middleware/auth');
 
 // Feedback is low-value to an attacker and high-noise if spammed:
 // 5 submissions per IP per hour is generous for humans, hostile to bots.
+// Applies to POST only - the developer viewer (GET) must not be throttled.
 const feedbackLimiter = rateLimit({
   windowMs:        60 * 60 * 1000,
   max:             5,
@@ -24,8 +25,6 @@ const feedbackLimiter = rateLimit({
   keyGenerator:    ipKeyGenerator,
 });
 
-router.use(feedbackLimiter);
-
 const RATING_FIELDS = ['ease', 'accuracy', 'ledger', 'grizz', 'performance'];
 const PROGRAMS = ['BSCoE', 'BSCE', 'BSECE'];
 const clampText = (v, max) => {
@@ -34,7 +33,8 @@ const clampText = (v, max) => {
   return t ? t.slice(0, max) : null;
 };
 
-router.post('/', async (req, res) => {
+// Submissions require a signed-in account; the identity is stored with the row.
+router.post('/', authMiddleware, feedbackLimiter, async (req, res) => {
   try {
     const body = req.body || {};
 
@@ -63,6 +63,8 @@ router.post('/', async (req, res) => {
     const year = Number(body.year_level);
     row.year_level = Number.isInteger(year) && year >= 1 && year <= 6 ? year : null;
 
+    row.user_id = req.user.id;
+    row.email   = req.user.email;
     row.user_agent = clampText(req.headers['user-agent'], 200);
 
     // At least some signal: require every rating OR some written feedback,
@@ -109,7 +111,7 @@ router.get('/', authMiddleware, devGate, async (req, res) => {
   try {
     const { data: items, error } = await supabase
       .from('feedback')
-      .select('id, ease, accuracy, ledger, grizz, performance, improve, bug, program, year_level, user_agent, created_at')
+      .select('id, user_id, email, ease, accuracy, ledger, grizz, performance, improve, bug, program, year_level, user_agent, created_at')
       .order('created_at', { ascending: false })
       .limit(500);
 

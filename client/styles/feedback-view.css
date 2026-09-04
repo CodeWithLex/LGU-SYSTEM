@@ -31,7 +31,8 @@
   padding: 0.65rem 0.7rem;
 }
 
-#fbv-login-btn {
+#fbv-login-btn,
+#fb-login-btn {
   font: inherit;
   font-weight: 600;
   color: var(--accent-ink);
@@ -43,7 +44,8 @@
   margin-top: 0.4rem;
 }
 
-#fbv-login-btn:disabled { opacity: 0.55; cursor: default; }
+#fbv-login-btn:disabled,
+#fb-login-btn:disabled { opacity: 0.55; cursor: default; }
 
 .fbv-secondary {
   font: inherit;

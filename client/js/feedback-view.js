@@ -43,7 +43,7 @@
 
   function ratingCell(label, value) {
     if (typeof value !== 'number') {
-      return `<span class="na">${label} —</span>`;
+      return `<span class="na">${label} n/a</span>`;
     }
     return `<span>${label} <b>${value}</b></span>`;
   }
@@ -96,11 +96,11 @@
     const avg = stats.avg || {};
     statsEl.innerHTML =
       statBlock(stats.total, '', 'Total') +
-      statBlock(avg.ease ?? '—', `n=${avg.ease_n || 0}`, 'Ease') +
-      statBlock(avg.accuracy ?? '—', `n=${avg.accuracy_n || 0}`, 'Reliability') +
-      statBlock(avg.ledger ?? '—', `n=${avg.ledger_n || 0}`, 'Ledger') +
-      statBlock(avg.grizz ?? '—', `n=${avg.grizz_n || 0}`, 'Grizz') +
-      statBlock(avg.performance ?? '—', `n=${avg.performance_n || 0}`, 'Perf');
+      statBlock(avg.ease ?? 'n/a', `n=${avg.ease_n || 0}`, 'Ease') +
+      statBlock(avg.accuracy ?? 'n/a', `n=${avg.accuracy_n || 0}`, 'Reliability') +
+      statBlock(avg.ledger ?? 'n/a', `n=${avg.ledger_n || 0}`, 'Ledger') +
+      statBlock(avg.grizz ?? 'n/a', `n=${avg.grizz_n || 0}`, 'Grizz') +
+      statBlock(avg.performance ?? 'n/a', `n=${avg.performance_n || 0}`, 'Perf');
 
     if (!items.length) {
       listEl.innerHTML = '<p class="fbv-empty">No submissions yet.</p>';
@@ -108,8 +108,8 @@
     }
 
     listEl.innerHTML = items.map((it) => {
-      const who = [it.program, it.year_level ? it.year_level + (it.year_level === 1 ? 'st' : it.year_level === 2 ? 'nd' : it.year_level === 3 ? 'rd' : 'th') : null]
-        .filter(Boolean).join(' · ') || 'anonymous';
+      const who = [it.email, it.program, it.year_level ? it.year_level + (it.year_level === 1 ? 'st' : it.year_level === 2 ? 'nd' : it.year_level === 3 ? 'rd' : 'th') : null]
+        .filter(Boolean).join(' · ') || 'no account';
       const ratings = [
         ratingCell('Ease', it.ease),
         ratingCell('Reliability', it.accuracy),
