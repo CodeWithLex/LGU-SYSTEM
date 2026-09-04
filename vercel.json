@@ -17,7 +17,7 @@
     },
     {
       "src": "/feedback/view",
-      "dest": "client/feedback/view.html"
+      "dest": "client/feedback/view/index.html"
     },
     {
       "src": "/feedback",

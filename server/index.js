@@ -150,7 +150,7 @@ app.use(express.static(path.join(__dirname, "../client")));
 // directory paths to their .html files, so route them explicitly.
 const feedbackDir = path.join(__dirname, "../client/feedback");
 app.get(["/feedback", "/feedback/"],        (req, res) => res.sendFile(path.join(feedbackDir, "index.html")));
-app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view.html")));
+app.get(["/feedback/view", "/feedback/view/"], (req, res) => res.sendFile(path.join(feedbackDir, "view", "index.html")));
 
 // =============================================
 // Public Routes
