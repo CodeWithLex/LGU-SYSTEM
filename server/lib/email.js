@@ -390,58 +390,64 @@ content: `
 
 function buildEmailTemplate({ subject, preheader, content }) {
   return `<!DOCTYPE html>
-<html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
   <title>${subject}</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-    @media only screen and (max-width: 620px) {
-      .container { width: 100% !important; padding: 10px !important; }
-      .card { padding: 24px !important; }
-    }
-  </style>
 </head>
-<body style="margin:0;padding:0;background-color:#f4f7fa;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#f8fafc;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f7fa;padding:40px 0;">
+  
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;padding:40px 16px;">
     <tr>
       <td align="center">
-        <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;margin:0 auto;">
-          <!-- Header Logo/Branding -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:540px;margin:0 auto;background:#ffffff;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 10px 30px rgba(15, 23, 42, 0.04);overflow:hidden;">
+          
+          <!-- Top Header Banner -->
           <tr>
-            <td align="center" style="padding-bottom:24px;">
-              <table cellpadding="0" cellspacing="0" border="0">
+            <td style="background:#0f172a;padding:24px 32px;text-align:left;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="padding:10px 20px;background:#1a1f35;border-radius:12px;">
-                    <h1 style="margin:0;color:#ffffff;font-size:18px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">COE Financial Transparency System</h1>
+                  <td>
+                    <span style="color:#38bdf8;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:3px;">COR JESU COLLEGE</span>
+                    <h1 style="margin:0;color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.3px;">College of Engineering — LGU Portal</h1>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          <!-- Main Content Card -->
+
+          <!-- Main Content -->
           <tr>
-            <td class="card" style="background-color:#ffffff;padding:48px;border-radius:24px;box-shadow:0 10px 25px rgba(0,0,0,0.05);border:1px solid #eef2f6;">
+            <td style="padding:40px 32px;text-align:center;">
               ${content}
             </td>
           </tr>
-          <!-- Footer -->
+
+          <!-- Footer Inside Card -->
           <tr>
-            <td align="center" style="padding-top:32px;">
-              <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.5;">
-                College of Engineering - Cor Jesu College<br/>
-                Budget Transparency & Liquidation System
+            <td style="background:#f8fafc;border-top:1px solid #f1f5f9;padding:20px 32px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#64748b;line-height:1.5;font-weight:500;">
+                College of Engineering Local Government Unit<br/>
+                <span style="color:#94a3b8;font-weight:400;">Cor Jesu College — Digos City</span>
               </p>
-              <p style="margin:16px 0 0;font-size:12px;color:#cbd5e1;">
-                You received this because you are registered student member.
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Outer Sub-footer -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:540px;margin:16px auto 0;">
+          <tr>
+            <td align="center">
+              <p style="margin:0;font-size:11px;color:#94a3b8;">
+                This is an automated system notification from the COE Transparency Portal.
               </p>
             </td>
           </tr>
         </table>
+
       </td>
     </tr>
   </table>
@@ -459,69 +465,61 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
     if (!userEmail) return { sent: 0, reason: 'No recipient email provided' };
 
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sendSmtpEmail.subject = `🎉 Account Verified: Welcome to COE Financial System`;
+    sendSmtpEmail.subject = `Account Verified: Welcome to COE Financial System`;
     sendSmtpEmail.htmlContent = buildEmailTemplate({
       subject: `Account Verified & Approved`,
       preheader: `Good news! Your account has been verified by the COE LGU Admin. You can now log into the portal.`,
       content: `
         <!-- Badge -->
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-          <tr>
-            <td align="center" style="padding-bottom: 20px;">
-              <span style="
-                display: inline-block;
-                background: #dcfce7;
-                color: #15803d;
-                padding: 6px 18px;
-                border-radius: 100px;
-                font-size: 12px;
-                font-weight: 700;
-                letter-spacing: 0.5px;
-                text-transform: uppercase;
-              ">Account Verified</span>
-            </td>
-          </tr>
-        </table>
+        <div style="margin-bottom:20px;">
+          <span style="
+            display: inline-block;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 5px 16px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+          ">&#10003; Account Verified</span>
+        </div>
 
         <!-- Greeting & Title -->
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-          <tr>
-            <td align="center" style="padding-bottom: 28px;">
-              <h2 style="
-                margin: 0 0 12px;
-                color: #0f172a;
-                font-size: 24px;
-                font-weight: 800;
-                line-height: 1.3;
-              ">Welcome, ${userName}!</h2>
-              <p style="
-                margin: 0;
-                color: #475569;
-                font-size: 15px;
-                line-height: 1.6;
-              ">Your account has been officially <strong>verified and approved</strong> by the admin. You can now log into your account.</p>
-            </td>
-          </tr>
-        </table>
+        <h2 style="
+          margin: 0 0 12px;
+          color: #0f172a;
+          font-size: 22px;
+          font-weight: 700;
+          letter-spacing: -0.3px;
+          line-height: 1.3;
+        ">Welcome, ${userName}!</h2>
+        
+        <p style="
+          margin: 0 0 32px;
+          color: #475569;
+          font-size: 15px;
+          line-height: 1.6;
+          max-width: 440px;
+          margin-left: auto;
+          margin-right: auto;
+        ">Your student account has been officially <strong>verified and approved</strong> by the council administration. You now have full access to the portal.</p>
 
         <!-- CTA Button -->
-        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-          <tr>
-            <td align="center">
-              <a href="${APP_URL}" style="
-                display: inline-block;
-                background: #16a34a;
-                color: #ffffff;
-                padding: 14px 36px;
-                border-radius: 12px;
-                text-decoration: none;
-                font-weight: 700;
-                font-size: 15px;
-                box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
-              ">Log In to Account &rarr;</a>
-            </td>
-          </tr>
-        </table>
+        <div>
+          <a href="${APP_URL}" style="
+            display: inline-block;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 14px 36px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.2px;
+          ">Access Student Portal &rarr;</a>
+        </div>
       `
     });
 
@@ -541,4 +539,3 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
 }
 
 module.exports = { sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail };
-
