@@ -157,15 +157,16 @@ const Api = (() => {
   };
 
   const admin = {
-    users:             ()            => _request('GET',   '/admin/users', null, false, 30000),
-    setRole:           (id, role)    => _request('PATCH', `/admin/users/${id}/role`, { role }),
-    verifyUser:        (id)          => _request('POST',  `/admin/users/${id}/verify`),
-    sendApprovalEmail: (email, full_name) => _request('POST', '/admin/send-approval-email', { email, full_name }),
-    auditLogs:         (params={})   => {
+    users:                  ()            => _request('GET',   '/admin/users', null, false, 30000),
+    setRole:                (id, role)    => _request('PATCH', `/admin/users/${id}/role`, { role }),
+    verifyUser:             (id)          => _request('POST',  `/admin/users/${id}/verify`),
+    sendApprovalEmail:      (email, full_name) => _request('POST', '/admin/send-approval-email', { email, full_name }),
+    backfillApprovalEmails: ()            => _request('POST',  '/admin/backfill-approval-emails'),
+    auditLogs:              (params={})   => {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`, null, false, 30000);
     },
-    transfer:          (body)        => _request('POST',  '/admin/budget-transfer', body),
+    transfer:               (body)        => _request('POST',  '/admin/budget-transfer', body),
   };
 
   const units = {

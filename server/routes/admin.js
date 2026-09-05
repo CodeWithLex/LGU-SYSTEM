@@ -444,4 +444,71 @@ router.patch('/events/:id/archive', requireGovernorOrAdmin, async (req, res) => 
   res.json(data);
 });
 
+// ── POST /api/admin/backfill-approval-emails ────────────────────────────────
+// Triggers verification/approval emails in minimalist COE Orange theme to all
+// verified student accounts and approved verification requests.
+router.post('/backfill-approval-emails', requireOfficer, async (req, res) => {
+  try {
+    const { data: verifiedProfiles } = await supabase
+      .from('profiles')
+      .select('email, full_name, role, is_verified')
+      .neq('role', 'admin')
+      .or('email.ilike.%@gmail.com,email.ilike.%@g.cjc.edu.ph');
+
+    const { data: approvedRequests } = await supabase
+      .from('enrollment_verification_requests')
+      .select('email, full_name, status')
+      .eq('status', 'approved')
+      .or('email.ilike.%@gmail.com,email.ilike.%@g.cjc.edu.ph');
+
+    const recipientsMap = new Map();
+
+    (verifiedProfiles || []).forEach(p => {
+      if (p.email && (p.is_verified === true || p.is_verified === undefined)) {
+        recipientsMap.set(p.email.trim().toLowerCase(), {
+          email: p.email.trim(),
+          name: p.full_name || 'COE Member'
+        });
+      }
+    });
+
+    (approvedRequests || []).forEach(r => {
+      if (r.email) {
+        const em = r.email.trim().toLowerCase();
+        if (!recipientsMap.has(em)) {
+          recipientsMap.set(em, {
+            email: r.email.trim(),
+            name: r.full_name || 'COE Member'
+          });
+        }
+      }
+    });
+
+    const recipients = Array.from(recipientsMap.values());
+    let sentCount = 0;
+    let failCount = 0;
+
+    for (const item of recipients) {
+      const emailRes = await sendAccountApprovalEmail(item.email, item.name);
+      if (emailRes && emailRes.sent > 0) {
+        sentCount++;
+      } else {
+        failCount++;
+      }
+    }
+
+    logAudit(req.user.id, 'BACKFILL_APPROVAL_EMAILS', { total: recipients.length, sent: sentCount, failed: failCount });
+    res.json({
+      success: true,
+      message: `Dispatched approval emails to ${sentCount} account(s).`,
+      total: recipients.length,
+      sent: sentCount,
+      failed: failCount
+    });
+  } catch (err) {
+    logError('admin/backfill-approval-emails', err);
+    res.status(500).json({ error: 'Failed to dispatch backfill verification emails.' });
+  }
+});
+
 module.exports = router;
