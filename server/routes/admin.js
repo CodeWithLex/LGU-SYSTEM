@@ -140,8 +140,8 @@ router.patch('/users/:id/role', async (req, res) => {
 });
 
 // ── POST /api/admin/users/:id/verify ─────────────────────────────────────────
-// Admins and Governors can verify/approve user accounts and dispatch an automated Gmail email notification.
-router.post('/users/:id/verify', requireGovernorOrAdmin, async (req, res) => {
+// Officers, Governors, and Admins can verify/approve user accounts and dispatch an automated Gmail email notification.
+router.post('/users/:id/verify', requireOfficer, async (req, res) => {
   const { id } = req.params;
 
   if (!isValidUUID(id)) {
@@ -189,6 +189,26 @@ router.post('/users/:id/verify', requireGovernorOrAdmin, async (req, res) => {
     message: `User account verified successfully. Approval notification dispatched to ${data.email}.`,
     user: data
   });
+});
+
+// ── POST /api/admin/send-approval-email ─────────────────────────────────────
+// Dispatches an account approval notification email directly to an email address
+router.post('/send-approval-email', requireOfficer, async (req, res) => {
+  const { email, full_name } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required.' });
+
+  // Update profile by email if profile exists
+  try {
+    await supabase
+      .from('profiles')
+      .update({ is_verified: true })
+      .eq('email', email);
+  } catch (err) {
+    /* non-fatal */
+  }
+
+  const result = await sendAccountApprovalEmail(email, full_name || 'COE Member');
+  res.json({ message: 'Approval email dispatched.', result });
 });
 
 // ── GET /api/admin/audit-logs (readable by all officers) ─────────────────────

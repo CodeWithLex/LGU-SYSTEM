@@ -157,14 +157,15 @@ const Api = (() => {
   };
 
   const admin = {
-    users:          ()         => _request('GET',   '/admin/users', null, false, 30000),
-    setRole:        (id, role) => _request('PATCH', `/admin/users/${id}/role`, { role }),
-    verifyUser:     (id)       => _request('POST',  `/admin/users/${id}/verify`),
-    auditLogs:      (params={})=> {
+    users:             ()            => _request('GET',   '/admin/users', null, false, 30000),
+    setRole:           (id, role)    => _request('PATCH', `/admin/users/${id}/role`, { role }),
+    verifyUser:        (id)          => _request('POST',  `/admin/users/${id}/verify`),
+    sendApprovalEmail: (email, full_name) => _request('POST', '/admin/send-approval-email', { email, full_name }),
+    auditLogs:         (params={})   => {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`, null, false, 30000);
     },
-    transfer:       (body)     => _request('POST',  '/admin/budget-transfer', body),
+    transfer:          (body)        => _request('POST',  '/admin/budget-transfer', body),
   };
 
   const units = {
@@ -494,7 +495,7 @@ const Api = (() => {
 
       // 4. Verify user account profile & dispatch Gmail notification
       const targetUserId = req.user_id;
-      const targetEmail = req.email;
+      const targetEmail = req.email || req.user_email;
 
       if (targetUserId) {
         try {
@@ -502,18 +503,13 @@ const Api = (() => {
         } catch (err) {
           console.warn('[RosterRequests] User profile verification by ID note:', err?.message || err);
         }
-      } else if (targetEmail) {
+      }
+      
+      if (targetEmail) {
         try {
-          const { data: prof } = await window.supabaseClient
-            .from('profiles')
-            .select('id')
-            .eq('email', targetEmail)
-            .maybeSingle();
-          if (prof?.id) {
-            await admin.verifyUser(prof.id);
-          }
+          await admin.sendApprovalEmail(targetEmail, req.full_name || studentName);
         } catch (err) {
-          console.warn('[RosterRequests] User profile verification by Email note:', err?.message || err);
+          console.warn('[RosterRequests] Direct email approval dispatch note:', err?.message || err);
         }
       }
 
