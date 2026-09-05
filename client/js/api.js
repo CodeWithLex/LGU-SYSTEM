@@ -460,7 +460,7 @@ const Api = (() => {
         .from('enrollment_verification_requests')
         .select('*')
         .eq('id', requestId)
-        .single();
+        .maybeSingle();
       if (reqErr || !req) throw new Error(reqErr?.message || 'Verification request not found');
 
       // 2. Insert into enrolled_students (ignore if duplicate)
@@ -488,10 +488,36 @@ const Api = (() => {
         })
         .eq('id', requestId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw new Error(error.message);
-      return data;
+
+      // 4. Verify user account profile & dispatch Gmail notification
+      const targetUserId = req.user_id;
+      const targetEmail = req.email;
+
+      if (targetUserId) {
+        try {
+          await admin.verifyUser(targetUserId);
+        } catch (err) {
+          console.warn('[RosterRequests] User profile verification by ID note:', err?.message || err);
+        }
+      } else if (targetEmail) {
+        try {
+          const { data: prof } = await window.supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('email', targetEmail)
+            .maybeSingle();
+          if (prof?.id) {
+            await admin.verifyUser(prof.id);
+          }
+        } catch (err) {
+          console.warn('[RosterRequests] User profile verification by Email note:', err?.message || err);
+        }
+      }
+
+      return data || req;
     },
 
     async bulkApprove(requestIds) {
@@ -536,7 +562,15 @@ const Api = (() => {
         .select();
 
       if (updateErr) throw new Error(updateErr.message);
-      return data || [];
+
+      // Verify user profiles & dispatch Gmail notification
+      for (const r of reqs) {
+        if (r.user_id) {
+          admin.verifyUser(r.user_id).catch(() => {});
+        }
+      }
+
+      return data || reqs;
     },
 
     async reject(requestId, reason = '') {
@@ -553,7 +587,7 @@ const Api = (() => {
         })
         .eq('id', requestId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw new Error(error.message);
       return data;
