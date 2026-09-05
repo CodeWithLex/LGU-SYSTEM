@@ -49,7 +49,7 @@ async function getAllStudentEmails() {
 }
 
 /**
- * Wraps email contents into a minimalist COE Orange template.
+ * Wraps email contents into a minimalist COE Orange Palette template.
  */
 function buildEmailTemplate({ subject, preheader, content }) {
   return `<!DOCTYPE html>
@@ -59,19 +59,19 @@ function buildEmailTemplate({ subject, preheader, content }) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#fafaf9;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#fff7ed;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;">${preheader}</div>
   
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fafaf9;padding:36px 16px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fff7ed;padding:36px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:500px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #fed7aa;overflow:hidden;box-shadow:0 4px 20px rgba(234, 88, 12, 0.08);">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:500px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #fed7aa;overflow:hidden;box-shadow:0 6px 24px rgba(234, 88, 12, 0.12);">
           
           <!-- COE Orange Top Header -->
           <tr>
-            <td style="background:#ea580c;padding:20px 24px;text-align:left;">
-              <span style="color:#ffedd5;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:2px;">COR JESU COLLEGE</span>
-              <h1 style="margin:0;color:#ffffff;font-size:15px;font-weight:700;">College of Engineering LGU Portal</h1>
+            <td style="background:linear-gradient(135deg, #ea580c 0%, #c2410c 100%);padding:22px 24px;text-align:left;">
+              <span style="color:#ffedd5;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:2px;">COR JESU COLLEGE</span>
+              <h1 style="margin:0;color:#ffffff;font-size:16px;font-weight:700;letter-spacing:0.2px;">College of Engineering LGU Portal</h1>
             </td>
           </tr>
 
@@ -82,10 +82,10 @@ function buildEmailTemplate({ subject, preheader, content }) {
             </td>
           </tr>
 
-          <!-- Minimalist Footer -->
+          <!-- Orange Minimalist Footer -->
           <tr>
-            <td style="background:#fff7ed;border-top:1px solid #ffedd5;padding:16px 24px;text-align:center;">
-              <p style="margin:0;font-size:12px;color:#c2410c;font-weight:600;line-height:1.4;">
+            <td style="background:#fff7ed;border-top:1px solid #ffedd5;padding:18px 24px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#c2410c;font-weight:700;line-height:1.5;">
                 College of Engineering Local Government Unit<br/>
                 <span style="color:#9a3412;font-weight:400;">Cor Jesu College, Digos City</span>
               </p>
@@ -98,7 +98,7 @@ function buildEmailTemplate({ subject, preheader, content }) {
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:500px;margin:14px auto 0;">
           <tr>
             <td align="center">
-              <p style="margin:0;font-size:11px;color:#a8a29e;">
+              <p style="margin:0;font-size:11px;color:#9a3412;opacity:0.8;">
                 Automated notification from COE Transparency Portal.
               </p>
             </td>
@@ -130,14 +130,14 @@ async function sendAnnouncementEmail(title, body) {
       preheader: body.slice(0, 100),
       content: `
         <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#fff7ed;color:#c2410c;border:1px solid #ffedd5;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Announcement</span>
+          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Announcement</span>
         </div>
-        <h2 style="margin:0 0 16px;color:#1c1917;font-size:20px;font-weight:700;line-height:1.3;">${title}</h2>
-        <div style="background:#fafaf9;border-radius:8px;padding:18px;margin-bottom:24px;border:1px solid #e7e5e4;text-align:left;">
-          <p style="margin:0;color:#44403c;line-height:1.6;white-space:pre-wrap;font-size:14px;">${body}</p>
+        <h2 style="margin:0 0 16px;color:#7c2d12;font-size:20px;font-weight:700;line-height:1.3;">${title}</h2>
+        <div style="background:#fff7ed;border-radius:8px;padding:18px;margin-bottom:24px;border:1px solid #ffedd5;text-align:left;">
+          <p style="margin:0;color:#431407;line-height:1.6;white-space:pre-wrap;font-size:14px;">${body}</p>
         </div>
         <div>
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Open Portal</a>
+          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">Open Portal</a>
         </div>
       `
     });
@@ -183,32 +183,32 @@ async function sendNewEventEmail(event) {
       preheader: `A new event has been scheduled: ${event.event_name}.`,
       content: `
         <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#fff7ed;color:#c2410c;border:1px solid #ffedd5;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">New Event</span>
+          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">New Event</span>
         </div>
-        <h2 style="margin:0 0 8px;color:#1c1917;font-size:20px;font-weight:700;line-height:1.3;">${event.event_name}</h2>
-        <p style="margin:0 0 20px;color:#78716c;font-size:13px;">A new event has been posted to the council calendar.</p>
+        <h2 style="margin:0 0 8px;color:#7c2d12;font-size:20px;font-weight:700;line-height:1.3;">${event.event_name}</h2>
+        <p style="margin:0 0 20px;color:#9a3412;font-size:13px;">A new event has been posted to the council calendar.</p>
 
-        <div style="background:#fafaf9;border-radius:8px;padding:20px;margin-bottom:24px;border:1px solid #e7e5e4;text-align:left;">
+        <div style="background:#fff7ed;border-radius:8px;padding:20px;margin-bottom:24px;border:1px solid #ffedd5;text-align:left;">
           ${formattedDate ? `
             <div style="margin-bottom:12px;">
-              <span style="display:block;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Scheduled Date</span>
-              <span style="font-size:14px;font-weight:600;color:#1c1917;">${formattedDate}</span>
+              <span style="display:block;font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Scheduled Date</span>
+              <span style="font-size:14px;font-weight:600;color:#431407;">${formattedDate}</span>
             </div>
           ` : ''}
           <div style="margin-bottom:${event.description ? '12px' : '0'};">
-            <span style="display:block;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Allocated Budget</span>
+            <span style="display:block;font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Allocated Budget</span>
             <span style="font-size:18px;font-weight:700;color:#ea580c;">PHP ${formattedBudget}</span>
           </div>
           ${event.description ? `
-            <div style="border-top:1px solid #e7e5e4;padding-top:12px;margin-top:12px;">
-              <span style="display:block;font-size:11px;font-weight:700;color:#a8a29e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Description</span>
-              <p style="margin:0;font-size:13px;color:#44403c;line-height:1.5;">${event.description}</p>
+            <div style="border-top:1px solid #fed7aa;padding-top:12px;margin-top:12px;">
+              <span style="display:block;font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Description</span>
+              <p style="margin:0;font-size:13px;color:#431407;line-height:1.5;">${event.description}</p>
             </div>
           ` : ''}
         </div>
 
         <div>
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">View Event Details</a>
+          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">View Event Details</a>
         </div>
       `
     });
@@ -246,12 +246,12 @@ async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
       preheader: `Your account has been verified by the admin. You can now log into the portal.`,
       content: `
         <div style="margin-bottom:18px;">
-          <span style="display:inline-block;background:#fff7ed;color:#c2410c;border:1px solid #ffedd5;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Account Verified</span>
+          <span style="display:inline-block;background:#ffedd5;color:#c2410c;border:1px solid #fed7aa;padding:4px 14px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;">Account Verified</span>
         </div>
-        <h2 style="margin:0 0 10px;color:#1c1917;font-size:20px;font-weight:700;line-height:1.3;">Welcome, ${userName}</h2>
-        <p style="margin:0 0 28px;color:#44403c;font-size:14px;line-height:1.6;max-width:420px;margin-left:auto;margin-right:auto;">Your account has been verified by the council admin. You may now log in to access the student portal.</p>
+        <h2 style="margin:0 0 10px;color:#7c2d12;font-size:20px;font-weight:700;line-height:1.3;">Welcome, ${userName}</h2>
+        <p style="margin:0 0 28px;color:#431407;font-size:14px;line-height:1.6;max-width:420px;margin-left:auto;margin-right:auto;">Your account has been verified by the council admin. You may now log in to access the student portal.</p>
         <div>
-          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Log In to Portal</a>
+          <a href="${APP_URL}" style="display:inline-block;background:#ea580c;color:#ffffff;padding:12px 30px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;box-shadow:0 3px 12px rgba(234, 88, 12, 0.25);">Log In to Portal</a>
         </div>
       `
     });
