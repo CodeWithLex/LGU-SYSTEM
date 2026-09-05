@@ -67,7 +67,15 @@
 
       <!-- Form Edit Drawer for Details & Technical Skills -->
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <h4 style="margin: 0; font-size: 0.9rem; font-weight: 700;">✏️ Edit Personal Details</h4>
+        <h4 style="margin: 0; font-size: 0.9rem; font-weight: 700;">✏️ Edit Personal & Career Details</h4>
+        <div>
+          <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Career Headline</label>
+          <input type="text" id="cv-headline" class="form-input" placeholder="e.g. Graduating Civil Engineering Student | Structural Analysis" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
+        </div>
+        <div>
+          <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Professional Summary</label>
+          <textarea id="cv-summary" class="form-input" rows="2" placeholder="Motivated engineering student with a strong background in problem solving..." oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;"></textarea>
+        </div>
         <div>
           <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Contact Phone</label>
           <input type="text" id="cv-phone" class="form-input" placeholder="+63 912 345 6789" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
@@ -77,12 +85,20 @@
           <input type="text" id="cv-location" class="form-input" placeholder="Manila, Philippines" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
         </div>
         <div>
-          <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">LinkedIn / Portfolio URL</label>
+          <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">LinkedIn URL</label>
           <input type="text" id="cv-linkedin" class="form-input" placeholder="linkedin.com/in/username" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
+        </div>
+        <div>
+          <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Portfolio / GitHub Link</label>
+          <input type="text" id="cv-portfolio" class="form-input" placeholder="github.com/username or portfolio link" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
         </div>
         <div>
           <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Technical Skills (Comma Separated)</label>
           <input type="text" id="cv-skills" class="form-input" placeholder="AutoCAD, MATLAB, SolidWorks, Python" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
+        </div>
+        <div>
+          <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Soft Skills (Comma Separated)</label>
+          <input type="text" id="cv-soft-skills" class="form-input" placeholder="Leadership, Project Management, Technical Writing" oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;" />
         </div>
         <div>
           <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Capstone Project Title</label>
@@ -90,9 +106,9 @@
         </div>
         <div>
           <label style="font-size: 0.78rem; font-weight: 600; color: #475569;">Capstone Abstract / Summary</label>
-          <textarea id="cv-capstone-abstract" class="form-input" rows="2" placeholder="Brief 1-2 sentence description of design project..." oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;"></textarea>
+          <textarea id="cv-capstone-abstract" class="form-input" rows="2" placeholder="Brief description of design project..." oninput="CvBuilder.renderCvPreview()" style="width: 100%; padding: 6px 10px; font-size: 0.82rem;"></textarea>
         </div>
-        <button class="btn btn-secondary" onclick="CvBuilder.saveCv()" style="margin-top: 6px; font-size: 0.82rem; padding: 6px;">
+        <button class="btn btn-secondary" onclick="CvBuilder.saveCv()" style="margin-top: 6px; font-size: 0.82rem; padding: 6px; background: #3b82f6; color: #ffffff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
           💾 Save Changes
         </button>
       </div>

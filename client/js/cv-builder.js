@@ -136,14 +136,21 @@ const CvBuilder = (() => {
     const canvas = document.getElementById('harvard-cv-canvas');
     if (!canvas || !cvData) return;
 
+    const getVal = (id, fallback) => {
+      const el = document.getElementById(id);
+      return el && el.value !== undefined ? el.value : (fallback || '');
+    };
+
     const profile = cvData.profile || {};
     const name = profile.full_name || 'STUDENT NAME';
     const course = profile.course || 'Bachelor of Science in Engineering';
     const email = cvData.contact_email || profile.email || 'student@university.edu.ph';
-    const phone = cvData.contact_phone || '';
-    const location = cvData.location || 'Manila, Philippines';
-    const linkedin = cvData.linkedin_url ? ` | LinkedIn: ${cvData.linkedin_url}` : '';
-    const portfolio = cvData.portfolio_url ? ` | Portfolio: ${cvData.portfolio_url}` : '';
+    const phone = getVal('cv-phone', cvData.contact_phone);
+    const location = getVal('cv-location', cvData.location || 'Manila, Philippines');
+    const linkedinRaw = getVal('cv-linkedin', cvData.linkedin_url);
+    const linkedin = linkedinRaw ? ` | LinkedIn: ${linkedinRaw}` : '';
+    const portfolioRaw = getVal('cv-portfolio', cvData.portfolio_url);
+    const portfolio = portfolioRaw ? ` | Portfolio: ${portfolioRaw}` : '';
     const shareToken = cvData.share_token || 'VERIFY-TOKEN';
 
     // Get selected locker items
@@ -152,13 +159,13 @@ const CvBuilder = (() => {
     const seminarItems = selectedMilestones.filter(i => i.type === 'seminar');
 
     // Parse skills
-    const techSkillsStr = document.getElementById('cv-skills')?.value || (cvData.technical_skills || []).join(', ');
+    const techSkillsStr = getVal('cv-skills', (cvData.technical_skills || []).join(', '));
     const techSkillsList = techSkillsStr.split(',').map(s => s.trim()).filter(Boolean);
 
-    const capTitle = document.getElementById('cv-capstone-title')?.value || cvData.capstone_project?.title || '';
-    const capAbstract = document.getElementById('cv-capstone-abstract')?.value || cvData.capstone_project?.abstract || '';
+    const capTitle = getVal('cv-capstone-title', cvData.capstone_project?.title);
+    const capAbstract = getVal('cv-capstone-abstract', cvData.capstone_project?.abstract);
 
-    // Generate QR Code image URL via Google API
+    // Generate QR Code image URL via server API
     const verifyUrl = `${window.location.origin}/cv-verify.html?token=${shareToken}`;
     const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verifyUrl)}`;
 
@@ -167,7 +174,7 @@ const CvBuilder = (() => {
       <div class="harvard-header">
         <div class="harvard-name">${name}</div>
         <div class="harvard-contact-line">
-          ${location} • ${phone ? phone + ' • ' : ''}${email}${linkedin}${portfolio}
+          ${location}${phone ? ' • ' + phone : ''} • ${email}${linkedin}${portfolio}
         </div>
         <div class="harvard-qr-box">
           <img src="${qrApiUrl}" class="harvard-qr-img" alt="QR Verify" />
@@ -280,12 +287,13 @@ const CvBuilder = (() => {
     try {
       const updated = await Api.put('/cv/me', payload);
       if (updated) {
-        if (typeof UI !== 'undefined' && UI.toast) {
-          UI.toast('CV changes saved.', 'info');
-        }
+        cvData = { ...cvData, ...updated, profile: cvData.profile, locker_items: lockerItems };
+        renderCvPreview();
+        alert('✅ CV Changes Saved Successfully!');
       }
     } catch (err) {
       console.error('[CvBuilder] Save failed:', err);
+      alert('❌ Failed to save CV changes: ' + (err.message || 'Server error'));
     }
   }
 
