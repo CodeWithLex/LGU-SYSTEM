@@ -449,4 +449,96 @@ function buildEmailTemplate({ subject, preheader, content }) {
 </html>`;
 }
 
-module.exports = { sendAnnouncementEmail, sendNewEventEmail };
+/**
+ * Sends an account approval notification email via Brevo API (HTTP).
+ */
+async function sendAccountApprovalEmail(userEmail, userName = 'COE Member') {
+  try {
+    const apiInstance = getBrevoApi();
+    if (!apiInstance) return { sent: 0, reason: 'Brevo API key missing' };
+    if (!userEmail) return { sent: 0, reason: 'No recipient email provided' };
+
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.subject = `🎉 Account Verified: Welcome to COE Financial System`;
+    sendSmtpEmail.htmlContent = buildEmailTemplate({
+      subject: `Account Verified & Approved`,
+      preheader: `Good news! Your account has been verified by the COE LGU Admin. You can now log into the portal.`,
+      content: `
+        <!-- Badge -->
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          <tr>
+            <td align="center" style="padding-bottom: 20px;">
+              <span style="
+                display: inline-block;
+                background: #dcfce7;
+                color: #15803d;
+                padding: 6px 18px;
+                border-radius: 100px;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+              ">Account Verified</span>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Greeting & Title -->
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          <tr>
+            <td align="center" style="padding-bottom: 28px;">
+              <h2 style="
+                margin: 0 0 12px;
+                color: #0f172a;
+                font-size: 24px;
+                font-weight: 800;
+                line-height: 1.3;
+              ">Welcome, ${userName}!</h2>
+              <p style="
+                margin: 0;
+                color: #475569;
+                font-size: 15px;
+                line-height: 1.6;
+              ">Your account has been officially <strong>verified and approved</strong> by the admin. You can now log into your account.</p>
+            </td>
+          </tr>
+        </table>
+
+        <!-- CTA Button -->
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          <tr>
+            <td align="center">
+              <a href="${APP_URL}" style="
+                display: inline-block;
+                background: #16a34a;
+                color: #ffffff;
+                padding: 14px 36px;
+                border-radius: 12px;
+                text-decoration: none;
+                font-weight: 700;
+                font-size: 15px;
+                box-shadow: 0 4px 14px rgba(22, 163, 74, 0.25);
+              ">Log In to Account &rarr;</a>
+            </td>
+          </tr>
+        </table>
+      `
+    });
+
+    sendSmtpEmail.sender = {
+      name: "COE Financial Transparency System",
+      email: process.env.BREVO_SENDER_EMAIL || "coebudget@gmail.com"
+    };
+    sendSmtpEmail.to = [{ email: userEmail, name: userName }];
+
+    const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`[Email] Approval email sent to ${userEmail} via Brevo: ${data.messageId}`);
+    return { sent: 1, messageId: data.messageId };
+  } catch (err) {
+    logError('Email Approval Notification Error', err);
+    return { sent: 0, error: err.message };
+  }
+}
+
+module.exports = { sendAnnouncementEmail, sendNewEventEmail, sendAccountApprovalEmail };
+

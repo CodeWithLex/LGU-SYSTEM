@@ -91,6 +91,20 @@
     if (el) Dropdowns.bindDropdown(el);
   });
 
+  // Auto-calculate enrollment year based on selected Year Level (SY 2026-2027 base: 2026)
+  const onboardingYearSelect = document.getElementById('onboarding-year');
+  const onboardingEnrollSelect = document.getElementById('onboarding-enrollment-year');
+  if (onboardingYearSelect && onboardingEnrollSelect) {
+    onboardingYearSelect.addEventListener('change', () => {
+      const y = parseInt(onboardingYearSelect.value, 10);
+      if (y >= 1 && y <= 5) {
+        const computedYear = String(2026 - (y - 1));
+        onboardingEnrollSelect.value = computedYear;
+        Dropdowns.syncAll();
+      }
+    });
+  }
+
   // Every other select in the logged-in app
   Dropdowns.bindAll('#app-screen');
 

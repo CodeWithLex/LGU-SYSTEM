@@ -159,6 +159,7 @@ const Api = (() => {
   const admin = {
     users:          ()         => _request('GET',   '/admin/users', null, false, 30000),
     setRole:        (id, role) => _request('PATCH', `/admin/users/${id}/role`, { role }),
+    verifyUser:     (id)       => _request('POST',  `/admin/users/${id}/verify`),
     auditLogs:      (params={})=> {
       const q = new URLSearchParams(params).toString();
       return _request('GET', `/admin/audit-logs${q ? '?' + q : ''}`, null, false, 30000);

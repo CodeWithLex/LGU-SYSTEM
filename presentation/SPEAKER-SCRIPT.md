@@ -1,6 +1,6 @@
 # Speaker Script: "Asa Kaya Napadulong ang Pondo?"
 ### COE Budget Transparency & Financial Monitoring System
-**Audience:** College of Engineering · **Length:** ~6 minutes (6 slides)
+**Audience:** College of Engineering · **Length:** ~6 minutes (7 slides)
 
 > Tip: Open `COE-System-Presentation.html` in a browser, press **F11** for fullscreen, advance with **→** or click. Slides carry real screenshots of the system, so point at them as you talk. Replace **[Your Name]** on Slide 1 before presenting.
 
@@ -92,8 +92,18 @@
 > **Transparency**: trust is earned in real time, not in a once-a-year report. **Accountability**: every peso has a record and a receipt. **Audit readiness**: the books are organized every single day, not just when auditors arrive. And it's **scalable**: the exact same model works for a student council, a department, or an entire **local government unit**.
 >
 > I'll leave you with this: *"Transparency shouldn't be a report you make once. It should be a system that never sleeps."*
+
+---
+
+## Slide 7: Thank You + Feedback QR
+
+**On slide:** Big "Thank you!" + QR code linking to the feedback form (coelgu-system.engineer/feedback).
+
+> "Thank you for listening. Before we open for questions, one small favor: the system was built for *you*, so we want to know how it feels to use it.
 >
-> Thank you. I'm happy to take questions."
+> Pull out your phones and scan this QR code. It takes you straight to the feedback form — eight questions, about two minutes. Just sign in with your student account and your answers go directly to the council officers.
+>
+> While you scan — I'm happy to take your questions."
 
 ---
 

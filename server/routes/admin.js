@@ -9,6 +9,7 @@ const { logAudit } = require('../lib/audit');
 const { logError } = require('../lib/logger');
 const { requireAdmin, requireGovernorOrAdmin, requireOfficer } = require('../middleware/roles');
 const { createNotification } = require('./notifications');
+const { sendAccountApprovalEmail } = require('../lib/email');
 
 const ASSIGNABLE_ROLES = ['admin', 'student', 'governor', 'cashier', 'officer'];
 const OFFICER_ASSIGNABLE_ROLES = ['student', 'governor', 'cashier', 'officer'];
@@ -17,7 +18,7 @@ const OFFICER_ASSIGNABLE_ROLES = ['student', 'governor', 'cashier', 'officer'];
 router.get('/users', requireOfficer, async (req, res) => {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, email, role, course, year_level, created_at')
+    .select('id, full_name, email, role, course, year_level, is_verified, created_at')
     .order('created_at', { ascending: false });
 
   if (error) return res.status(500).json({ error: 'Failed to fetch users.' });
@@ -45,6 +46,11 @@ router.post('/profile', async (req, res) => {
 
   const role = existing?.role || 'student';
 
+  const yearNum = year_level ? Number(year_level) : null;
+  const computedEnrollmentYear = enrollment_year 
+    ? Number(enrollment_year) 
+    : (yearNum && yearNum >= 1 ? (2026 - (yearNum - 1)) : null);
+
   const updates = {
     id: userId,
     email: email,
@@ -52,7 +58,7 @@ router.post('/profile', async (req, res) => {
     role: role,
     course: course || null,
     year_level: year_level || null,
-    enrollment_year: enrollment_year ? Number(enrollment_year) : null,
+    enrollment_year: computedEnrollmentYear,
     ...(avatar_url !== undefined && { avatar_url })
   };
 
@@ -131,6 +137,58 @@ router.patch('/users/:id/role', async (req, res) => {
   });
 
   res.json(data);
+});
+
+// ── POST /api/admin/users/:id/verify ─────────────────────────────────────────
+// Admins and Governors can verify/approve user accounts and dispatch an automated Gmail email notification.
+router.post('/users/:id/verify', requireGovernorOrAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  if (!isValidUUID(id)) {
+    return res.status(400).json({ error: 'Invalid user ID format.' });
+  }
+
+  // Update profile to set is_verified = true
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ is_verified: true })
+    .eq('id', id)
+    .select('id, full_name, email, role, is_verified')
+    .single();
+
+  if (error || !data) {
+    logError('Verify User Error', error);
+    return res.status(400).json({ error: 'Failed to verify user account.' });
+  }
+
+  // Dispatch approval email notification asynchronously via Brevo / Gmail
+  sendAccountApprovalEmail(data.email, data.full_name).catch(err => {
+    logError('Async Approval Email Error', err);
+  });
+
+  // Audit logging
+  logAudit(req.user.id, 'VERIFY_USER_ACCOUNT', {
+    target_user_id: id,
+    user_name: data.full_name,
+    user_email: data.email,
+    verified_by: req.user.id
+  });
+
+  // In-App Notification
+  createNotification({
+    userId: id,
+    targetRole: 'all',
+    type: 'system',
+    title: `🎉 Account Verified!`,
+    message: `Your account has been officially verified by the admin. You can now access all portal features.`,
+    category: 'system',
+    link: 'dashboard'
+  });
+
+  res.json({
+    message: `User account verified successfully. Approval notification dispatched to ${data.email}.`,
+    user: data
+  });
 });
 
 // ── GET /api/admin/audit-logs (readable by all officers) ─────────────────────

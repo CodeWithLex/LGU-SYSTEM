@@ -7,9 +7,12 @@
 // Usage: node presentation/build-deck.mjs
 // =============================================
 import sharp from 'sharp';
+import QRCode from 'qrcode';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const FEEDBACK_URL = 'https://coelgu-system.engineer/feedback';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SHOTS = path.join(__dirname, 'shots');
@@ -27,6 +30,18 @@ async function png(name) {
   return `data:image/png;base64,${buf.toString('base64')}`;
 }
 
+async function qrFeedback() {
+  // Dark modules on white so phone cameras scan it straight off a projector
+  const buf = await QRCode.toBuffer(FEEDBACK_URL, {
+    type: 'png',
+    width: 640,
+    margin: 1,
+    errorCorrectionLevel: 'M',
+    color: { dark: '#0B0F17', light: '#FFFFFF' },
+  });
+  return `data:image/png;base64,${buf.toString('base64')}`;
+}
+
 async function main() {
   // Grizz chat panel: crop the right-side drawer from the full screenshot
   const grizzCrop = { left: 1880, top: 0, width: 1000, height: 1800 };
@@ -39,6 +54,7 @@ async function main() {
     // Real receipt modal screenshot provided by the owner
     receipt: await jpeg('receipt-real', 843, { quality: 90 }),
     grizz: await png('grizz-mascot'),
+    qrFeedback: await qrFeedback(),
   };
 
   let html = fs.readFileSync(path.join(__dirname, 'deck-template.html'), 'utf8');
