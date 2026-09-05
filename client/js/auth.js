@@ -28,8 +28,13 @@ const Auth = (() => {
   }
 
   async function logout() {
-    if (window.supabaseClient?.auth) {
-      await window.supabaseClient.auth.signOut();
+    if (window.supabaseClient) {
+      if (typeof window.supabaseClient.removeAllChannels === 'function') {
+        try { window.supabaseClient.removeAllChannels(); } catch {}
+      }
+      if (window.supabaseClient.auth) {
+        await window.supabaseClient.auth.signOut();
+      }
     }
   }
 

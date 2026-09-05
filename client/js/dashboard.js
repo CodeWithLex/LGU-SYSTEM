@@ -323,7 +323,9 @@ const Dashboard = (() => {
   }
 
   function destroy() {
-    if (realtimeChannel) window.supabaseClient.removeChannel(realtimeChannel);
+    if (realtimeChannel && window.supabaseClient) {
+      try { window.supabaseClient.removeChannel(realtimeChannel); } catch {}
+    }
     realtimeChannel = null;
   }
 

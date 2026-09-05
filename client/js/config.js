@@ -21,5 +21,16 @@ if (typeof supabase === 'undefined') {
       autoRefreshToken: true,
     },
   });
+
+  // Gracefully tear down Realtime channels when page hides or unloads to avoid abrupt disconnect warnings
+  const cleanupRealtime = () => {
+    if (window.supabaseClient && typeof window.supabaseClient.removeAllChannels === 'function') {
+      try { window.supabaseClient.removeAllChannels(); } catch {}
+    }
+  };
+
+  window.addEventListener('pagehide', cleanupRealtime);
+  window.addEventListener('beforeunload', cleanupRealtime);
 }
+
 
