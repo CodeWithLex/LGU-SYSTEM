@@ -16,6 +16,14 @@
       "dest": "server/index.js"
     },
     {
+      "src": "/cv-builder",
+      "dest": "client/cv-builder.html"
+    },
+    {
+      "src": "/cv-verify",
+      "dest": "client/cv-verify.html"
+    },
+    {
       "src": "/feedback/view",
       "dest": "client/feedback/view/index.html"
     },
