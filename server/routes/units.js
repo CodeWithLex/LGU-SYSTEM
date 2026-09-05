@@ -430,7 +430,7 @@ router.post('/enroll', async (req, res) => {
 
     const { error } = await supabase
       .from('student_units')
-      .insert({
+      .upsert({
         student_id: req.user.id,
         subject_id,
         school_year,
@@ -439,12 +439,11 @@ router.post('/enroll', async (req, res) => {
         grade: normalizeGrade(grade),
         instructor: sanitizeOptionalText(instructor),
         schedule: sanitizeOptionalText(schedule),
+      }, {
+        onConflict: 'student_id,subject_id,school_year,semester',
       });
 
     if (error) {
-      if (error.code === '23505') {
-        return res.status(409).json({ error: 'This subject is already logged for that school year and semester.' });
-      }
       logError('units/enroll', error);
       return res.status(500).json({ error: 'Failed to log the subject.' });
     }
