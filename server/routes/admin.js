@@ -46,10 +46,10 @@ router.post('/profile', async (req, res) => {
 
   const role = existing?.role || 'student';
 
-  const yearNum = year_level ? Number(year_level) : null;
-  const computedEnrollmentYear = enrollment_year 
-    ? Number(enrollment_year) 
-    : (yearNum && yearNum >= 1 ? (2026 - (yearNum - 1)) : null);
+  const yearNum = year_level ? parseInt(String(year_level).replace(/\D/g, ''), 10) : null;
+  const computedEnrollmentYear = (yearNum && yearNum >= 1 && yearNum <= 6)
+    ? (2026 - (yearNum - 1))
+    : (enrollment_year ? Number(enrollment_year) : 2026);
 
   const updates = {
     id: userId,
